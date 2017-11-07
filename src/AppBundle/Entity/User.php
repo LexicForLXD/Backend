@@ -10,6 +10,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use FOS\UserBundle\Model\User as BaseUser;
 
 
 /**
@@ -18,33 +19,65 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Entity
  * @ORM\Table(name="users")
  */
-class User
+class User extends BaseUser
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string")
      */
-    private $firstName;
+    protected $firstName;
 
     /**
      * @ORM\Column(type="string")
      */
-    private $lastName;
+    protected $lastName;
 
     /**
-     * @ORM\Column(type="email", unique=true)
+     * @return mixed
      */
-    private $email;
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
 
     /**
-     * @ORM\Column(type="string", unique=true)
+     * @param mixed $firstName
      */
-    private $apiKey;
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @param mixed $lastName
+     */
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
+    }
+
+
 
 }

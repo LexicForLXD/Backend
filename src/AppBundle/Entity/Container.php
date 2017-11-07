@@ -2,23 +2,24 @@
 /**
  * Created by PhpStorm.
  * User: Leon
- * Date: 06.11.2017
- * Time: 19:10
+ * Date: 07.11.2017
+ * Time: 15:14
  */
+
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use AppBundle\Entity\Container;
+use AppBundle\Entity\Host;
 
 
 /**
- * Class Host
+ * Class Container
  * @package AppBundle\Entity
  * @ORM\Entity
- * @ORM\Table(name="hosts")
+ * @ORM\Table(name="containers")
  */
-class Host
+class Container
 {
     /**
      * @ORM\Id
@@ -52,14 +53,7 @@ class Host
      */
     private $settings;
 
-    /**
-     * @ORM\OneToMany(
-     *     targetEntity="Container",
-     *     mappedBy="host",
-     *     orphanRemoval=true
-     * )
-     */
-    private $containers;
+
 
     /**
      * @return mixed
@@ -157,6 +151,5 @@ class Host
     {
         $this->settings = $settings;
     }
-
 
 }
