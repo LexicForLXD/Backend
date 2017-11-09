@@ -29,12 +29,12 @@ class Container
     private $id;
 
     /**
-     * @ORM\Column(type="inet")
+     * @ORM\Column(type="string")
      */
     private $ipv4;
 
     /**
-     * @ORM\Column(type="inet")
+     * @ORM\Column(type="string")
      */
     private $ipv6;
 
@@ -44,7 +44,7 @@ class Container
     private $name;
 
     /**
-     * @ORM\Column(type="macaddr")
+     * @ORM\Column(type="string")
      */
     private $mac;
 
