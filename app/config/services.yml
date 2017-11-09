@@ -33,3 +33,15 @@ services:
     # AppBundle\Service\ExampleService:
     #     arguments:
     #         $someArgument: 'some_value'
+
+    platform.user.manager:
+        class: Doctrine\ORM\EntityManager
+        factory: ['@doctrine','getManagerForClass']
+        arguments: ['AppBundle\Entity\User']
+    platform.user.repository:
+        class: AppBundle\Repository\UserRepository
+        factory: ['@platform.user.manager','getRepository']
+        arguments: ['AppBundle\Entity\User']
+    platform.user.provider:
+        class: AppBundle\Provider\UserProvider
+        arguments: ['@platform.user.repository']

@@ -2,12 +2,14 @@
 # https://symfony.com/doc/current/security.html
 security:
     encoders:
-        FOS\UserBundle\Model\UserInterface: sha512
+        AppBundle\Entity\User:
+                    algorithm: bcrypt
 
     # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
     providers:
-        fos_userbundle:
-            id: fos_user.user_provider.username
+        user_db_provider:
+            entity:
+              class: AppBundle:User
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs

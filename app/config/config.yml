@@ -90,14 +90,6 @@ fos_rest:
     view:
         view_response_listener: true
 
-fos_user:
-    db_driver: orm
-    firewall_name: api                                  # Seems to be used when registering user/reseting password,
-    from_email:
-            address: info@leonlenzen.de
-            sender_name: You                                                  # but since there is no "login", as so it seems to be useless in
-                                                        # our particular context, but still required by "FOSUserBundle"
-    user_class: AppBundle\Entity\User
 
 fos_oauth_server:
     db_driver:           orm
@@ -106,4 +98,4 @@ fos_oauth_server:
     refresh_token_class: AppBundle\Entity\RefreshToken
     auth_code_class:     AppBundle\Entity\AuthCode
     service:
-        user_provider: fos_user.user_provider.username_email            # This property will be used when valid credentials are given to load the user upon access token creation
+        user_provider: platform.user.provider           # This property will be used when valid credentials are given to load the user upon access token creation
