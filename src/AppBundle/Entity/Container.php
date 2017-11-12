@@ -54,15 +54,6 @@ class Container
     private $settings;
 
 
-
-    /**
-     * @return mixed
-     */
-    public function getContainers()
-    {
-        return $this->containers;
-    }
-
     /**
      * @return mixed
      */
