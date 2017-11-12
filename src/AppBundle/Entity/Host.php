@@ -9,7 +9,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use AppBundle\Entity\Container;
+
 
 
 /**
@@ -28,46 +28,35 @@ class Host
     private $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
      */
     private $ipv4;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
      */
     private $ipv6;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     */
+    private $domainName;
+
+    /**
+     * @ORM\Column(type="string", unique=true)
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
      */
     private $mac;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="string")
      */
     private $settings;
 
-    /**
-     * @ORM\OneToMany(
-     *     targetEntity="Container",
-     *     mappedBy="host",
-     *     orphanRemoval=true
-     * )
-     */
-    private $containers;
-
-    /**
-     * @return mixed
-     */
-    public function getContainers()
-    {
-        return $this->containers;
-    }
 
     /**
      * @return mixed
@@ -76,7 +65,6 @@ class Host
     {
         return $this->id;
     }
-
 
     /**
      * @return mixed
@@ -92,6 +80,22 @@ class Host
     public function getIpv6()
     {
         return $this->ipv6;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDomainName()
+    {
+        return $this->domainName;
+    }
+
+    /**
+     * @param mixed $domainName
+     */
+    public function setDomainName($domainName)
+    {
+        $this->domainName = $domainName;
     }
 
     /**
@@ -158,5 +162,31 @@ class Host
         $this->settings = $settings;
     }
 
+    /** @see \Serializable::serialize() */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->name,
+            $this->ipv4,
+            $this->ipv6,
+            $this->domainName,
+            $this->mac,
+            $this->settings
+        ));
+    }
 
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->name,
+            $this->ipv4,
+            $this->ipv6,
+            $this->domainName,
+            $this->mac,
+            $this->settings
+            ) = unserialize($serialized);
+    }
 }
