@@ -1,5 +1,4 @@
-# Select image from https://hub.docker.com/_/php/
-image: php:7.0-alpine
+image: epcallan/php7-testing-phpunit:7.1-phpunit5
  
 # Select what we should cache
 cache:
@@ -7,18 +6,10 @@ cache:
   - vendor/
  
 before_script:
-# Install git, the php image doesn't have installed
-- apt-get update -yqq
-- apt-get install git -yqq
- 
-# Install composer
-- curl -sS https://getcomposer.org/installer | php
- 
-# Install all project dependencies
-- php composer.phar install
+  - composer install
  
 # We test PHP7
-test:php7:
+test:php7.1:
   image: php:7
   script:
   - phpunit --coverage-text
