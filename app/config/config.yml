@@ -103,7 +103,7 @@ fos_oauth_server:
 nelmio_cors:
     defaults:
         allow_credentials: false
-        allow_origin: [*]
+        allow_origin: ['*']
         allow_headers: []
         allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
         expose_headers: []
