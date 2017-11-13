@@ -1,4 +1,4 @@
-image: epcallan/php7-testing-phpunit:7.1-phpunit5
+image: janrtr/php7-testing-phpunit:7.1-phpunit5
  
 # Select what we should cache
 cache:
@@ -14,7 +14,6 @@ variables:
   POSTGRES_PASSWORD: "test"
  
 before_script:
-  - docker-php-ext-install pdo_pgsql
   - composer install
 
 php7.1:
