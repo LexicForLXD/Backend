@@ -1,4 +1,4 @@
-image: janrtr/php7-testing-phpunit:7.1-phpunit5
+image: janrtr/docker-phpunit-php7:7.1-phpunit5
  
 # Select what we should cache
 cache:
