@@ -5,6 +5,8 @@
  * Date: 11.11.2017
  * Time: 22:53
  */
+ namespace AppBundle\Service\LxdApi\Endpoints;
+ 
 
 use GuzzleHttp\Psr7\Request;
 use AppBundle\Service\Util\ResponseFormat;
