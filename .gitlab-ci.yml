@@ -7,9 +7,8 @@ cache:
  
 before_script:
   - composer install
- 
-# We test PHP7
-test:php7.1:
-  image: php:7
+
+in_docker:
+  stage: test
   script:
-  - phpunit --coverage-text
+    - phpunit --coverage-text
