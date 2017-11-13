@@ -14,7 +14,7 @@ variables:
   POSTGRES_PASSWORD: "test"
  
 before_script:
-  - apt-get install pdo_pgsql
+  - docker-php-ext-install pdo_pgsql
   - composer install
 
 php7.1:
