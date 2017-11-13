@@ -4,11 +4,19 @@ image: epcallan/php7-testing-phpunit:7.1-phpunit5
 cache:
   paths:
   - vendor/
+
+services:
+  - postgres:latest
+
+variables:
+  POSTGRES_DB: syp-lxc
+  POSTGRES_USER: runner
+  POSTGRES_PASSWORD: "test"
  
 before_script:
   - composer install
 
-in_docker:
+php7.1:
   stage: test
   script:
     - phpunit --coverage-text
