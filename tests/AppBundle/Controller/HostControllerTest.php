@@ -3,6 +3,7 @@
 namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Entity\Host;
 
 class HostControllerTest extends WebTestCase
 {
@@ -44,5 +45,8 @@ class HostControllerTest extends WebTestCase
                 "settings": "sldkasdaldk"
             }'
         );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode());
+
     }
 }
