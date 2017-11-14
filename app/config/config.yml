@@ -77,7 +77,12 @@ swiftmailer:
     password: '%mailer_password%'
     spool: { type: memory }
 
-nelmio_api_doc: ~
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Lexci API
+            description: Backend for new LXD ui
+            version: 0.0.1
 
 fos_rest:
     routing_loader:
