@@ -78,6 +78,10 @@ swiftmailer:
     spool: { type: memory }
 
 nelmio_api_doc:
+    routes:
+        path_patterns: # an array of regexps
+            - ^/[^_doc]
+            - ^/oauth
     documentation:
         info:
             title: Lexci API
