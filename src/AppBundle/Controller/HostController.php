@@ -28,10 +28,12 @@ class HostController extends Controller
      *     response=200,
      *     description="Zeigt eine Liste aller Hosts an",
      *     @SWG\Schema(
-     *         type="array",
-     *         @Model(type=Host::class, groups={"full"})
+     *          type="array",
+     *          @Model(type=Host::class)
      *     )
      * )
+     *
+     * @SWG\Tag(name="hosts")
      */
     public function indexAction()
     {
@@ -51,47 +53,49 @@ class HostController extends Controller
      *
      * @SWG\Response(
      *     response=201,
-     *     description="speichert einen neuen host und gibt diesen zurück",
-     *     @SWG\Schema(
-     *         type="item",
-     *         @Model(type=Host::class, groups={"full"})
-     *     )
+     *     description="gibt den gespeicherten Host zurück",
+     *      @Model(type=Host::class)
      * )
      *
      * @SWG\Parameter(
      *     name="ipv4",
      *     in="body",
-     *     type="string",
-     *     description="IPv4 Adresse des Hosts"
+     *required=true,
+     *     description="IPv4 Adresse des Hosts",
+     *     @SWG\Schema(@SWG\Schema(type="string"))
      * )
      * @SWG\Parameter(
      *     name="ipv6",
      *     in="body",
-     *     type="string",
+     *required=true,
+     *     @SWG\Schema(@SWG\Schema(type="string")),
      *     description="IPv6 Adresse des Hosts"
      * )
-     *@SWG\Parameter(
+     * @SWG\Parameter(
      *     name="domain_name",
      *     in="body",
-     *     type="string",
+     *     @SWG\Schema(@SWG\Schema(type="string")),
      *     description="FQDN des Hosts"
      * )
-     *@SWG\Parameter(
+     * @SWG\Parameter(
      *     name="name",
      *     in="body",
-     *     type="string",
+     *required=true,
+     *     @SWG\Schema(@SWG\Schema(type="string")),
      *     description="Name des Hosts"
      * )
      * @SWG\Parameter(
      *     name="mac",
      *     in="body",
-     *     type="string",
+     *required=true,
+     *     @SWG\Schema(@SWG\Schema(type="string")),
      *     description="MAC Adresse des Hosts"
      * )
      * @SWG\Parameter(
      *     name="settings",
      *     in="body",
-     *     type="string",
+     *required=true,
+     *     @SWG\Schema(type="string"),
      *     description="Sonstige Settings des Hosts"
      * )
      *
@@ -131,11 +135,8 @@ class HostController extends Controller
      *
      * @SWG\Response(
      *     response=200,
-     *     description="speichert einen neuen host und gibt diesen zurück",
-     *     @SWG\Schema(
-     *         type="item",
-     *         @Model(type=Host::class, groups={"full"})
-     *    )
+     *     description="gibt einen Host zurück",
+     *      @Model(type=Host::class)
      * )
      *
      * @SWG\Tag(name="hosts")
@@ -146,7 +147,7 @@ class HostController extends Controller
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id '.$id
+                'No host found for id ' . $id
             );
         }
 
@@ -172,47 +173,49 @@ class HostController extends Controller
      * @SWG\Parameter(
      *     name="ipv4",
      *     in="body",
-     *     type="string",
+     *     required=true,
+     *     @SWG\Schema(type="string"),
      *     description="IPv4 Adresse des Hosts"
      * )
      * @SWG\Parameter(
      *     name="ipv6",
      *     in="body",
-     *     type="string",
+     *     required=true,
+     *     @SWG\Schema(type="string"),
      *     description="IPv6 Adresse des Hosts"
      * )
      * @SWG\Parameter(
      *     name="domain_name",
      *     in="body",
-     *     type="string",
+     *     @SWG\Schema(type="string"),
      *     description="FQDN des Hosts"
      * )
      * @SWG\Parameter(
      *     name="name",
      *     in="body",
-     *     type="string",
+     *required=true,
+     *     @SWG\Schema(type="string"),
      *     description="Name des Hosts"
      * )
      * @SWG\Parameter(
      *     name="mac",
      *     in="body",
-     *     type="string",
+     *required=true,
+     *     @SWG\Schema(type="string"),
      *     description="MAC Adresse des Hosts"
      * )
      * @SWG\Parameter(
      *     name="settings",
      *     in="body",
-     *     type="string",
+     *required=true,
+     *     @SWG\Schema(type="string"),
      *     description="Sonstige Settings des Hosts"
      * )
      *
      * @SWG\Response(
      *     response=200,
-     *     description="speichert einen neuen host und gibt diesen zurück",
-     *     @SWG\Schema(
-     *         type="item",
-     *         @Model(type=Host::class, groups={"full"})
-     *    )
+     *     description="gibt den bearbeiteten Host zurück",
+     *     @Model(type=Host::class)
      * )
      *
      * @SWG\Tag(name="hosts")
@@ -223,7 +226,7 @@ class HostController extends Controller
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id '.$id
+                'No host found for id ' . $id
             );
         }
 
@@ -259,6 +262,8 @@ class HostController extends Controller
      *     response=200,
      *     description="löscht einen Host",
      * )
+     *
+     * @SWG\Tag(name="hosts")
      */
     public function deleteAction($id, EntityManagerInterface $em)
     {
@@ -266,7 +271,7 @@ class HostController extends Controller
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id '.$id
+                'No host found for id ' . $id
             );
         }
 
