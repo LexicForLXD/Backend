@@ -116,7 +116,7 @@ class HostController extends Controller
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($host, 'json');
-        return new Response($response);
+        return new Response($response, Response::HTTP_CREATED);
     }
 
     /**
