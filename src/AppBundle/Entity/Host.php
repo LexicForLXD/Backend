@@ -38,7 +38,6 @@ class Host
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip(
      *     version = 6
-     *     message = "{{value}}'is no valid IPv6-address"
      * )
      */
     private $ipv6;
