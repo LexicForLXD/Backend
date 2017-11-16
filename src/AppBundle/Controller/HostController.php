@@ -54,47 +54,47 @@ class HostController extends Controller
      * @SWG\Response(
      *     response=201,
      *     description="gibt den gespeicherten Host zurück",
-     *      @Model(type=Host::class)
+     *     @Model(type=Host::class)
      * )
      *
      * @SWG\Parameter(
      *     name="ipv4",
      *     in="body",
-     *required=true,
+     *     required=true,
      *     description="IPv4 Adresse des Hosts",
-     *     @SWG\Schema(@SWG\Schema(type="string"))
+     *     <@SWG\Schema(type="string")
      * )
      * @SWG\Parameter(
      *     name="ipv6",
      *     in="body",
-     *required=true,
-     *     @SWG\Schema(@SWG\Schema(type="string")),
+     *     required=true,
+     *     @SWG\Schema(type="string"),
      *     description="IPv6 Adresse des Hosts"
      * )
      * @SWG\Parameter(
      *     name="domain_name",
      *     in="body",
-     *     @SWG\Schema(@SWG\Schema(type="string")),
+     *     @SWG\Schema(type="string"),
      *     description="FQDN des Hosts"
      * )
      * @SWG\Parameter(
      *     name="name",
      *     in="body",
-     *required=true,
-     *     @SWG\Schema(@SWG\Schema(type="string")),
+     *     required=true,
+     *     @SWG\Schema(type="string"),
      *     description="Name des Hosts"
      * )
      * @SWG\Parameter(
      *     name="mac",
      *     in="body",
-     *required=true,
-     *     @SWG\Schema(@SWG\Schema(type="string")),
+     *     required=true,
+     *     @SWG\Schema(type="string"),
      *     description="MAC Adresse des Hosts"
      * )
      * @SWG\Parameter(
      *     name="settings",
      *     in="body",
-     *required=true,
+     *     required=true,
      *     @SWG\Schema(type="string"),
      *     description="Sonstige Settings des Hosts"
      * )
@@ -111,6 +111,15 @@ class HostController extends Controller
         $host->setMac($request->request->get('mac'));
         $host->setName($request->request->get('name'));
         $host->setSettings($request->request->get('settings'));
+
+        $validator = $this->get('validator');
+        $errors = $validator->validate($host);
+
+        if (count($errors) > 0) {
+            $errorsString = (string)$errors;
+            return new Response($errorsString);
+        }
+
         $em->persist($host);
         $em->flush();
 
@@ -180,7 +189,6 @@ class HostController extends Controller
      * @SWG\Parameter(
      *     name="ipv6",
      *     in="body",
-     *     required=true,
      *     @SWG\Schema(type="string"),
      *     description="IPv6 Adresse des Hosts"
      * )
@@ -193,21 +201,21 @@ class HostController extends Controller
      * @SWG\Parameter(
      *     name="name",
      *     in="body",
-     *required=true,
+     *     required=true,
      *     @SWG\Schema(type="string"),
      *     description="Name des Hosts"
      * )
      * @SWG\Parameter(
      *     name="mac",
      *     in="body",
-     *required=true,
+     *     required=true,
      *     @SWG\Schema(type="string"),
      *     description="MAC Adresse des Hosts"
      * )
      * @SWG\Parameter(
      *     name="settings",
      *     in="body",
-     *required=true,
+     *     required=true,
      *     @SWG\Schema(type="string"),
      *     description="Sonstige Settings des Hosts"
      * )

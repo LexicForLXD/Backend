@@ -9,6 +9,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 
@@ -29,16 +30,22 @@ class Host
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
+     * @Assert\Ip
      */
     private $ipv4;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
+     * @Assert\Ip(
+     *     version = 6
+     *     message = "{{value}}'is no valid IPv6-address"
+     * )
      */
     private $ipv6;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
+     * @Assert\Regex("/[.]/")
      */
     private $domainName;
 
