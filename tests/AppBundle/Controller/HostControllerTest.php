@@ -249,7 +249,7 @@ class HostControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $crawler = $client->request(
-            'PUT',
+            'DELETE',
             '/hosts/99',
             [],
             [],
@@ -260,5 +260,22 @@ class HostControllerTest extends WebTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
+    }
+
+    public function testDeleteValid()
+    {
+        $client = static::createClient();
+        $crawler = $client->request(
+            'DELETE',
+            '/hosts/1',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ]
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode());
     }
 }
