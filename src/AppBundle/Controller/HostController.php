@@ -117,7 +117,7 @@ class HostController extends Controller
 
         if (count($errors) > 0) {
             $errorsString = (string)$errors;
-            return new Response($errorsString);
+            return new Response($errorsString, 400);
         }
 
         $em->persist($host);
@@ -244,6 +244,14 @@ class HostController extends Controller
         $host->setMac($request->request->get('mac'));
         $host->setName($request->request->get('name'));
         $host->setSettings($request->request->get('settings'));
+
+        $validator = $this->get('validator');
+        $errors = $validator->validate($host);
+        if (count($errors) > 0) {
+            $errorsString = (string)$errors;
+            return new Response($errorsString, 400);
+        }
+
         $em->flush();
 
         $serializer = $this->get('jms_serializer');
@@ -286,7 +294,7 @@ class HostController extends Controller
         $em->remove($host);
         $em->flush();
 
-        return $this->json(array('message' => 'erfolgreich gelöscht'));
+        return $this->json([], 204);
     }
 
 }
