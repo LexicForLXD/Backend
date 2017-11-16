@@ -10,7 +10,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
@@ -18,6 +18,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="hosts")
+ * @UniqueEntity("ipv4")
+ * @UniqueEntity("ipv6")
+ * @UniqueEntity("domainName")
+ * @UniqueEntity("name")
+ * @UniqueEntity("mac")
  */
 class Host
 {
@@ -36,9 +41,7 @@ class Host
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\Ip(
-     *     version = 6
-     * )
+     * @Assert\Ip(version = 6)
      */
     private $ipv6;
 
@@ -50,11 +53,12 @@ class Host
 
     /**
      * @ORM\Column(type="string", unique=true)
+     * @Assert\NotNull()
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $mac;
 
