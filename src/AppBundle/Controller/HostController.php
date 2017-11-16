@@ -62,7 +62,7 @@ class HostController extends Controller
      *     in="body",
      *     required=true,
      *     description="IPv4 Adresse des Hosts",
-     *     <@SWG\Schema(type="string")
+     *     @SWG\Schema(type="string")
      * )
      * @SWG\Parameter(
      *     name="ipv6",
