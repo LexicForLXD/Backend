@@ -14,6 +14,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 
@@ -112,12 +113,9 @@ class HostController extends Controller
         $host->setName($request->request->get('name'));
         $host->setSettings($request->request->get('settings'));
 
-        $validator = $this->get('validator');
-        $errors = $validator->validate($host);
-
-        if (count($errors) > 0) {
-            $errorsString = (string)$errors;
-            return new Response($errorsString, 400);
+        if($errorArray = $this->validation($host))
+        {
+            return new JsonResponse(['errors' => $errorArray], 400);
         }
 
         $em->persist($host);
@@ -245,11 +243,9 @@ class HostController extends Controller
         $host->setName($request->request->get('name'));
         $host->setSettings($request->request->get('settings'));
 
-        $validator = $this->get('validator');
-        $errors = $validator->validate($host);
-        if (count($errors) > 0) {
-            $errorsString = (string)$errors;
-            return new Response($errorsString, 400);
+        if($errorArray = $this->validation($host))
+        {
+            return new JsonResponse(['errors' => $errorArray], 400);
         }
 
         $em->flush();
@@ -295,6 +291,21 @@ class HostController extends Controller
         $em->flush();
 
         return $this->json([], 204);
+    }
+
+    private function validation($object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
+
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $errorArray;
+        }
+        return false;
     }
 
 }
