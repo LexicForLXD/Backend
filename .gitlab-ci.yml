@@ -36,4 +36,5 @@ deploy:dev:
   script:
     # Trigger deploy webhook with secret
     - curl "https://lxd-api.lleon.de/"
+  when: on_success
 
