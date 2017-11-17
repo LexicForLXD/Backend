@@ -4,20 +4,20 @@ stages:
   - test
   - deploy
 
-# Select what we should cache
-cache:
-  paths:
-  - vendor/
-
-services:
-  - postgres:latest
-
 variables:
   POSTGRES_DB: syp-lxc
   POSTGRES_USER: runner
   POSTGRES_PASSWORD: "test"
 
 test:php7.1:
+  # Select what we should cache
+  cache:
+    paths:
+    - vendor/
+
+  services:
+    - postgres:latest
+
   stage: test
   before_script:
   - composer install
@@ -25,6 +25,14 @@ test:php7.1:
     - phpunit --coverage-text
 
 test:php7.0:
+  # Select what we should cache
+  cache:
+    paths:
+    - vendor/
+
+  services:
+    - postgres:latest
+
   stage: test
   image: janrtr/docker-phpunit-php7:7.0-phpunit6
   before_script:
