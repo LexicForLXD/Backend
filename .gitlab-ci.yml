@@ -16,7 +16,13 @@ variables:
 before_script:
   - composer install
 
-php7.1:
+test:php7.1:
   stage: test
+  script:
+    - phpunit --coverage-text
+
+test:php7.0:
+  stage: test
+  image: janrtr/docker-phpunit-php7:7.0-phpunit6
   script:
     - phpunit --coverage-text
