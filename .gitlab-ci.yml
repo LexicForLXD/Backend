@@ -16,23 +16,24 @@ variables:
   POSTGRES_DB: syp-lxc
   POSTGRES_USER: runner
   POSTGRES_PASSWORD: "test"
- 
-before_script:
-  - composer install
 
 test:php7.1:
   stage: test
+  before_script:
+  - composer install
   script:
     - phpunit --coverage-text
 
 test:php7.0:
   stage: test
   image: janrtr/docker-phpunit-php7:7.0-phpunit6
+  before_script:
+  - composer install
   script:
     - phpunit --coverage-text
 
 deploy:dev:
-  image: ruby:2.1
+  image: byrnedo/alpine-curl
   stage: deploy
   script:
     # Trigger deploy webhook with secret
