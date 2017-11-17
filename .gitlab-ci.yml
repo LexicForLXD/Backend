@@ -1,5 +1,9 @@
 image: janrtr/docker-phpunit-php7:7.1-phpunit6
  
+stages:
+  - test
+  - deploy
+
 # Select what we should cache
 cache:
   paths:
@@ -26,3 +30,10 @@ test:php7.0:
   image: janrtr/docker-phpunit-php7:7.0-phpunit6
   script:
     - phpunit --coverage-text
+
+deploy:dev:
+  image: ruby:2.1
+  script:
+    # Trigger deploy webhook with secret
+    - curl "https://lxd-api.lleon.de/"
+
