@@ -33,6 +33,7 @@ test:php7.0:
 
 deploy:dev:
   image: ruby:2.1
+  stage: deploy
   script:
     # Trigger deploy webhook with secret
     - curl "https://lxd-api.lleon.de/"
