@@ -64,7 +64,7 @@ deploy:dev:
 
   script:
     # try to connect to GitLab.com
-    - ssh deploy@2a02:c207:3002:3224::4
+    - ssh -t deploy@2a02:c207:3002:3224::4
 
     - cd Backend
 
