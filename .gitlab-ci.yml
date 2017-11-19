@@ -20,7 +20,9 @@ test:php7.1:
 
   stage: test
   before_script:
-  - composer install
+    - composer install
+    - php bin/console doctrine:schema:update --force
+    - php bin/console doctrine:fixtures:load
   script:
     - phpunit --coverage-text
 
@@ -36,15 +38,40 @@ test:php7.0:
   stage: test
   image: janrtr/docker-phpunit-php7:7.0-phpunit6
   before_script:
-  - composer install
+    - composer install
+    - php bin/console doctrine:schema:update --force
+    - php bin/console doctrine:fixtures:load
   script:
     - phpunit --coverage-text
 
 deploy:dev:
-  image: byrnedo/alpine-curl
-  stage: deploy
+  image: ruby:2.1
+  before_script:
+  # install ssh-agent
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+
+  # run ssh-agent
+  - eval $(ssh-agent -s)
+
+  # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+
+  # disable host key checking (NOTE: makes you susceptible to man-in-the-middle attacks)
+  # WARNING: use only in docker container, if you use it with shell you will overwrite your user's ssh config
+  - mkdir -p ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
   script:
-    # Trigger deploy webhook with secret
-    - curl "https://lxd-api.lleon.de/"
-  when: on_success
+    # try to connect to GitLab.com
+    - ssh ssh deploy@2a02:c207:3002:3224::4
+
+    - cd Backend
+
+    - git pull
+
+    - composer install
+    
+    #copy to web folder
+    - cp -R *  /var/www/html
+
 
