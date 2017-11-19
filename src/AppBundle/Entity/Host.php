@@ -63,7 +63,7 @@ class Host
     private $mac;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $port;
 
