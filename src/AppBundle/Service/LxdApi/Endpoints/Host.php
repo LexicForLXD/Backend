@@ -18,7 +18,7 @@ class Host extends AbstractEndpoint
         return '';
     }
 
-    
+
 
     /**
      *  Server configuration and environment information
@@ -39,5 +39,10 @@ class Host extends AbstractEndpoint
     {
         $info = $this->info();
         return $info['auth'] === 'trusted' ? true : false;
+    }
+
+    public function authenticate($data)
+    {
+        return $this->post('/certificates', $data);
     }
 }

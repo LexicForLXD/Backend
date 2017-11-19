@@ -309,6 +309,62 @@ class HostController extends Controller
         return $this->json([], 204);
     }
 
+    /**
+     * @Route("/hosts/{id}", name="hosts_authorize", methods={"POST"})
+     * 
+     * push the client certificate to server
+     *
+     * @param Request $request
+     * @param [integer] $id
+     * @return void
+     *
+     * @SWG\Parameter(
+     *  description="ID des Host",
+     *  format="int64",
+     *  in="path",
+     *  name="id",
+     *  required=true,
+     *  type="integer"
+     * )
+     *
+     * @SWG\Parameter(
+     *  description="password of lxd host",
+     *  format="int64",
+     *  in="body",
+     *  name="password",
+     *  required=true,
+     *  @SWG\Schema(type="string"),
+     * )
+     *
+     * @SWG\Response(
+     *  response = 200,
+     *  description="erfolgsmeldung"
+     * )
+     *
+     * @SWG\Tag(name = "hosts")
+     */
+    public function authorizeAction(Request $request, $id)
+    {
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($id);
+
+        if (!$host) {
+            throw $this->createNotFoundException(
+                'No host found for id ' . $id
+            );
+        }
+
+        $client = new ApiClient($host);
+        $hostApi = new \AppBundle\Service\LxdApi\Endpoints\Host($client);
+
+        $data = [
+            "type" => "client",
+            "password" => $request->get("password")
+        ];
+
+        return $hostApi->authenticate($data);
+
+    }
+
     private function validation($object)
     {
         $validator = $this->get('validator');
@@ -323,5 +379,7 @@ class HostController extends Controller
         }
         return false;
     }
+
+
 
 }
