@@ -63,6 +63,11 @@ class Host
     private $mac;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $port;
+
+    /**
      * @ORM\Column(type="string")
      */
     private $settings;
@@ -172,6 +177,17 @@ class Host
         $this->settings = $settings;
     }
 
+
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    public function setPort($port)
+    {
+        $this->port = $port;
+    }
+
     /** @see \Serializable::serialize() */
     public function serialize()
     {
@@ -182,6 +198,7 @@ class Host
             $this->ipv6,
             $this->domainName,
             $this->mac,
+            $this->port,
             $this->settings
         ));
     }
@@ -196,6 +213,7 @@ class Host
             $this->ipv6,
             $this->domainName,
             $this->mac,
+            $this->port,
             $this->settings
             ) = unserialize($serialized);
     }

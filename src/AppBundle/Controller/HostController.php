@@ -99,6 +99,13 @@ class HostController extends Controller
      *     @SWG\Schema(type="string"),
      *     description="Sonstige Settings des Hosts"
      * )
+     * @SWG\Parameter(
+     *     name="port",
+     *     in="body",
+     *     required=false,
+     *     @SWG\Schema(type="integer"),
+     *     description="Port für lxd"
+     * )
      *
      * @SWG\Tag(name="hosts")
      */
@@ -111,6 +118,7 @@ class HostController extends Controller
         $host->setDomainName($request->request->get('domain_name'));
         $host->setMac($request->request->get('mac'));
         $host->setName($request->request->get('name'));
+        $host->setPort($request->request->get('port'));
         $host->setSettings($request->request->get('settings'));
 
         if($errorArray = $this->validation($host))
@@ -217,6 +225,13 @@ class HostController extends Controller
      *     @SWG\Schema(type="string"),
      *     description="Sonstige Settings des Hosts"
      * )
+     * @SWG\Parameter(
+     *     name="port",
+     *     in="body",
+     *     required=false,
+     *     @SWG\Schema(type="integer"),
+     *     description="Port für lxd"
+     * )
      *
      * @SWG\Response(
      *     response=200,
@@ -241,6 +256,7 @@ class HostController extends Controller
         $host->setDomainName($request->request->get('domain_name'));
         $host->setMac($request->request->get('mac'));
         $host->setName($request->request->get('name'));
+        $host->setPort($request->request->get('port'));
         $host->setSettings($request->request->get('settings'));
 
         if($errorArray = $this->validation($host))
