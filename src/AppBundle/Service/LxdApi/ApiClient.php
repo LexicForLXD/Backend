@@ -33,14 +33,14 @@ class ApiClient
     private $client;
 
 
-    public function __construct($hostname =null, $apiVersion = null, $port = null)
+    public function __construct($hostname =null, $port = null, $apiVersion = null)
     {
         $this->port = $port ?: '8443';
-        $this->url = 'https://'.$hostname.'/'.$this->port ?: 'https://127.0.0.1:8443';
+        $this->url = 'https://'.$hostname.':'.$this->port.'/' ?: 'https://127.0.0.1:8443';
         $this->apiVersion = $apiVersion ?: '1.0';
 
         $this->client = new Client([
-            'base_uri' => ['{url}/{version}', ['url' => $this->url, 'version' => $this->apiVersion]],
+            'base_uri' => $this->url.'/'.$this->apiVersion,
             'defaults' => [
                 'headers' => ['Content-Type' => 'application/json'],
                 'cert' => ['~/.config/lxc/client.crt']
