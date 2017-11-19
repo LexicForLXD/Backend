@@ -5,25 +5,20 @@
  * Date: 11.11.2017
  * Time: 22:53
  */
+namespace AppBundle\Service\LxdApi\Endpoints;
+
 
 use AppBundle\Service\Util\ResponseFormat;
-use \AppBundle\Service\LxdApi\ApiClient;
+use AppBundle\Service\LxdApi\ApiClient;
 
 class Host extends AbstractEndpoint
 {
-    protected function getEndpoint()
+    protected function getEndpoint($urlParam = NULL)
     {
         return '';
     }
 
-    /**
-     * A LXD Host
-     * @param ApiClient $client
-     */
-    public function __construct(ApiClient $client)
-    {
-        $this->client = $client;
-    }
+    
 
     /**
      *  Server configuration and environment information
