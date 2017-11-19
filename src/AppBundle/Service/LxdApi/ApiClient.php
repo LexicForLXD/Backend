@@ -33,17 +33,22 @@ class ApiClient
     private $client;
 
 
-    public function __construct($hostname =null, $port = null, $apiVersion = null)
+    public function __construct($host = null, $apiVersion = null)
     {
-        $this->port = $port ?: '8443';
-        $this->url = 'https://'.$hostname.':'.$this->port.'/' ?: 'https://127.0.0.1:8443';
+        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
+
+
+        $this->port = $host->getPort() ?: '8443';
+        $this->url = 'https://'.$hostname.':'.$this->port.'/';
         $this->apiVersion = $apiVersion ?: '1.0';
 
         $this->client = new Client([
             'base_uri' => $this->url.'/'.$this->apiVersion,
             'defaults' => [
                 'headers' => ['Content-Type' => 'application/json'],
-                'cert' => ['~/.config/lxc/client.crt']
+                'cert' => ['~/Downloads/93297610_192.168.10.42.cert'],
+                'ssl_key' => ['~/Downloads/93297610_192.168.10.42.key'],
+                'verify' => false
             ]
         ]);
     }
