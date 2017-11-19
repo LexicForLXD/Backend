@@ -1,10 +1,11 @@
 <?php
+namespace AppBundle\Service\LxdApi\Endpoints;
 
 use \AppBundle\Service\LxdApi\ApiClient;
 
-class Container extends AbstractEndpoint
+class ContainerState extends AbstractEndpoint
 {
-    public function getEndpoint($containerName)
+    public function getEndpoint($urlParam = NULL)
     {
         return '/containers/'.$containerName.'/state';
     }
