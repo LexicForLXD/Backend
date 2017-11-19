@@ -188,6 +188,22 @@ class Host
         $this->port = $port;
     }
 
+    /**
+     * Checks if the host has at least on URI
+     *
+     * @Assert\IsTrue(message = "You have to use at least one of the following: ipv4, ipv6, domainname")
+     *
+     * @return boolean
+     */
+    public function hasUri(){
+        if($this->ipv4 || $this->ipv6 || $this->domainName)
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /** @see \Serializable::serialize() */
     public function serialize()
     {
