@@ -8,9 +8,11 @@
 
 namespace AppBundle\Entity;
 
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use AppBundle\Entity\Host;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
@@ -43,10 +45,6 @@ class Container
      */
     private $name;
 
-    /**
-     * @ORM\Column(type="string")
-     */
-    private $mac;
 
     /**
      * @ORM\Column(type="text")
@@ -111,21 +109,6 @@ class Container
         $this->name = $name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMac()
-    {
-        return $this->mac;
-    }
-
-    /**
-     * @param mixed $mac
-     */
-    public function setMac($mac)
-    {
-        $this->mac = $mac;
-    }
 
     /**
      * @return mixed
@@ -143,4 +126,27 @@ class Container
         $this->settings = $settings;
     }
 
+    /** @see \Serializable::serialize() */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->name,
+            $this->ipv4,
+            $this->ipv6,
+            $this->settings
+        ));
+    }
+
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->name,
+            $this->ipv4,
+            $this->ipv6,
+            $this->settings
+            ) = unserialize($serialized);
+    }
 }
