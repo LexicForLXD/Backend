@@ -1,23 +1,16 @@
 <?php
+namespace AppBundle\Service\LxdApi\Endpoints;
 
 use AppBundle\Service\Util\ResponseFormat;
 use \AppBundle\Service\LxdApi\ApiClient;
 
 class Container extends AbstractEndpoint
 {
-    protected function getEndpoint()
+    protected function getEndpoint($urlParam = NULL)
     {
         return '/containers';
     }
 
-    /**
-     * A LXD Host
-     * @param ApiClient $client
-     */
-    public function __construct(ApiClient $client)
-    {
-        $this->client = $client;
-    }
 
     /**
      *  List of all containers on one host
@@ -34,7 +27,7 @@ class Container extends AbstractEndpoint
      *
      * @return object
      */
-    public function delete($containerName)
+    public function remove($containerName)
     {
         return $this->delete($this->getEndpoint().'/'.$containerName);
     }
