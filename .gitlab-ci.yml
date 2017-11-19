@@ -9,43 +9,44 @@ variables:
   POSTGRES_USER: runner
   POSTGRES_PASSWORD: "test"
 
-test:php7.1:
-  # Select what we should cache
-  cache:
-    paths:
-    - vendor/
+# test:php7.1:
+#   # Select what we should cache
+#   cache:
+#     paths:
+#     - vendor/
 
-  services:
-    - postgres:latest
+#   services:
+#     - postgres:latest
 
-  stage: test
-  before_script:
-    - composer install
-    - php bin/console doctrine:schema:update --force
-    - php bin/console doctrine:fixtures:load
-  script:
-    - phpunit --coverage-text
+#   stage: test
+#   before_script:
+#     - composer install
+#     - php bin/console doctrine:schema:update --force
+#     - php bin/console doctrine:fixtures:load
+#   script:
+#     - phpunit --coverage-text
 
-test:php7.0:
-  # Select what we should cache
-  cache:
-    paths:
-    - vendor/
+# test:php7.0:
+#   # Select what we should cache
+#   cache:
+#     paths:
+#     - vendor/
 
-  services:
-    - postgres:latest
+#   services:
+#     - postgres:latest
 
-  stage: test
-  image: janrtr/docker-phpunit-php7:7.0-phpunit6
-  before_script:
-    - composer install
-    - php bin/console doctrine:schema:update --force
-    - php bin/console doctrine:fixtures:load
-  script:
-    - phpunit --coverage-text
+#   stage: test
+#   image: janrtr/docker-phpunit-php7:7.0-phpunit6
+#   before_script:
+#     - composer install
+#     - php bin/console doctrine:schema:update --force
+#     - php bin/console doctrine:fixtures:load
+#   script:
+#     - phpunit --coverage-text
 
 deploy:dev:
   image: ruby:2.1
+  stage: deploy
   before_script:
   # install ssh-agent
   - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
@@ -63,7 +64,7 @@ deploy:dev:
 
   script:
     # try to connect to GitLab.com
-    - ssh ssh deploy@2a02:c207:3002:3224::4
+    - ssh deploy@2a02:c207:3002:3224::4
 
     - cd Backend
 
