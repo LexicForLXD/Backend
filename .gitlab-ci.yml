@@ -63,7 +63,8 @@ deploy:dev:
   - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
   script:
-    # try to connect to GitLab.com
+    # try to connect as deploy
+    - ssh deploy@2a02:c207:3002:3224::4
 
     - ssh deploy@2a02:c207:3002:3224::4 "cd Backend"
 
