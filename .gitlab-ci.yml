@@ -66,13 +66,9 @@ deploy:dev:
     # try to connect as deploy
     - ssh deploy@2a02:c207:3002:3224::4
 
-    - ssh deploy@2a02:c207:3002:3224::4 "cd Backend"
-
-    - ssh deploy@2a02:c207:3002:3224::4 "git pull"
-
-    - ssh deploy@2a02:c207:3002:3224::4 "composer install"
+    - ssh deploy@2a02:c207:3002:3224::4 "./pullAndInstall.sh"
     
     #copy to web folder
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R *  /var/www/html"  
+    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/*  /var/www/html"  
 
 
