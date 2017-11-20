@@ -63,10 +63,6 @@ deploy:dev:
   - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
   script:
-    # debug ipv6 connectivity
-    
-    - ping6 google.com
-
     # try to connect to GitLab.com
     - ssh -t -t -v deploy@2a02:c207:3002:3224::4
 
