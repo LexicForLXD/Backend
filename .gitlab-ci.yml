@@ -64,15 +64,14 @@ deploy:dev:
 
   script:
     # try to connect to GitLab.com
-    - ssh deploy@2a02:c207:3002:3224::4
 
-    - cd Backend
+    - ssh deploy@2a02:c207:3002:3224::4 "cd Backend"
 
-    - git pull
+    - ssh deploy@2a02:c207:3002:3224::4 "git pull"
 
-    - composer install
+    - ssh deploy@2a02:c207:3002:3224::4 "composer install"
     
     #copy to web folder
-    - cp -R *  /var/www/html
+    - ssh deploy@2a02:c207:3002:3224::4 "cp -R *  /var/www/html"  
 
 
