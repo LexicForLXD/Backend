@@ -9,40 +9,40 @@ variables:
   POSTGRES_USER: runner
   POSTGRES_PASSWORD: "test"
 
-# test:php7.1:
-#   # Select what we should cache
-#   cache:
-#     paths:
-#     - vendor/
+ test:php7.1:
+   # Select what we should cache
+   cache:
+     paths:
+     - vendor/
 
-#   services:
-#     - postgres:latest
+   services:
+     - postgres:latest
 
-#   stage: test
-#   before_script:
-#     - composer install
-#     - php bin/console doctrine:schema:update --force
-#     - php bin/console doctrine:fixtures:load
-#   script:
-#     - phpunit --coverage-text
+   stage: test
+   before_script:
+     - composer install
+     - php bin/console doctrine:schema:update --force
+     - php bin/console doctrine:fixtures:load
+   script:
+     - phpunit --coverage-text
 
-# test:php7.0:
-#   # Select what we should cache
-#   cache:
-#     paths:
-#     - vendor/
+ test:php7.0:
+   # Select what we should cache
+   cache:
+     paths:
+     - vendor/
 
-#   services:
-#     - postgres:latest
+   services:
+     - postgres:latest
 
-#   stage: test
-#   image: janrtr/docker-phpunit-php7:7.0-phpunit6
-#   before_script:
-#     - composer install
-#     - php bin/console doctrine:schema:update --force
-#     - php bin/console doctrine:fixtures:load
-#   script:
-#     - phpunit --coverage-text
+   stage: test
+   image: janrtr/docker-phpunit-php7:7.0-phpunit6
+   before_script:
+     - composer install
+     - php bin/console doctrine:schema:update --force
+     - php bin/console doctrine:fixtures:load
+   script:
+     - phpunit --coverage-text
 
 deploy:dev:
   image: ruby:2.1
@@ -66,7 +66,10 @@ deploy:dev:
     # try to connect as deploy
     - ssh deploy@2a02:c207:3002:3224::4
 
-    - ssh deploy@2a02:c207:3002:3224::4 "./pullAndInstall.sh"
+    - ssh deploy@2a02:c207:3002:3224::4 "cd Backend && git checkout dev && git pull"
+
+    #remove all files from html folder
+    - ssh deploy@2a02:c207:3002:3224::4 "rm -rf /var/www/html/*"
     
     #copy app folder
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/app  /var/www/html/app" 
@@ -86,7 +89,7 @@ deploy:dev:
     #copy composer files to folder
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/composer.json  /var/www/html/composer.json"  
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/composer.lock  /var/www/html/composer.lock" 
-    
+
     #Install composer dependencies
     - ssh deploy@2a02:c207:3002:3224::4 "cd /var/www/html && composer install" 
 
