@@ -86,4 +86,7 @@ deploy:dev:
     #copy web folder
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/web  /var/www/html/web"  
 
+    #copy vendor folder
+    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/vendor  /var/www/html/vendor"  
+
 
