@@ -83,11 +83,14 @@ deploy:dev:
     #copy web folder
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/web  /var/www/html/web"  
 
-    #copy vendor folder
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/vendor  /var/www/html/vendor"  
+    #copy composer files to folder
+    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/composer.json  /var/www/html/composer.json"  
+    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/composer.lock  /var/www/html/composer.lock" 
+    
+    #Install composer dependencies
+    - ssh deploy@2a02:c207:3002:3224::4 "cd /var/www/html && composer install" 
 
     #change permissions for html folder
     - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S chown -R www-data:www-data /var/www/html" 
-
 
 
