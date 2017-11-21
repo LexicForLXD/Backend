@@ -80,13 +80,14 @@ deploy:dev:
     #copy var folder
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/var  /var/www/html/var" 
 
-    #change permissions for var folder
-    - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S chown -R www-data:www-data /var/www/html/var" 
-
     #copy web folder
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/web  /var/www/html/web"  
 
     #copy vendor folder
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/vendor  /var/www/html/vendor"  
+
+    #change permissions for html folder
+    - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S chown -R www-data:www-data /var/www/html" 
+
 
 
