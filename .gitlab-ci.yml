@@ -9,7 +9,7 @@ variables:
   POSTGRES_USER: runner
   POSTGRES_PASSWORD: "test"
 
- test:php7.1:
+test:php7.1:
    # Select what we should cache
    cache:
      paths:
@@ -26,7 +26,7 @@ variables:
    script:
      - phpunit --coverage-text
 
- test:php7.0:
+test:php7.0:
    # Select what we should cache
    cache:
      paths:
