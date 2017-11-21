@@ -69,7 +69,7 @@ deploy:dev:
     - ssh deploy@2a02:c207:3002:3224::4 "cd Backend && git checkout dev && git pull"
 
     #remove all files from html folder
-    - ssh deploy@2a02:c207:3002:3224::4 "rm -rf /var/www/html/*"
+    - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S rm -rf /var/www/html/*"
     
     #copy app folder
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/app  /var/www/html/app" 
