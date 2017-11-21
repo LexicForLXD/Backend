@@ -47,6 +47,8 @@ test:php7.0:
 deploy:dev:
   image: ruby:2.1
   stage: deploy
+  only: 
+    - dev
   before_script:
   # install ssh-agent
   - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
