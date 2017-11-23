@@ -68,9 +68,24 @@ class Host
     private $port;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private $settings;
+
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     *
+     * @ORM\OneToMany(targetEntity="Container", mappedBy="host")
+     */
+    private $containers;
+
+
+    public function __construct()
+    {
+        $this->containers = new ArrayCollection();
+    }
 
 
     /**
@@ -186,6 +201,16 @@ class Host
     public function setPort($port)
     {
         $this->port = $port;
+    }
+
+    public function getContainers()
+    {
+        return $this->containers;
+    }
+
+    public function setContainers($containers)
+    {
+        $this->containers = $containers;
     }
 
     /**
