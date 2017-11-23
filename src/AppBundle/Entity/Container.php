@@ -18,12 +18,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * Class Container
  * @package AppBundle\Entity
- * @ORM\Entity
  * @ORM\Table(name="containers")
  * @UniqueEntity("ipv4")
  * @UniqueEntity("ipv6")
  * @UniqueEntity("domainName")
  * @UniqueEntity("name")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\ContainerRepository")
  */
 class Container
 {
@@ -68,7 +68,7 @@ class Container
      * @var [type]
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
-     * @ORM\Entity(repositoryClass="AppBundle\Repository\ContainerRepository")
+     *
      */
     private $host;
 
