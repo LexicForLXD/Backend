@@ -20,6 +20,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="containers")
+ * @UniqueEntity("ipv4")
+ * @UniqueEntity("ipv6")
+ * @UniqueEntity("domainName")
+ * @UniqueEntity("name")
  */
 class Container
 {
@@ -41,6 +45,13 @@ class Container
     private $ipv6;
 
     /**
+     * @ORM\Column(type="string")
+     *
+     * @var [type]
+     */
+    private $domainName;
+
+    /**
      * @ORM\Column(type="text")
      */
     private $name;
@@ -50,6 +61,16 @@ class Container
      * @ORM\Column(type="text")
      */
     private $settings;
+
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
+     * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     * @ORM\Entity(repositoryClass="AppBundle\Repository\ContainerRepository")
+     */
+    private $host;
 
 
     /**
@@ -124,6 +145,43 @@ class Container
     public function setSettings($settings)
     {
         $this->settings = $settings;
+    }
+
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    public function setHost($host)
+    {
+        $this->host = $host;
+    }
+
+    public function getDomainName()
+    {
+        return $this->domainName;
+    }
+
+    public function setDomainName($domainName)
+    {
+        $this->domainName = $domainName;
+    }
+
+
+    /**
+     * Checks if the host has at least on URI
+     *
+     * @Assert\IsTrue(message = "You have to use at least one of the following: ipv4, ipv6, domainname")
+     *
+     * @return boolean
+     */
+    public function hasUri(){
+        if($this->ipv4 || $this->ipv6 || $this->domainName)
+        {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /** @see \Serializable::serialize() */
