@@ -40,7 +40,13 @@ class ContainerController extends Controller
      */
     public function indexAction()
     {
-        $containers = $this->getDoctrine()->getRepository(Container::class)->findAll();
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findAllJoinedToHost();
+
+        if (!$containers) {
+            throw $this->createNotFoundException(
+                'No containers found'
+            );
+        }
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($containers, 'json');
@@ -50,7 +56,7 @@ class ContainerController extends Controller
     /**
      * get Containers from one host
      *
-     * @param [String] $hostId
+     * @param [integer] $hostId
      * @return void
      *
      * @Route("/hosts/{hostId}/containers", name="containers_from_host", methods={"GET"})
@@ -59,23 +65,43 @@ class ContainerController extends Controller
      *  response=200,
      *  description="list of containers from one host"
      * )
+     *
+     * @SWG\Parameter(
+     *  description="ID von Host",
+     *  format="int64",
+     *  in="path",
+     *  name="hostId",
+     *  required=true,
+     *  type="integer"
+     * )
+     *
      * @SWG\Tag(name="containers")
      *
      */
     public function listFormHostAction($hostId)
     {
-        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+        // $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
-        if (!$host) {
+        // if (!$host) {
+        //     throw $this->createNotFoundException(
+        //         'No host found for id ' . $id
+        //     );
+        // }
+
+        // $containers = $host->getContainers();
+
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
+
+        if (!$containers) {
             throw $this->createNotFoundException(
-                'No host found for id ' . $id
+                'No containers found'
             );
         }
 
-        $client = new ApiClient($host);
-        $containerApi = new ContainerApi($client);
+        // $client = new ApiClient($host);
+        // $containerApi = new ContainerApi($client);
 
-        $containers = $containerApi->list();
+        // $containers = $containerApi->list();
 
         return new Response($containers);
     }
@@ -123,9 +149,10 @@ class ContainerController extends Controller
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id ' . $id
+                'No host found for id ' . $hostId
             );
         }
+
         $client = new ApiClient($host);
         $containerApi = new ContainerApi($client);
         $type = $request->query->get('type');
@@ -143,13 +170,15 @@ class ContainerController extends Controller
                     "source" => [
                         "type" => "image",
                         "mode" => "pull",
-                        "server" => $request->get("image_server") ?: 'https://images.linuxcontainers.org:8443',
+                        "server" => $request->get("imageServer") ?: 'https://images.linuxcontainers.org:8443',
                         "protocol" => $request->get("protocol") ?: 'lxd',
                         "alias" => $request->get("alias"),
                         "fingerprint" => $request->get("fingerprint")
                     ]
                 ];
-                
+
+                $container = new Container();
+
                 return $containerApi->create($data);
 
                 break;
@@ -165,6 +194,56 @@ class ContainerController extends Controller
 
         return new JsonResponse(["message" => "blas"]);
     }
+
+
+    /**
+     * Returns a container with host
+     * @Route("/hosts/{hostId}/containers/{containerId}", name="containers_show", methods={"GET"})
+     *
+     * @SWG\Parameter(
+     *  description="ID des Hosts",
+     *  format="int64",
+     *  in="path",
+     *  name="hostId",
+     *  required=true,
+     *  type="integer"
+     * )
+     *
+     * @SWG\Parameter(
+     *  description="ID des Containers",
+     *  format="int64",
+     *  in="path",
+     *  name="containerId",
+     *  required=true,
+     *  type="integer"
+     * )
+     *
+     * @SWG\Response(
+     *      response=200,
+     *      description="list of all host",
+     *      @Model(type=Container::class)
+     * )
+     *
+     * @SWG\Tag(name="containers")
+     *
+     * @param int $containerId
+     * @param int $hostId
+     * @return void
+     */
+    public function showAction($hostId, $containerId)
+    {
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+
+        if (!$containers) {
+            throw $this->createNotFoundException(
+                'No container found for id ' .$containerId
+            );
+        }
+
+        return new Response($containers);
+    }
+
+    
 
 
 }
