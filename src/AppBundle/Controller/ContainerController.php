@@ -198,16 +198,8 @@ class ContainerController extends Controller
 
     /**
      * Returns a container with host
-     * @Route("/hosts/{hostId}/containers/{containerId}", name="containers_show", methods={"GET"})
+     * @Route("/containers/{containerId}", name="containers_show", methods={"GET"})
      *
-     * @SWG\Parameter(
-     *  description="ID des Hosts",
-     *  format="int64",
-     *  in="path",
-     *  name="hostId",
-     *  required=true,
-     *  type="integer"
-     * )
      *
      * @SWG\Parameter(
      *  description="ID des Containers",
@@ -230,7 +222,7 @@ class ContainerController extends Controller
      * @param int $hostId
      * @return void
      */
-    public function showAction($hostId, $containerId)
+    public function showSingleAction($containerId)
     {
         $containers = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
 
@@ -243,7 +235,9 @@ class ContainerController extends Controller
         return new Response($containers);
     }
 
-    
+
+
+
 
 
 }
