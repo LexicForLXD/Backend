@@ -7,7 +7,7 @@ class ContainerState extends AbstractEndpoint
 {
     public function getEndpoint($urlParam = NULL)
     {
-        return '/containers/'.$containerName.'/state';
+        return '/containers/'.$urlParam.'/state';
     }
 
     public function actual($containerName)
