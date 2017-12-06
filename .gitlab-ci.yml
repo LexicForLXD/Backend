@@ -49,8 +49,8 @@ release:
     before_script:
       - npm install
     image: node:6
-#    only:
-#     - dev
+    only:
+     - dev
     script:
       - $(npm bin)/semantic-release-gitlab
     stage: release
