@@ -2,6 +2,7 @@ image: janrtr/docker-phpunit-php7:7.1-phpunit6
  
 stages:
   - test
+  - release
   - deploy
 
 variables:
@@ -43,6 +44,16 @@ test:php7.0:
      - php bin/console doctrine:fixtures:load
    script:
      - phpunit --coverage-text
+
+release:
+    before_script:
+      - npm install
+    image: node:6
+#    only:
+#     - dev
+    script:
+      - $(npm bin)/semantic-release-gitlab
+    stage: release
 
 deploy:dev:
   image: ruby:2.1
@@ -96,6 +107,7 @@ deploy:dev:
     - ssh deploy@2a02:c207:3002:3224::4 "cd /var/www/html && composer install" 
 
     #change permissions for html folder
-    - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S chown -R www-data:www-data /var/www/html" 
+    - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S chown -R www-data:www-data /var/www/html"
+
 
 
