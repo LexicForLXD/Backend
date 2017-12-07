@@ -47,6 +47,9 @@ test:php7.0:
      - php bin/console doctrine:fixtures:load
    script:
      - phpunit --coverage-text
+   only:
+       - dev
+       - /^feature.*$/
 
 release:
     before_script:
