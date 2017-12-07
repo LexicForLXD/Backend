@@ -26,6 +26,9 @@ test:php7.1:
      - php bin/console doctrine:fixtures:load
    script:
      - phpunit --coverage-text
+   only:
+     - dev
+     - /^feature.*$/
 
 test:php7.0:
    # Select what we should cache
