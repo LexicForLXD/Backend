@@ -88,16 +88,7 @@ nelmio_api_doc:
             description: Backend for new LXD ui
             version: 0.0.1
 
-fos_rest:
-    routing_loader:
-        default_format: json                            # All responses should be JSON formated
-        include_format: false                           # We do not include format in request, so that all responses
-                                                        # will eventually be JSON formated
-    format_listener:
-        rules:
-            - { priorities: ['json', 'xml'], fallback_format: json, prefer_extension: false }
-    view:
-        view_response_listener: true
+
 
 
 fos_oauth_server:
