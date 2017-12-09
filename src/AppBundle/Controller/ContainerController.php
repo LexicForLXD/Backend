@@ -19,21 +19,21 @@ use Swagger\Annotations as SWG;
 use Nelmio\ApiDocBundle\Annotation\Model;
 
 
+
 class ContainerController extends Controller
 {
     /**
      * Get all saved Containers
      *
      * @Route("/containers", name="containers_all", methods={"GET"})
-     * @return Response
      *
      * @SWG\Response(
      *      response=200,
-     *      description="list of all host",
+     *      description="list of all containers",
+     *      ref="$/responses/Json",
      *      @SWG\Schema(
-     *          type="array",
-     *          @Model(type=Container::class)
-     *      )
+     *          type="array"
+     *      ),
      * )
      *
      * @SWG\Tag(name="containers")
@@ -56,18 +56,20 @@ class ContainerController extends Controller
     /**
      * get Containers from one host
      *
-     * @param [integer] $hostId
-     * @return void
+
      *
      * @Route("/hosts/{hostId}/containers", name="containers_from_host", methods={"GET"})
      *
      * @SWG\Response(
      *  response=200,
-     *  description="list of containers from one host"
+     *  description="list of containers from one host",
+     *  @SWG\Schema(
+     *      type="array"
+     *  )
      * )
      *
      * @SWG\Parameter(
-     *  description="ID von Host",
+     *  description="ID des Hosts",
      *  format="int64",
      *  in="path",
      *  name="hostId",
@@ -75,20 +77,12 @@ class ContainerController extends Controller
      *  type="integer"
      * )
      *
+     *
      * @SWG\Tag(name="containers")
      *
      */
     public function listFormHostAction($hostId)
     {
-        // $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
-
-        // if (!$host) {
-        //     throw $this->createNotFoundException(
-        //         'No host found for id ' . $id
-        //     );
-        // }
-
-        // $containers = $host->getContainers();
 
         $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
 
@@ -115,16 +109,31 @@ class ContainerController extends Controller
      * @SWG\Parameter(
      *  description="how to create a new container",
      *  format="int64",
-     *  in="query",
-     *  name="type",
+     *  in="body",
+     *  name="containerStoreData",
      *  required=true,
-     *  type="string",
-     *  enum={"image", "migration", "copy", "none"},
-     *  default="none"
+     *  @SWG\Schema(
+     *      @SWG\Property(
+     *          property="action",
+     *          type="string",
+     *          enum={"image", "migration", "copy", "none"},
+     *          default="none"
+     *      ),
+     *      @SWG\Property(
+     *          property="name",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="architecture",
+     *          type="string"
+     *      )
+     *  )
+     *
+     *
      * )
      *
      * @SWG\Parameter(
-     *  description="ID von Host",
+     *  description="ID des Hosts",
      *  format="int64",
      *  in="path",
      *  name="hostId",
@@ -133,15 +142,12 @@ class ContainerController extends Controller
      * )
      *
      * @SWG\Response(
-     *  description="erfolgsmeldung",
+     *  description="erfolgsmeldung dass der Container erstellt wurde",
      *  response=201
      * )
      *
      * @SWG\Tag(name="containers")
      *
-     * @param Request $request
-     * @param [int] $hostId
-     * @return void
      */
     public function storeAction(Request $request, $hostId)
     {
@@ -198,6 +204,7 @@ class ContainerController extends Controller
 
     /**
      * Returns a container with host
+     *
      * @Route("/containers/{containerId}", name="containers_show", methods={"GET"})
      *
      *
@@ -212,15 +219,12 @@ class ContainerController extends Controller
      *
      * @SWG\Response(
      *      response=200,
-     *      description="list of all host",
-     *      @Model(type=Container::class)
+     *      description="show a single container"
      * )
      *
      * @SWG\Tag(name="containers")
      *
-     * @param int $containerId
-     * @param int $hostId
-     * @return void
+
      */
     public function showSingleAction($containerId)
     {

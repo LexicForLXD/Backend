@@ -29,8 +29,7 @@ class HostController extends Controller
      *     response=200,
      *     description="Zeigt eine Liste aller Hosts an",
      *     @SWG\Schema(
-     *          type="array",
-     *          @Model(type=Host::class)
+     *          type="array"
      *     )
      * )
      *
@@ -54,57 +53,43 @@ class HostController extends Controller
      *
      * @SWG\Response(
      *     response=201,
-     *     description="gibt den gespeicherten Host zurück",
-     *     @Model(type=Host::class)
+     *     description="gibt den neu gespeicherten Host zurück"
      * )
      *
      * @SWG\Parameter(
-     *     name="ipv4",
-     *     in="body",
-     *     required=true,
-     *     description="IPv4 Adresse des Hosts",
-     *     @SWG\Schema(type="string")
-     * )
-     * @SWG\Parameter(
-     *     name="ipv6",
-     *     in="body",
-     *     required=true,
-     *     @SWG\Schema(type="string"),
-     *     description="IPv6 Adresse des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="domain_name",
-     *     in="body",
-     *     @SWG\Schema(type="string"),
-     *     description="FQDN des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="name",
-     *     in="body",
-     *     required=true,
-     *     @SWG\Schema(type="string"),
-     *     description="Name des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="mac",
-     *     in="body",
-     *     required=true,
-     *     @SWG\Schema(type="string"),
-     *     description="MAC Adresse des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="settings",
-     *     in="body",
-     *     required=true,
-     *     @SWG\Schema(type="string"),
-     *     description="Sonstige Settings des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="port",
-     *     in="body",
-     *     required=false,
-     *     @SWG\Schema(type="integer"),
-     *     description="Port für lxd"
+     *  name="hostStoreData",
+     *  in="body",
+     *  required=true,
+     *  @SWG\Schema(
+     *      @SWG\Property(
+     *          property="ipv4",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="ipv6",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="domainName",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="name",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="mac",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="settings",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="port",
+     *          type="integer"
+     *      )
+     *  )
      * )
      *
      * @SWG\Tag(name="hosts")
@@ -144,14 +129,14 @@ class HostController extends Controller
      *         format="int64",
      *         in="path",
      *         name="id",
+     *          parameter="id",
      *         required=true,
      *         type="integer"
      * )
      *
      * @SWG\Response(
      *     response=200,
-     *     description="gibt einen Host zurück",
-     *      @Model(type=Host::class)
+     *     description="gibt einen Host zurück"
      * )
      *
      * @SWG\Tag(name="hosts")
@@ -185,58 +170,46 @@ class HostController extends Controller
      *     required=true,
      *     type="integer"
      * )
+     *
      * @SWG\Parameter(
-     *     name="ipv4",
-     *     in="body",
-     *     required=true,
-     *     @SWG\Schema(type="string"),
-     *     description="IPv4 Adresse des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="ipv6",
-     *     in="body",
-     *     @SWG\Schema(type="string"),
-     *     description="IPv6 Adresse des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="domain_name",
-     *     in="body",
-     *     @SWG\Schema(type="string"),
-     *     description="FQDN des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="name",
-     *     in="body",
-     *     required=true,
-     *     @SWG\Schema(type="string"),
-     *     description="Name des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="mac",
-     *     in="body",
-     *     required=true,
-     *     @SWG\Schema(type="string"),
-     *     description="MAC Adresse des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="settings",
-     *     in="body",
-     *     required=true,
-     *     @SWG\Schema(type="string"),
-     *     description="Sonstige Settings des Hosts"
-     * )
-     * @SWG\Parameter(
-     *     name="port",
-     *     in="body",
-     *     required=false,
-     *     @SWG\Schema(type="integer"),
-     *     description="Port für lxd"
+     *  name="hostUpdateData",
+     *  in="body",
+     *  required=true,
+     *  @SWG\Schema(
+     *      @SWG\Property(
+     *          property="ipv4",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="ipv6",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="domainName",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="name",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="mac",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="settings",
+     *          type="string"
+     *      ),
+     *      @SWG\Property(
+     *          property="port",
+     *          type="integer"
+     *      )
+     *  )
      * )
      *
      * @SWG\Response(
-     *     response=200,
-     *     description="gibt den bearbeiteten Host zurück",
-     *     @Model(type=Host::class)
+     *  response=200,
+     *  description="Erfolgsmeldung,dass der Host erfolgreich geupdated wurde"
      * )
      *
      * @SWG\Tag(name="hosts")
@@ -288,7 +261,7 @@ class HostController extends Controller
      *
      * @SWG\Response(
      *     response=200,
-     *     description="löscht einen Host",
+     *     description="löscht einen Host"
      * )
      *
      * @SWG\Tag(name="hosts")
@@ -311,7 +284,7 @@ class HostController extends Controller
 
     /**
      * @Route("/hosts/{id}", name="hosts_authorize", methods={"POST"})
-     * 
+     *
      * push the client certificate to server
      *
      * @param Request $request
@@ -333,12 +306,12 @@ class HostController extends Controller
      *  in="body",
      *  name="password",
      *  required=true,
-     *  @SWG\Schema(type="string"),
+     *  @SWG\Schema(@SWG\Property(type="string", property="password")),
      * )
      *
      * @SWG\Response(
      *  response = 200,
-     *  description="erfolgsmeldung"
+     *  description="erfolgsmeldung dass Host erfolgreich authorisiert"
      * )
      *
      * @SWG\Tag(name = "hosts")

@@ -27,6 +27,29 @@ class ContainerStateController extends Controller
      * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
      *
      * @SWG\Parameter(
+     *  name="actionData",
+     *  in="body",
+     *  required=true,
+     *  @SWG\Schema(
+     *      @SWG\Property(
+     *          property="action",
+     *          type="string"
+     *      ),
+     *       @SWG\Property(
+     *          property="timeout",
+     *          type="integer"
+     *      ),
+     *       @SWG\Property(
+     *          property="force",
+     *          type="boolean"
+     *      ),
+     *       @SWG\Property(
+     *          property="stateful",
+     *          type="boolean"
+     *      )
+     *  )
+     * )
+     * @SWG\Parameter(
      *  description="ID von Container",
      *  format="int64",
      *  in="path",
@@ -35,45 +58,10 @@ class ContainerStateController extends Controller
      *  type="integer"
      * )
      *
-     * @SWG\Parameter(
-     *  description="Auswahl ob 'start', 'stop', 'restart', 'freeze', 'unfreeze'",
-     *  format="int64",
-     *  in="body",
-     *  name="action",
-     *  required=true,
-     *  type="string"
-     * )
-     *
-     * @SWG\Parameter(
-     *  description="Timeout nachdem die Aktion als gescheitert gilt. Default 30 (Sekunden)",
-     *  format="int64",
-     *  in="body",
-     *  name="timeout",
-     *  required=false,
-     *  type="integer"
-     * )
-     *
-     * @SWG\Parameter(
-     *  description="Force ob bei stop und restart der Befehl erzwungen wird",
-     *  format="int64",
-     *  in="body",
-     *  name="force",
-     *  required=false,
-     *  type="boolean"
-     * )
-     *
-     * @SWG\Parameter(
-     *  description="Stateful, ob der aktuelle Zustand gespeichert wird (seamless restart)",
-     *  format="int64",
-     *  in="body",
-     *  name="force",
-     *  required=false,
-     *  type="boolean"
-     * )
      *
      * @SWG\Response(
      *  response=200,
-     *  description="Erfolgsmeldung"
+     *  description="Erfolgsmeldung für Container Status Update."
      * )
      *
      * @SWG\Tag(name="containers")
@@ -121,7 +109,7 @@ class ContainerStateController extends Controller
      *
      * @SWG\Response(
      *  response=200,
-     *  description="Erfolgsmeldung"
+     *  description="Aktueller Status des Contianers"
      * )
      *
      * @SWG\Tag(name="containers")
