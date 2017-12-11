@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 use AppBundle\Service\LxdApi\ApiClient;
 use AppBundle\Service\LxdApi\Endpoints\Container as ContainerApi;
 use AppBundle\Service\LxdApi\Endpoints\ContainerState;
@@ -77,6 +79,14 @@ class ContainerController extends Controller
      *  type="integer"
      * )
      *
+     * @SWG\Parameter(
+     *  description="Ob die gecacheten Container zurückgegeben werden sollen. Wenn fresh dann gleich true",
+     *  format="int64",
+     *  in="query",
+     *  name="fresh",
+     *  type="string"
+     * )
+     *
      *
      * @SWG\Tag(name="containers")
      *
@@ -84,20 +94,38 @@ class ContainerController extends Controller
     public function listFormHostAction($hostId)
     {
 
-        $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
+        $fresh = $request->query->get('fresh');
 
-        if (!$containers) {
-            throw $this->createNotFoundException(
-                'No containers found'
-            );
+
+        if ($fresh == 'true') {
+            $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+            if (!$host) {
+                throw $this->createNotFoundException(
+                    'No host found for id ' . $id
+                );
+            }
+            $client = new ApiClient($host);
+            $containerApi = new ContainerApi($client);
+
+            $containers = $containerApi->list();
+
+            //TODO in DB aktualisieren
+
+            return containers;
+        } else {
+            $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
+
+            if (!$containers) {
+                throw $this->createNotFoundException(
+                    'No containers found'
+                );
+            }
+            return new Response($containers);
         }
 
-        // $client = new ApiClient($host);
-        // $containerApi = new ContainerApi($client);
 
-        // $containers = $containerApi->list();
 
-        return new Response($containers);
     }
 
 
@@ -163,21 +191,20 @@ class ContainerController extends Controller
         $containerApi = new ContainerApi($client);
         $type = $request->query->get('type');
 
-        switch($type)
-        {
+        switch ($type) {
             case 'image':
                 $data = [
                     "name" => $request->get("name"),
-                    "architecture" => $request->get("architecture") ?: 'x86_64',
-                    "profiles" => $request->get("profiles") ?: array('default'),
-                    "ephermeral" => $request->get("ephermeral") ?: false,
+                    "architecture" => $request->get("architecture") ? : 'x86_64',
+                    "profiles" => $request->get("profiles") ? : array('default'),
+                    "ephermeral" => $request->get("ephermeral") ? : false,
                     "config" => $request->get("config"),
                     "devices" => $request->get("devices"),
                     "source" => [
                         "type" => "image",
                         "mode" => "pull",
-                        "server" => $request->get("imageServer") ?: 'https://images.linuxcontainers.org:8443',
-                        "protocol" => $request->get("protocol") ?: 'lxd',
+                        "server" => $request->get("imageServer") ? : 'https://images.linuxcontainers.org:8443',
+                        "protocol" => $request->get("protocol") ? : 'lxd',
                         "alias" => $request->get("alias"),
                         "fingerprint" => $request->get("fingerprint")
                     ]
@@ -198,7 +225,6 @@ class ContainerController extends Controller
                 return new JsonResponse(["message" => "none"]);
         }
 
-        return new JsonResponse(["message" => "blas"]);
     }
 
 
@@ -228,15 +254,69 @@ class ContainerController extends Controller
      */
     public function showSingleAction($containerId)
     {
-        $containers = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+        $fresh = $request->query->get('fresh');
 
-        if (!$containers) {
+        $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+
+        if (!$container) {
             throw $this->createNotFoundException(
-                'No container found for id ' .$containerId
+                'No container found for id ' . $containerId
             );
         }
 
-        return new Response($containers);
+        if ($fresh == 'true') {
+            $host = $this->getDoctrine()->getRepository(Host::class)->find($id);
+
+            if (!$host) {
+                throw $this->createNotFoundException(
+                    'No host found for id ' . $id
+                );
+            }
+            $client = new ApiClient($host);
+            $containerApi = new ContainerApi($client);
+
+            $container = $containerApi->show($container->name);
+
+                    //TODO in DB aktualisieren
+
+            return container;
+        }
+        return new Response($container);
+
+    }
+
+
+    public function deleteAction($containerId, EntityManagerInterface $em)
+    {
+        $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+
+        if (!$container) {
+            throw $this->createNotFoundException(
+                'No container found for id ' . $containerId
+            );
+        }
+
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($container->host->id);
+
+        if (!$host) {
+            throw $this->createNotFoundException(
+                'No host found for id ' . $hostId
+            );
+        }
+
+        $client = new ApiClient($host);
+        $containerApi = new ContainerApi($client);
+
+        $response = $containerApi->remove($container->name);
+
+        if ($response->getStatusCode() == 202) {
+            $em->remove($contianer);
+            $em->flush();
+
+            return $this->json([], 204);
+        }
+
+        return $this->json(['error' => 'Leider konnte der Container nicht gelöschtwerden.'], 500);
     }
 
 
