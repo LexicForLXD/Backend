@@ -46,8 +46,8 @@ class ApiClient
             'base_uri' => $this->url.'/'.$this->apiVersion,
             'defaults' => [
                 'headers' => ['Content-Type' => 'application/json'],
-                'cert' => ['~/Downloads/93297610_192.168.10.42.cert'],
-                'ssl_key' => ['~/Downloads/93297610_192.168.10.42.key'],
+                'cert' => ['/etc/letsencryt/live/lxd-api.lleon.de/cert.pem'],
+                'ssl_key' => ['/etc/letsencryt/live/lxd-api.lleon.de/privkey.pem'],
                 'verify' => false
             ]
         ]);
