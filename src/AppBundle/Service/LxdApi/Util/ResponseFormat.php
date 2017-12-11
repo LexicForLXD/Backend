@@ -5,7 +5,7 @@
  * Date: 11.11.2017
  * Time: 23:43
  */
-namespace AppBundle\Service\Util;
+namespace AppBundle\Service\LxdApi\Util;
 
 use GuzzleHttp\Psr7\Response;
 

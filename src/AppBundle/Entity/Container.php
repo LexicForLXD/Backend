@@ -8,16 +8,22 @@
 
 namespace AppBundle\Entity;
 
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use AppBundle\Entity\Host;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
  * Class Container
  * @package AppBundle\Entity
- * @ORM\Entity
  * @ORM\Table(name="containers")
+ * @UniqueEntity("ipv4")
+ * @UniqueEntity("ipv6")
+ * @UniqueEntity("domainName")
+ * @UniqueEntity("name")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\ContainerRepository")
  */
 class Container
 {
@@ -39,19 +45,32 @@ class Container
     private $ipv6;
 
     /**
+     * @ORM\Column(type="string")
+     *
+     * @var [type]
+     */
+    private $domainName;
+
+    /**
      * @ORM\Column(type="text")
      */
     private $name;
 
-    /**
-     * @ORM\Column(type="string")
-     */
-    private $mac;
 
     /**
      * @ORM\Column(type="text")
      */
     private $settings;
+
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
+     * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     *
+     */
+    private $host;
 
 
     /**
@@ -111,21 +130,6 @@ class Container
         $this->name = $name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMac()
-    {
-        return $this->mac;
-    }
-
-    /**
-     * @param mixed $mac
-     */
-    public function setMac($mac)
-    {
-        $this->mac = $mac;
-    }
 
     /**
      * @return mixed
@@ -143,4 +147,64 @@ class Container
         $this->settings = $settings;
     }
 
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    public function setHost($host)
+    {
+        $this->host = $host;
+    }
+
+    public function getDomainName()
+    {
+        return $this->domainName;
+    }
+
+    public function setDomainName($domainName)
+    {
+        $this->domainName = $domainName;
+    }
+
+
+    /**
+     * Checks if the host has at least on URI
+     *
+     * @Assert\IsTrue(message = "You have to use at least one of the following: ipv4, ipv6, domainname")
+     *
+     * @return boolean
+     */
+    public function hasUri(){
+        if($this->ipv4 || $this->ipv6 || $this->domainName)
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /** @see \Serializable::serialize() */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->name,
+            $this->ipv4,
+            $this->ipv6,
+            $this->settings
+        ));
+    }
+
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->name,
+            $this->ipv4,
+            $this->ipv6,
+            $this->settings
+            ) = unserialize($serialized);
+    }
 }

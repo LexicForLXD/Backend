@@ -63,9 +63,29 @@ class Host
     private $mac;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $port;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
      */
     private $settings;
+
+    /**
+     * Undocumented variable
+     *
+     * @var [type]
+     *
+     * @ORM\OneToMany(targetEntity="Container", mappedBy="host")
+     */
+    private $containers;
+
+
+    public function __construct()
+    {
+        $this->containers = new ArrayCollection();
+    }
 
 
     /**
@@ -172,6 +192,43 @@ class Host
         $this->settings = $settings;
     }
 
+
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    public function setPort($port)
+    {
+        $this->port = $port;
+    }
+
+    public function getContainers()
+    {
+        return $this->containers;
+    }
+
+    public function setContainers($containers)
+    {
+        $this->containers = $containers;
+    }
+
+    /**
+     * Checks if the host has at least on URI
+     *
+     * @Assert\IsTrue(message = "You have to use at least one of the following: ipv4, ipv6, domainname")
+     *
+     * @return boolean
+     */
+    public function hasUri(){
+        if($this->ipv4 || $this->ipv6 || $this->domainName)
+        {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /** @see \Serializable::serialize() */
     public function serialize()
     {
@@ -182,6 +239,7 @@ class Host
             $this->ipv6,
             $this->domainName,
             $this->mac,
+            $this->port,
             $this->settings
         ));
     }
@@ -196,6 +254,7 @@ class Host
             $this->ipv6,
             $this->domainName,
             $this->mac,
+            $this->port,
             $this->settings
             ) = unserialize($serialized);
     }

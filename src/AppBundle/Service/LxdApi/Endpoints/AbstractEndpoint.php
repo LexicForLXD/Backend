@@ -6,7 +6,7 @@
  * Time: 22:53
  */
  namespace AppBundle\Service\LxdApi\Endpoints;
- 
+
 
 use GuzzleHttp\Psr7\Request;
 use AppBundle\Service\Util\ResponseFormat;
@@ -23,7 +23,9 @@ abstract class AbstractEndpoint
         $this->client = $apiClient->getClient();
     }
 
-    abstract protected function getEndpoint();
+    abstract protected function getEndpoint($urlParam = NULL);
+
+
     /**
      * Send a GET request with query parameters.
      *
