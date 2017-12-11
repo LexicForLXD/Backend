@@ -50,48 +50,48 @@ class ContainerControllerTest extends WebTestCase
         $this->host = $result;
     }
 
-    private function createTestContainer(){
+    // private function createTestContainer(){
 
-        $client = static::createClient();
-        $client->request(
-            'POST',
-            '/hosts/'.$this->host->getId().'/containers',
-            array(),
-            array(),
-            array(
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_Authorization' => $this->token
-            ),
-            '{
-                "name": "container1",
-                "ipv4": "10.0.0.2"
-            }'
-        );
+    //     $client = static::createClient();
+    //     $client->request(
+    //         'POST',
+    //         '/hosts/'.$this->host->getId().'/containers',
+    //         array(),
+    //         array(),
+    //         array(
+    //             'CONTENT_TYPE' => 'application/json',
+    //             'HTTP_Authorization' => $this->token
+    //         ),
+    //         '{
+    //             "name": "container1",
+    //             "ipv4": "10.0.0.2"
+    //         }'
+    //     );
 
-        $result = json_decode($client->getResponse()->getContent());
+    //     $result = json_decode($client->getResponse()->getContent());
 
-        return $result;
-    }
+    //     return $result;
+    // }
 
-    public function testIndex()
-    {
-        $this->createTestContainer();
-
-
-        $client = static::createClient();
-
-        $client->request(
-            'GET',
-            '/containers',
-            array(),
-            array(),
-            array(
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_Authorization' => $this->token
-            )
-        );
+    // public function testIndex()
+    // {
+        // $this->createTestContainer();
 
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-    }
+        // $client = static::createClient();
+
+        // $client->request(
+        //     'GET',
+        //     '/containers',
+        //     array(),
+        //     array(),
+        //     array(
+        //         'CONTENT_TYPE' => 'application/json',
+        //         'HTTP_Authorization' => $this->token
+        //     )
+        // );
+
+
+        // $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    // }
 }
