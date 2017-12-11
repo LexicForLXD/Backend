@@ -91,7 +91,7 @@ class ContainerController extends Controller
      * @SWG\Tag(name="containers")
      *
      */
-    public function listFormHostAction($hostId)
+    public function listFormHostAction(Request $request, $hostId)
     {
 
         $fresh = $request->query->get('fresh');
@@ -102,7 +102,7 @@ class ContainerController extends Controller
 
             if (!$host) {
                 throw $this->createNotFoundException(
-                    'No host found for id ' . $id
+                    'No host found for id ' . $hostId
                 );
             }
             $client = new ApiClient($host);
@@ -252,7 +252,7 @@ class ContainerController extends Controller
      *
 
      */
-    public function showSingleAction($containerId)
+    public function showSingleAction(Request $request, $containerId)
     {
         $fresh = $request->query->get('fresh');
 
@@ -265,11 +265,11 @@ class ContainerController extends Controller
         }
 
         if ($fresh == 'true') {
-            $host = $this->getDoctrine()->getRepository(Host::class)->find($id);
+            $host = $this->getDoctrine()->getRepository(Host::class)->find($container->host->id);
 
             if (!$host) {
                 throw $this->createNotFoundException(
-                    'No host found for id ' . $id
+                    'No host found for id ' . $host
                 );
             }
             $client = new ApiClient($host);
@@ -300,7 +300,7 @@ class ContainerController extends Controller
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id ' . $hostId
+                'No host found for id ' . $host->getId()
             );
         }
 
@@ -310,7 +310,7 @@ class ContainerController extends Controller
         $response = $containerApi->remove($container->name);
 
         if ($response->getStatusCode() == 202) {
-            $em->remove($contianer);
+            $em->remove($container);
             $em->flush();
 
             return $this->json([], 204);
