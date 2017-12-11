@@ -56,12 +56,15 @@ abstract class AbstractEndpoint
      */
     protected function post($path, $data = [], array $parameters = [])
     {
+
+
+
         $request = new Request(
             'POST',
             $path,
             [
                 'query' => $parameters,
-                'body' => $this->createJsonBody($data)
+                'json' => $data
             ]
         );
 
@@ -84,7 +87,7 @@ abstract class AbstractEndpoint
             $path,
             [
                 'query' => $parameters,
-                'body' => $this->createJsonBody($data)
+                'json' => $data
             ]
         );
 
@@ -107,7 +110,7 @@ abstract class AbstractEndpoint
             $path,
             [
                 'query' => $parameters,
-                'body' => $this->createJsonBody($data)
+                'json' => $data
             ]
         );
 
