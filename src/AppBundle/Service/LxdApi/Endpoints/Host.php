@@ -43,6 +43,6 @@ class Host extends AbstractEndpoint
 
     public function authenticate($data)
     {
-        return $this->post('/certificates', $data);
+        return $this->post('certificates', $data);
     }
 }
