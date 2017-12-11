@@ -10,6 +10,8 @@ namespace AppBundle\Service\LxdApi;
 
 use GuzzleHttp\Client;
 
+
+
 class ApiClient
 {
     /**
@@ -33,20 +35,27 @@ class ApiClient
     private $client;
 
 
-    public function __construct($host = null, $apiVersion = null)
+    public function __construct($host = null)
     {
         $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
 
+        if($hostname == $host->getIpV6()){
+            $hostname = '['.$hostname.']';
+        }
+
+
 
         $this->port = $host->getPort() ?: '8443';
-        $this->url = 'https://'.$hostname.':'.$this->port.'/';
-        $this->apiVersion = $apiVersion ?: '1.0';
+        $this->apiVersion = '1.0';
+        $this->url = 'https://'.$hostname.':'.$this->port.'/'.$this->apiVersion.'/';
+
+
 
         $this->client = new Client([
-            'base_uri' => $this->url.'/'.$this->apiVersion,
+            'base_uri' => $this->url,
             'defaults' => [
                 'headers' => ['Content-Type' => 'application/json'],
-                'cert' => ['/etc/letsencryt/live/lxd-api.lleon.de/cert.pem'],
+                'cert' => ['/etc/letsencryt/live/lxd-api.lleon.de/fullchain.pem'],
                 'ssl_key' => ['/etc/letsencryt/live/lxd-api.lleon.de/privkey.pem'],
                 'verify' => false
             ]

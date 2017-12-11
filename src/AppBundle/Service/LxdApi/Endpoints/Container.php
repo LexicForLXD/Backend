@@ -8,7 +8,7 @@ class Container extends AbstractEndpoint
 {
     protected function getEndpoint($urlParam = NULL)
     {
-        return '/containers';
+        return 'containers';
     }
 
 
