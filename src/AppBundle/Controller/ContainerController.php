@@ -11,14 +11,12 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use AppBundle\Service\LxdApi\ApiClient;
 use AppBundle\Service\LxdApi\Endpoints\Container as ContainerApi;
-use AppBundle\Service\LxdApi\Endpoints\ContainerState;
 
 use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as SWG;
-use Nelmio\ApiDocBundle\Annotation\Model;
 
 
 
@@ -29,16 +27,17 @@ class ContainerController extends Controller
      *
      * @Route("/containers", name="containers_all", methods={"GET"})
      *
-     * @SWG\Response(
-     *      response=200,
-     *      description="list of all containers",
-     *      ref="$/responses/Json",
-     *      @SWG\Schema(
-     *          type="array"
-     *      ),
+     * @SWG\Get(path="/containers",
+     *     tags={"containers"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="list of all containers",
+     *          ref="$/responses/Json",
+     *          @SWG\Schema(
+     *              type="array"
+     *          ),
+     *      )
      * )
-     *
-     * @SWG\Tag(name="containers")
      */
     public function indexAction()
     {
@@ -56,19 +55,19 @@ class ContainerController extends Controller
     }
 
     /**
-     * get Containers from one host
+     * Get all Containers from one host
      *
-
+     *@Route("/hosts/{hostId}/containers", name="containers_from_host", methods={"GET"})
      *
-     * @Route("/hosts/{hostId}/containers", name="containers_from_host", methods={"GET"})
-     *
+     *@SWG\Get(path="/hosts/{hostId}/containers",
+     * tags={"containers"},
      * @SWG\Response(
      *  response=200,
      *  description="list of containers from one host",
      *  @SWG\Schema(
      *      type="array"
      *  )
-     * )
+     * ),
      *
      * @SWG\Parameter(
      *  description="ID des Hosts",
@@ -77,7 +76,7 @@ class ContainerController extends Controller
      *  name="hostId",
      *  required=true,
      *  type="integer"
-     * )
+     * ),
      *
      * @SWG\Parameter(
      *  description="Ob die gecacheten Container zurückgegeben werden sollen. Wenn fresh dann gleich true",
@@ -86,10 +85,7 @@ class ContainerController extends Controller
      *  name="fresh",
      *  type="string"
      * )
-     *
-     *
-     * @SWG\Tag(name="containers")
-     *
+     *)
      */
     public function listFormHostAction(Request $request, $hostId)
     {
@@ -130,51 +126,50 @@ class ContainerController extends Controller
 
 
     /**
-     * Undocumented function
+     * Create a new Container on a specific Host
      *
      * @Route("/hosts/{hostId}/containers", name="containers_store", methods={"POST"})
      *
-     * @SWG\Parameter(
-     *  description="how to create a new container",
-     *  format="int64",
-     *  in="body",
-     *  name="containerStoreData",
-     *  required=true,
-     *  @SWG\Schema(
-     *      @SWG\Property(
-     *          property="action",
-     *          type="string",
-     *          enum={"image", "migration", "copy", "none"},
-     *          default="none"
-     *      ),
-     *      @SWG\Property(
-     *          property="name",
-     *          type="string"
-     *      ),
-     *      @SWG\Property(
-     *          property="architecture",
-     *          type="string"
-     *      )
-     *  )
-     *
-     *
+     * @SWG\Post(path="/hosts/{hostId}/containers",
+     * tags={"containers"},
+         * @SWG\Parameter(
+         *  description="how to create a new container",
+         *  format="int64",
+         *  in="body",
+         *  name="containerStoreData",
+         *  required=true,
+         *  @SWG\Schema(
+         *      @SWG\Property(
+         *          property="action",
+         *          type="string",
+         *          enum={"image", "migration", "copy", "none"},
+         *          default="none"
+         *      ),
+         *      @SWG\Property(
+         *          property="name",
+         *          type="string"
+         *      ),
+         *      @SWG\Property(
+         *          property="architecture",
+         *          type="string"
+         *      ),
+         *  ),
+         *),
+         *
+         * @SWG\Parameter(
+         *  description="ID des Hosts",
+         *  format="int64",
+         *  in="path",
+         *  name="hostId",
+         *  required=true,
+         *  type="integer"
+         * ),
+         *
+         * @SWG\Response(
+         *  description="erfolgsmeldung dass der Container erstellt wurde",
+         *  response=201
+         * ),
      * )
-     *
-     * @SWG\Parameter(
-     *  description="ID des Hosts",
-     *  format="int64",
-     *  in="path",
-     *  name="hostId",
-     *  required=true,
-     *  type="integer"
-     * )
-     *
-     * @SWG\Response(
-     *  description="erfolgsmeldung dass der Container erstellt wurde",
-     *  response=201
-     * )
-     *
-     * @SWG\Tag(name="containers")
      *
      */
     public function storeAction(Request $request, $hostId, EntityManagerInterface $em)
@@ -242,11 +237,12 @@ class ContainerController extends Controller
 
 
     /**
-     * Returns a container with host
+     * Get a Container by containerID
      *
      * @Route("/containers/{containerId}", name="containers_show", methods={"GET"})
      *
-     *
+     *@SWG\Get(path="/containers/{containerId}",
+     * tags={"containers"},
      * @SWG\Parameter(
      *  description="ID des Containers",
      *  format="int64",
@@ -254,16 +250,14 @@ class ContainerController extends Controller
      *  name="containerId",
      *  required=true,
      *  type="integer"
-     * )
+     * ),
      *
      * @SWG\Response(
      *      response=200,
      *      description="show a single container"
-     * )
+     * ),
+     *)
      *
-     * @SWG\Tag(name="containers")
-     *
-
      */
     public function showSingleAction(Request $request, $containerId)
     {
@@ -299,6 +293,29 @@ class ContainerController extends Controller
     }
 
 
+    /**
+     * Deletes a Container by containerID
+     *
+     * @Route("/containers/{containerId}", name="containers_show", methods={"DELETE"})
+     *
+     *@SWG\Delete(path="/containers/{containerId}",
+     * tags={"containers"},
+     * @SWG\Parameter(
+     *  description="ID des Containers",
+     *  format="int64",
+     *  in="path",
+     *  name="containerId",
+     *  required=true,
+     *  type="integer"
+     * ),
+     *
+     * @SWG\Response(
+     *      response=200,
+     *      description="show a single container"
+     * ),
+     *)
+     *
+     */
     public function deleteAction($containerId, EntityManagerInterface $em)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);

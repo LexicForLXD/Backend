@@ -31,46 +31,46 @@ class Host
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip
      */
-    private $ipv4;
+    protected $ipv4;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip(version = 6)
      */
-    private $ipv6;
+    protected $ipv6;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Regex("/[.]/")
      */
-    private $domainName;
+    protected $domainName;
 
     /**
      * @ORM\Column(type="string", unique=true)
      * @Assert\NotNull()
      */
-    private $name;
+    protected $name;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      */
-    private $mac;
+    protected $mac;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $port;
+    protected $port;
 
     /**
      * @ORM\Column(type="json", nullable=true)
      */
-    private $settings;
+    protected $settings;
 
     /**
      * Undocumented variable
@@ -79,7 +79,7 @@ class Host
      *
      * @ORM\OneToMany(targetEntity="Container", mappedBy="host")
      */
-    private $containers;
+    protected $containers;
 
 
     public function __construct()

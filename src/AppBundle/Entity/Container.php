@@ -32,35 +32,35 @@ class Container
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      */
-    private $ipv4;
+    protected $ipv4;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      */
-    private $ipv6;
+    protected $ipv6;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      *
      * @var [type]
      */
-    private $domainName;
+    protected $domainName;
 
     /**
      * @ORM\Column(type="text", unique=true)
      */
-    private $name;
+    protected $name;
 
 
     /**
      * @ORM\Column(type="json", nullable=true)
      */
-    private $settings;
+    protected $settings;
 
     /**
      * Undocumented variable
@@ -70,7 +70,7 @@ class Container
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      *
      */
-    private $host;
+    protected $host;
 
 
     /**
