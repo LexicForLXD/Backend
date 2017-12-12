@@ -305,7 +305,9 @@ class ContainerController extends Controller
 
             return $container;
         }
-        return new Response($container);
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($container, 'json');
+        return new Response($response);
 
     }
 
