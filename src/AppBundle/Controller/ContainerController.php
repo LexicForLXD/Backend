@@ -315,7 +315,7 @@ class ContainerController extends Controller
     /**
      * Deletes a Container by containerID
      *
-     * @Route("/containers/{containerId}", name="containers_show", methods={"DELETE"})
+     * @Route("/containers/{containerId}", name="containers_delete", methods={"DELETE"})
      *
      *@SWG\Delete(path="/containers/{containerId}",
      * tags={"containers"},
