@@ -72,6 +72,15 @@ class Container
      */
     protected $host;
 
+    /**
+     * gibt den Status zu einem Container an
+     *
+     * @var
+     *
+     * @ORM\OneToOne(targetEntity="ContainerStatus")
+     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
+     */
+    protected $containerStatus;
 
     /**
      * @return mixed
