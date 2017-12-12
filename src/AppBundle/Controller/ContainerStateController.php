@@ -157,9 +157,9 @@ class ContainerStateController extends Controller
 
         // return $containerApi->actual($container->name);
 
-        $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($container, 'json');
-        return new Response($response);
+        // $serializer = $this->get('jms_serializer');
+        // $response = $serializer->serialize($container, 'json');
+        return new JsonResponse(['state' => $container->getState()]);
     }
 
 }
