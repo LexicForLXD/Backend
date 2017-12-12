@@ -35,30 +35,30 @@ class Container
     private $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $ipv4;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $ipv6;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      *
      * @var [type]
      */
     private $domainName;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", unique=true)
      */
     private $name;
 
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="json", nullable=true)
      */
     private $settings;
 
@@ -185,26 +185,28 @@ class Container
     }
 
     /** @see \Serializable::serialize() */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->settings
-        ));
-    }
+    // public function serialize()
+    // {
+    //     return serialize(array(
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->settings,
+    //         $this->host
+    //     ));
+    // }
 
-    /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
-    {
-        list (
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->settings
-            ) = unserialize($serialized);
-    }
+    // /** @see \Serializable::unserialize() */
+    // public function unserialize($serialized)
+    // {
+    //     list (
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->settings,
+    //         $this->host
+    //         ) = unserialize($serialized);
+    // }
 }
