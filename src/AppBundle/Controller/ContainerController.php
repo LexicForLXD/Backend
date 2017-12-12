@@ -13,6 +13,7 @@ use AppBundle\Service\LxdApi\ApiClient;
 use AppBundle\Service\LxdApi\Endpoints\Container as ContainerApi;
 
 use AppBundle\Entity\Container;
+use AppBundle\Entity\ContainerStatus;
 use AppBundle\Entity\Host;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -117,7 +118,9 @@ class ContainerController extends Controller
                     'No containers found'
                 );
             }
-            return new Response($containers);
+            $serializer = $this->get('jms_serializer');
+            $response = $serializer->serialize($containers, 'json');
+            return new Response($response);
         }
 
 
@@ -182,8 +185,15 @@ class ContainerController extends Controller
             );
         }
 
-        $client = new ApiClient($host);
-        $containerApi = new ContainerApi($client);
+        // $containerStatus = new ContainerStatus;
+        // $containerStatus->setState('stopped');
+
+        // $em->persist($containerStatus);
+        // $em->flush();
+
+
+        // $client = new ApiClient($host);
+        // $containerApi = new ContainerApi($client);
         $type = $request->query->get('type');
 
         switch ($type) {
@@ -211,9 +221,16 @@ class ContainerController extends Controller
                 $container->setIpv4($request->get("ipv4"));
                 $container->setName($request->get("name"));
                 $container->setSettings($data);
+                // $container->setStatus($containerStatus);
+                $container->setState('stopped');
 
 
-                $em->persist($host);
+                if($errorArray = $this->validation($container))
+                {
+                    return new JsonResponse(['errors' => $errorArray], 400);
+                }
+
+                $em->persist($container);
                 $em->flush();
 
                 $serializer = $this->get('jms_serializer');
@@ -358,6 +375,19 @@ class ContainerController extends Controller
 
 
 
+    private function validation($object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
 
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $errorArray;
+        }
+        return false;
+    }
 
 }

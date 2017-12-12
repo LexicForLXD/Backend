@@ -63,6 +63,15 @@ class Container
     protected $settings;
 
     /**
+     * Nur für DEMO
+     *
+     * @var string
+     *
+     * @ORM\Column(type="string")
+     */
+    protected $state;
+
+    /**
      * Undocumented variable
      *
      * @var [type]
@@ -80,7 +89,9 @@ class Container
      * @ORM\OneToOne(targetEntity="ContainerStatus")
      * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      */
-    protected $containerStatus;
+    protected $status;
+
+
 
     /**
      * @return mixed
@@ -161,9 +172,19 @@ class Container
         return $this->host;
     }
 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
     public function setHost($host)
     {
         $this->host = $host;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 
     public function getDomainName()
@@ -176,6 +197,15 @@ class Container
         $this->domainName = $domainName;
     }
 
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    public function setState($state)
+    {
+        $this->state = $state;
+    }
 
     /**
      * Checks if the host has at least on URI
