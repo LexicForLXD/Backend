@@ -68,7 +68,7 @@ class Host
     protected $port;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      */
     protected $settings;
 
@@ -230,32 +230,32 @@ class Host
     }
 
     /** @see \Serializable::serialize() */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->domainName,
-            $this->mac,
-            $this->port,
-            $this->settings
-        ));
-    }
+    // public function serialize()
+    // {
+    //     return serialize(array(
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->domainName,
+    //         $this->mac,
+    //         $this->port,
+    //         $this->settings
+    //     ));
+    // }
 
-    /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
-    {
-        list (
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->domainName,
-            $this->mac,
-            $this->port,
-            $this->settings
-            ) = unserialize($serialized);
-    }
+    // /** @see \Serializable::unserialize() */
+    // public function unserialize($serialized)
+    // {
+    //     list (
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->domainName,
+    //         $this->mac,
+    //         $this->port,
+    //         $this->settings
+    //         ) = unserialize($serialized);
+    // }
 }

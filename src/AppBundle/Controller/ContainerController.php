@@ -172,7 +172,7 @@ class ContainerController extends Controller
      * )
      *
      */
-    public function storeAction(Request $request, $hostId)
+    public function storeAction(Request $request, $hostId, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -207,7 +207,20 @@ class ContainerController extends Controller
 
                 $container = new Container();
 
-                return $containerApi->create($data);
+                $container->setHost($host);
+                $container->setIpv4($request->get("ipv4"));
+                $container->setName($request->get("name"));
+                $container->setSettings($data);
+
+
+                $em->persist($host);
+                $em->flush();
+
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($container, 'json');
+                return new Response($response, Response::HTTP_CREATED);
+
+                // return $containerApi->create($data);
 
                 break;
             case 'migration':
@@ -273,7 +286,7 @@ class ContainerController extends Controller
 
                     //TODO in DB aktualisieren
 
-            return container;
+            return $container;
         }
         return new Response($container);
 
@@ -321,17 +334,23 @@ class ContainerController extends Controller
             );
         }
 
-        $client = new ApiClient($host);
-        $containerApi = new ContainerApi($client);
+        $em->remove($container);
+        $em->flush();
 
-        $response = $containerApi->remove($container->name);
+        return $this->json([], 204);
 
-        if ($response->getStatusCode() == 202) {
-            $em->remove($container);
-            $em->flush();
 
-            return $this->json([], 204);
-        }
+        // $client = new ApiClient($host);
+        // $containerApi = new ContainerApi($client);
+
+        //$response = $containerApi->remove($container->name);
+
+        // if ($response->getStatusCode() == 202) {
+        //     $em->remove($container);
+        //     $em->flush();
+
+        //     return $this->json([], 204);
+        // }
 
         return $this->json(['error' => 'Leider konnte der Container nicht gelöschtwerden.'], 500);
     }

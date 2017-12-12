@@ -35,30 +35,30 @@ class Container
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      */
     protected $ipv4;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      */
     protected $ipv6;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      *
      * @var [type]
      */
     protected $domainName;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", unique=true)
      */
     protected $name;
 
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="json", nullable=true)
      */
     protected $settings;
 
@@ -72,6 +72,15 @@ class Container
      */
     protected $host;
 
+    /**
+     * gibt den Status zu einem Container an
+     *
+     * @var
+     *
+     * @ORM\OneToOne(targetEntity="ContainerStatus")
+     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
+     */
+    protected $containerStatus;
 
     /**
      * @return mixed
@@ -185,26 +194,28 @@ class Container
     }
 
     /** @see \Serializable::serialize() */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->settings
-        ));
-    }
+    // public function serialize()
+    // {
+    //     return serialize(array(
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->settings,
+    //         $this->host
+    //     ));
+    // }
 
-    /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
-    {
-        list (
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->settings
-            ) = unserialize($serialized);
-    }
+    // /** @see \Serializable::unserialize() */
+    // public function unserialize($serialized)
+    // {
+    //     list (
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->settings,
+    //         $this->host
+    //         ) = unserialize($serialized);
+    // }
 }
