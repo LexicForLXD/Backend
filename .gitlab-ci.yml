@@ -30,27 +30,6 @@ test:php7.1:
      - master
      - /^feature.*$/
 
-test:php7.0:
-   # Select what we should cache
-   cache:
-     paths:
-     - vendor/
-
-   services:
-     - postgres:latest
-
-   stage: test
-   image: janrtr/docker-phpunit-php7:7.0-phpunit6
-   before_script:
-     - composer install
-     - php bin/console doctrine:schema:update --force
-     - php bin/console doctrine:fixtures:load
-   script:
-     - phpunit --coverage-text
-   only:
-       - master
-       - /^feature.*$/
-
 release:
     before_script:
       - npm install
