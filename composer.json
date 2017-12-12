@@ -18,6 +18,7 @@
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/doctrine-migrations-bundle": "^1.0",
         "doctrine/orm": "^2.5",
+        "doctrine/dbal": "^2.6",
         "friendsofsymfony/oauth-server-bundle": "^1.5",
         "friendsofsymfony/rest-bundle": "^2.2",
         "guzzlehttp/guzzle": "^6.3",
@@ -58,7 +59,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.0"
+            "php": "7.1"
         },
         "sort-packages": true
     },
