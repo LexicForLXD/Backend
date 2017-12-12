@@ -18,7 +18,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 class ContainerStateController extends Controller
 {
     /**
-     * Startet stopped oder restartet einen Container
+     * Start, stop or restart a Contaner by ContainerID
      *
      * @param Request $request
      * @param int $containerId
@@ -26,6 +26,8 @@ class ContainerStateController extends Controller
      *
      * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
      *
+     *@SWG\Put(path="/containers/{containerId}/state",
+     *tags={"containerStates"},
      * @SWG\Parameter(
      *  name="actionData",
      *  in="body",
@@ -46,9 +48,9 @@ class ContainerStateController extends Controller
      *       @SWG\Property(
      *          property="stateful",
      *          type="boolean"
-     *      )
-     *  )
-     * )
+     *      ),
+     *  ),
+     * ),
      * @SWG\Parameter(
      *  description="ID von Container",
      *  format="int64",
@@ -56,15 +58,14 @@ class ContainerStateController extends Controller
      *  name="containerId",
      *  required=true,
      *  type="integer"
-     * )
+     * ),
      *
      *
      * @SWG\Response(
      *  response=200,
      *  description="Erfolgsmeldung für Container Status Update."
-     * )
-     *
-     * @SWG\Tag(name="containers")
+     * ),
+     *)
      */
     public function updateStateAction(Request $request, $containerId)
     {
@@ -91,13 +92,15 @@ class ContainerStateController extends Controller
 
 
     /**
-     * Zeigt den aktuellen Zustand eines Containers an.
+     * Get the current state of the Container by ContainerID
      *
      * @param int $containerId
      * @return Response
      *
      * @Route("/containers/{containerId}/state", name="show_container_state", methods={"GET"})
      *
+     *@SWG\Get(path="/containers/{containerId}/state",
+     *tags={"containerStates"},
      * @SWG\Parameter(
      *  description="ID von Container",
      *  format="int64",
@@ -105,14 +108,13 @@ class ContainerStateController extends Controller
      *  name="containerId",
      *  required=true,
      *  type="integer"
-     * )
+     * ),
      *
      * @SWG\Response(
      *  response=200,
      *  description="Aktueller Status des Contianers"
-     * )
-     *
-     * @SWG\Tag(name="containers")
+     * ),
+     *)
      */
     public function showCurrentStateAction($containerId)
     {

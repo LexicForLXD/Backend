@@ -23,18 +23,21 @@ use Swagger\Annotations as SWG;
 class HostController extends Controller
 {
     /**
+     * Get a list of all saved Hosts
+     *
      * @Route("/hosts", name="hosts_index", methods={"GET"})
      * @return Response
      *
-     * @SWG\Response(
-     *     response=200,
-     *     description="Zeigt eine Liste aller Hosts an",
-     *     @SWG\Schema(
-     *          type="array"
-     *     )
-     * )
-     *
-     * @SWG\Tag(name="hosts")
+     * @SWG\Get(path="/hosts",
+     * tags={"hosts"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Zeigt eine Liste aller Hosts an",
+     *          @SWG\Schema(
+     *              type="array"
+     *          ),
+     *      ),
+     *)
      */
     public function indexAction()
     {
@@ -47,15 +50,19 @@ class HostController extends Controller
 
 
     /**
+     * Create a new Host
+     *
      * @Route("/hosts", name="hosts_store", methods={"POST"})
      * @param Request $request
      * @param EntityManagerInterface $em
      * @return Response
      *
+     *@SWG\POST(path="/hosts",
+     *tags={"hosts"},
      * @SWG\Response(
      *     response=201,
      *     description="gibt den neu gespeicherten Host zurück"
-     * )
+     * ),
      *
      * @SWG\Parameter(
      *  name="hostStoreData",
@@ -89,11 +96,10 @@ class HostController extends Controller
      *      @SWG\Property(
      *          property="port",
      *          type="integer"
-     *      )
-     *  )
-     * )
-     *
-     * @SWG\Tag(name="hosts")
+     *      ),
+     *  ),
+     * ),
+     *)
      */
     public function storeAction(Request $request, EntityManagerInterface $em)
     {
@@ -121,10 +127,13 @@ class HostController extends Controller
     }
 
     /**
+     * Get a Host by hostID
      * @Route("/hosts/{id}", name="hosts_show", methods={"GET"})
      * @param int $id
      * @return Response
      *
+     *@SWG\Get(path="/hosts/{hostId}",
+     *tags={"hosts"},
      * @SWG\Parameter(
      *         description="ID von anzuzeigendem Host",
      *         format="int64",
@@ -133,14 +142,13 @@ class HostController extends Controller
      *          parameter="id",
      *         required=true,
      *         type="integer"
-     * )
+     * ),
      *
      * @SWG\Response(
      *     response=200,
      *     description="gibt einen Host zurück"
-     * )
-     *
-     * @SWG\Tag(name="hosts")
+     * ),
+     *)
      */
     public function showAction($id)
     {
@@ -158,11 +166,15 @@ class HostController extends Controller
     }
 
     /**
+     * Update a Host by hostID
      * @Route("/hosts/{id}", name="hosts_update", methods={"PUT"})
      * @param Request $request
      * @param int $id
      * @param EntityManagerInterface $em
      * @return Response
+     *
+     *@SWG\Put(path="/hosts/{hostId}",
+     *tags={"hosts"},
      * @SWG\Parameter(
      *     description="ID von upzudaten Host",
      *     format="int64",
@@ -170,8 +182,7 @@ class HostController extends Controller
      *     name="id",
      *     required=true,
      *     type="integer"
-     * )
-     *
+     * ),
      * @SWG\Parameter(
      *  name="hostUpdateData",
      *  in="body",
@@ -204,16 +215,15 @@ class HostController extends Controller
      *      @SWG\Property(
      *          property="port",
      *          type="integer"
-     *      )
-     *  )
-     * )
+     *      ),
+     *  ),
+     * ),
      *
      * @SWG\Response(
      *  response=200,
      *  description="Erfolgsmeldung,dass der Host erfolgreich geupdated wurde"
-     * )
-     *
-     * @SWG\Tag(name="hosts")
+     * ),
+     *)
      */
     public function updateAction(Request $request, $id, EntityManagerInterface $em)
     {
@@ -246,11 +256,15 @@ class HostController extends Controller
     }
 
     /**
+     * Delete a Host by hostID
+     *
      * @Route("/hosts/{id}", name="hosts_delete", methods={"DELETE"})
      * @param $id
      * @param EntityManagerInterface $em
      * @return Response
      *
+     * @SWG\Delete(path="/hosts/{hostId}",
+     *tags={"hosts"},
      * @SWG\Parameter(
      *     description="ID des zu löschenden Host",
      *     format="int64",
@@ -258,14 +272,13 @@ class HostController extends Controller
      *     name="id",
      *     required=true,
      *     type="integer"
-     * )
+     * ),
      *
      * @SWG\Response(
      *     response=200,
      *     description="löscht einen Host"
-     * )
-     *
-     * @SWG\Tag(name="hosts")
+     * ),
+     *)
      */
     public function deleteAction($id, EntityManagerInterface $em)
     {
@@ -284,7 +297,9 @@ class HostController extends Controller
     }
 
     /**
-     * @Route("/hosts/{id}", name="hosts_authorize", methods={"POST"})
+     * Authorize the Backend to Access the Hosts LXD API
+     *
+     * @Route("/hosts/{id}authorization", name="hosts_authorize", methods={"POST"})
      *
      * push the client certificate to server
      *
@@ -292,6 +307,8 @@ class HostController extends Controller
      * @param [integer] $id
      * @return void
      *
+     *@SWG\Post(path="/hosts/{hostId}/authorization",
+     *tags={"hosts"},
      * @SWG\Parameter(
      *  description="ID des Host",
      *  format="int64",
@@ -299,7 +316,7 @@ class HostController extends Controller
      *  name="id",
      *  required=true,
      *  type="integer"
-     * )
+     * ),
      *
      * @SWG\Parameter(
      *  description="password of lxd host",
@@ -308,14 +325,13 @@ class HostController extends Controller
      *  name="password",
      *  required=true,
      *  @SWG\Schema(@SWG\Property(type="string", property="password")),
-     * )
+     * ),
      *
      * @SWG\Response(
      *  response = 200,
      *  description="erfolgsmeldung dass Host erfolgreich authorisiert"
-     * )
-     *
-     * @SWG\Tag(name = "hosts")
+     * ),
+     *)
      */
     public function authorizeAction(Request $request, $id)
     {

@@ -85,7 +85,7 @@ deploy:dev:
     # try to connect as deploy
     - ssh deploy@2a02:c207:3002:3224::4
 
-    - ssh deploy@2a02:c207:3002:3224::4 "cd Backend && git checkout dev && git pull"
+    - ssh deploy@2a02:c207:3002:3224::4 "cd Backend && git checkout master && git pull"
 
     #remove all files from html folder
     - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S rm -rf /var/www/html/*"
