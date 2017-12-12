@@ -177,7 +177,7 @@ class ContainerController extends Controller
      * @SWG\Tag(name="containers")
      *
      */
-    public function storeAction(Request $request, $hostId)
+    public function storeAction(Request $request, $hostId, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
