@@ -80,6 +80,120 @@ class ContainerStatus
      */
     protected $state;
 
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHealthCheckEnabled(): bool
+    {
+        return $this->healthCheckEnabled;
+    }
+
+    /**
+     * @param bool $healthCheckEnabled
+     */
+    public function setHealthCheckEnabled(bool $healthCheckEnabled)
+    {
+        $this->healthCheckEnabled = $healthCheckEnabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHealthCheck(): bool
+    {
+        return $this->healthCheck;
+    }
+
+    /**
+     * @param bool $healthCheck
+     */
+    public function setHealthCheck(bool $healthCheck)
+    {
+        $this->healthCheck = $healthCheck;
+    }
+
+    /**
+     * @return datetime
+     */
+    public function getLastSuccessfullPing()
+    {
+        return $this->lastSuccessfullPing;
+    }
+
+    /**
+     * @param datetime $lastSuccessfullPing
+     */
+    public function setLastSuccessfullPing($lastSuccessfullPing)
+    {
+        $this->lastSuccessfullPing = $lastSuccessfullPing;
+    }
+
+    /**
+     * @return datetime
+     */
+    public function getLastFailedPing()
+    {
+        return $this->lastFailedPing;
+    }
+
+    /**
+     * @param datetime $lastFailedPing
+     */
+    public function setLastFailedPing($lastFailedPing)
+    {
+        $this->lastFailedPing = $lastFailedPing;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastRtt(): int
+    {
+        return $this->lastRtt;
+    }
+
+    /**
+     * @param int $lastRtt
+     */
+    public function setLastRtt(int $lastRtt)
+    {
+        $this->lastRtt = $lastRtt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param string $state
+     */
+    public function setState(string $state)
+    {
+        $this->state = $state;
+    }
+
+    
+
 
 
 }
