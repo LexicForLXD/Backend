@@ -24,6 +24,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity("domainName")
  * @UniqueEntity("name")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ContainerRepository")
+ *
+ * @OAS\Schema(schema="container", type="object")
  */
 class Container
 {
@@ -31,44 +33,58 @@ class Container
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     *
+     * @OAS\Property(example="14")
+     * var integer
      */
     private $id;
 
     /**
      * @ORM\Column(type="string")
+     *
+     * @OAS\Property(example="192.168.178.20")
+     * var string
      */
     private $ipv4;
 
     /**
      * @ORM\Column(type="string")
+     *
+     * @OAS\Property(example="fe80::20")
+     * var string
      */
     private $ipv6;
 
     /**
      * @ORM\Column(type="string")
      *
-     * @var [type]
+     * @OAS\Property(example="container14.localnet.com")
+     * var string
      */
     private $domainName;
 
     /**
      * @ORM\Column(type="text")
+     *
+     * @OAS\Property(example="WebServer1")
+     * var string
      */
     private $name;
 
 
     /**
      * @ORM\Column(type="text")
+     *
+     * @OAS\Property(example="TODO Settings")
+     * var string
      */
     private $settings;
 
     /**
-     * Undocumented variable
-     *
-     * @var [type]
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      *
+     * @OAS\Property(ref="#/components/schemas/host")
      */
     private $host;
 
