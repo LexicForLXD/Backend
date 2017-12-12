@@ -128,7 +128,7 @@ class HostController extends Controller
 
     /**
      * Get a Host by hostID
-     * @Route("/hosts/{id}", name="hosts_show", methods={"GET"})
+     * @Route("/hosts/{hostId}", name="hosts_show", methods={"GET"})
      * @param int $hostId
      * @return Response
      *
@@ -138,8 +138,8 @@ class HostController extends Controller
      *         description="ID von anzuzeigendem Host",
      *         format="int64",
      *         in="path",
-     *         name="id",
-     *          parameter="id",
+     *         name="hostId",
+     *          parameter="hostId",
      *         required=true,
      *         type="integer"
      * ),
@@ -167,7 +167,7 @@ class HostController extends Controller
 
     /**
      * Update a Host by hostID
-     * @Route("/hosts/{id}", name="hosts_update", methods={"PUT"})
+     * @Route("/hosts/{hostId}", name="hosts_update", methods={"PUT"})
      * @param Request $request
      * @param int $hostId
      * @param EntityManagerInterface $em
@@ -179,7 +179,7 @@ class HostController extends Controller
      *     description="ID von upzudaten Host",
      *     format="int64",
      *     in="path",
-     *     name="id",
+     *     name="hostId",
      *     required=true,
      *     type="integer"
      * ),
@@ -257,7 +257,7 @@ class HostController extends Controller
     /**
      * Delete a Host by hostID
      *
-     * @Route("/hosts/{id}", name="hosts_delete", methods={"DELETE"})
+     * @Route("/hosts/{hostId}", name="hosts_delete", methods={"DELETE"})
      * @param $hostId
      * @param EntityManagerInterface $em
      * @return Response
@@ -268,7 +268,7 @@ class HostController extends Controller
      *     description="ID des zu löschenden Host",
      *     format="int64",
      *     in="path",
-     *     name="id",
+     *     name="hostId",
      *     required=true,
      *     type="integer"
      * ),
@@ -298,7 +298,7 @@ class HostController extends Controller
     /**
      * Authorize the Backend to Access the Hosts LXD API
      *
-     * @Route("/hosts/{id}authorization", name="hosts_authorize", methods={"POST"})
+     * @Route("/hosts/{hostId}authorization", name="hosts_authorize", methods={"POST"})
      *
      * push the client certificate to server
      *
@@ -312,7 +312,7 @@ class HostController extends Controller
      *  description="ID des Host",
      *  format="int64",
      *  in="path",
-     *  name="id",
+     *  name="hostId",
      *  required=true,
      *  type="integer"
      * ),
