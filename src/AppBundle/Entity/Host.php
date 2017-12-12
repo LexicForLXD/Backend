@@ -23,6 +23,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity("domainName")
  * @UniqueEntity("name")
  * @UniqueEntity("mac")
+ *
+ * @OAS\Schema(schema="host", type="object")
  */
 class Host
 {
@@ -30,45 +32,69 @@ class Host
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     *
+     * @OAS\Property(example="2")
+     * var integer
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip
+     *
+     * @OAS\Property(example="192.168.178.5")
+     * var string
      */
     private $ipv4;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip(version = 6)
+     *
+     * @OAS\Property(example="fe80::5")
+     * var string
      */
     private $ipv6;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Regex("/[.]/")
+     *
+     * @OAS\Property(example="host2.localnet.com")
+     * var string
      */
     private $domainName;
 
     /**
      * @ORM\Column(type="string", unique=true)
      * @Assert\NotNull()
+     *
+     * @OAS\Property(example="host2")
+     * var string
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
+     *
+     * @OAS\Property(example="82-75-93-4D-B8-6F")
+     * var string
      */
     private $mac;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     *
+     * @OAS\Property(example="22")
+     * var integer
      */
     private $port;
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     *
+     * @OAS\Property(example="TODO Settings")
+     * var string
      */
     private $settings;
 
