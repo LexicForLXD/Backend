@@ -13,7 +13,7 @@ class DefaultController extends Controller
      * @Route("/", name="homepage")
      * @SWG\Info(
      *     title="Lexic API",
-     *     version=1.0
+     *     version="1.0"
      * )
      */
     public function indexAction(Request $request)
