@@ -1,7 +1,7 @@
 SYP-LXC Backend
 ========================
 
-#Installation
+# Installation
 
 ### Resolve dependencies
 
@@ -26,7 +26,7 @@ php bin/console server:run
 php bin/console doctrine:fixtures:load     
 ```
 
-#Documentation
+# Documentation
 ### Create up to date Swagger documentation
 ```php
 ./vendor/bin/swagger -e vendor   
