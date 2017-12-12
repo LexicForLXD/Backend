@@ -299,7 +299,7 @@ class HostController extends Controller
     /**
      * Authorize the Backend to Access the Hosts LXD API
      *
-     * @Route("/hosts/{id}", name="hosts_authorize", methods={"POST"})
+     * @Route("/hosts/{id}authorization", name="hosts_authorize", methods={"POST"})
      *
      * push the client certificate to server
      *
@@ -307,7 +307,7 @@ class HostController extends Controller
      * @param [integer] $id
      * @return void
      *
-     *@SWG\Post(path="/hosts/{hostId}",
+     *@SWG\Post(path="/hosts/{hostId}/authorization",
      *tags={"hosts"},
      * @SWG\Parameter(
      *  description="ID des Host",
