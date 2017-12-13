@@ -1,10 +1,12 @@
 <?php
 namespace AppBundle\Service\LxdApi\Endpoints;
 
-use AppBundle\Service\Util\ResponseFormat;
-use \AppBundle\Service\LxdApi\ApiClient;
+use AppBundle\Entity\Host;
+use AppBundle\Service\LxdApi\Util\UriBuilder;
+use Httpful\Request;
 
-class Container extends AbstractEndpoint
+
+class Container
 {
     protected function getEndpoint($urlParam = NULL)
     {
@@ -12,47 +14,68 @@ class Container extends AbstractEndpoint
     }
 
 
+    public function __construct()
+    {
+        $template = Request::init()
+        ->sendsJson()    // Send application/x-www-form-urlencoded
+        ->withoutStrictSsl()        // Ease up on some of the SSL checks
+        ->expectsJson()             // Expect JSON responses
+        ->authenticateWithCert($this->getParameter('cert_location'), $this->getParameter('cert_key_location')); //uses cert from parameters.yml
+        //TODO maybe use cert_passphrase
+
+        Request::ini($template);
+    }
+
+
     /**
      *  List of all containers on one host
      *
+     * @param Host $host
      * @return object
      */
-    public function list()
+    public function list(Host $host)
     {
-        return $this->get($this->getEndpoint());
+        $uri = UriBuilder::build($host, $this->getEndpoint());
+        return Request::get($uri)->send();
     }
 
     /**
-     * Does the server trust the client
+     * delete a container
      *
+     * @param Host $host
      * @return object
      */
-    public function remove($containerName)
+    public function remove(Host $host, $containerName)
     {
-        return $this->delete($this->getEndpoint().'/'.$containerName);
+        $uri = UriBuilder::build($host, $this->getEndpoint().'/'.$containerName);
+        return Request::delete($uri)->send();
     }
 
 
     /**
      * show details of a given container
      *
-     * @param [String] $containerName
+     * @param Host $host
+     * @param string $containerName
      * @return Object
      */
-    public function show($containerName)
+    public function show(Host $host, $containerName)
     {
-        return $this->get($this->getEndpoint().'/'.$containerName);
+        $uri = UriBuilder::build($host, $this->getEndpoint().'/'.$containerName);
+        return Request::get($uri)->send();
     }
 
     /**
      * create a new container with given data
      *
-     * @param [type] $data
+     * @param array $data
+     * @param Host $host
      * @return Object
      */
-    public function create($data)
+    public function create(Host $host, $data)
     {
-        return $this->post($this->getEndpoint(), $data);
+        $uri = UriBuilder::build($host, $this->getEndpoint());
+        return Request::post($uri, $data)->send();
     }
 
     /**
@@ -64,6 +87,7 @@ class Container extends AbstractEndpoint
      */
     public function update($containerName, $data)
     {
-        return $this->put($this->getEndpoint().'/'.$containerName, $data);
+        $uri = UriBuilder::build($host, $this->getEndpoint().'/'.$containerName);
+        return Request::put($uri, $data)->send();
     }
 }
