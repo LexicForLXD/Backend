@@ -88,7 +88,7 @@ class ContainerController extends Controller
      * )
      *)
      */
-    public function listFormHostAction(Request $request, $hostId)
+    public function listFromHostAction(Request $request, $hostId)
     {
 
         $fresh = $request->query->get('fresh');
