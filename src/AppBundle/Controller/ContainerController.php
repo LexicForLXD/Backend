@@ -33,13 +33,13 @@ class ContainerController extends Controller
      *          response=200,
      *          description="List of all containers",
      *          @OAS\JsonContent(ref="#/components/schemas/container"),
+     *          @OAS\Schema(
+     *              type="array"
+     *          ),
      *      ),
      *      @OAS\Response(
      *          response=404,
      *          description="No containers found",
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
      *      ),
      * )
      */
@@ -170,7 +170,7 @@ class ContainerController extends Controller
          * ),
          *
          * @OAS\Response(
-         *  description="erfolgsmeldung dass der Container erstellt wurde",
+         *  description="The Container was successfully created",
          *  response=201
          * ),
      * )
@@ -232,20 +232,22 @@ class ContainerController extends Controller
      *
      * @Route("/containers/{containerId}", name="containers_show", methods={"GET"})
      *
-     *@SWG\Get(path="/containers/{containerId}",
+     *@OAS\Get(path="/containers/{containerId}",
      * tags={"containers"},
-     * @SWG\Parameter(
-     *  description="ID des Containers",
-     *  format="int64",
+     * @OAS\Parameter(
+     *  description="ID of the Container",
      *  in="path",
      *  name="containerId",
      *  required=true,
-     *  type="integer"
+     *   @OAS\Schema(
+     *         type="integer"
+     *   ),
      * ),
      *
-     * @SWG\Response(
+     * @OAS\Response(
      *      response=200,
-     *      description="show a single container"
+     *      description="Returns the informationen of a single Container",
+     *      @OAS\JsonContent(ref="#/components/schemas/container"),
      * ),
      *)
      *
