@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Swagger\Annotations as OAS;
 
 
 /**
@@ -23,6 +24,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity("domainName")
  * @UniqueEntity("name")
  * @UniqueEntity("mac")
+ *
+ * @OAS\Schema(schema="host", type="object")
  */
 class Host
 {
@@ -30,45 +33,69 @@ class Host
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     *
+     * @OAS\Property(example="2")
+     * var integer
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip
+     *
+     * @OAS\Property(example="192.168.178.5")
+     * var string
      */
     protected $ipv4;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip(version = 6)
+     *
+     * @OAS\Property(example="fe80::5")
+     * var string
      */
     protected $ipv6;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Regex("/[.]/")
+     *
+     * @OAS\Property(example="host2.localnet.com")
+     * var string
      */
     protected $domainName;
 
     /**
      * @ORM\Column(type="string", unique=true)
      * @Assert\NotNull()
+     *
+     * @OAS\Property(example="host2")
+     * var string
      */
     protected $name;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
+     *
+     * @OAS\Property(example="82-75-93-4D-B8-6F")
+     * var string
      */
     protected $mac;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     *
+     * @OAS\Property(example="22")
+     * var integer
      */
     protected $port;
 
     /**
-     * @ORM\Column(type="json", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
+     *
+     * @OAS\Property(example="TODO Settings")
+     * var string
      */
     protected $settings;
 

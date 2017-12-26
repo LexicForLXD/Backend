@@ -15,8 +15,6 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as SWG;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 class ContainerStateController extends Controller
@@ -30,32 +28,32 @@ class ContainerStateController extends Controller
      *
      * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
      *
-     *@SWG\Put(path="/containers/{containerId}/state",
+     *SWG\Put(path="/containers/{containerId}/state",
      *tags={"containerStates"},
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  name="actionData",
      *  in="body",
      *  required=true,
-     *  @SWG\Schema(
-     *      @SWG\Property(
+     *  SWG\Schema(
+     *      SWG\Property(
      *          property="action",
      *          type="string"
      *      ),
-     *       @SWG\Property(
+     *       SWG\Property(
      *          property="timeout",
      *          type="integer"
      *      ),
-     *       @SWG\Property(
+     *       SWG\Property(
      *          property="force",
      *          type="boolean"
      *      ),
-     *       @SWG\Property(
+     *       SWG\Property(
      *          property="stateful",
      *          type="boolean"
      *      ),
      *  ),
      * ),
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  description="ID von Container",
      *  format="int64",
      *  in="path",
@@ -65,7 +63,7 @@ class ContainerStateController extends Controller
      * ),
      *
      *
-     * @SWG\Response(
+     * SWG\Response(
      *  response=200,
      *  description="Erfolgsmeldung für Container Status Update."
      * ),
@@ -125,9 +123,9 @@ class ContainerStateController extends Controller
      *
      * @Route("/containers/{containerId}/state", name="show_container_state", methods={"GET"})
      *
-     *@SWG\Get(path="/containers/{containerId}/state",
+     *SWG\Get(path="/containers/{containerId}/state",
      *tags={"containerStates"},
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  description="ID von Container",
      *  format="int64",
      *  in="path",
@@ -136,7 +134,7 @@ class ContainerStateController extends Controller
      *  type="integer"
      * ),
      *
-     * @SWG\Response(
+     * SWG\Response(
      *  response=200,
      *  description="Aktueller Status des Contianers"
      * ),

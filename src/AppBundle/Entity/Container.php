@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Swagger\Annotations as OAS;
 
 
 /**
@@ -24,6 +25,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity("domainName")
  * @UniqueEntity("name")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ContainerRepository")
+ *
+ * @OAS\Schema(schema="container", type="object")
  */
 class Container
 {
@@ -31,28 +34,41 @@ class Container
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     *
+     * @OAS\Property(example="14")
+     * var integer
      */
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
+     * @ORM\Column(type="string")
+     *
+     * @OAS\Property(example="192.168.178.20")
+     * var string
      */
     protected $ipv4;
 
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
+     * @ORM\Column(type="string")
+     *
+     * @OAS\Property(example="fe80::20")
+     * var string
      */
     protected $ipv6;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      *
-     * @var [type]
+     * @OAS\Property(example="container14.localnet.com")
+     * var string
      */
     protected $domainName;
 
     /**
-     * @ORM\Column(type="text", unique=true)
+     * @ORM\Column(type="text")
+     *
+     * @OAS\Property(example="WebServer1")
+     * var string
      */
     protected $name;
 
@@ -63,21 +79,18 @@ class Container
     protected $settings;
 
     /**
-     * Nur für DEMO
+     * @ORM\Column(type="text")
      *
-     * @var string
-     *
-     * @ORM\Column(type="string")
+     * @OAS\Property(example="TODO Settings")
+     * var string
      */
     protected $state;
 
     /**
-     * Undocumented variable
-     *
-     * @var [type]
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      *
+     * @OAS\Property(ref="#/components/schemas/host")
      */
     protected $host;
 
