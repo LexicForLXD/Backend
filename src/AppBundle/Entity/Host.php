@@ -92,7 +92,7 @@ class Host
     protected $port;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      *
      * @OAS\Property(example="TODO Settings")
      * var string
