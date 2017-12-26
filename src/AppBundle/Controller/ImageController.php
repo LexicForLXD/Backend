@@ -72,6 +72,16 @@ class ImageController extends Controller
      * @Route("/images/{imageId}", name="get_single_image", methods={"GET"})
      */
     public function getSingleImage($imageId){
+        $images = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
+        if (!$images) {
+            throw $this->createNotFoundException(
+                'No Image for ID '.$imageId.' found'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($images, 'json');
+        return new Response($response);
     }
 }
