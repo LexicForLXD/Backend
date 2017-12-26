@@ -2,7 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Image;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Swagger\Annotations\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class ImageController extends Controller
@@ -13,7 +15,17 @@ class ImageController extends Controller
      * @Route("/images", name="images_all", methods={"GET"})
      */
     public function getAllImages(){
+        $images = $this->getDoctrine()->getRepository(Image::class)->findAll();
 
+        if (!$images) {
+            throw $this->createNotFoundException(
+                'No Images found'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($images, 'json');
+        return new Response($response);
     }
 
     /**
