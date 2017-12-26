@@ -34,7 +34,6 @@ class ImageController extends Controller
      * @Route("/hosts/{hostId}/images", name="all_images_on_host", methods={"GET"})
      */
     public function getAllImagesOnHost($hostId){
-        //TODO https://git.janrtr.de/syp-lxc/Backend/issues/32
         $images = $this->getDoctrine()->getRepository(Image::class)->findBy(array('host' => $hostId));
 
         if (!$images) {

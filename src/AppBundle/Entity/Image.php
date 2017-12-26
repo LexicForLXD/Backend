@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Class Container
@@ -42,6 +43,7 @@ class Image
     /**
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Host")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     * @JMS\Exclude()
      */
     protected $host;
 
@@ -116,6 +118,18 @@ class Image
     {
         $this->size = $size;
     }
+
+    /**
+     * @return mixed
+     * /**
+     * @JMS\VirtualProperty()
+     */
+    public function getHost()
+    {
+        return $this->host->getId();
+    }
+
+
 
 
 }
