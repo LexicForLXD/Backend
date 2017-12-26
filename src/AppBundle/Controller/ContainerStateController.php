@@ -9,6 +9,9 @@ use AppBundle\Service\LxdApi\ApiClient;
 use AppBundle\Service\LxdApi\Endpoints\ContainerState as ContainerStateApi;
 
 use AppBundle\Entity\Container;
+use AppBundle\Entity\ContainerStatus;
+
+use Doctrine\ORM\EntityManagerInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as SWG;
@@ -66,9 +69,9 @@ class ContainerStateController extends Controller
      * ),
      *)
      */
-    public function updateStateAction(Request $request, $containerId)
+    public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+        $container = $this->getDoctrine()->getRepository(Container::class)->findOneById($containerId);
 
         if (!$container) {
             throw $this->createNotFoundException(
@@ -76,17 +79,39 @@ class ContainerStateController extends Controller
             );
         }
 
-        $client = new ApiClient($container->host);
-        $containerApi = new ContainerStateApi($client);
+        // $status = $this->getDoctrine()->getRepository(ContainerStatus::class)->findOneById($container->status->id);
 
-        $data = [
-            "action" => $request->get("action"),
-            "timeout" => $request->get("timeout") ? : 30,
-            "force" => $request->get("force") ? : false,
-            "stateful" => $request->get("stateful") ? : false
-        ];
+        switch($request->get("action")){
+            case "start":
+                $container->setState("running");
+                break;
+            case "stop":
+                $container->setState("stopped");
+                break;
+            case "restart":
+                $container->setState("running");
+                break;
+            default:
+                return new JsonResponse(['error' => 'please use one of the following actions: state, stop, restart']);
+                break;
+        }
 
-        return $containerApi->update($container->name, $data);
+        $em->flush();
+
+
+        // $client = new ApiClient($container->host);
+        // $containerApi = new ContainerStateApi($client);
+
+        // $data = [
+        //     "action" => $request->get("action"),
+        //     "timeout" => $request->get("timeout") ? : 30,
+        //     "force" => $request->get("force") ? : false,
+        //     "stateful" => $request->get("stateful") ? : false
+        // ];
+
+        return new JsonResponse(['message' => 'success']);
+
+        // return $containerApi->update($container->name, $data);
     }
 
 
@@ -117,7 +142,7 @@ class ContainerStateController extends Controller
      */
     public function showCurrentStateAction($containerId)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+        $container = $this->getDoctrine()->getRepository(Container::class)->findOneById($containerId);
 
         if (!$container) {
             throw $this->createNotFoundException(
@@ -125,10 +150,14 @@ class ContainerStateController extends Controller
             );
         }
 
-        $client = new ApiClient($container->host);
-        $containerApi = new ContainerStateApi($client);
+        // $client = new ApiClient($container->host);
+        // $containerApi = new ContainerStateApi($client);
 
-        return $containerApi->actual($container->name);
+        // return $containerApi->actual($container->name);
+
+        // $serializer = $this->get('jms_serializer');
+        // $response = $serializer->serialize($container, 'json');
+        return new JsonResponse(['state' => $container->getState()]);
     }
 
 }

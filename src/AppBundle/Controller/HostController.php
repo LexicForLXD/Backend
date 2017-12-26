@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Leon
@@ -112,8 +113,7 @@ class HostController extends Controller
         $host->setPort($request->request->get('port'));
         $host->setSettings($request->request->get('settings'));
 
-        if($errorArray = $this->validation($host))
-        {
+        if ($errorArray = $this->validation($host)) {
             return new JsonResponse(['errors' => $errorArray], 400);
         }
 
@@ -127,8 +127,8 @@ class HostController extends Controller
 
     /**
      * Get a Host by hostID
-     * @Route("/hosts/{id}", name="hosts_show", methods={"GET"})
-     * @param int $id
+     * @Route("/hosts/{hostId}", name="hosts_show", methods={"GET"})
+     * @param int $hostId
      * @return Response
      *
      *SWG\Get(path="/hosts/{hostId}",
@@ -137,8 +137,8 @@ class HostController extends Controller
      *         description="ID von anzuzeigendem Host",
      *         format="int64",
      *         in="path",
-     *         name="id",
-     *          parameter="id",
+     *         name="hostId",
+     *          parameter="hostId",
      *         required=true,
      *         type="integer"
      * ),
@@ -149,13 +149,13 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function showAction($id)
+    public function showAction($hostId)
     {
-        $host = $this->getDoctrine()->getRepository(Host::class)->find($id);
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id ' . $id
+                'No host found for id ' . $hostId
             );
         }
 
@@ -166,9 +166,9 @@ class HostController extends Controller
 
     /**
      * Update a Host by hostID
-     * @Route("/hosts/{id}", name="hosts_update", methods={"PUT"})
+     * @Route("/hosts/{hostId}", name="hosts_update", methods={"PUT"})
      * @param Request $request
-     * @param int $id
+     * @param int $hostId
      * @param EntityManagerInterface $em
      * @return Response
      *
@@ -178,7 +178,7 @@ class HostController extends Controller
      *     description="ID von upzudaten Host",
      *     format="int64",
      *     in="path",
-     *     name="id",
+     *     name="hostId",
      *     required=true,
      *     type="integer"
      * ),
@@ -224,13 +224,13 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function updateAction(Request $request, $id, EntityManagerInterface $em)
+    public function updateAction(Request $request, $hostId, EntityManagerInterface $em)
     {
-        $host = $this->getDoctrine()->getRepository(Host::class)->find($id);
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id ' . $id
+                'No host found for id ' . $hostId
             );
         }
 
@@ -242,8 +242,7 @@ class HostController extends Controller
         $host->setPort($request->request->get('port'));
         $host->setSettings($request->request->get('settings'));
 
-        if($errorArray = $this->validation($host))
-        {
+        if ($errorArray = $this->validation($host)) {
             return new JsonResponse(['errors' => $errorArray], 400);
         }
 
@@ -257,8 +256,8 @@ class HostController extends Controller
     /**
      * Delete a Host by hostID
      *
-     * @Route("/hosts/{id}", name="hosts_delete", methods={"DELETE"})
-     * @param $id
+     * @Route("/hosts/{hostId}", name="hosts_delete", methods={"DELETE"})
+     * @param $hostId
      * @param EntityManagerInterface $em
      * @return Response
      *
@@ -268,7 +267,7 @@ class HostController extends Controller
      *     description="ID des zu löschenden Host",
      *     format="int64",
      *     in="path",
-     *     name="id",
+     *     name="hostId",
      *     required=true,
      *     type="integer"
      * ),
@@ -279,13 +278,13 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function deleteAction($id, EntityManagerInterface $em)
+    public function deleteAction($hostId, EntityManagerInterface $em)
     {
-        $host = $this->getDoctrine()->getRepository(Host::class)->find($id);
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id ' . $id
+                'No host found for id ' . $hostId
             );
         }
 
@@ -298,12 +297,12 @@ class HostController extends Controller
     /**
      * Authorize the Backend to Access the Hosts LXD API
      *
-     * @Route("/hosts/{id}authorization", name="hosts_authorize", methods={"POST"})
+     * @Route("/hosts/{hostId}authorization", name="hosts_authorize", methods={"POST"})
      *
      * push the client certificate to server
      *
      * @param Request $request
-     * @param [integer] $id
+     * @param [integer] $hostId
      * @return void
      *
      *SWG\Post(path="/hosts/{hostId}/authorization",
@@ -312,7 +311,7 @@ class HostController extends Controller
      *  description="ID des Host",
      *  format="int64",
      *  in="path",
-     *  name="id",
+     *  name="hostId",
      *  required=true,
      *  type="integer"
      * ),
@@ -332,13 +331,13 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function authorizeAction(Request $request, $id)
+    public function authorizeAction(Request $request, $hostId)
     {
-        $host = $this->getDoctrine()->getRepository(Host::class)->find($id);
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No host found for id ' . $id
+                'No host found for id ' . $hostId
             );
         }
 

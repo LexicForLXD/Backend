@@ -37,7 +37,7 @@ class Host
      * @OAS\Property(example="2")
      * var integer
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
@@ -46,7 +46,7 @@ class Host
      * @OAS\Property(example="192.168.178.5")
      * var string
      */
-    private $ipv4;
+    protected $ipv4;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
@@ -55,7 +55,7 @@ class Host
      * @OAS\Property(example="fe80::5")
      * var string
      */
-    private $ipv6;
+    protected $ipv6;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
@@ -64,7 +64,7 @@ class Host
      * @OAS\Property(example="host2.localnet.com")
      * var string
      */
-    private $domainName;
+    protected $domainName;
 
     /**
      * @ORM\Column(type="string", unique=true)
@@ -73,7 +73,7 @@ class Host
      * @OAS\Property(example="host2")
      * var string
      */
-    private $name;
+    protected $name;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
@@ -81,7 +81,7 @@ class Host
      * @OAS\Property(example="82-75-93-4D-B8-6F")
      * var string
      */
-    private $mac;
+    protected $mac;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -89,7 +89,7 @@ class Host
      * @OAS\Property(example="22")
      * var integer
      */
-    private $port;
+    protected $port;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -97,7 +97,7 @@ class Host
      * @OAS\Property(example="TODO Settings")
      * var string
      */
-    private $settings;
+    protected $settings;
 
     /**
      * Undocumented variable
@@ -106,7 +106,7 @@ class Host
      *
      * @ORM\OneToMany(targetEntity="Container", mappedBy="host")
      */
-    private $containers;
+    protected $containers;
 
 
     public function __construct()
@@ -257,32 +257,32 @@ class Host
     }
 
     /** @see \Serializable::serialize() */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->domainName,
-            $this->mac,
-            $this->port,
-            $this->settings
-        ));
-    }
+    // public function serialize()
+    // {
+    //     return serialize(array(
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->domainName,
+    //         $this->mac,
+    //         $this->port,
+    //         $this->settings
+    //     ));
+    // }
 
-    /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
-    {
-        list (
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->domainName,
-            $this->mac,
-            $this->port,
-            $this->settings
-            ) = unserialize($serialized);
-    }
+    // /** @see \Serializable::unserialize() */
+    // public function unserialize($serialized)
+    // {
+    //     list (
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->domainName,
+    //         $this->mac,
+    //         $this->port,
+    //         $this->settings
+    //         ) = unserialize($serialized);
+    // }
 }

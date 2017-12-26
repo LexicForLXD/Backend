@@ -38,7 +38,7 @@ class Container
      * @OAS\Property(example="14")
      * var integer
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string")
@@ -46,7 +46,7 @@ class Container
      * @OAS\Property(example="192.168.178.20")
      * var string
      */
-    private $ipv4;
+    protected $ipv4;
 
     /**
      * @ORM\Column(type="string")
@@ -54,15 +54,15 @@ class Container
      * @OAS\Property(example="fe80::20")
      * var string
      */
-    private $ipv6;
+    protected $ipv6;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      *
      * @OAS\Property(example="container14.localnet.com")
      * var string
      */
-    private $domainName;
+    protected $domainName;
 
     /**
      * @ORM\Column(type="text")
@@ -70,8 +70,13 @@ class Container
      * @OAS\Property(example="WebServer1")
      * var string
      */
-    private $name;
+    protected $name;
 
+
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     */
+    protected $settings;
 
     /**
      * @ORM\Column(type="text")
@@ -79,7 +84,7 @@ class Container
      * @OAS\Property(example="TODO Settings")
      * var string
      */
-    private $settings;
+    protected $state;
 
     /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
@@ -87,7 +92,18 @@ class Container
      *
      * @OAS\Property(ref="#/components/schemas/host")
      */
-    private $host;
+    protected $host;
+
+    /**
+     * gibt den Status zu einem Container an
+     *
+     * @var
+     *
+     * @ORM\OneToOne(targetEntity="ContainerStatus")
+     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
+     */
+    protected $status;
+
 
 
     /**
@@ -169,9 +185,19 @@ class Container
         return $this->host;
     }
 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
     public function setHost($host)
     {
         $this->host = $host;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 
     public function getDomainName()
@@ -184,6 +210,15 @@ class Container
         $this->domainName = $domainName;
     }
 
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    public function setState($state)
+    {
+        $this->state = $state;
+    }
 
     /**
      * Checks if the host has at least on URI
@@ -202,26 +237,28 @@ class Container
     }
 
     /** @see \Serializable::serialize() */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->settings
-        ));
-    }
+    // public function serialize()
+    // {
+    //     return serialize(array(
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->settings,
+    //         $this->host
+    //     ));
+    // }
 
-    /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
-    {
-        list (
-            $this->id,
-            $this->name,
-            $this->ipv4,
-            $this->ipv6,
-            $this->settings
-            ) = unserialize($serialized);
-    }
+    // /** @see \Serializable::unserialize() */
+    // public function unserialize($serialized)
+    // {
+    //     list (
+    //         $this->id,
+    //         $this->name,
+    //         $this->ipv4,
+    //         $this->ipv6,
+    //         $this->settings,
+    //         $this->host
+    //         ) = unserialize($serialized);
+    // }
 }

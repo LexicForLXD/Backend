@@ -13,6 +13,7 @@ use AppBundle\Service\LxdApi\ApiClient;
 use AppBundle\Service\LxdApi\Endpoints\Container as ContainerApi;
 
 use AppBundle\Entity\Container;
+use AppBundle\Entity\ContainerStatus;
 use AppBundle\Entity\Host;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -91,7 +92,7 @@ class ContainerController extends Controller
      *  ),
      *)
      */
-    public function listFormHostAction(Request $request, $hostId)
+    public function listFromHostAction(Request $request, $hostId)
     {
 
         $fresh = $request->query->get('fresh');
@@ -121,7 +122,9 @@ class ContainerController extends Controller
                     'No containers found'
                 );
             }
-            return new Response($containers);
+            $serializer = $this->get('jms_serializer');
+            $response = $serializer->serialize($containers, 'json');
+            return new Response($response);
         }
 
 
@@ -176,7 +179,7 @@ class ContainerController extends Controller
      * )
      *
      */
-    public function storeAction(Request $request, $hostId)
+    public function storeAction(Request $request, $hostId, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -186,8 +189,15 @@ class ContainerController extends Controller
             );
         }
 
-        $client = new ApiClient($host);
-        $containerApi = new ContainerApi($client);
+        // $containerStatus = new ContainerStatus;
+        // $containerStatus->setState('stopped');
+
+        // $em->persist($containerStatus);
+        // $em->flush();
+
+
+        // $client = new ApiClient($host);
+        // $containerApi = new ContainerApi($client);
         $type = $request->query->get('type');
 
         switch ($type) {
@@ -211,7 +221,27 @@ class ContainerController extends Controller
 
                 $container = new Container();
 
-                return $containerApi->create($data);
+                $container->setHost($host);
+                $container->setIpv4($request->get("ipv4"));
+                $container->setName($request->get("name"));
+                $container->setSettings($data);
+                // $container->setStatus($containerStatus);
+                $container->setState('stopped');
+
+
+                if($errorArray = $this->validation($container))
+                {
+                    return new JsonResponse(['errors' => $errorArray], 400);
+                }
+
+                $em->persist($container);
+                $em->flush();
+
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($container, 'json');
+                return new Response($response, Response::HTTP_CREATED);
+
+                // return $containerApi->create($data);
 
                 break;
             case 'migration':
@@ -279,9 +309,11 @@ class ContainerController extends Controller
 
                     //TODO in DB aktualisieren
 
-            return container;
+            return $container;
         }
-        return new Response($container);
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($container, 'json');
+        return new Response($response);
 
     }
 
@@ -289,7 +321,7 @@ class ContainerController extends Controller
     /**
      * Deletes a Container by containerID
      *
-     * @Route("/containers/{containerId}", name="containers_show", methods={"DELETE"})
+     * @Route("/containers/{containerId}", name="containers_delete", methods={"DELETE"})
      *
      *SWG\Delete(path="/containers/{containerId}",
      * tags={"containers"},
@@ -327,17 +359,23 @@ class ContainerController extends Controller
             );
         }
 
-        $client = new ApiClient($host);
-        $containerApi = new ContainerApi($client);
+        $em->remove($container);
+        $em->flush();
 
-        $response = $containerApi->remove($container->name);
+        return $this->json([], 204);
 
-        if ($response->getStatusCode() == 202) {
-            $em->remove($container);
-            $em->flush();
 
-            return $this->json([], 204);
-        }
+        // $client = new ApiClient($host);
+        // $containerApi = new ContainerApi($client);
+
+        //$response = $containerApi->remove($container->name);
+
+        // if ($response->getStatusCode() == 202) {
+        //     $em->remove($container);
+        //     $em->flush();
+
+        //     return $this->json([], 204);
+        // }
 
         return $this->json(['error' => 'Leider konnte der Container nicht gelöschtwerden.'], 500);
     }
@@ -345,6 +383,19 @@ class ContainerController extends Controller
 
 
 
+    private function validation($object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
 
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $errorArray;
+        }
+        return false;
+    }
 
 }
