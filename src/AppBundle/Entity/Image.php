@@ -40,6 +40,12 @@ class Image
     protected $size;
 
     /**
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Host")
+     * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     */
+    protected $host;
+
+    /**
      * @return mixed
      */
     public function getId()
