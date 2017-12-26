@@ -11,7 +11,7 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/", name="homepage")
-     * @SWG\Info(
+     * SWG\Info(
      *     title="Lexic API",
      *     version="1.0"
      * )

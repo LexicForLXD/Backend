@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use AppBundle\Service\LxdApi\ApiClient;
 use Swagger\Annotations as SWG;
 
@@ -28,12 +27,12 @@ class HostController extends Controller
      * @Route("/hosts", name="hosts_index", methods={"GET"})
      * @return Response
      *
-     * @SWG\Get(path="/hosts",
+     * SWG\Get(path="/hosts",
      * tags={"hosts"},
-     *      @SWG\Response(
+     *      SWG\Response(
      *          response=200,
      *          description="Zeigt eine Liste aller Hosts an",
-     *          @SWG\Schema(
+     *          SWG\Schema(
      *              type="array"
      *          ),
      *      ),
@@ -57,43 +56,43 @@ class HostController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      *
-     *@SWG\POST(path="/hosts",
+     *SWG\POST(path="/hosts",
      *tags={"hosts"},
-     * @SWG\Response(
+     * SWG\Response(
      *     response=201,
      *     description="gibt den neu gespeicherten Host zurück"
      * ),
      *
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  name="hostStoreData",
      *  in="body",
      *  required=true,
-     *  @SWG\Schema(
-     *      @SWG\Property(
+     *  SWG\Schema(
+     *      SWG\Property(
      *          property="ipv4",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="ipv6",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="domainName",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="name",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="mac",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="settings",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="port",
      *          type="integer"
      *      ),
@@ -132,9 +131,9 @@ class HostController extends Controller
      * @param int $id
      * @return Response
      *
-     *@SWG\Get(path="/hosts/{hostId}",
+     *SWG\Get(path="/hosts/{hostId}",
      *tags={"hosts"},
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *         description="ID von anzuzeigendem Host",
      *         format="int64",
      *         in="path",
@@ -144,7 +143,7 @@ class HostController extends Controller
      *         type="integer"
      * ),
      *
-     * @SWG\Response(
+     * SWG\Response(
      *     response=200,
      *     description="gibt einen Host zurück"
      * ),
@@ -173,9 +172,9 @@ class HostController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      *
-     *@SWG\Put(path="/hosts/{hostId}",
+     *SWG\Put(path="/hosts/{hostId}",
      *tags={"hosts"},
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *     description="ID von upzudaten Host",
      *     format="int64",
      *     in="path",
@@ -183,43 +182,43 @@ class HostController extends Controller
      *     required=true,
      *     type="integer"
      * ),
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  name="hostUpdateData",
      *  in="body",
      *  required=true,
-     *  @SWG\Schema(
-     *      @SWG\Property(
+     *  SWG\Schema(
+     *      SWG\Property(
      *          property="ipv4",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="ipv6",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="domainName",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="name",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="mac",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="settings",
      *          type="string"
      *      ),
-     *      @SWG\Property(
+     *      SWG\Property(
      *          property="port",
      *          type="integer"
      *      ),
      *  ),
      * ),
      *
-     * @SWG\Response(
+     * SWG\Response(
      *  response=200,
      *  description="Erfolgsmeldung,dass der Host erfolgreich geupdated wurde"
      * ),
@@ -263,9 +262,9 @@ class HostController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      *
-     * @SWG\Delete(path="/hosts/{hostId}",
+     * SWG\Delete(path="/hosts/{hostId}",
      *tags={"hosts"},
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *     description="ID des zu löschenden Host",
      *     format="int64",
      *     in="path",
@@ -274,7 +273,7 @@ class HostController extends Controller
      *     type="integer"
      * ),
      *
-     * @SWG\Response(
+     * SWG\Response(
      *     response=200,
      *     description="löscht einen Host"
      * ),
@@ -307,9 +306,9 @@ class HostController extends Controller
      * @param [integer] $id
      * @return void
      *
-     *@SWG\Post(path="/hosts/{hostId}/authorization",
+     *SWG\Post(path="/hosts/{hostId}/authorization",
      *tags={"hosts"},
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  description="ID des Host",
      *  format="int64",
      *  in="path",
@@ -318,16 +317,16 @@ class HostController extends Controller
      *  type="integer"
      * ),
      *
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  description="password of lxd host",
      *  format="int64",
      *  in="body",
      *  name="password",
      *  required=true,
-     *  @SWG\Schema(@SWG\Property(type="string", property="password")),
+     *  SWG\Schema(SWG\Property(type="string", property="password")),
      * ),
      *
-     * @SWG\Response(
+     * SWG\Response(
      *  response = 200,
      *  description="erfolgsmeldung dass Host erfolgreich authorisiert"
      * ),

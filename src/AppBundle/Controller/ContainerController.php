@@ -16,7 +16,7 @@ use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Swagger\Annotations as SWG;
+use Swagger\Annotations as OAS;
 
 
 
@@ -291,9 +291,9 @@ class ContainerController extends Controller
      *
      * @Route("/containers/{containerId}", name="containers_show", methods={"DELETE"})
      *
-     *@SWG\Delete(path="/containers/{containerId}",
+     *SWG\Delete(path="/containers/{containerId}",
      * tags={"containers"},
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  description="ID des Containers",
      *  format="int64",
      *  in="path",
@@ -302,7 +302,7 @@ class ContainerController extends Controller
      *  type="integer"
      * ),
      *
-     * @SWG\Response(
+     * SWG\Response(
      *      response=200,
      *      description="show a single container"
      * ),
