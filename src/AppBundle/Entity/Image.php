@@ -51,10 +51,10 @@ class Image
     protected $architecture;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      *
-     * @OAS\Property(example="1997")
-     * var integer
+     * @OAS\Property(example="160.23MB")
+     * var string
      */
     protected $size;
 
