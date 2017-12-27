@@ -126,7 +126,21 @@ class ImageController extends Controller
      * )
      */
     public function deleteImage($imageId){
+        $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
+        if (!$image) {
+            throw $this->createNotFoundException(
+                'No Image found for id ' . $imageId
+            );
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($image);
+        $em->flush();
+
+        //TODO Delete Image from Host
+
+        return $this->json([], 204);
     }
 
     /**
