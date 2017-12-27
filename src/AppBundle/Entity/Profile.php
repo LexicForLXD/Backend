@@ -9,7 +9,7 @@ use Swagger\Annotations as OAS;
  * Class Profile
  * @package AppBundle\Entity
  * @ORM\Entity
- * @ORM\Table(name="lxc-profiles")
+ * @ORM\Table(name="lxcprofiles")
  *
  * @OAS\Schema(schema="profile", type="object")
  */
