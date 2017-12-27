@@ -34,7 +34,17 @@ class ProfileController extends Controller
      * @Route("/profiles/{profileId}", name="profile_single", methods={"GET"})
      */
     public function getSingleProfile($profileId){
+        $profiles = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
+        if (!$profiles) {
+            throw $this->createNotFoundException(
+                'No LXC-Profile for ID '.$profileId.' found'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($profiles, 'json');
+        return new Response($response);
     }
 
     /**
