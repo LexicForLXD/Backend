@@ -103,6 +103,27 @@ class ImageController extends Controller
      * Delete a single Image
      *
      * @Route("/images/{imageId}", name="delete_image", methods={"DELETE"})
+     *
+     * @OAS\Delete(path="/images/{imageId}",
+     *     tags={"images"},
+     *     @OAS\Parameter(
+     *      description="ID of the Image",
+     *      in="path",
+     *      name="imageId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Image with the specified ImageId successfully deleted",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Image with the ImageId found or the image couldn't be deleted ",
+     *      ),
+     * )
      */
     public function deleteImage($imageId){
 
