@@ -94,6 +94,11 @@ class ImageController extends Controller
      *
      *
      * @Route("/hosts/{hostId}/images", name="create_image_on_host", methods={"POST"})
+     *
+     * @OAS\Post(path="/hosts/{hostId}/images",
+     *     tags={"images"},
+     *     description="TO BE DEFINED"
+     * )
      */
     public function createNewImageOnHost($hostId){
 
