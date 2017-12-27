@@ -6,6 +6,7 @@ use AppBundle\Entity\Image;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Swagger\Annotations as OAS;
 
 class ImageController extends Controller
 {
