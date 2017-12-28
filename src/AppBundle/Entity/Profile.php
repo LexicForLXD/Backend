@@ -133,4 +133,77 @@ class Profile
         $this->containers->removeElement($container);
         $container->removeProfile($this);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param mixed $config
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDevices()
+    {
+        return $this->devices;
+    }
+
+    /**
+     * @param mixed $devices
+     */
+    public function setDevices($devices)
+    {
+        $this->devices = $devices;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHosts()
+    {
+        return $this->hosts;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContainers()
+    {
+        return $this->containers;
+    }
+
 }
