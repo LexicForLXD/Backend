@@ -33,6 +33,14 @@ class Profile
      * @OAS\Property(example="TODO example description")
      * var string
      */
+    protected $name;
+
+    /**
+     * @ORM\Column(type="string")
+     *
+     * @OAS\Property(example="TODO example description")
+     * var string
+     */
     protected $description;
 
     /**
