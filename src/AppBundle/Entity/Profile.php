@@ -46,7 +46,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="{ "limits.memory": "2GB" }")
+     * @OAS\Property(example="TODO find out how to input JSON")
      * var json_array
      */
     protected $config;
@@ -54,7 +54,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="{ "kvm": { "type": "unix-char", "path": "/dev/kvm" } }")
+     * @OAS\Property(example="TODO find out how to input JSON")
      * var json_array
      */
     protected $devices;
