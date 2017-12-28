@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Swagger\Annotations as OAS;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Class Profile
@@ -48,4 +49,32 @@ class Profile
      * var json_array
      */
     protected $devices;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Host", inversedBy="profiles")
+     * @ORM\JoinTable(
+     *  joinColumns={
+     *      @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
+     *  }
+     * )
+     * @JMS\Exclude()
+     */
+    protected $hosts;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="profiles")
+     * @ORM\JoinTable(
+     *  joinColumns={
+     *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
+     *  }
+     * )
+     * @JMS\Exclude()
+     */
+    protected $containers;
 }

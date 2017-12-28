@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Swagger\Annotations as OAS;
+use JMS\Serializer\Annotation as JMS;
 
 
 /**
@@ -107,6 +108,12 @@ class Host
      * @ORM\OneToMany(targetEntity="Container", mappedBy="host")
      */
     protected $containers;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Profile", mappedBy="hosts")
+     * @JMS\Exclude()
+     */
+    protected $profiles;
 
 
     public function __construct()
