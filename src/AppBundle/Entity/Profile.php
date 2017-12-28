@@ -108,6 +108,6 @@ class Profile
             return;
         }
         $this->hosts->removeElement($host);
-        $host->removeUser($this);
+        $host->removeProfile($this);
     }
 }
