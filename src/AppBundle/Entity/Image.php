@@ -7,7 +7,7 @@ use JMS\Serializer\Annotation as JMS;
 use Swagger\Annotations as OAS;
 
 /**
- * Class Container
+ * Class Image
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="images")
