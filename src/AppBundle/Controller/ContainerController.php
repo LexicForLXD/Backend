@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use AppBundle\Service\LxdApi\ApiClient;
 use AppBundle\Service\LxdApi\Endpoints\Container as ContainerApi;
 
 use AppBundle\Entity\Container;
@@ -48,7 +47,7 @@ class ContainerController extends Controller
     {
         $containers = $this->getDoctrine()->getRepository(Container::class)->findAllJoinedToHost();
 
-        
+
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($containers, 'json');
@@ -102,10 +101,13 @@ class ContainerController extends Controller
                     'No host found for id ' . $hostId
                 );
             }
-            $client = new ApiClient($host);
-            $containerApi = new ContainerApi($client);
 
-            $containers = $containerApi->list();
+
+            $containerApi = new ContainerApi();
+
+
+
+            $containers = $containerApi->list($host);
 
             //TODO in DB aktualisieren
 
@@ -230,15 +232,6 @@ class ContainerController extends Controller
                     return new JsonResponse(['errors' => $errorArray], 400);
                 }
 
-                $em->persist($container);
-                $em->flush();
-
-                $serializer = $this->get('jms_serializer');
-                $response = $serializer->serialize($container, 'json');
-                return new Response($response, Response::HTTP_CREATED);
-
-                // return $containerApi->create($data);
-
                 break;
             case 'migration':
                 return new JsonResponse(["message" => "migration"]);
@@ -249,6 +242,18 @@ class ContainerController extends Controller
             default:
                 return new JsonResponse(["message" => "none"]);
         }
+
+        $containerApi = new \AppBundle\Service\LxdApi\Endpoints\ContainerApi();
+        $response = $containerApi->create($host, $data);
+
+        //TODO Mögliche Fehler abfangen async
+
+        $em->persist($container);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($container, 'json');
+        return new Response($response, Response::HTTP_CREATED);
 
     }
 
@@ -291,19 +296,13 @@ class ContainerController extends Controller
         }
 
         if ($fresh == 'true') {
-            $host = $this->getDoctrine()->getRepository(Host::class)->find($container->host->id);
 
-            if (!$host) {
-                throw $this->createNotFoundException(
-                    'No host found for id ' . $host
-                );
-            }
-            $client = new ApiClient($host);
-            $containerApi = new ContainerApi($client);
 
-            $container = $containerApi->show($container->name);
+            $containerApi = new ContainerApi();
 
-                    //TODO in DB aktualisieren
+            $container = $containerApi->show($container->host, $container->name);
+
+            //TODO in DB aktualisieren
 
             return $container;
         }
@@ -347,31 +346,15 @@ class ContainerController extends Controller
             );
         }
 
-        // $host = $this->getDoctrine()->getRepository(Host::class)->find($container->host->id);
+        $containerApi = new ContainerApi();
+        $response = $containerApi->remove($container->host, $container->name);
 
-        // if (!$host) {
-        //     throw $this->createNotFoundException(
-        //         'No host found for id ' . $host->getId()
-        //     );
-        // }
+        if ($response->getStatusCode() == 202) {
+            $em->remove($container);
+            $em->flush();
 
-        $em->remove($container);
-        $em->flush();
-
-        return $this->json([], 204);
-
-
-        // $client = new ApiClient($host);
-        // $containerApi = new ContainerApi($client);
-
-        //$response = $containerApi->remove($container->name);
-
-        // if ($response->getStatusCode() == 202) {
-        //     $em->remove($container);
-        //     $em->flush();
-
-        //     return $this->json([], 204);
-        // }
+            return $this->json([], 204);
+        }
 
         return $this->json(['error' => 'Leider konnte der Container nicht gelöschtwerden.'], 500);
     }

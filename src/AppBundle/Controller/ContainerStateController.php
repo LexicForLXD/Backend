@@ -97,6 +97,7 @@ class ContainerStateController extends Controller
 
         $stateApi = new \AppBundle\Service\LxdApi\Endpoints\ContainerStateApi();
         $response = $stateApi->update($container->host, $container->name, $request->get("action"));
+        //TODO mögliche Fehler abfangen
 
         $em->flush();
 
