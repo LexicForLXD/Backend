@@ -8,26 +8,32 @@
 namespace AppBundle\Service\LxdApi\Endpoints;
 
 
-use AppBundle\Service\Util\ResponseFormat;
-use AppBundle\Service\LxdApi\ApiClient;
+use AppBundle\Service\LxdApi\Util\HttpHelper;
+use Httpful\Request;
+use AppBundle\Entity\Host;
 
-class Host extends AbstractEndpoint
+
+class HostApi
 {
     protected function getEndpoint($urlParam = NULL)
     {
         return '';
     }
 
-
+    public function __construct()
+    {
+        HttpHelper::init();
+    }
 
     /**
      *  Server configuration and environment information
      *
      * @return object
      */
-    public function info()
+    public function info(Host $host)
     {
-        return $this->get($this->getEndpoint());
+        $uri = HttpHelper::buildUri($host, $this->getEndpoint());
+        return Request::get($uri)->send();
     }
 
     /**
@@ -41,8 +47,9 @@ class Host extends AbstractEndpoint
         return $info['auth'] === 'trusted' ? true : false;
     }
 
-    public function authenticate($data)
+    public function authenticate(Host $host, $data)
     {
-        return $this->post('certificates', $data);
+        $uri = HttpHelper::buildUri($host, 'certificates');
+        return Request::post($uri, $data)->send();
     }
 }
