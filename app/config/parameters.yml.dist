@@ -18,3 +18,8 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret: ThisTokenIsNotSoSecretChangeIt
+
+    # Location of the certificate for authorization to lxd
+    cert_location: /path/to/fullchain.pem
+    cert_key_location: /path/to/privkey.pem
+    cert_passphrase: ~

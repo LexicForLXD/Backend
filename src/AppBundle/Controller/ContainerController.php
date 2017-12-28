@@ -17,7 +17,7 @@ use AppBundle\Entity\ContainerStatus;
 use AppBundle\Entity\Host;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Swagger\Annotations as SWG;
+use Swagger\Annotations as OAS;
 
 
 
@@ -28,16 +28,20 @@ class ContainerController extends Controller
      *
      * @Route("/containers", name="containers_all", methods={"GET"})
      *
-     * @SWG\Get(path="/containers",
+     * @OAS\Get(path="/containers",
      *     tags={"containers"},
-     *      @SWG\Response(
+     *      @OAS\Response(
      *          response=200,
-     *          description="list of all containers",
-     *          ref="$/responses/Json",
-     *          @SWG\Schema(
+     *          description="List of all containers",
+     *          @OAS\JsonContent(ref="#/components/schemas/container"),
+     *          @OAS\Schema(
      *              type="array"
      *          ),
-     *      )
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No containers found",
+     *      ),
      * )
      */
     public function indexAction()
@@ -56,32 +60,32 @@ class ContainerController extends Controller
      *
      *@Route("/hosts/{hostId}/containers", name="containers_from_host", methods={"GET"})
      *
-     *@SWG\Get(path="/hosts/{hostId}/containers",
-     * tags={"containers"},
-     * @SWG\Response(
-     *  response=200,
-     *  description="list of containers from one host",
-     *  @SWG\Schema(
-     *      type="array"
-     *  )
-     * ),
+     *@OAS\Get(path="/hosts/{hostId}/containers?fresh={fresh}",
+     *  tags={"containers"},
+     *  @OAS\Response(
+     *      response=200,
+     *      description="List of containers from one host",
+     *      @OAS\JsonContent(ref="#/components/schemas/container"),
+     *  ),
      *
-     * @SWG\Parameter(
-     *  description="ID des Hosts",
-     *  format="int64",
-     *  in="path",
-     *  name="hostId",
-     *  required=true,
-     *  type="integer"
-     * ),
+     *  @OAS\Parameter(
+     *      description="ID of the Host",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *      @OAS\Schema(
+     *          type="integer"
+     *      ),
+     *  ),
      *
-     * @SWG\Parameter(
-     *  description="Ob die gecacheten Container zurückgegeben werden sollen. Wenn fresh dann gleich true",
-     *  format="int64",
-     *  in="query",
-     *  name="fresh",
-     *  type="string"
-     * )
+     *  @OAS\Parameter(
+     *      description="true = force collect new data and return them, false = return cached data from the database",
+     *      in="query",
+     *      name="fresh",
+     *      @OAS\Schema(
+     *          type="boolean"
+     *      ),
+     *  ),
      *)
      */
     public function listFromHostAction(Request $request, $hostId)
@@ -129,43 +133,43 @@ class ContainerController extends Controller
      *
      * @Route("/hosts/{hostId}/containers", name="containers_store", methods={"POST"})
      *
-     * @SWG\Post(path="/hosts/{hostId}/containers",
+     * @OAS\Post(path="/hosts/{hostId}/containers",
      * tags={"containers"},
-         * @SWG\Parameter(
-         *  description="how to create a new container",
-         *  format="int64",
+         * @OAS\Parameter(
+         *  description="Parameters for the new Container",
          *  in="body",
-         *  name="containerStoreData",
+         *  name="containerData",
          *  required=true,
-         *  @SWG\Schema(
-         *      @SWG\Property(
+         *  @OAS\Schema(
+         *      @OAS\Property(
          *          property="action",
          *          type="string",
          *          enum={"image", "migration", "copy", "none"},
          *          default="none"
          *      ),
-         *      @SWG\Property(
+         *      @OAS\Property(
          *          property="name",
          *          type="string"
          *      ),
-         *      @SWG\Property(
+         *      @OAS\Property(
          *          property="architecture",
          *          type="string"
          *      ),
          *  ),
          *),
          *
-         * @SWG\Parameter(
-         *  description="ID des Hosts",
-         *  format="int64",
+         * @OAS\Parameter(
+         *  description="ID of the Host the container should be created on",
          *  in="path",
          *  name="hostId",
          *  required=true,
-         *  type="integer"
+         *  @OAS\Schema(
+         *     type="integer"
+         *  ),
          * ),
          *
-         * @SWG\Response(
-         *  description="erfolgsmeldung dass der Container erstellt wurde",
+         * @OAS\Response(
+         *  description="The Container was successfully created",
          *  response=201
          * ),
      * )
@@ -254,20 +258,22 @@ class ContainerController extends Controller
      *
      * @Route("/containers/{containerId}", name="containers_show", methods={"GET"})
      *
-     *@SWG\Get(path="/containers/{containerId}",
+     *@OAS\Get(path="/containers/{containerId}",
      * tags={"containers"},
-     * @SWG\Parameter(
-     *  description="ID des Containers",
-     *  format="int64",
+     * @OAS\Parameter(
+     *  description="ID of the Container",
      *  in="path",
      *  name="containerId",
      *  required=true,
-     *  type="integer"
+     *   @OAS\Schema(
+     *         type="integer"
+     *   ),
      * ),
      *
-     * @SWG\Response(
+     * @OAS\Response(
      *      response=200,
-     *      description="show a single container"
+     *      description="Returns the informationen of a single Container",
+     *      @OAS\JsonContent(ref="#/components/schemas/container"),
      * ),
      *)
      *
@@ -313,9 +319,9 @@ class ContainerController extends Controller
      *
      * @Route("/containers/{containerId}", name="containers_delete", methods={"DELETE"})
      *
-     *@SWG\Delete(path="/containers/{containerId}",
+     *SWG\Delete(path="/containers/{containerId}",
      * tags={"containers"},
-     * @SWG\Parameter(
+     * SWG\Parameter(
      *  description="ID des Containers",
      *  format="int64",
      *  in="path",
@@ -324,7 +330,7 @@ class ContainerController extends Controller
      *  type="integer"
      * ),
      *
-     * @SWG\Response(
+     * SWG\Response(
      *      response=200,
      *      description="show a single container"
      * ),

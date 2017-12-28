@@ -77,17 +77,6 @@ swiftmailer:
     password: '%mailer_password%'
     spool: { type: memory }
 
-nelmio_api_doc:
-    routes:
-        path_patterns: # an array of regexps
-            - ^/[^_doc]
-            - ^/oauth
-    documentation:
-        info:
-            title: Lexci API
-            description: Backend for new LXD ui
-            version: 0.0.1
-
 fos_rest:
     routing_loader:
         default_format: json                            # All responses should be JSON formated
