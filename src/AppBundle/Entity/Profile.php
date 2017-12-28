@@ -110,4 +110,27 @@ class Profile
         $this->hosts->removeElement($host);
         $host->removeProfile($this);
     }
+
+    /**
+     * @param Container $container
+     */
+    public function addContainer(Container $container)
+    {
+        if ($this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->add($container);
+        $container->addProfile($this);
+    }
+
+    /**
+     * @param Container $container
+     */
+    public function removeContainer(Container $container){
+        if (!$this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->removeElement($container);
+        $container->removeProfile($this);
+    }
 }

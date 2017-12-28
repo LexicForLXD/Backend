@@ -111,6 +111,10 @@ class Container
      */
     protected $profiles;
 
+    public function __construct()
+    {
+        $this->profiles = new ArrayCollection();
+    }
 
     /**
      * @return mixed
@@ -240,6 +244,28 @@ class Container
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param Profile $profile
+     */
+    public function addProfile(Profile $profile){
+        if ($this->profiles->contains($profile)) {
+            return;
+        }
+        $this->profiles->add($profile);
+        $profile->addContainer($this);
+    }
+
+    /**
+     * @param Profile $profile
+     */
+    public function removeProfile(Profile $profile){
+        if (!$this->profiles->contains($profile)) {
+            return;
+        }
+        $this->profiles->removeElement($profile);
+        $profile->removeContainer($this);
     }
 
     /** @see \Serializable::serialize() */
