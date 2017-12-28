@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
@@ -77,4 +78,36 @@ class Profile
      * @JMS\Exclude()
      */
     protected $containers;
+
+    /**
+     * Profile constructor.-
+     */
+    public function __construct()
+    {
+        $this->hosts = new ArrayCollection();
+        $this->containers = new ArrayCollection();
+    }
+
+    /**
+     * @param Host $host
+     */
+    public function addHost(Host $host)
+    {
+        if ($this->hosts->contains($host)) {
+            return;
+        }
+        $this->hosts->add($host);
+        $host->addProfile($this);
+    }
+
+    /**
+     * @param Host $host
+     */
+    public function removeHost(Host $host){
+        if (!$this->hosts->contains($host)) {
+            return;
+        }
+        $this->hosts->removeElement($host);
+        $host->removeUser($this);
+    }
 }

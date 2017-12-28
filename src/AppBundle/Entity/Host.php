@@ -119,6 +119,7 @@ class Host
     public function __construct()
     {
         $this->containers = new ArrayCollection();
+        $this->profiles = new ArrayCollection();
     }
 
 
@@ -261,6 +262,28 @@ class Host
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param Profile $profile
+     */
+    public function addProfile(Profile $profile){
+        if ($this->profiles->contains($profile)) {
+            return;
+        }
+        $this->profiles->add($profile);
+        $profile->addHost($this);
+    }
+
+    /**
+     * @param Profile $profile
+     */
+    public function removeProfile(Profile $profile){
+        if (!$this->profiles->contains($profile)) {
+            return;
+        }
+        $this->profiles->removeElement($profile);
+        $profile->removeHost($this);
     }
 
     /** @see \Serializable::serialize() */
