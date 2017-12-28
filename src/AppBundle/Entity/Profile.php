@@ -30,7 +30,7 @@ class Profile
     /**
      * @ORM\Column(type="string")
      *
-     * @OAS\Property(example="TODO example description")
+     * @OAS\Property(example="my-profilename")
      * var string
      */
     protected $name;
@@ -38,7 +38,7 @@ class Profile
     /**
      * @ORM\Column(type="string")
      *
-     * @OAS\Property(example="TODO example description")
+     * @OAS\Property(example="Some description string")
      * var string
      */
     protected $description;
@@ -46,7 +46,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="TODO example config")
+     * @OAS\Property(example="{ "limits.memory": "2GB" }")
      * var json_array
      */
     protected $config;
@@ -54,7 +54,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="TODO example devices")
+     * @OAS\Property(example="{ "kvm": { "type": "unix-char", "path": "/dev/kvm" } }")
      * var json_array
      */
     protected $devices;
