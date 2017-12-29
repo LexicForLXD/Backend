@@ -164,7 +164,7 @@ class ProfileController extends Controller
      * @param Profile $profile
      * @param Container $container
      */
-    public function useProfile(Profile $profile, Container $container){
+    public function enableProfile(Profile $profile, Container $container){
         $profile->addContainer($container);
         $host = $container->getHost();
         if($profile->isHostLinked($host)){
