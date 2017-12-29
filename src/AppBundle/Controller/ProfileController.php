@@ -108,9 +108,11 @@ class ProfileController extends Controller
         }
 
         if($profile->linkedToHost()){
-            // TODO add logic to delete LXC-Profile from all hosts then delete Profile from Database
-            return new JsonResponse(['errors' => 'This variation is not implemented'], Response::HTTP_NOT_IMPLEMENTED);
+            $this->removeProfileFromHosts($profile);
         }
+
+        //Get updated Profile object
+        $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
         $em = $this->getDoctrine()->getManager();
 
@@ -143,5 +145,27 @@ class ProfileController extends Controller
             return $errorArray;
         }
         return false;
+    }
+
+    /**
+     * Used to remove the Profile from als Hosts via the LXD Api
+     *
+     * @param Profile $profile
+     */
+    private function removeProfileFromHosts(Profile $profile){
+        $hosts = $profile->getHosts();
+        while($hosts->next()){
+            $host = $hosts->current();
+            //TODO Add LXD Api call to remove profile from Host
+
+            $profile->removeHost($host);
+
+            //Get updated list of Hosts
+            $hosts = $profile->getHosts();
+        }
+        //Update Profile in the Database
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($profile);
+        $em->flush();
     }
 }
