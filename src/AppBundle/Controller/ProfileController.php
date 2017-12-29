@@ -164,7 +164,9 @@ class ProfileController extends Controller
      * @param Container $container
      */
     public function useProfile(Profile $profile, Container $container){
-
+        $profile->addContainer($container);
+        $host = $container->getHost();
+        $profile->addHost($host);
     }
 
     private function validation($object)
