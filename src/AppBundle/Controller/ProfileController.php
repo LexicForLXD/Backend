@@ -159,7 +159,7 @@ class ProfileController extends Controller
 
     /**
      * Used internally in the container creation process to link the profile to host and container
-     * and publish the container to the host if needed
+     * and publish the profile to the host if needed
      * @param Profile $profile
      * @param Container $container
      */
