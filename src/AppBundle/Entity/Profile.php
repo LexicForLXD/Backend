@@ -267,4 +267,17 @@ class Profile
         return $ids;
     }
 
+    /**
+     * Internally used to check if a profile is used by one or more containers
+     *
+     * @return bool
+     */
+    public function isUsedByContainer() : bool {
+        if($this->containers->count() > 0){
+            return true;
+        }
+
+        return false;
+    }
+
 }
