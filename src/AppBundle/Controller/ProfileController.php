@@ -6,6 +6,8 @@ use AppBundle\Entity\Container;
 use AppBundle\Entity\Profile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProfileController extends Controller
@@ -52,9 +54,30 @@ class ProfileController extends Controller
      * Create a LXC-Profile
      *
      * @Route("/profiles", name="create_profile", methods={"POST"})
+     * @param Request $request
+     * @return JsonResponse|Response
      */
-    public function createProfile(){
+    public function createProfile(Request $request){
 
+        $profile = new Profile();
+
+        $profile->setName($request->request->get('name'));
+        $profile->setDescription($request->request->get('description'));
+        $profile->setConfig($request->request->get('config'));
+        $profile->setDevices($request->request->get('devices'));
+
+        if ($errorArray = $this->validation($profile)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($profile);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($profile, 'json');
+        return new Response($response, Response::HTTP_CREATED);
     }
 
     /**
@@ -83,6 +106,22 @@ class ProfileController extends Controller
      */
     public function useProfile(Profile $profile, Container $container){
 
+    }
+
+    //TODO Add validation to Entity
+    private function validation($object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
+
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $errorArray;
+        }
+        return false;
     }
 
 }
