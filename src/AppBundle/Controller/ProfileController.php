@@ -169,6 +169,12 @@ class ProfileController extends Controller
         $profile->addHost($host);
     }
 
+    public function disableProfileForContainer(Profile $profile, Container $container){
+        $profile->removeContainer($container);
+        $host = $container->getHost();
+        $profile->removeHost($host);
+    }
+
     private function validation($object)
     {
         $validator = $this->get('validator');
