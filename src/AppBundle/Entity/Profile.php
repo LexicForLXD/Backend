@@ -28,9 +28,17 @@ class Profile
     protected $id;
 
     /**
+     * @ORM\Column(type="string", unique=true, nullable=false)
+     *
+     * @OAS\Property(example="my-profilename")
+     * var string
+     */
+    protected $name;
+
+    /**
      * @ORM\Column(type="string")
      *
-     * @OAS\Property(example="TODO example description")
+     * @OAS\Property(example="Some description string")
      * var string
      */
     protected $description;
@@ -38,7 +46,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="TODO example config")
+     * @OAS\Property(example="TODO find out how to input JSON")
      * var json_array
      */
     protected $config;
@@ -46,7 +54,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="TODO example devices")
+     * @OAS\Property(example="TODO find out how to input JSON")
      * var json_array
      */
     protected $devices;
@@ -204,6 +212,52 @@ class Profile
     public function getContainers()
     {
         return $this->containers;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return array
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getHostId(){
+        $ids[] = null;
+
+        while($this->hosts->next()){
+            $ids[] = $this->hosts->current()->getId();
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @return array
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getContainerId(){
+        $ids[] = null;
+
+        while($this->containers->next()){
+            $ids[] = $this->containers->current()->getId();
+        }
+
+        return $ids;
     }
 
 }
