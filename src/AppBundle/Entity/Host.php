@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Swagger\Annotations as OAS;
+use JMS\Serializer\Annotation as JMS;
 
 
 /**
@@ -108,10 +109,17 @@ class Host
      */
     protected $containers;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Profile", mappedBy="hosts")
+     * @JMS\Exclude()
+     */
+    protected $profiles;
+
 
     public function __construct()
     {
         $this->containers = new ArrayCollection();
+        $this->profiles = new ArrayCollection();
     }
 
 
@@ -254,6 +262,28 @@ class Host
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param Profile $profile
+     */
+    public function addProfile(Profile $profile){
+        if ($this->profiles->contains($profile)) {
+            return;
+        }
+        $this->profiles->add($profile);
+        $profile->addHost($this);
+    }
+
+    /**
+     * @param Profile $profile
+     */
+    public function removeProfile(Profile $profile){
+        if (!$this->profiles->contains($profile)) {
+            return;
+        }
+        $this->profiles->removeElement($profile);
+        $profile->removeHost($this);
     }
 
     /** @see \Serializable::serialize() */

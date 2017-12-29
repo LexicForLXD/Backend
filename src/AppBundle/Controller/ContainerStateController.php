@@ -5,7 +5,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use AppBundle\Service\LxdApi\ApiClient;
 use AppBundle\Service\LxdApi\Endpoints\ContainerState as ContainerStateApi;
 
 use AppBundle\Entity\Container;
@@ -96,6 +95,10 @@ class ContainerStateController extends Controller
                 break;
         }
 
+        $stateApi = new \AppBundle\Service\LxdApi\Endpoints\ContainerStateApi();
+        $response = $stateApi->update($container->host, $container->name, $request->get("action"));
+        //TODO mögliche Fehler abfangen
+
         $em->flush();
 
 
@@ -150,14 +153,17 @@ class ContainerStateController extends Controller
             );
         }
 
-        // $client = new ApiClient($container->host);
-        // $containerApi = new ContainerStateApi($client);
 
-        // return $containerApi->actual($container->name);
+        $stateApi  = new \AppBundle\Service\LxdApi\Endpoints\ContainerStateApi();
+        $response = $stateApi->actual($container->host, $container->name);
+
 
         // $serializer = $this->get('jms_serializer');
         // $response = $serializer->serialize($container, 'json');
-        return new JsonResponse(['state' => $container->getState()]);
+        return new JsonResponse([
+            'state' => $response->body->metadata->status,
+            'stateCode' => $response->body->metadata->status_code
+        ]);
     }
 
 }
