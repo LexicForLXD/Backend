@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Container;
 use AppBundle\Entity\Profile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -71,6 +72,16 @@ class ProfileController extends Controller
      * @Route("/profiles/{profileId}", name="delete_profile", methods={"DELETE"})
      */
     public function deleteProfile($profileId){
+
+    }
+
+    /**
+     * Used internally in the container creation process to link the profile to host and container
+     * and publish the container to the host if needed
+     * @param Profile $profile
+     * @param Container $container
+     */
+    public function useProfile(Profile $profile, Container $container){
 
     }
 
