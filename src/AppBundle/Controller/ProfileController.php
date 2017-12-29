@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Container;
+use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -84,9 +85,44 @@ class ProfileController extends Controller
      * Edit a existing LXC-Profile
      *
      * @Route("/profiles/{profileId}", name="edit_profile", methods={"PUT"})
+     * @param $profileId
+     * @param Request $request
+     * @return Response
      */
-    public function editProfile($profileId){
+    public function editProfile($profileId, Request $request){
+        $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
+        if (!$profile) {
+            throw $this->createNotFoundException(
+                'No LXC-Profile for ID '.$profileId.' found'
+            );
+        }
+
+        if($request->request->get('name')) {
+            $profile->setName($request->request->get('name'));
+        }
+        if($request->request->get('description')) {
+            $profile->setDescription($request->request->get('description'));
+        }
+        if($request->request->get('config')) {
+            $profile->setConfig($request->request->get('config'));
+        }
+        if($request->request->get('devices')) {
+            $profile->setDevices($request->request->get('devices'));
+        }
+
+        if($profile->linkedToHost()){
+            $this->updateProfileOnHosts($profile);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($profile);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($profile, 'json');
+        return new Response($response, Response::HTTP_CREATED);
     }
 
     /**
@@ -124,12 +160,25 @@ class ProfileController extends Controller
 
     /**
      * Used internally in the container creation process to link the profile to host and container
-     * and publish the container to the host if needed
+     * and publish the profile to the host if needed
      * @param Profile $profile
      * @param Container $container
      */
-    public function useProfile(Profile $profile, Container $container){
+    public function enableProfile(Profile $profile, Container $container){
+        $profile->addContainer($container);
+        $host = $container->getHost();
+        if($profile->isHostLinked($host)){
+            return;
+        }
+        $this->createProfileOnHost($profile, $host);
+        $profile->addHost($host);
+    }
 
+    public function disableProfileForContainer(Profile $profile, Container $container){
+        $profile->removeContainer($container);
+        $host = $container->getHost();
+        $profile->removeHost($host);
+        //TODO Remove LXC-Profile from Host
     }
 
     private function validation($object)
@@ -145,6 +194,15 @@ class ProfileController extends Controller
             return $errorArray;
         }
         return false;
+    }
+
+    /**
+     * Publishes the LXC-Profile to the specified Host via the LXD-API
+     * @param Profile $profile
+     * @param Host $host
+     */
+    private function createProfileOnHost(Profile $profile, Host $host){
+        //TODO LXD API Call to create LXC-Profile on the specified Host
     }
 
     /**
@@ -167,5 +225,18 @@ class ProfileController extends Controller
         $em = $this->getDoctrine()->getManager();
         $em->persist($profile);
         $em->flush();
+    }
+
+    /**
+     * Used to update the LXC-Profile an all hosts where it's used
+     *
+     * @param Profile $profile
+     */
+    private function updateProfileOnHosts(Profile $profile){
+        $hosts = $profile->getHosts();
+        while($hosts->next()){
+            $host = $hosts->current();
+            //TODO Add LXD Api call to update profile on Host
+        }
     }
 }
