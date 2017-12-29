@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Container;
+use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -166,6 +167,10 @@ class ProfileController extends Controller
     public function useProfile(Profile $profile, Container $container){
         $profile->addContainer($container);
         $host = $container->getHost();
+        if($profile->isHostLinked($host)){
+            return;
+        }
+        $this->createProfileOnHost($profile, $host);
         $profile->addHost($host);
     }
 
@@ -173,6 +178,7 @@ class ProfileController extends Controller
         $profile->removeContainer($container);
         $host = $container->getHost();
         $profile->removeHost($host);
+        //TODO Remove LXC-Profile from Host
     }
 
     private function validation($object)
@@ -188,6 +194,15 @@ class ProfileController extends Controller
             return $errorArray;
         }
         return false;
+    }
+
+    /**
+     * Publishes the LXC-Profile to the specified Host via the LXD-API
+     * @param Profile $profile
+     * @param Host $host
+     */
+    private function createProfileOnHost(Profile $profile, Host $host){
+        //TODO LXD API Call to create LXC-Profile on the specified Host
     }
 
     /**
