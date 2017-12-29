@@ -245,4 +245,19 @@ class Profile
         return $ids;
     }
 
+    /**
+     * @return array
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getContainerId(){
+        $ids[] = null;
+
+        while($this->containers->next()){
+            $ids[] = $this->containers->current()->getId();
+        }
+
+        return $ids;
+    }
+
 }
