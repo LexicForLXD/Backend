@@ -111,7 +111,7 @@ class ProfileController extends Controller
         }
 
         if($profile->linkedToHost()){
-            //TODO Add update function for Host
+            $this->updateProfileOnHosts($profile);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -202,5 +202,18 @@ class ProfileController extends Controller
         $em = $this->getDoctrine()->getManager();
         $em->persist($profile);
         $em->flush();
+    }
+
+    /**
+     * Used to update the LXC-Profile an all hosts where it's used
+     *
+     * @param Profile $profile
+     */
+    private function updateProfileOnHosts(Profile $profile){
+        $hosts = $profile->getHosts();
+        while($hosts->next()){
+            $host = $hosts->current();
+            //TODO Add LXD Api call to update profile on Host
+        }
     }
 }
