@@ -280,4 +280,16 @@ class Profile
         return false;
     }
 
+    /**
+     * Internally used to check if a profile is present on one or more hosts
+     * @return bool
+     */
+    public function linkedToHost() : bool {
+        if($this->hosts->count() > 0){
+            return true;
+        }
+
+        return false;
+    }
+
 }
