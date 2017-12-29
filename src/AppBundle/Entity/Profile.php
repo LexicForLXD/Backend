@@ -28,7 +28,7 @@ class Profile
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=false)
      *
      * @OAS\Property(example="my-profilename")
      * var string
@@ -228,6 +228,21 @@ class Profile
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return array
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getHostId(){
+        $ids[] = null;
+
+        while($this->hosts->next()){
+            $ids[] = $this->hosts->current()->getId();
+        }
+
+        return $ids;
     }
 
 }
