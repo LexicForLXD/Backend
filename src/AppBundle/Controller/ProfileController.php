@@ -95,7 +95,31 @@ class ProfileController extends Controller
      * @Route("/profiles/{profileId}", name="delete_profile", methods={"DELETE"})
      */
     public function deleteProfile($profileId){
+        $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
+        if (!$profile) {
+            throw $this->createNotFoundException(
+                'No LXC-Profile found for id ' . $profileId
+            );
+        }
+
+        if($profile->isUsedByContainer()){
+            return new JsonResponse(['errors' => 'The LXC-Profile is used by at least one Container'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if($profile->linkedToHost()){
+            $this->removeProfileFromHosts($profile);
+        }
+
+        //Get updated Profile object
+        $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->remove($profile);
+        $em->flush();
+
+        return $this->json([], 204);
     }
 
     /**
@@ -108,7 +132,6 @@ class ProfileController extends Controller
 
     }
 
-    //TODO Add validation to Entity
     private function validation($object)
     {
         $validator = $this->get('validator');
@@ -124,4 +147,25 @@ class ProfileController extends Controller
         return false;
     }
 
+    /**
+     * Used to remove the Profile from als Hosts via the LXD Api
+     *
+     * @param Profile $profile
+     */
+    private function removeProfileFromHosts(Profile $profile){
+        $hosts = $profile->getHosts();
+        while($hosts->next()){
+            $host = $hosts->current();
+            //TODO Add LXD Api call to remove profile from Host
+
+            $profile->removeHost($host);
+
+            //Get updated list of Hosts
+            $hosts = $profile->getHosts();
+        }
+        //Update Profile in the Database
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($profile);
+        $em->flush();
+    }
 }
