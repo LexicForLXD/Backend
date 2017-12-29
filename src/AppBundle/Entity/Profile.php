@@ -292,4 +292,12 @@ class Profile
         return false;
     }
 
+    /**
+     * Returns true or false to show if the Host is already using this LXC-Profile
+     * @param Host $host
+     * @return bool
+     */
+    public function isHostLinked(Host $host) : bool {
+        return $this->hosts->contains($host);
+    }
 }
