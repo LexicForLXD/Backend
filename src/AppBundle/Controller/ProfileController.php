@@ -95,7 +95,29 @@ class ProfileController extends Controller
      * @Route("/profiles/{profileId}", name="delete_profile", methods={"DELETE"})
      */
     public function deleteProfile($profileId){
+        $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
+        if (!$profile) {
+            throw $this->createNotFoundException(
+                'No LXC-Profile found for id ' . $profileId
+            );
+        }
+
+        if($profile->isUsedByContainer()){
+            return new JsonResponse(['errors' => 'The LXC-Profile is used by at least one Container'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if($profile->linkedToHost()){
+            // TODO add logic to delete LXC-Profile from all hosts then delete Profile from Database
+            return new JsonResponse(['errors' => 'This variation is not implemented'], Response::HTTP_NOT_IMPLEMENTED);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->remove($profile);
+        $em->flush();
+
+        return $this->json([], 204);
     }
 
     /**
@@ -108,7 +130,6 @@ class ProfileController extends Controller
 
     }
 
-    //TODO Add validation to Entity
     private function validation($object)
     {
         $validator = $this->get('validator');
@@ -123,5 +144,4 @@ class ProfileController extends Controller
         }
         return false;
     }
-
 }
