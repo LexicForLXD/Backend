@@ -6,12 +6,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Class Profile
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="lxcprofiles")
+ *
+ * @UniqueEntity("name")
  *
  * @OAS\Schema(schema="profile", type="object")
  */
@@ -29,6 +33,9 @@ class Profile
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=false)
+     *
+     * @Assert\NotNull
+     * @Assert\NotBlank()
      *
      * @OAS\Property(example="my-profilename")
      * var string
