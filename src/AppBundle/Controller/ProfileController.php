@@ -84,9 +84,44 @@ class ProfileController extends Controller
      * Edit a existing LXC-Profile
      *
      * @Route("/profiles/{profileId}", name="edit_profile", methods={"PUT"})
+     * @param $profileId
+     * @param Request $request
+     * @return Response
      */
-    public function editProfile($profileId){
+    public function editProfile($profileId, Request $request){
+        $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
+        if (!$profile) {
+            throw $this->createNotFoundException(
+                'No LXC-Profile for ID '.$profileId.' found'
+            );
+        }
+
+        if($request->request->get('name')) {
+            $profile->setName($request->request->get('name'));
+        }
+        if($request->request->get('description')) {
+            $profile->setDescription($request->request->get('description'));
+        }
+        if($request->request->get('config')) {
+            $profile->setConfig($request->request->get('config'));
+        }
+        if($request->request->get('devices')) {
+            $profile->setDevices($request->request->get('devices'));
+        }
+
+        if($profile->linkedToHost()){
+            //TODO Add update function for Host
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($profile);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($profile, 'json');
+        return new Response($response, Response::HTTP_CREATED);
     }
 
     /**
