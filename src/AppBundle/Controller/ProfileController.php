@@ -128,7 +128,8 @@ class ProfileController extends Controller
      * ),
      * @OAS\Response(
      *  description="The LXC-Profile was successfully created",
-     *  response=201
+     *  response=201,
+     *  @OAS\JsonContent(ref="#/components/schemas/profile"),
      * ),
      * )
      *
@@ -208,6 +209,7 @@ class ProfileController extends Controller
      * ),
      * @OAS\Response(
      *  description="The LXC-Profile was successfully updated",
+     *  @OAS\JsonContent(ref="#/components/schemas/profile"),
      *  response=201
      * ),
      * )
