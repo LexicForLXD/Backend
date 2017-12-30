@@ -172,6 +172,11 @@ class ProfileController extends Controller
         }
         $this->createProfileOnHost($profile, $host);
         $profile->addHost($host);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($profile);
+        $em->flush();
     }
 
     public function disableProfileForContainer(Profile $profile, Container $container){
