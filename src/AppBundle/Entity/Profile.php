@@ -76,6 +76,7 @@ class Profile
      *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
      *  }
      * )
+     *
      * @JMS\Exclude()
      */
     protected $hosts;
@@ -90,6 +91,7 @@ class Profile
      *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
      *  }
      * )
+     *
      * @JMS\Exclude()
      */
     protected $containers;
@@ -240,6 +242,8 @@ class Profile
     /**
      * @return array
      *
+     * @OAS\Property(property="host_id", example="[1]")
+     *
      * @JMS\VirtualProperty()
      */
     public function getHostId(){
@@ -254,6 +258,8 @@ class Profile
 
     /**
      * @return array
+     *
+     * @OAS\Property(property="container_id", example="[1]")
      *
      * @JMS\VirtualProperty()
      */
