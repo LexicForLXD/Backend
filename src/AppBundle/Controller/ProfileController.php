@@ -61,6 +61,10 @@ class ProfileController extends Controller
      *      description="Detailed information about a specific LXC-Profile",
      *      @OAS\JsonContent(ref="#/components/schemas/profile"),
      *  ),
+     *  @OAS\Response(
+     *      description="No LXC-Profile for the provided id found",
+     *      response=404
+     * ),
      *
      *  @OAS\Parameter(
      *      description="ID of the LXC-Profile",
@@ -117,6 +121,10 @@ class ProfileController extends Controller
      *          type="string"
      *      ),
      *  ),
+     * ),
+     * @OAS\Response(
+     *  description="The provided values for the LXC-Profile are not valid",
+     *  response=400
      * ),
      * @OAS\Response(
      *  description="The LXC-Profile was successfully created",
@@ -195,6 +203,10 @@ class ProfileController extends Controller
      *  response=404
      * ),
      * @OAS\Response(
+     *  description="The provided values for the LXC-Profile are not valid",
+     *  response=400
+     * ),
+     * @OAS\Response(
      *  description="The LXC-Profile was successfully updated",
      *  response=201
      * ),
@@ -225,6 +237,8 @@ class ProfileController extends Controller
         if($request->request->get('devices')) {
             $profile->setDevices($request->request->get('devices'));
         }
+
+        //TODO Add validate logic
 
         if($profile->linkedToHost()){
             $this->updateProfileOnHosts($profile);
