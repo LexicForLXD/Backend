@@ -154,6 +154,52 @@ class ProfileController extends Controller
      * Edit a existing LXC-Profile
      *
      * @Route("/profiles/{profileId}", name="edit_profile", methods={"PUT"})
+     *
+     * @OAS\Put(path="/profiles/{profileId}",
+     * tags={"profiles"},
+     * @OAS\Parameter(
+     *      description="Parameters which should be used to update the LXC-Profile",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *      @OAS\Property(
+     *          property="name",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="description",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="config",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="devices",
+     *          type="string"
+     *      ),
+     *  ),
+     * ),
+     * @OAS\Parameter(
+     *  description="ID of the LXC-Profile",
+     *  in="path",
+     *  name="profileId",
+     *  required=true,
+     *  @OAS\Schema(
+     *     type="integer"
+     *  ),
+     * ),
+     * @OAS\Response(
+     *  description="No LXC-Profile for the provided id found",
+     *  response=404
+     * ),
+     * @OAS\Response(
+     *  description="The LXC-Profile was successfully updated",
+     *  response=201
+     * ),
+     * )
+     *
      * @param $profileId
      * @param Request $request
      * @return Response
