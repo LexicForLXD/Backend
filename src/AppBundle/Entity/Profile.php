@@ -281,6 +281,22 @@ class Profile
     }
 
     /**
+     * Returns the number of Containers from the param var using this LXC-Profile
+     * @param ArrayCollection $containers
+     * @return int
+     */
+    public function numberOfContainersMatchingProfile(ArrayCollection $containers) : int {
+        $total = 0;
+        while($containers->next()){
+            $container = $containers->current();
+            if($this->containers->contains($container)){
+                $total++;
+            }
+        }
+        return $total;
+    }
+
+    /**
      * Internally used to check if a profile is present on one or more hosts
      * @return bool
      */
