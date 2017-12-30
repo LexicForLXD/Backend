@@ -179,11 +179,22 @@ class ProfileController extends Controller
         $em->flush();
     }
 
+    /**
+     * Used internally to remove the link from a Profile to a Container and Host, it will also remove the Profile from the Host
+     * if this was the last Container using it
+     * @param Profile $profile
+     * @param Container $container
+     */
     public function disableProfileForContainer(Profile $profile, Container $container){
         $profile->removeContainer($container);
         $host = $container->getHost();
-        $profile->removeHost($host);
-        //TODO Remove LXC-Profile from Host
+        //Check if this container was the only one using this profile on the host
+        if($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1){
+            $profile->removeHost($host);
+            $this->removeProfileFromHost($profile, $host);
+            return;
+        }
+        //LXC-Profile should remain on Host
     }
 
     private function validation($object)
