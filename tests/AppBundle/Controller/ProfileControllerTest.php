@@ -71,6 +71,45 @@ class ProfileControllerTest extends WebTestCase
     }
 
     /**
+     * Positive test for getAllProfiles()
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function testGetAllProfiles()
+    {
+        $profile = new Profile();
+        $profile->setName("testProfile");
+        $profile->setDescription("testDescription");
+        $profile->setDevices(array("kvm" => (array("type" => "unix-char"))));
+        $profile->setConfig(array("limits.memory" => "2GB"));
+
+        $this->em->persist($profile);
+        $this->em->flush();
+
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/profiles',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertContains("testProfile", $client->getResponse()->getContent());
+        //TODO Add checks for all content
+
+        $profile = $this->em->getRepository(Profile::class)->find($profile->getId());
+        $this->em->remove($profile);
+        $this->em->flush();
+    }
+
+    /**
      * Negative test for getSingleProfile($profileId)
      */
     public function testGetSingleProfileNoProfiles()
@@ -109,11 +148,13 @@ class ProfileControllerTest extends WebTestCase
         $this->em->persist($profile);
         $this->em->flush();
 
+        $profile = $this->em->merge($profile);
+
         $client = static::createClient();
 
         $client->request(
             'GET',
-            '/profiles/1',
+            '/profiles/'.$profile->getId(),
             array(),
             array(),
             array(
@@ -126,34 +167,14 @@ class ProfileControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertContains("testProfile", $client->getResponse()->getContent());
         //TODO Add checks for all content
+
+        $profile = $this->em->getRepository(Profile::class)->find($profile->getId());
+        $this->em->remove($profile);
+        $this->em->flush();
     }
 
     /**
-     * Positive test for getAllProfiles()
-     */
-    public function testGetAllProfiles()
-    {
-        $client = static::createClient();
-
-        $client->request(
-            'GET',
-            '/profiles',
-            array(),
-            array(),
-            array(
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_Authorization' => $this->token
-            )
-        );
-
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains("testProfile", $client->getResponse()->getContent());
-        //TODO Add checks for all content
-    }
-
-    /**
-     * Negative test for deleteProfile($profileId)
+     * Negative test for deleteProfile($profileId) - unknown profileId
      */
     public function testDeleteProfileNoProfile()
     {
@@ -175,15 +196,26 @@ class ProfileControllerTest extends WebTestCase
     }
 
     /**
-     * Positive test for deleteProfile($profileId)
+     * Positive test for deleteProfile($profileId) with no links to hosts or containers
      */
     public function testDeleteProfile()
     {
+        $profile = new Profile();
+        $profile->setName("testProfileDelete");
+        $profile->setDescription("testDescription");
+        $profile->setDevices(array("kvm" => (array("type" => "unix-char"))));
+        $profile->setConfig(array("limits.memory" => "2GB"));
+
+        $this->em->persist($profile);
+        $this->em->flush();
+
+        $profile = $this->em->merge($profile);
+
         $client = static::createClient();
 
         $client->request(
             'DELETE',
-            '/profiles/1',
+            '/profiles/'.$profile->getId(),
             array(),
             array(),
             array(
