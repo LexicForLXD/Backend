@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Swagger\Annotations as OAS;
 
 class ProfileController extends Controller
 {
@@ -17,6 +18,22 @@ class ProfileController extends Controller
      * Get all LXC-Profiles
      *
      * @Route("/profiles", name="profiles_all", methods={"GET"})
+     *
+     * @OAS\Get(path="/profiles",
+     *     tags={"profiles"},
+     *      @OAS\Response(
+     *          response=200,
+     *          description="List of all LXC-Profiles",
+     *          @OAS\JsonContent(ref="#/components/schemas/profile"),
+     *          @OAS\Schema(
+     *              type="array"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No LXC-Profiles found",
+     *      ),
+     * )
      */
     public function getAllProfiles(){
         $profiles = $this->getDoctrine()->getRepository(Profile::class)->findAll();
@@ -36,6 +53,25 @@ class ProfileController extends Controller
      * Get a single LXC-Profile by its id
      *
      * @Route("/profiles/{profileId}", name="profile_single", methods={"GET"})
+     *
+     * @OAS\Get(path="/profiles/{profileId}",
+     *  tags={"profiles"},
+     *  @OAS\Response(
+     *      response=200,
+     *      description="Detailed information about a specific LXC-Profile",
+     *      @OAS\JsonContent(ref="#/components/schemas/profile"),
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *      description="ID of the LXC-Profile",
+     *      in="path",
+     *      name="profileId",
+     *      required=true,
+     *      @OAS\Schema(
+     *          type="integer"
+     *      ),
+     *  ),
+     *)
      */
     public function getSingleProfile($profileId){
         $profiles = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -55,6 +91,39 @@ class ProfileController extends Controller
      * Create a LXC-Profile
      *
      * @Route("/profiles", name="create_profile", methods={"POST"})
+     *
+     * @OAS\Post(path="/profiles",
+     * tags={"profiles"},
+     * @OAS\Parameter(
+     *      description="Parameters for the new LXC-Profile",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *      @OAS\Property(
+     *          property="name",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="description",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="config",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="devices",
+     *          type="string"
+     *      ),
+     *  ),
+     * ),
+     * @OAS\Response(
+     *  description="The LXC-Profile was successfully created",
+     *  response=201
+     * ),
+     * )
+     *
      * @param Request $request
      * @return JsonResponse|Response
      */
