@@ -172,6 +172,11 @@ class ProfileController extends Controller
         }
         $this->createProfileOnHost($profile, $host);
         $profile->addHost($host);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($profile);
+        $em->flush();
     }
 
     public function disableProfileForContainer(Profile $profile, Container $container){
@@ -206,6 +211,15 @@ class ProfileController extends Controller
     }
 
     /**
+     * Removes the LXC-Profile from the specified Host via the LXD-API
+     * @param Profile $profile
+     * @param Host $host
+     */
+    private function removeProfileFromHost(Profile $profile, Host $host){
+        //TODO LXD API Call to remove LXC-Profile from the specified Host
+    }
+
+    /**
      * Used to remove the Profile from als Hosts via the LXD Api
      *
      * @param Profile $profile
@@ -214,7 +228,7 @@ class ProfileController extends Controller
         $hosts = $profile->getHosts();
         while($hosts->next()){
             $host = $hosts->current();
-            //TODO Add LXD Api call to remove profile from Host
+            $this->removeProfileFromHost($profile, $host);
 
             $profile->removeHost($host);
 
