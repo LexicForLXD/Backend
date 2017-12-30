@@ -1,6 +1,8 @@
 <?php
 namespace Tests\AppBundle\Controller;
 
+use AppBundle\Entity\Container;
+use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -148,8 +150,6 @@ class ProfileControllerTest extends WebTestCase
         $this->em->persist($profile);
         $this->em->flush();
 
-        $profile = $this->em->merge($profile);
-
         $client = static::createClient();
 
         $client->request(
@@ -209,8 +209,6 @@ class ProfileControllerTest extends WebTestCase
         $this->em->persist($profile);
         $this->em->flush();
 
-        $profile = $this->em->merge($profile);
-
         $client = static::createClient();
 
         $client->request(
@@ -227,6 +225,61 @@ class ProfileControllerTest extends WebTestCase
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode());
     }
+
+//    /**
+//     * Negative test for deleteProfile($profileId) with linked container and host - container is the problem
+//     */
+//    public function testDeleteProfileLinkedToContainer()
+//    {
+//        $profile = new Profile();
+//        $profile->setName("testProfileDelete");
+//        $profile->setDescription("testDescription");
+//        $profile->setDevices(array("kvm" => (array("type" => "unix-char"))));
+//        $profile->setConfig(array("limits.memory" => "2GB"));
+//
+//        $host = new Host();
+//        $host->setName("Test-Host1");
+//        $host->setDomainName("test.test.de");
+//        $host->setPort(8443);
+//        $host->setSettings("settings");
+//
+//        $container = new Container();
+//        $container->setName("testContainer");
+//        $container->setHost($host);
+//        $container->setIpv4("192.168.178.20");
+//
+//        $profile->addHost($host);
+//        $profile->addContainer($container);
+//
+//        $this->em->persist($profile);
+//        $this->em->persist($host);
+//        $this->em->persist($container);
+//        $this->em->flush();
+//
+//        $client = static::createClient();
+//
+//        $client->request(
+//            'DELETE',
+//            '/profiles/'.$profile->getId(),
+//            array(),
+//            array(),
+//            array(
+//                'CONTENT_TYPE' => 'application/json',
+//                'HTTP_Authorization' => $this->token
+//            )
+//        );
+//
+//
+//        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+//
+//        $profile = $this->em->getRepository(Profile::class)->find($profile->getId());
+//        $container = $this->em->getRepository(Container::class)->find($container->getId());
+//        $host = $this->em->getRepository(Host::class)->find($host->getId());
+//        $this->em->remove($host);
+//        $this->em->remove($profile);
+//        $this->em->remove($container);
+//        $this->em->flush();
+//    }
 
     /**
      * {@inheritDoc}
