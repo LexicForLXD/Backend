@@ -25,7 +25,7 @@ test:php7.1:
      - php bin/console doctrine:schema:update --force
      - php bin/console doctrine:fixtures:load
    script:
-     - phpunit --coverage-text
+     - phpunit --coverage-text --colors=never
    only:
      - master
      - /^feature.*$/
