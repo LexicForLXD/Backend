@@ -258,6 +258,31 @@ class ProfileController extends Controller
      * Delete a existing LXC-Profile
      *
      * @Route("/profiles/{profileId}", name="delete_profile", methods={"DELETE"})
+     *
+     * @OAS\Delete(path="/profiles/{profileId}",
+     *  tags={"profiles"},
+     *  @OAS\Parameter(
+     *      description="ID of the LXC-Profile",
+     *      in="path",
+     *      name="profileId",
+     *      required=true,
+     *      @OAS\Schema(
+     *          type="integer"
+     *      ),
+     *  ),
+     *  @OAS\Response(
+     *      response=204,
+     *      description="The LXC-Profile was successfully deleted",
+     *  ),
+     *  @OAS\Response(
+     *      response=400,
+     *      description="The LXC-Profile couldn't be deleted, because it is used by at least one Container",
+     *  ),
+     *  @OAS\Response(
+     *      description="No LXC-Profile for the provided id found",
+     *      response=404
+     * ),
+     *)
      */
     public function deleteProfile($profileId){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
