@@ -48,6 +48,9 @@ class ProfileControllerTest extends WebTestCase
 
     }
 
+    /**
+     * Negative test for getAllProfiles()
+     */
     public function testGetAllProfilesNoProfiles()
     {
         $client = static::createClient();
@@ -67,6 +70,9 @@ class ProfileControllerTest extends WebTestCase
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
+    /**
+     * Negative test for getSingleProfile($profileId)
+     */
     public function testGetSingleProfileNoProfiles()
     {
         $client = static::createClient();
@@ -86,6 +92,12 @@ class ProfileControllerTest extends WebTestCase
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
+    /**
+     * Positive test for getSingleProfile($profileId)
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function testGetSingleProfile()
     {
         $profile = new Profile();
@@ -113,6 +125,31 @@ class ProfileControllerTest extends WebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertContains("testProfile", $client->getResponse()->getContent());
+        //TODO Add checks for all content
+    }
+
+    /**
+     * Positive test for getAllProfiles()
+     */
+    public function testGetAllProfiles()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/profiles',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertContains("testProfile", $client->getResponse()->getContent());
+        //TODO Add checks for all content
     }
 
     /**
