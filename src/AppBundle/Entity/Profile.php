@@ -150,87 +150,87 @@ class Profile
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getDescription()
+    public function getDescription() : string
     {
         return $this->description;
     }
 
     /**
-     * @param mixed $description
+     * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getConfig()
+    public function getConfig() : array
     {
         return $this->config;
     }
 
     /**
-     * @param mixed $config
+     * @param array $config
      */
-    public function setConfig($config)
+    public function setConfig(array $config)
     {
         $this->config = $config;
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getDevices()
+    public function getDevices() : array
     {
         return $this->devices;
     }
 
     /**
-     * @param mixed $devices
+     * @param array $devices
      */
-    public function setDevices($devices)
+    public function setDevices(array $devices)
     {
         $this->devices = $devices;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getHosts()
+    public function getHosts() : ArrayCollection
     {
         return $this->hosts;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getContainers()
+    public function getContainers() : ArrayCollection
     {
         return $this->containers;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
     public function setName($name)
     {
@@ -278,6 +278,22 @@ class Profile
         }
 
         return false;
+    }
+
+    /**
+     * Returns the number of Containers from the param var using this LXC-Profile
+     * @param ArrayCollection $containers
+     * @return int
+     */
+    public function numberOfContainersMatchingProfile(ArrayCollection $containers) : int {
+        $total = 0;
+        while($containers->next()){
+            $container = $containers->current();
+            if($this->containers->contains($container)){
+                $total++;
+            }
+        }
+        return $total;
     }
 
     /**
