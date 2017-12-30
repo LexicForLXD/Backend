@@ -153,6 +153,50 @@ class ProfileControllerTest extends WebTestCase
     }
 
     /**
+     * Negative test for deleteProfile($profileId)
+     */
+    public function testDeleteProfileNoProfile()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/profiles/999',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * Positive test for deleteProfile($profileId)
+     */
+    public function testDeleteProfile()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/profiles/1',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode());
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function tearDown()
