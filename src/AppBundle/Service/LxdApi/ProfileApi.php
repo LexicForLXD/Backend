@@ -48,4 +48,19 @@ class ProfileApi extends HttpHelper
             -> send();
     }
 
+    /**
+     * @param Host $host
+     * @param Profile $profile
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function updateProfileOnHost(Host $host, Profile $profile){
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$profile->getName());
+        $body = '{ "description": "'.$profile->getDescription().'", "config": '.json_encode($profile->getConfig()).', "devices": '.json_encode($profile->getDevices()).' }';
+
+        return Request::put($uri)
+            -> body($body)
+            -> send();
+    }
+
 }

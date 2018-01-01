@@ -212,7 +212,7 @@ class Profile
     /**
      * @return ArrayCollection
      */
-    public function getHosts() : ArrayCollection
+    public function getHosts() : PersistentCollection
     {
         return $this->hosts;
     }
