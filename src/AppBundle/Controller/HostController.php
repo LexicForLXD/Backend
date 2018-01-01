@@ -331,7 +331,7 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function authorizeAction(Request $request, $hostId)
+    public function authorizeAction(Request $request, $hostId, HostApi $hostApi)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -341,8 +341,6 @@ class HostController extends Controller
             );
         }
 
-
-        $hostApi = new HostApi();
 
         $data = [
             "type" => "client",
