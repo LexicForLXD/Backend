@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use AppBundle\Service\LxdApi\Endpoints\Container as ContainerApi;
+use AppBundle\Service\LxdApi\Container as ContainerApi;
 
 use AppBundle\Entity\Container;
 use AppBundle\Entity\ContainerStatus;
