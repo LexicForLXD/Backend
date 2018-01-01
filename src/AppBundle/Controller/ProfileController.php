@@ -5,12 +5,14 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
+use AppBundle\Service\LxdApi\ProfileApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ProfileController extends Controller
 {
@@ -319,6 +321,7 @@ class ProfileController extends Controller
      * and publish the profile to the host if needed
      * @param Profile $profile
      * @param Container $container
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function enableProfile(Profile $profile, Container $container){
         $profile->addContainer($container);
@@ -326,7 +329,11 @@ class ProfileController extends Controller
         if($profile->isHostLinked($host)){
             return;
         }
-        $this->createProfileOnHost($profile, $host);
+
+        //Create Profile via LXD-API
+        $profileApi = $this->container->get('lxd.api.profile');
+        $profileApi->createProfileOnHost($host, $profile);
+
         $profile->addHost($host);
 
         $em = $this->getDoctrine()->getManager();
@@ -413,7 +420,7 @@ class ProfileController extends Controller
      *
      * @param Profile $profile
      */
-    private function updateProfileOnHosts(Profile $profile){
+    private function updateProfileOnHosts(Profile $profile, ProfileApi $profileApi){
         $hosts = $profile->getHosts();
         while($hosts->next()){
             $host = $hosts->current();
