@@ -7,6 +7,18 @@ use Httpful\Request;
 
 class HttpHelper
 {
+    private $cert_location;
+    private $cert_key_location;
+    private $cert_passphrase;
+
+    public function __contruct($cert_location, $cert_key_location, $cert_passphrase)
+    {
+        $this->cert_location = $cert_location;
+        $this->cert_key_location = $cert_key_location;
+        $this->cert_passphrase = $cert_passphrase;
+    }
+
+
     public static function buildUri($host, $endpoint, $apiVersion = null)
     {
         $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
@@ -21,19 +33,19 @@ class HttpHelper
     public static function init()
     {
 
-        if($this->hasParameter('cert_passphrase'))
+        if($cert_passphrase != NULL)
         {
             $template = Request::init()
             ->sendsJson()    // Send application/x-www-form-urlencoded
             ->withoutStrictSsl()        // Ease up on some of the SSL checks
             ->expectsJson()             // Expect JSON responses
-            ->authenticateWithCert($this->getParameter('cert_location'), $this->getParameter('cert_key_location'), $this->getParameter('cert_passphrase')); //uses cert from parameters.yml
+            ->authenticateWithCert($cert_location, $cert_key_location, $cert_passphrase); //uses cert from parameters.yml
         } else {
             $template = Request::init()
             ->sendsJson()    // Send application/x-www-form-urlencoded
             ->withoutStrictSsl()        // Ease up on some of the SSL checks
             ->expectsJson()             // Expect JSON responses
-            ->authenticateWithCert($this->getParameter('cert_location'), $this->getParameter('cert_key_location')); //uses cert from parameters.yml
+            ->authenticateWithCert($cert_location, $cert_key_location);
         }
 
         Request::ini($template);
