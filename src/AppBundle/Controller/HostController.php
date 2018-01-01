@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use AppBundle\Service\LxdApi\ApiClient;
+use AppBundle\Service\LxdApi\HostApi;
 use Swagger\Annotations as SWG;
 
 
@@ -341,15 +341,15 @@ class HostController extends Controller
             );
         }
 
-        $client = new ApiClient($host);
-        $hostApi = new \AppBundle\Service\LxdApi\Endpoints\Host($client);
+
+        $hostApi = new HostApi();
 
         $data = [
             "type" => "client",
             "password" => $request->get("password")
         ];
 
-        return $hostApi->authenticate($data);
+        return $hostApi->authenticate($host, $data);
 
     }
 
