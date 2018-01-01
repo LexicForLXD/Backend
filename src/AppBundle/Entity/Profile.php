@@ -4,10 +4,12 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Class Profile
@@ -218,7 +220,7 @@ class Profile
     /**
      * @return ArrayCollection
      */
-    public function getContainers() : ArrayCollection
+    public function getContainers() : PersistentCollection
     {
         return $this->containers;
     }
@@ -266,9 +268,10 @@ class Profile
     public function getContainerId(){
         $ids[] = null;
 
-        while($this->containers->next()){
+        $this->containers->first();
+        do{
             $ids[] = $this->containers->current()->getId();
-        }
+        }while($this->containers->next());
 
         return $ids;
     }
