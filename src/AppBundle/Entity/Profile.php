@@ -251,9 +251,10 @@ class Profile
     public function getHostId(){
         $ids[] = null;
 
-        while($this->hosts->next()){
+        $this->hosts->first();
+        do{
             $ids[] = $this->hosts->current()->getId();
-        }
+        }while($this->hosts->next());
 
         return $ids;
     }
