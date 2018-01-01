@@ -34,8 +34,9 @@ services:
     #     arguments:
     #         $someArgument: 'some_value'
 
-    AppBundle\Service\LxdApi\Util\HttpHelper:
-        arguments:
+    AppBundle\Service\LxdApi\:
+       resource: '../../src/AppBundle/Service/LxdApi'
+       arguments:
             $cert_location: '%cert_location%'
             $cert_key_location: '%cert_key_location%'
             $cert_passphrase: '%cert_passphrase%'
