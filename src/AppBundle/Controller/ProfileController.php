@@ -219,6 +219,7 @@ class ProfileController extends Controller
      * @param $profileId
      * @param Request $request
      * @return Response
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function editProfile($profileId, Request $request){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -227,10 +228,6 @@ class ProfileController extends Controller
             throw $this->createNotFoundException(
                 'No LXC-Profile for ID '.$profileId.' found'
             );
-        }
-
-        if($request->request->get('name')) {
-            $profile->setName($request->request->get('name'));
         }
         if($request->request->get('description')) {
             $profile->setDescription($request->request->get('description'));
@@ -419,12 +416,22 @@ class ProfileController extends Controller
      * Used to update the LXC-Profile an all hosts where it's used
      *
      * @param Profile $profile
+     * @return bool
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function updateProfileOnHosts(Profile $profile, ProfileApi $profileApi){
+    private function updateProfileOnHosts(Profile $profile) : bool {
         $hosts = $profile->getHosts();
-        while($hosts->next()){
-            $host = $hosts->current();
-            //TODO Add LXD Api call to update profile on Host
+        if($hosts->isEmpty()){
+            return true;
         }
+        for($i=0; $i<$hosts->count(); $i++){
+            $host = $hosts->get($i);
+            //Update Profile via LXD-API
+            $profileApi = $this->container->get('lxd.api.profile');
+            $profileApi->updateProfileOnHost($host, $profile);
+
+            //TODO Return false for errors
+        }
+        return true;
     }
 }
