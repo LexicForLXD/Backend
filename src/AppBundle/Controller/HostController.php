@@ -297,7 +297,7 @@ class HostController extends Controller
     /**
      * Authorize the Backend to Access the Hosts LXD API
      *
-     * @Route("/hosts/{hostId}authorization", name="hosts_authorize", methods={"POST"})
+     * @Route("/hosts/{hostId}/authorization", name="hosts_authorize", methods={"POST"})
      *
      * push the client certificate to server
      *
