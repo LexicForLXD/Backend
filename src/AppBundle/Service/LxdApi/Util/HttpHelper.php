@@ -19,33 +19,33 @@ class HttpHelper
     }
 
 
-    public static function buildUri($host, $endpoint, $apiVersion = null)
+    public function buildUri($host, $endpoint, $apiVersion = null)
     {
         $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
 
         $port = $host->getPort() ?: '8443';
         $apiVersion = $apiVersion ?: '1.0';
-        $url = 'https://'.$hostname.':'.$this->port.'/'.$this->apiVersion.'/'.$endpoint;
+        $url = 'https://'.$hostname.':'.$port.'/'.$apiVersion.'/'.$endpoint;
 
         return $url;
     }
 
-    public static function init()
+    public function init()
     {
 
-        if($cert_passphrase != NULL)
+        if($this->cert_passphrase != NULL)
         {
             $template = Request::init()
             ->sendsJson()    // Send application/x-www-form-urlencoded
             ->withoutStrictSsl()        // Ease up on some of the SSL checks
             ->expectsJson()             // Expect JSON responses
-            ->authenticateWithCert($cert_location, $cert_key_location, $cert_passphrase); //uses cert from parameters.yml
+            ->authenticateWithCert($this->cert_location, $this->cert_key_location, $this->cert_passphrase); //uses cert from parameters.yml
         } else {
             $template = Request::init()
             ->sendsJson()    // Send application/x-www-form-urlencoded
             ->withoutStrictSsl()        // Ease up on some of the SSL checks
             ->expectsJson()             // Expect JSON responses
-            ->authenticateWithCert($cert_location, $cert_key_location);
+            ->authenticateWithCert($this->cert_location, $this->cert_key_location);
         }
 
         Request::ini($template);

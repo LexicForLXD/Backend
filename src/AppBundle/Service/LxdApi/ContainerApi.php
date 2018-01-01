@@ -1,12 +1,12 @@
 <?php
-namespace AppBundle\Service\LxdApi\Endpoints;
+namespace AppBundle\Service\LxdApi;
 
 use AppBundle\Entity\Host;
 use AppBundle\Service\LxdApi\Util\HttpHelper;
 use Httpful\Request;
 
 
-class ContainerApi
+class ContainerApi extends HttpHelper
 {
     protected function getEndpoint($urlParam = NULL)
     {
@@ -14,9 +14,10 @@ class ContainerApi
     }
 
 
-    public function __construct()
+    public function __construct($cert_location, $cert_key_location, $cert_passphrase)
     {
-        HttpHelper::init();
+        parent::__construct($cert_location, $cert_key_location, $cert_passphrase);
+        $this->init();
     }
 
 
@@ -28,7 +29,7 @@ class ContainerApi
      */
     public function list(Host $host)
     {
-        $uri = HttpHelper::buildUri($host, $this->getEndpoint());
+        $uri = $this->buildUri($host, $this->getEndpoint());
         return Request::get($uri)->send();
     }
 
@@ -40,7 +41,7 @@ class ContainerApi
      */
     public function remove(Host $host, $containerName)
     {
-        $uri = HttpHelper::buildUri($host, $this->getEndpoint().'/'.$containerName);
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
         return Request::delete($uri)->send();
     }
 
@@ -54,7 +55,7 @@ class ContainerApi
      */
     public function show(Host $host, $containerName)
     {
-        $uri = HttpHelper::buildUri($host, $this->getEndpoint().'/'.$containerName);
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
         return Request::get($uri)->send();
     }
 
@@ -67,7 +68,7 @@ class ContainerApi
      */
     public function create(Host $host, $data)
     {
-        $uri = HttpHelper::buildUri($host, $this->getEndpoint());
+        $uri = $this->buildUri($host, $this->getEndpoint());
         return Request::post($uri, $data)->send();
     }
 
@@ -80,7 +81,7 @@ class ContainerApi
      */
     public function update($containerName, $data)
     {
-        $uri = HttpHelper::buildUri($host, $this->getEndpoint().'/'.$containerName);
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
         return Request::put($uri, $data)->send();
     }
 }
