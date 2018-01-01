@@ -251,6 +251,10 @@ class Profile
     public function getHostId(){
         $ids[] = null;
 
+        if($this->hosts->isEmpty()){
+            return $ids;
+        }
+
         $this->hosts->first();
         do{
             $ids[] = $this->hosts->current()->getId();
@@ -268,6 +272,10 @@ class Profile
      */
     public function getContainerId(){
         $ids[] = null;
+
+        if($this->containers->isEmpty()){
+            return $ids;
+        }
 
         $this->containers->first();
         do{
