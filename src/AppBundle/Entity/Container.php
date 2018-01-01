@@ -42,7 +42,7 @@ class Container
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      *
      * @OAS\Property(example="192.168.178.20")
      * var string
@@ -50,7 +50,7 @@ class Container
     protected $ipv4;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true, nullable=true)
      *
      * @OAS\Property(example="fe80::20")
      * var string
