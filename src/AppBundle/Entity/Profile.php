@@ -53,7 +53,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="TODO find out how to input JSON")
+     * @OAS\Property(example="Config JSON array")
      * var json_array
      */
     protected $config;
@@ -61,7 +61,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="TODO find out how to input JSON")
+     * @OAS\Property(example="Devices JSON array")
      * var json_array
      */
     protected $devices;
