@@ -11,7 +11,7 @@ class HttpHelper
     private $cert_key_location;
     private $cert_passphrase;
 
-    public function __contruct($cert_location, $cert_key_location, $cert_passphrase)
+    public function __construct($cert_location, $cert_key_location, $cert_passphrase)
     {
         $this->cert_location = $cert_location;
         $this->cert_key_location = $cert_key_location;
