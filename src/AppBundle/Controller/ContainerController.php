@@ -243,7 +243,7 @@ class ContainerController extends Controller
                 return new JsonResponse(["message" => "none"]);
         }
 
-        $containerApi = new \AppBundle\Service\LxdApi\Endpoints\ContainerApi();
+        $containerApi = new ContainerApi();
         $response = $containerApi->create($host, $data);
 
         //TODO Mögliche Fehler abfangen async
