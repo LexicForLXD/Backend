@@ -206,7 +206,7 @@ class ProfileController extends Controller
      *  response=404
      * ),
      * @OAS\Response(
-     *  description="The provided values for the LXC-Profile are not valid",
+     *  description="The provided values for the LXC-Profile are not valid or the LXD Api call failed - forwards LXD API response",
      *  response=400
      * ),
      * @OAS\Response(
@@ -293,7 +293,7 @@ class ProfileController extends Controller
      *  ),
      *  @OAS\Response(
      *      response=400,
-     *      description="The LXC-Profile couldn't be deleted, because it is used by at least one Container",
+     *      description="The LXC-Profile couldn't be deleted, because it is used by at least one Container or the LXD Api call failed - forwards LXD API response",
      *  ),
      *  @OAS\Response(
      *      description="No LXC-Profile for the provided id found",
