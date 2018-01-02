@@ -4,10 +4,12 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Class Profile
@@ -53,7 +55,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="Config JSON array")
+     * @OAS\Property(example="Config JSON Object")
      * var json_array
      */
     protected $config;
@@ -61,7 +63,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="Devices JSON array")
+     * @OAS\Property(example="Devices JSON Object")
      * var json_array
      */
     protected $devices;
@@ -70,10 +72,10 @@ class Profile
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Host", inversedBy="profiles")
      * @ORM\JoinTable(
      *  joinColumns={
-     *      @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
      *  },
      *  inverseJoinColumns={
-     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
+     *      @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      *  }
      * )
      *
@@ -85,10 +87,10 @@ class Profile
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="profiles")
      * @ORM\JoinTable(
      *  joinColumns={
-     *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
      *  },
      *  inverseJoinColumns={
-     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
+     *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
      *  }
      * )
      *
@@ -210,7 +212,7 @@ class Profile
     /**
      * @return ArrayCollection
      */
-    public function getHosts() : ArrayCollection
+    public function getHosts() : PersistentCollection
     {
         return $this->hosts;
     }
@@ -218,7 +220,7 @@ class Profile
     /**
      * @return ArrayCollection
      */
-    public function getContainers() : ArrayCollection
+    public function getContainers() : PersistentCollection
     {
         return $this->containers;
     }
@@ -249,9 +251,14 @@ class Profile
     public function getHostId(){
         $ids[] = null;
 
-        while($this->hosts->next()){
-            $ids[] = $this->hosts->current()->getId();
+        if($this->hosts->isEmpty()){
+            return $ids;
         }
+
+        $this->hosts->first();
+        do{
+            $ids[] = $this->hosts->current()->getId();
+        }while($this->hosts->next());
 
         return $ids;
     }
@@ -266,9 +273,14 @@ class Profile
     public function getContainerId(){
         $ids[] = null;
 
-        while($this->containers->next()){
-            $ids[] = $this->containers->current()->getId();
+        if($this->containers->isEmpty()){
+            return $ids;
         }
+
+        $this->containers->first();
+        do{
+            $ids[] = $this->containers->current()->getId();
+        }while($this->containers->next());
 
         return $ids;
     }

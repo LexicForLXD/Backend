@@ -5,12 +5,14 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
+use AppBundle\Service\LxdApi\ProfileApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ProfileController extends Controller
 {
@@ -204,7 +206,7 @@ class ProfileController extends Controller
      *  response=404
      * ),
      * @OAS\Response(
-     *  description="The provided values for the LXC-Profile are not valid",
+     *  description="The provided values for the LXC-Profile are not valid or the LXD Api call failed - forwards LXD API response",
      *  response=400
      * ),
      * @OAS\Response(
@@ -217,6 +219,7 @@ class ProfileController extends Controller
      * @param $profileId
      * @param Request $request
      * @return Response
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function editProfile($profileId, Request $request){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -225,10 +228,6 @@ class ProfileController extends Controller
             throw $this->createNotFoundException(
                 'No LXC-Profile for ID '.$profileId.' found'
             );
-        }
-
-        if($request->request->get('name')) {
-            $profile->setName($request->request->get('name'));
         }
         if($request->request->get('description')) {
             $profile->setDescription($request->request->get('description'));
@@ -239,11 +238,27 @@ class ProfileController extends Controller
         if($request->request->get('devices')) {
             $profile->setDevices($request->request->get('devices'));
         }
+        $oldName = null;
+        if($request->request->get('name') && $request->request->get('name') != $profile->getName()) {
+            $oldName = $profile->getName();
+            $profile->setName($request->request->get('name'));
+        }
 
-        //TODO Add validate logic
+        if ($errorArray = $this->validation($profile)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
 
         if($profile->linkedToHost()){
-            $this->updateProfileOnHosts($profile);
+            if($oldName != null) {
+                $result = $this->renameProfileOnHosts($profile, $oldName);
+                if($result['status'] == 'failure'){
+                    return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+                }
+            }
+            $result = $this->updateProfileOnHosts($profile);
+            if($result['status'] == 'failure'){
+                return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+            }
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -278,13 +293,14 @@ class ProfileController extends Controller
      *  ),
      *  @OAS\Response(
      *      response=400,
-     *      description="The LXC-Profile couldn't be deleted, because it is used by at least one Container",
+     *      description="The LXC-Profile couldn't be deleted, because it is used by at least one Container or the LXD Api call failed - forwards LXD API response",
      *  ),
      *  @OAS\Response(
      *      description="No LXC-Profile for the provided id found",
      *      response=404
      * ),
      *)
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function deleteProfile($profileId){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -300,7 +316,10 @@ class ProfileController extends Controller
         }
 
         if($profile->linkedToHost()){
-            $this->removeProfileFromHosts($profile);
+            $result = $this->removeProfileFromHosts($profile);
+            if($result['status'] == 'failure'){
+                return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+            }
         }
 
         //Get updated Profile object
@@ -319,6 +338,7 @@ class ProfileController extends Controller
      * and publish the profile to the host if needed
      * @param Profile $profile
      * @param Container $container
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function enableProfile(Profile $profile, Container $container){
         $profile->addContainer($container);
@@ -326,7 +346,11 @@ class ProfileController extends Controller
         if($profile->isHostLinked($host)){
             return;
         }
-        $this->createProfileOnHost($profile, $host);
+
+        //Create Profile via LXD-API
+        $profileApi = $this->container->get('lxd.api.profile');
+        $profileApi->createProfileOnHost($host, $profile);
+
         $profile->addHost($host);
 
         $em = $this->getDoctrine()->getManager();
@@ -340,6 +364,7 @@ class ProfileController extends Controller
      * if this was the last Container using it
      * @param Profile $profile
      * @param Container $container
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function disableProfileForContainer(Profile $profile, Container $container){
         $profile->removeContainer($container);
@@ -347,7 +372,9 @@ class ProfileController extends Controller
         //Check if this container was the only one using this profile on the host
         if($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1){
             $profile->removeHost($host);
-            $this->removeProfileFromHost($profile, $host);
+            //Remove Profile via LXD-API
+            $profileApi = $this->container->get('lxd.api.profile');
+            $profileApi->deleteProfileOnHost($host, $profile);
             return;
         }
         //LXC-Profile should remain on Host
@@ -369,55 +396,102 @@ class ProfileController extends Controller
     }
 
     /**
-     * Publishes the LXC-Profile to the specified Host via the LXD-API
-     * @param Profile $profile
-     * @param Host $host
-     */
-    private function createProfileOnHost(Profile $profile, Host $host){
-        //TODO LXD API Call to create LXC-Profile on the specified Host
-    }
-
-    /**
-     * Removes the LXC-Profile from the specified Host via the LXD-API
-     * @param Profile $profile
-     * @param Host $host
-     */
-    private function removeProfileFromHost(Profile $profile, Host $host){
-        //TODO LXD API Call to remove LXC-Profile from the specified Host
-    }
-
-    /**
      * Used to remove the Profile from als Hosts via the LXD Api
      *
      * @param Profile $profile
+     * @return array
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function removeProfileFromHosts(Profile $profile){
+    private function removeProfileFromHosts(Profile $profile) : array{
         $hosts = $profile->getHosts();
-        while($hosts->next()){
-            $host = $hosts->current();
-            $this->removeProfileFromHost($profile, $host);
-
-            $profile->removeHost($host);
-
-            //Get updated list of Hosts
-            $hosts = $profile->getHosts();
+        if($hosts->isEmpty()){
+            return ['status' => 'success'];
         }
+        $return['status'] = 'failure';
+        $failure = false;
+        for($i=0; $i<$hosts->count(); $i++){
+            $host = $hosts->get($i);
+            //Remove Profile via LXD-API
+            $profileApi = $this->container->get('lxd.api.profile');
+            $result = $profileApi->deleteProfileOnHost($host, $profile);
+
+            if($result->code != 204){
+                $return[$host->getName()] = $result->body;
+                $failure = true;
+            }else{
+                $profile->removeHost($host);
+            }
+        }
+
         //Update Profile in the Database
         $em = $this->getDoctrine()->getManager();
         $em->persist($profile);
         $em->flush();
+
+        if($failure){
+            return $return;
+        }
+        return ['status' => 'success'];
     }
 
     /**
      * Used to update the LXC-Profile an all hosts where it's used
      *
      * @param Profile $profile
+     * @return array
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function updateProfileOnHosts(Profile $profile){
+    private function updateProfileOnHosts(Profile $profile) : array{
         $hosts = $profile->getHosts();
-        while($hosts->next()){
-            $host = $hosts->current();
-            //TODO Add LXD Api call to update profile on Host
+        if($hosts->isEmpty()){
+            return ['status' => 'success'];
         }
+        $return['status'] = 'failure';
+        $failure = false;
+        for($i=0; $i<$hosts->count(); $i++){
+            $host = $hosts->get($i);
+            //Update Profile via LXD-API
+            $profileApi = $this->container->get('lxd.api.profile');
+            $result = $profileApi->updateProfileOnHost($host, $profile);
+            if($result->code != 200){
+                $return[$host->getName()] = $result->body;
+                $failure = true;
+            }
+        }
+        if($failure){
+            return $return;
+        }
+        return ['status' => 'success'];
+    }
+
+    /**
+     * Used to rename the LXC-Profile on all hosts where it's used
+     *
+     * @param Profile $profile
+     * @param String $oldName
+     * @return array
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    private function renameProfileOnHosts(Profile $profile, String $oldName) : array{
+        $hosts = $profile->getHosts();
+        if($hosts->isEmpty()){
+            return ['status' => 'success'];
+        }
+        $return['status'] = 'failure';
+        $failure = false;
+        for($i=0; $i<$hosts->count(); $i++){
+            $host = $hosts->get($i);
+            //Update Profile via LXD-API
+            $profileApi = $this->container->get('lxd.api.profile');
+            $result = $profileApi->renameProfileOnHost($host, $profile, $oldName);
+            if($result->code != 201){
+                $return[$host->getName()] = $result->body;
+                $failure = true;
+            }
+        }
+        if($failure){
+            return $return;
+        }
+        return ['status' => 'success'];
     }
 }
