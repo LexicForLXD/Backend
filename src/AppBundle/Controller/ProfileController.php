@@ -392,24 +392,6 @@ class ProfileController extends Controller
     }
 
     /**
-     * Publishes the LXC-Profile to the specified Host via the LXD-API
-     * @param Profile $profile
-     * @param Host $host
-     */
-    private function createProfileOnHost(Profile $profile, Host $host){
-        //TODO LXD API Call to create LXC-Profile on the specified Host
-    }
-
-    /**
-     * Removes the LXC-Profile from the specified Host via the LXD-API
-     * @param Profile $profile
-     * @param Host $host
-     */
-    private function removeProfileFromHost(Profile $profile, Host $host){
-        //TODO LXD API Call to remove LXC-Profile from the specified Host
-    }
-
-    /**
      * Used to remove the Profile from als Hosts via the LXD Api
      *
      * @param Profile $profile
