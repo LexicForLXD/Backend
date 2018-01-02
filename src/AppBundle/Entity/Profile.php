@@ -72,10 +72,10 @@ class Profile
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Host", inversedBy="profiles")
      * @ORM\JoinTable(
      *  joinColumns={
-     *      @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
      *  },
      *  inverseJoinColumns={
-     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
+     *      @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      *  }
      * )
      *
@@ -87,10 +87,10 @@ class Profile
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="profiles")
      * @ORM\JoinTable(
      *  joinColumns={
-     *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
      *  },
      *  inverseJoinColumns={
-     *      @ORM\JoinColumn(name="profile_id", referencedColumnName="id")
+     *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
      *  }
      * )
      *
