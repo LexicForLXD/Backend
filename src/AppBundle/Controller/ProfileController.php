@@ -239,7 +239,7 @@ class ProfileController extends Controller
             $profile->setDevices($request->request->get('devices'));
         }
         $oldName = null;
-        if($request->request->get('name')) {
+        if($request->request->get('name') && $request->request->get('name') != $profile->getName()) {
             $oldName = $profile->getName();
             $profile->setName($request->request->get('name'));
         }
@@ -251,11 +251,13 @@ class ProfileController extends Controller
         if($profile->linkedToHost()){
             if($oldName != null) {
                 $result = $this->renameProfileOnHosts($profile, $oldName);
-
-                $result = $this->updateProfileOnHosts($profile);
                 if($result['status'] == 'failure'){
                     return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
                 }
+            }
+            $result = $this->updateProfileOnHosts($profile);
+            if($result['status'] == 'failure'){
+                return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -444,7 +446,7 @@ class ProfileController extends Controller
      * @return array
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function updateProfileOnHosts(Profile $profile) {
+    private function updateProfileOnHosts(Profile $profile) : array{
         $hosts = $profile->getHosts();
         if($hosts->isEmpty()){
             return ['status' => 'success'];
@@ -464,7 +466,7 @@ class ProfileController extends Controller
         if($failure){
             return $return;
         }
-        return array('status' => 'success');
+        return ['status' => 'success'];
     }
 
     /**
@@ -472,22 +474,29 @@ class ProfileController extends Controller
      *
      * @param Profile $profile
      * @param String $oldName
-     * @return bool
+     * @return array
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function renameProfileOnHosts(Profile $profile, String $oldName) : bool {
+    private function renameProfileOnHosts(Profile $profile, String $oldName) : array{
         $hosts = $profile->getHosts();
         if($hosts->isEmpty()){
-            return true;
+            return ['status' => 'success'];
         }
+        $return['status'] = 'failure';
+        $failure = false;
         for($i=0; $i<$hosts->count(); $i++){
             $host = $hosts->get($i);
             //Update Profile via LXD-API
             $profileApi = $this->container->get('lxd.api.profile');
-            $profileApi->renameProfileOnHost($host, $profile, $oldName);
-
-            //TODO Return false for errors
+            $result = $profileApi->renameProfileOnHost($host, $profile, $oldName);
+            if($result->code != 201){
+                $return[$host->getName()] = $result->body;
+                $failure = true;
+            }
         }
-        return true;
+        if($failure){
+            return $return;
+        }
+        return ['status' => 'success'];
     }
 }
