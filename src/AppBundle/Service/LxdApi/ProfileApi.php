@@ -63,4 +63,15 @@ class ProfileApi extends HttpHelper
             -> send();
     }
 
+    /**
+     * @param Host $host
+     * @param Profile $profile
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function deleteProfileOnHost(Host $host, Profile $profile){
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$profile->getName());
+        return Request::delete($uri)->send();
+    }
+
 }

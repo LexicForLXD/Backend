@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
-use Symfony\Component\VarDumper\VarDumper;
 
 class ProfileController extends Controller
 {
@@ -344,6 +343,7 @@ class ProfileController extends Controller
      * if this was the last Container using it
      * @param Profile $profile
      * @param Container $container
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function disableProfileForContainer(Profile $profile, Container $container){
         $profile->removeContainer($container);
@@ -351,7 +351,9 @@ class ProfileController extends Controller
         //Check if this container was the only one using this profile on the host
         if($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1){
             $profile->removeHost($host);
-            $this->removeProfileFromHost($profile, $host);
+            //Remove Profile via LXD-API
+            $profileApi = $this->container->get('lxd.api.profile');
+            $profileApi->deleteProfileOnHost($host, $profile);
             return;
         }
         //LXC-Profile should remain on Host
@@ -394,22 +396,30 @@ class ProfileController extends Controller
      * Used to remove the Profile from als Hosts via the LXD Api
      *
      * @param Profile $profile
+     * @return bool
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     private function removeProfileFromHosts(Profile $profile){
         $hosts = $profile->getHosts();
-        while($hosts->next()){
-            $host = $hosts->current();
-            $this->removeProfileFromHost($profile, $host);
+        if($hosts->isEmpty()){
+            return true;
+        }
+        for($i=0; $i<$hosts->count(); $i++){
+            $host = $hosts->get($i);
+            //Remove Profile via LXD-API
+            $profileApi = $this->container->get('lxd.api.profile');
+            $profileApi->deleteProfileOnHost($host, $profile);
 
             $profile->removeHost($host);
 
-            //Get updated list of Hosts
-            $hosts = $profile->getHosts();
+            //TODO Return false for errors
         }
+
         //Update Profile in the Database
         $em = $this->getDoctrine()->getManager();
         $em->persist($profile);
         $em->flush();
+        return true;
     }
 
     /**
