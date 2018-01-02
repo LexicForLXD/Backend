@@ -237,11 +237,22 @@ class ProfileController extends Controller
         if($request->request->get('devices')) {
             $profile->setDevices($request->request->get('devices'));
         }
+        $oldName = null;
+        if($request->request->get('name')) {
+            $oldName = $profile->getName();
+            $profile->setName($request->request->get('name'));
+        }
 
-        //TODO Add validate logic
+        if ($errorArray = $this->validation($profile)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
 
         if($profile->linkedToHost()){
             $this->updateProfileOnHosts($profile);
+
+            if($oldName != null) {
+                $this->renameProfileOnHosts($profile, $oldName);
+            }
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -439,6 +450,30 @@ class ProfileController extends Controller
             //Update Profile via LXD-API
             $profileApi = $this->container->get('lxd.api.profile');
             $profileApi->updateProfileOnHost($host, $profile);
+
+            //TODO Return false for errors
+        }
+        return true;
+    }
+
+    /**
+     * Used to rename the LXC-Profile on all hosts where it's used
+     *
+     * @param Profile $profile
+     * @param String $oldName
+     * @return bool
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    private function renameProfileOnHosts(Profile $profile, String $oldName) : bool {
+        $hosts = $profile->getHosts();
+        if($hosts->isEmpty()){
+            return true;
+        }
+        for($i=0; $i<$hosts->count(); $i++){
+            $host = $hosts->get($i);
+            //Update Profile via LXD-API
+            $profileApi = $this->container->get('lxd.api.profile');
+            $profileApi->renameProfileOnHost($host, $profile, $oldName);
 
             //TODO Return false for errors
         }

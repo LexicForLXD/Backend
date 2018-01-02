@@ -74,4 +74,20 @@ class ProfileApi extends HttpHelper
         return Request::delete($uri)->send();
     }
 
+    /**
+     * @param Host $host
+     * @param Profile $profile
+     * @param String $oldName
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function renameProfileOnHost(Host $host, Profile $profile, String $oldName){
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$oldName);
+        $body = '{ "name" : "'.$profile->getName().'" }';
+
+        return Request::post($uri)
+            -> body($body)
+            -> send();
+    }
+
 }
