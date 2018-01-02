@@ -55,7 +55,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="Config JSON array")
+     * @OAS\Property(example="Config JSON Object")
      * var json_array
      */
     protected $config;
@@ -63,7 +63,7 @@ class Profile
     /**
      * @ORM\Column(type="json_array")
      *
-     * @OAS\Property(example="Devices JSON array")
+     * @OAS\Property(example="Devices JSON Object")
      * var json_array
      */
     protected $devices;
