@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ProfileController extends Controller
 {
@@ -248,10 +249,13 @@ class ProfileController extends Controller
         }
 
         if($profile->linkedToHost()){
-            $this->updateProfileOnHosts($profile);
-
             if($oldName != null) {
-                $this->renameProfileOnHosts($profile, $oldName);
+                $result = $this->renameProfileOnHosts($profile, $oldName);
+
+                $result = $this->updateProfileOnHosts($profile);
+                if($result['status'] == 'failure'){
+                    return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+                }
             }
         }
 
@@ -437,23 +441,30 @@ class ProfileController extends Controller
      * Used to update the LXC-Profile an all hosts where it's used
      *
      * @param Profile $profile
-     * @return bool
+     * @return array
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function updateProfileOnHosts(Profile $profile) : bool {
+    private function updateProfileOnHosts(Profile $profile) {
         $hosts = $profile->getHosts();
         if($hosts->isEmpty()){
-            return true;
+            return ['status' => 'success'];
         }
+        $return['status'] = 'failure';
+        $failure = false;
         for($i=0; $i<$hosts->count(); $i++){
             $host = $hosts->get($i);
             //Update Profile via LXD-API
             $profileApi = $this->container->get('lxd.api.profile');
-            $profileApi->updateProfileOnHost($host, $profile);
-
-            //TODO Return false for errors
+            $result = $profileApi->updateProfileOnHost($host, $profile);
+            if($result->code != 200){
+                $return[$host->getName()] = $result->body;
+                $failure = true;
+            }
         }
-        return true;
+        if($failure){
+            return $return;
+        }
+        return array('status' => 'success');
     }
 
     /**
