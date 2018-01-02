@@ -300,6 +300,7 @@ class ProfileController extends Controller
      *      response=404
      * ),
      *)
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function deleteProfile($profileId){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -315,7 +316,10 @@ class ProfileController extends Controller
         }
 
         if($profile->linkedToHost()){
-            $this->removeProfileFromHosts($profile);
+            $result = $this->removeProfileFromHosts($profile);
+            if($result['status'] == 'failure'){
+                return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+            }
         }
 
         //Get updated Profile object
@@ -395,30 +399,39 @@ class ProfileController extends Controller
      * Used to remove the Profile from als Hosts via the LXD Api
      *
      * @param Profile $profile
-     * @return bool
+     * @return array
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function removeProfileFromHosts(Profile $profile){
+    private function removeProfileFromHosts(Profile $profile) : array{
         $hosts = $profile->getHosts();
         if($hosts->isEmpty()){
-            return true;
+            return ['status' => 'success'];
         }
+        $return['status'] = 'failure';
+        $failure = false;
         for($i=0; $i<$hosts->count(); $i++){
             $host = $hosts->get($i);
             //Remove Profile via LXD-API
             $profileApi = $this->container->get('lxd.api.profile');
-            $profileApi->deleteProfileOnHost($host, $profile);
+            $result = $profileApi->deleteProfileOnHost($host, $profile);
 
-            $profile->removeHost($host);
-
-            //TODO Return false for errors
+            if($result->code != 204){
+                $return[$host->getName()] = $result->body;
+                $failure = true;
+            }else{
+                $profile->removeHost($host);
+            }
         }
 
         //Update Profile in the Database
         $em = $this->getDoctrine()->getManager();
         $em->persist($profile);
         $em->flush();
-        return true;
+
+        if($failure){
+            return $return;
+        }
+        return ['status' => 'success'];
     }
 
     /**
