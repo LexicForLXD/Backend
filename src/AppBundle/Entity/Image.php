@@ -163,9 +163,20 @@ class Image
         return $this->host->getId();
     }
 
+    /**
+     * @return mixed
+     */
     public function getHost()
     {
         return $this->host;
+    }
+
+    /**
+     * @param Host $host
+     */
+    public function setHost(Host $host)
+    {
+        $this->host = $host;
     }
 
     /**
@@ -223,5 +234,7 @@ class Image
         $this->aliases->add($imageAlias);
         $imageAlias->setImage($this);
     }
+
+
 
 }
