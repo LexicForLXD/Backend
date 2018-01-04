@@ -5,7 +5,9 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use AppBundle\Service\LxdApi\ImageApi;
+use AppBundle\Service\LxdApi\OperationsRelayApi;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -104,7 +106,7 @@ class ImageController extends Controller
      *     description="TO BE DEFINED"
      * )
      */
-    public function createNewRemoteSourceImageOnHost($hostId, Request $request){
+    public function createNewRemoteSourceImageOnHost($hostId, Request $request, ImageApi $api, OperationsRelayApi $relayApi){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
@@ -129,7 +131,6 @@ class ImageController extends Controller
         $em = $this->getDoctrine()->getManager();
         //Create aliases
         if($request->request->get('aliases')) {
-            VarDumper::dump($request->request->get('aliases'));
             $aliasArray = $request->request->get('aliases');
 
             for($i=0; $i<sizeof($aliasArray); $i++){
@@ -142,12 +143,29 @@ class ImageController extends Controller
             }
         }
 
-        //TODO add LXD API call based on source data
-        //Will be set with the value provided by the lxd api response
+        $result = $api->createRemoteImageFromSource($host, $request->getContent());
+        //$result->body->operation = $relayApi->createNewOperationsLink($hostId, $result->body->operation);
+        //return new Response(json_encode($result->body));
 
-        $image->setFingerprint("JSKAJLSJASJ21344A3A3S1A2S34S5A6S");
+        $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
+
+        if($operationsResponse->code != 200){
+            return new Response(json_encode($operationsResponse->body));
+        }
+
+        while($operationsResponse->body->metadata->status_code == 103){
+            sleep(0.2);
+            $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
+        }
+
+        if($operationsResponse->body->metadata->status_code != 200){
+            return new Response(json_encode($operationsResponse->body));
+        }
+
+        $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
         $image->setArchitecture("amd64");
-        $image->setSize(12346);
+        //TODO Parse architecture
+        $image->setSize($operationsResponse->body->metadata->metadata->size);
 
         $em->persist($image);
         $em->flush();
