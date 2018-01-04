@@ -49,6 +49,11 @@ services:
             $cert_key_location: '%cert_key_location%'
             $cert_passphrase: '%cert_passphrase%'
 
+    image.creation.operation:
+            class: EventListener\ImageCreationListener
+            tags:
+                - { name: kernel.event_listener, event: image.creation.operation }
+
     platform.user.manager:
         class: Doctrine\ORM\EntityManager
         factory: ['@doctrine','getManagerForClass']
