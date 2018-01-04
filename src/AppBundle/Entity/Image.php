@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 use Swagger\Annotations as OAS;
@@ -35,8 +36,8 @@ class Image
     protected $fingerprint;
 
     /**
-     * @ORM\Column(type="string")
-     *
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\ImageAlias", mappedBy="image")
+     * @ORM\JoinColumn(name="alias_id", referencedColumnName="id")
      * @OAS\Property(example="alpine edge")
      * var string
      */
@@ -51,10 +52,10 @@ class Image
     protected $architecture;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="integer")
      *
-     * @OAS\Property(example="160.23MB")
-     * var string
+     * @OAS\Property(example="1602345")
+     * var int
      */
     protected $size;
 
@@ -64,6 +65,29 @@ class Image
      * @JMS\Exclude()
      */
     protected $host;
+
+    /**
+     * @ORM\Column(type="boolean")
+     * @var bool
+     */
+    protected $public;
+
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    protected $filename;
+
+    /**
+     * @ORM\Column(type="json")
+     * @var array
+     */
+    protected $properties;
+
+    public function __construct()
+    {
+        $alias = new ArrayCollection();
+    }
 
     /**
      * @return mixed
@@ -152,7 +176,52 @@ class Image
         return $this->host;
     }
 
+    /**
+     * @return bool
+     */
+    public function isPublic(): bool
+    {
+        return $this->public;
+    }
 
+    /**
+     * @param bool $public
+     */
+    public function setPublic(bool $public)
+    {
+        $this->public = $public;
+    }
 
+    /**
+     * @return string
+     */
+    public function getFilename(): string
+    {
+        return $this->filename;
+    }
+
+    /**
+     * @param string $filename
+     */
+    public function setFilename(string $filename)
+    {
+        $this->filename = $filename;
+    }
+
+    /**
+     * @return array
+     */
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
+
+    /**
+     * @param array $properties
+     */
+    public function setProperties(array $properties)
+    {
+        $this->properties = $properties;
+    }
 
 }
