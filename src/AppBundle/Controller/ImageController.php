@@ -2,11 +2,17 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Host;
 use AppBundle\Entity\Image;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use AppBundle\Entity\ImageAlias;
+use AppBundle\Service\LxdApi\ImageApi;
+use AppBundle\Service\LxdApi\OperationsRelayApi;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Swagger\Annotations as OAS;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ImageController extends Controller
 {
@@ -90,18 +96,83 @@ class ImageController extends Controller
     }
 
     /**
-     * Create a new Image on a specific Host
+     * Create a new Remote-Image on a specific Host
      *
      *
-     * @Route("/hosts/{hostId}/images", name="create_image_on_host", methods={"POST"})
+     * @Route("/hosts/{hostId}/images/remote", name="create_remote_image_on_host", methods={"POST"})
      *
      * @OAS\Post(path="/hosts/{hostId}/images",
      *     tags={"images"},
      *     description="TO BE DEFINED"
      * )
      */
-    public function createNewImageOnHost($hostId){
+    public function createNewRemoteSourceImageOnHost($hostId, Request $request, ImageApi $api, OperationsRelayApi $relayApi){
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
+        if (!$host) {
+            throw $this->createNotFoundException(
+                'No Host for '.$hostId.' found'
+            );
+        }
+
+        $image = new Image();
+        $image->setHost($host);
+
+        if($request->request->get('filename')) {
+            $image->setFilename($request->request->get('filename'));
+        }
+        if($request->request->get('public')) {
+            $image->setPublic($request->request->get('public'));
+        }
+        if($request->request->get('properties')) {
+            $image->setProperties($request->request->get('properties'));
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        //Create aliases
+        if($request->request->get('aliases')) {
+            $aliasArray = $request->request->get('aliases');
+
+            for($i=0; $i<sizeof($aliasArray); $i++){
+                $alias = new ImageAlias();
+                //TODO Validate if all necessary parameters were provided
+                $alias->setName($aliasArray[$i]['name']);
+                $alias->setDescription($aliasArray[$i]['description']);
+                $em->persist($alias);
+                $image->addAlias($alias);
+            }
+        }
+
+        $result = $api->createRemoteImageFromSource($host, $request->getContent());
+        //$result->body->operation = $relayApi->createNewOperationsLink($hostId, $result->body->operation);
+        //return new Response(json_encode($result->body));
+
+        $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
+
+        if($operationsResponse->code != 200){
+            return new Response(json_encode($operationsResponse->body));
+        }
+
+        while($operationsResponse->body->metadata->status_code == 103){
+            sleep(0.2);
+            $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
+        }
+
+        if($operationsResponse->body->metadata->status_code != 200){
+            return new Response(json_encode($operationsResponse->body));
+        }
+
+        $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
+        $image->setArchitecture("amd64");
+        //TODO Parse architecture
+        $image->setSize($operationsResponse->body->metadata->metadata->size);
+
+        $em->persist($image);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($image, 'json');
+        return new Response($response);
     }
 
     /**

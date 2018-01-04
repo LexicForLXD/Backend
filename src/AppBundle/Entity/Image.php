@@ -41,7 +41,7 @@ class Image
      * @OAS\Property(example="alpine edge")
      * var string
      */
-    protected $alias;
+    protected $aliases;
 
     /**
      * @ORM\Column(type="string")
@@ -86,7 +86,7 @@ class Image
 
     public function __construct()
     {
-        $alias = new ArrayCollection();
+        $this->aliases = new ArrayCollection();
     }
 
     /**
@@ -116,17 +116,9 @@ class Image
     /**
      * @return mixed
      */
-    public function getAlias()
+    public function getAliases()
     {
-        return $this->alias;
-    }
-
-    /**
-     * @param mixed $alias
-     */
-    public function setAlias($alias)
-    {
-        $this->alias = $alias;
+        return $this->aliases;
     }
 
     /**
@@ -171,9 +163,20 @@ class Image
         return $this->host->getId();
     }
 
+    /**
+     * @return mixed
+     */
     public function getHost()
     {
         return $this->host;
+    }
+
+    /**
+     * @param Host $host
+     */
+    public function setHost(Host $host)
+    {
+        $this->host = $host;
     }
 
     /**
@@ -223,5 +226,15 @@ class Image
     {
         $this->properties = $properties;
     }
+
+    public function addAlias(ImageAlias $imageAlias){
+        if ($this->aliases->contains($imageAlias)) {
+            return;
+        }
+        $this->aliases->add($imageAlias);
+        $imageAlias->setImage($this);
+    }
+
+
 
 }

@@ -33,7 +33,7 @@ class ImageAlias
     protected $description;
 
     /**
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Image", inversedBy="alias")
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Image", inversedBy="aliases")
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
      * @var mixed
      */
