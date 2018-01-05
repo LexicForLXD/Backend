@@ -28,7 +28,7 @@ class Image
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      *
      * @OAS\Property(example="a49d26ce5808075f5175bf31f5cb90561f5023dcd408da8ac5e834096d46b2d8")
      * var string
@@ -44,7 +44,7 @@ class Image
     protected $aliases;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      *
      * @OAS\Property(example="x86_64")
      * var string
@@ -52,7 +52,7 @@ class Image
     protected $architecture;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      *
      * @OAS\Property(example="1602345")
      * var int
@@ -83,6 +83,12 @@ class Image
      * @var array
      */
     protected $properties;
+
+    /**
+     * @ORM\Column(type="boolean")
+     * @var bool
+     */
+    protected $created;
 
     public function __construct()
     {
