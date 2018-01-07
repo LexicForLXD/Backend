@@ -115,3 +115,8 @@ nelmio_cors:
             allow_headers: ['*']
             allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
             max_age: 3600
+
+sb_event_queue:
+    service_name: 'event_queue'
+    default_name: 'event:default'
+    storage_path: '%kernel.cache_dir%/event-queue-daemon.%s.pid'
