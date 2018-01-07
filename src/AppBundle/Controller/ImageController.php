@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
+use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
 use Symfony\Component\Routing\Annotation\Route;
@@ -162,13 +163,17 @@ class ImageController extends Controller
             return new Response(json_encode($operationsResponse->body));
         }
 
-        $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
-        $image->setArchitecture("amd64");
+        //$image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
+        //$image->setArchitecture("amd64");
         //TODO Parse architecture
-        $image->setSize($operationsResponse->body->metadata->metadata->size);
+        //$image->setSize($operationsResponse->body->metadata->metadata->size);
+        $image->setCreated(false);
 
         $em->persist($image);
         $em->flush();
+
+        $dispatcher = $this->get('sb_event_queue');
+        $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), 'operationID', $hostId, $image->getId());
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($image, 'json');

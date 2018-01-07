@@ -49,8 +49,9 @@ services:
             $cert_key_location: '%cert_key_location%'
             $cert_passphrase: '%cert_passphrase%'
 
-    image.creation.operation:
-            class: EventListener\ImageCreationListener
+    lxd.image.creation.updater:
+            class: AppBundle\EventListener\ImageCreationListener
+            arguments: [ "@doctrine.orm.entity_manager" ]
             tags:
                 - { name: kernel.event_listener, event: image.creation.operation }
 
