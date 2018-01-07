@@ -1,8 +1,18 @@
 version: '2'
 services:
+  web:
+    image: "git.janrtr.de:4567/syp-lxc/backend"
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - "/path/to/cert/client.crt:/srv/lexic/client.crt"
+      - "/path/to/cert/client.key:/srv/lexic/client.key"
   postgres:
     image: "postgres"
     ports:
       - "5432:5432"
     environment:
       - "POSTGRES_PASSWORD=password"
+  redis:
+    image: "redis:alpine"
