@@ -85,6 +85,11 @@ class Image
     protected $properties;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var mixed
+     */
+    protected $error;
+    /**
      * @ORM\Column(type="boolean")
      * @var bool
      */
@@ -257,8 +262,20 @@ class Image
         $this->finished = $finished;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
 
-
-
+    /**
+     * @param mixed $error
+     */
+    public function setError($error)
+    {
+        $this->error = $error;
+    }
 
 }
