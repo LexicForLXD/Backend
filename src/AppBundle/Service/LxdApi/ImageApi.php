@@ -41,8 +41,8 @@ class ImageApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function getOperationsLink(Host $host, $operationsLink){
-        $uri = $this->buildUri($host, 'operations/'.substr($operationsLink, 16));
+    public function getOperationsLink(Host $host, $operationsId){
+        $uri = $this->buildUri($host, 'operations/'.$operationsId);
         return Request::get($uri)
             -> send();
     }
