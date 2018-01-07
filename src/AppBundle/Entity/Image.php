@@ -88,7 +88,7 @@ class Image
      * @ORM\Column(type="boolean")
      * @var bool
      */
-    protected $created;
+    protected $finished;
 
     public function __construct()
     {
@@ -240,6 +240,24 @@ class Image
         $this->aliases->add($imageAlias);
         $imageAlias->setImage($this);
     }
+
+    /**
+     * @return bool
+     */
+    public function isFinished(): bool
+    {
+        return $this->finished;
+    }
+
+    /**
+     * @param bool $finished
+     */
+    public function setFinished(bool $finished)
+    {
+        $this->finished = $finished;
+    }
+
+
 
 
 
