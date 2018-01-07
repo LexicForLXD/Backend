@@ -14,3 +14,4 @@ parameters:
     cert_location: /srv/lexic/client.crt
     cert_key_location: /srv/lexic/client.key
     cert_passphrase: null
+    redis_hostname: redis
