@@ -7,7 +7,7 @@ use SymfonyBundles\EventQueueBundle\Event;
 
 class ImageCreationEvent extends Event
 {
-    const NAME = 'lxd.image.creation.updater';
+    const NAME = 'lxd.image.creation.update';
 
     private $time;
     private $operationId;
