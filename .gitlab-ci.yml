@@ -4,6 +4,7 @@ stages:
   - test
   - release
   - deploy
+  - build
 
 variables:
   POSTGRES_DB: syp-lxc
@@ -94,5 +95,16 @@ deploy:dev:
     #change permissions for html folder
     - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S chown -R www-data:www-data /var/www/html"
 
-
+build_docker:
+  image: docker:git
+  stage: build
+  services:
+  - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY/syp-lxc/backend/tagged:$(git describe --abbrev=0) -t $CI_REGISTRY/syp-lxc/backend:latest .
+    - docker push $CI_REGISTRY/syp-lxc/backend/tagged:$(git describe --abbrev=0)
+    - docker push $CI_REGISTRY/syp-lxc/backend:latest
+  only:
+    - master
 
