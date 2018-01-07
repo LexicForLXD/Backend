@@ -120,3 +120,8 @@ sb_event_queue:
     service_name: 'event_queue'
     default_name: 'event:default'
     storage_path: '%kernel.cache_dir%/event-queue-daemon.%s.pid'
+
+jms_serializer:
+    visitors:
+        json:
+            options: [JSON_UNESCAPED_SLASHES, JSON_UNESCAPED_UNICODE]
