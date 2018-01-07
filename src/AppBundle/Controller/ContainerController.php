@@ -9,7 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use AppBundle\Service\LxdApi\Container as ContainerApi;
+use AppBundle\Service\LxdApi\ContainerApi;
+use AppBundle\Service\LxdApi\OperationsRelayApi;
 
 use AppBundle\Entity\Container;
 use AppBundle\Entity\ContainerStatus;
@@ -177,7 +178,7 @@ class ContainerController extends Controller
      * )
      *
      */
-    public function storeAction(Request $request, $hostId, EntityManagerInterface $em)
+    public function storeAction(Request $request, $hostId, EntityManagerInterface $em, OperationsRelayApi $relayApi, ContainerApi $api)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -237,16 +238,33 @@ class ContainerController extends Controller
                 return new JsonResponse(["message" => "migration"]);
                 break;
             case 'copy':
+                
                 return new JsonResponse(["message" => "copy"]);
                 break;
             default:
                 return new JsonResponse(["message" => "none"]);
         }
 
-        $containerApi = new ContainerApi();
-        $response = $containerApi->create($host, $data);
 
-        //TODO Mögliche Fehler abfangen async
+
+        $result = $api->create($host, $data);
+
+        $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
+
+        if($operationsResponse->code != 200){
+            return new Response(json_encode($operationsResponse->body));
+        }
+
+        while($operationsResponse->body->metadata->status_code == 103){
+            sleep(0.2);
+            $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
+        }
+
+        if($operationsResponse->body->metadata->status_code != 200){
+            return new Response(json_encode($operationsResponse->body));
+        }
+
+
 
         $em->persist($container);
         $em->flush();
@@ -283,7 +301,7 @@ class ContainerController extends Controller
      *)
      *
      */
-    public function showSingleAction(Request $request, $containerId)
+    public function showSingleAction(Request $request, $containerId, ContainerApi $api)
     {
         $fresh = $request->query->get('fresh');
 
@@ -297,10 +315,7 @@ class ContainerController extends Controller
 
         if ($fresh == 'true') {
 
-
-            $containerApi = new ContainerApi();
-
-            $container = $containerApi->show($container->host, $container->name);
+            $container = $api->show($container->host, $container->name);
 
             //TODO in DB aktualisieren
 
