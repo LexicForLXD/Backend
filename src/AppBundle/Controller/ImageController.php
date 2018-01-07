@@ -8,6 +8,7 @@ use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
+use JMS\Serializer\SerializationContext;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -91,8 +92,10 @@ class ImageController extends Controller
             );
         }
 
+        $context = new SerializationContext();
+        $context->setSerializeNull(true);
         $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($images, 'json');
+        $response = $serializer->serialize($images, 'json', $context);
         return new Response($response);
     }
 
@@ -145,35 +148,23 @@ class ImageController extends Controller
         }
 
         $result = $api->createRemoteImageFromSource($host, $request->getContent());
-        //$result->body->operation = $relayApi->createNewOperationsLink($hostId, $result->body->operation);
-        //return new Response(json_encode($result->body));
-
-        $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
-
-        if($operationsResponse->code != 200){
-            return new Response(json_encode($operationsResponse->body));
+        if ($result->code != 202) {
+            //return new Response(json_encode($operationsResponse->body));
+            Return new Response(json_encode($result->body));
+        }
+        if ($result->body->metadata->status_code == 400) {
+            //return new Response(json_encode($operationsResponse->body));
+            Return new Response(json_encode($result->body));
         }
 
-        while($operationsResponse->body->metadata->status_code == 103){
-            sleep(0.2);
-            $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
-        }
-
-        if($operationsResponse->body->metadata->status_code != 200){
-            return new Response(json_encode($operationsResponse->body));
-        }
-
-        //$image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
-        //$image->setArchitecture("amd64");
-        //TODO Parse architecture
-        //$image->setSize($operationsResponse->body->metadata->metadata->size);
-        $image->setCreated(false);
+        $image->setFinished(false);
 
         $em->persist($image);
         $em->flush();
 
         $dispatcher = $this->get('sb_event_queue');
-        $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), 'operationID', $hostId, $image->getId());
+
+        $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($image, 'json');
