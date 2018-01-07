@@ -1,13 +1,23 @@
-#DEV Env with Docker
+# DEV Env with Docker
 
-##Installation parameters
-- <code>database_driver: pdo_pgsql </code>
-- <code>database_host: localhost </code>
-- <code>database_port: 5432 </code>
-- <code>database_name: postgres </code>
-- <code>database_user: postgres </code>
-- <code>database_password: password </code>
-      
-##Start Database Container
+## Start Docker-DEV environment
 
-<code> docker-compose up -d </code>
+- Update the path to the LXD-certificate "/path/to/cert/" with your local path in docker-compose.yml 
+
+- Start all containers
+```
+docker-compose up -d
+```
+- Create the database schema 
+```
+docker-compose exec web php bin/console doctrine:schema:update --force
+```
+- Create the database fixtures 
+```
+docker-compose exec web php bin/console doctrine:fixtures:load
+```
+- Done :)
+
+## Access to Containers
+- WebServer : localhost port 80
+- Postgres Database : localhost port 5432
