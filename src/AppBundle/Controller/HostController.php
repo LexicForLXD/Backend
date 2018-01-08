@@ -43,6 +43,12 @@ class HostController extends Controller
     {
         $hosts = $this->getDoctrine()->getRepository(Host::class)->findAll();
 
+        if (!$hosts) {
+            throw $this->createNotFoundException(
+                'No Hosts found'
+            );
+        }
+
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($hosts, 'json');
         return new Response($response);
