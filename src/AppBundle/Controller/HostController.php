@@ -303,7 +303,7 @@ class HostController extends Controller
      *
      * @param Request $request
      * @param [integer] $hostId
-     * @return void
+     * @return Response
      *
      *SWG\Post(path="/hosts/{hostId}/authorization",
      *tags={"hosts"},
@@ -331,7 +331,7 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function authorizeAction(Request $request, $hostId, HostApi $hostApi)
+    public function authorizeAction(Request $request, $hostId, HostApi $api)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -347,8 +347,13 @@ class HostController extends Controller
             "password" => $request->get("password")
         ];
 
-        return $hostApi->authenticate($host, $data);
+        $result = $api->authenticate($host, $data);
 
+        if($result->code == '200'){
+            return new JsonResponse(['message' => 'authentication successful']);
+        } else {
+            return new JsonResponse(['error' => 'error while authentication'],500);
+        }
     }
 
     private function validation($object)
