@@ -59,7 +59,7 @@ class ImageCreationListener
         $image->setArchitecture("amd64");
         //TODO Parse architecture
         $image->setSize($operationsResponse->body->metadata->metadata->size);
-        $image->setFinish(true);
+        $image->setFinished(true);
 
         $this->em->persist($image);
         $this->em->flush($image);
