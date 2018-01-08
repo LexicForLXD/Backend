@@ -29,7 +29,7 @@ class ContainerRepository extends EntityRepository
         )->setParameter('id', $containerId);
 
         try {
-            return $query->getSingleResult();
+            return $query->getArrayResult();
         } catch (\Doctrine\ORM\NoResultException $e) {
             return null;
         }
