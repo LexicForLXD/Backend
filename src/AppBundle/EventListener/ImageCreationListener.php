@@ -41,11 +41,7 @@ class ImageCreationListener
             return;
         }
 
-        echo "WAITING... \n";
-        do{
-            $operationsResponse = $this->api->getOperationsLink($event->getHost(), $event->getOperationId());
-            sleep(0.5);
-        }while ($operationsResponse->body->metadata->status_code == 103);
+        $operationsResponse = $this->api->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
 
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-UPDATE : ".$operationsResponse->body->metadata->err."\n";
