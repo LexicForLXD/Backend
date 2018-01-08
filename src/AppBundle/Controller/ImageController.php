@@ -9,6 +9,7 @@ use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
 use JMS\Serializer\SerializationContext;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -132,6 +133,10 @@ class ImageController extends Controller
             $image->setProperties($request->request->get('properties'));
         }
 
+        if ($errorArray = $this->validation($image)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
         $em = $this->getDoctrine()->getManager();
         //Create aliases
         if($request->request->get('aliases')) {
@@ -139,9 +144,11 @@ class ImageController extends Controller
 
             for($i=0; $i<sizeof($aliasArray); $i++){
                 $alias = new ImageAlias();
-                //TODO Validate if all necessary parameters were provided
                 $alias->setName($aliasArray[$i]['name']);
                 $alias->setDescription($aliasArray[$i]['description']);
+                if ($errorArray = $this->validation($alias)) {
+                    return new JsonResponse(['errors' => $errorArray], 400);
+                }
                 $em->persist($alias);
                 $image->addAlias($alias);
             }
@@ -149,11 +156,9 @@ class ImageController extends Controller
 
         $result = $api->createRemoteImageFromSource($host, $request->getContent());
         if ($result->code != 202) {
-            //return new Response(json_encode($operationsResponse->body));
             Return new Response(json_encode($result->body));
         }
         if ($result->body->metadata->status_code == 400) {
-            //return new Response(json_encode($operationsResponse->body));
             Return new Response(json_encode($result->body));
         }
 
@@ -254,5 +259,20 @@ class ImageController extends Controller
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($images, 'json');
         return new Response($response);
+    }
+
+    private function validation($object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
+
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $errorArray;
+        }
+        return false;
     }
 }
