@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
+use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Service\LxdApi\ProfileApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -36,12 +37,14 @@ class ProfileController extends Controller
      *          description="No LXC-Profiles found",
      *      ),
      * )
+     *
+     * @throws ElementNotFoundException
      */
     public function getAllProfiles(){
         $profiles = $this->getDoctrine()->getRepository(Profile::class)->findAll();
 
         if (!$profiles) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No LXC-Profiles found'
             );
         }
@@ -78,12 +81,14 @@ class ProfileController extends Controller
      *      ),
      *  ),
      *)
+     *
+     * @throws ElementNotFoundException
      */
     public function getSingleProfile($profileId){
         $profiles = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
         if (!$profiles) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No LXC-Profile for ID '.$profileId.' found'
             );
         }
