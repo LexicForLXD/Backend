@@ -8,6 +8,7 @@ use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
+use Httpful\Exception\ConnectionErrorException;
 use JMS\Serializer\SerializationContext;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -93,10 +94,8 @@ class ImageController extends Controller
             );
         }
 
-        $context = new SerializationContext();
-        $context->setSerializeNull(true);
         $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($images, 'json', $context);
+        $response = $serializer->serialize($images, 'json');
         return new Response($response);
     }
 
@@ -154,7 +153,12 @@ class ImageController extends Controller
             }
         }
 
-        $result = $api->createRemoteImageFromSource($host, $request->getContent());
+        try{
+            $result = $api->createRemoteImageFromSource($host, $request->getContent());
+        }catch(ConnectionErrorException $e){
+            Return new Response(json_encode(['error' => $e->getMessage()]));
+        }
+
         if ($result->code != 202) {
             Return new Response(json_encode($result->body));
         }
