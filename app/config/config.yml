@@ -134,3 +134,8 @@ sb_redis:
             # connection parameters
             $parameters:
                 host: '%redis_hostname%'
+
+jms_serializer:
+    visitors:
+        json:
+            options: [JSON_UNESCAPED_SLASHES, JSON_UNESCAPED_UNICODE]

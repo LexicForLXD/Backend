@@ -30,6 +30,7 @@ test:php7.1:
    only:
      - master
      - /^feature.*$/
+     - /^fix.*$/
 
 release:
     before_script:
