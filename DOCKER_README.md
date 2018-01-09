@@ -18,6 +18,11 @@ docker-compose exec web php bin/console doctrine:schema:update --force
 ```
 docker-compose exec web php bin/console doctrine:fixtures:load
 ```
+- Start the event queue daemon
+```
+docker-compose exec web php bin/console event:queue:daemon:start
+```
+
 - Done :)
 
 ## Access to Containers
