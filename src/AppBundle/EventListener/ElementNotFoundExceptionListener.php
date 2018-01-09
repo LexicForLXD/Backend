@@ -6,7 +6,6 @@ namespace AppBundle\EventListener;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\Utils\NotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 
 class ElementNotFoundExceptionListener
@@ -27,6 +26,6 @@ class ElementNotFoundExceptionListener
             ]
         ];
 
-        $event->setResponse(new JsonResponse($responseData, Response::HTTP_SERVICE_UNAVAILABLE));
+        $event->setResponse(new JsonResponse($responseData, $code));
     }
 }
