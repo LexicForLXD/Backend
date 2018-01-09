@@ -6,6 +6,7 @@ use AppBundle\Entity\Host;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ImageCreationEvent;
+use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
 use Httpful\Exception\ConnectionErrorException;
@@ -40,12 +41,14 @@ class ImageController extends Controller
      *          description="No Images found",
      *      ),
      * )
+     *
+     * @throws ElementNotFoundException
      */
     public function getAllImages(){
         $images = $this->getDoctrine()->getRepository(Image::class)->findAll();
 
         if (!$images) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No Images found'
             );
         }
@@ -84,12 +87,14 @@ class ImageController extends Controller
      *          description="No Images on the Host found",
      *      ),
      * )
+     *
+     * @throws ElementNotFoundException
      */
     public function getAllImagesOnHost($hostId){
         $images = $this->getDoctrine()->getRepository(Image::class)->findBy(array('host' => $hostId));
 
         if (!$images) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No Images for Host '.$hostId.' found'
             );
         }
@@ -115,12 +120,15 @@ class ImageController extends Controller
      * @param ImageApi $api
      * @param OperationsRelayApi $relayApi
      * @return Response
+     *
+     * @throws ConnectionErrorException
+     * @throws ElementNotFoundException
      */
     public function createNewRemoteSourceImageOnHost($hostId, Request $request, ImageApi $api, OperationsRelayApi $relayApi){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No Host for '.$hostId.' found'
             );
         }
@@ -159,11 +167,7 @@ class ImageController extends Controller
             }
         }
 
-        try{
-            $result = $api->createRemoteImageFromSource($host, $request->getContent());
-        }catch(ConnectionErrorException $e){
-            Return new Response(json_encode(['error' => $e->getMessage()]));
-        }
+        $result = $api->createRemoteImageFromSource($host, $request->getContent());
 
         if ($result->code != 202) {
             Return new Response(json_encode($result->body));
@@ -211,12 +215,14 @@ class ImageController extends Controller
      *          description="No Image with the ImageId found or the image couldn't be deleted ",
      *      ),
      * )
+     *
+     * @throws ElementNotFoundException
      */
     public function deleteImage($imageId){
         $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
         if (!$image) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No Image found for id ' . $imageId
             );
         }
@@ -256,12 +262,14 @@ class ImageController extends Controller
      *          description="No Images with the ImageId found",
      *      ),
      * )
+     *
+     * @throws ElementNotFoundException
      */
     public function getSingleImage($imageId){
         $images = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
         if (!$images) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No Image for ID '.$imageId.' found'
             );
         }

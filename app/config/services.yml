@@ -66,3 +66,18 @@ services:
     platform.user.provider:
         class: AppBundle\Provider\UserProvider
         arguments: ['@platform.user.repository']
+
+    httpful_connection_exception.listener:
+        class: AppBundle\EventListener\HttpfulConnectionExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+    element_not_found_exception.listener:
+        class: AppBundle\EventListener\ElementNotFoundExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+    wrong_input_exception.listener:
+        class: AppBundle\EventListener\WrongInputExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
