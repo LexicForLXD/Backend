@@ -109,6 +109,12 @@ class ImageController extends Controller
      *     tags={"images"},
      *     description="TO BE DEFINED"
      * )
+     *
+     * @param $hostId
+     * @param Request $request
+     * @param ImageApi $api
+     * @param OperationsRelayApi $relayApi
+     * @return Response
      */
     public function createNewRemoteSourceImageOnHost($hostId, Request $request, ImageApi $api, OperationsRelayApi $relayApi){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
