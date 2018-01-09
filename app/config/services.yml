@@ -73,6 +73,11 @@ services:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
     element_not_found_exception.listener:
-            class: AppBundle\EventListener\ElementNotFoundExceptionListener
-            tags:
-                - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+        class: AppBundle\EventListener\ElementNotFoundExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+    wrong_input_exception.listener:
+        class: AppBundle\EventListener\WrongInputExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
