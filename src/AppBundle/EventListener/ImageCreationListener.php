@@ -29,7 +29,6 @@ class ImageCreationListener
     public function onLxdImageCreationUpdate(ImageCreationEvent $event){
 
         echo "START-UPDATE : ImageId ".$event->getImageId()." \n";
-        $this->time_elapsed();
 
         $operationsResponse = $this->api->getOperationsLink($event->getHost(), $event->getOperationId());
 
@@ -56,19 +55,16 @@ class ImageCreationListener
         $image = $this->em->getRepository(Image::class)->find($event->getImageId());
 
         $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
-        $image->setArchitecture("amd64");
-        //TODO Parse architecture
+        //Parse architecture
+        $result = $this->api->getImageByFingerprint($event->getHost(), $image->getFingerprint());
+        $image->setArchitecture($result->body->metadata->architecture);
         $image->setSize($operationsResponse->body->metadata->metadata->size);
         $image->setFinished(true);
 
         $this->em->persist($image);
         $this->em->flush($image);
 
-        echo "FINISH-UPDATE : ImageId ".$event->getImageId().' in '.$this->time_elapsed()."milliseconds \n";
-    }
-
-    function time_elapsed()
-    {
+        echo "FINISH-UPDATE : ImageId ".$event->getImageId()."\n";
     }
 
 }

@@ -59,4 +59,16 @@ class ImageApi extends HttpHelper
             -> send();
     }
 
+    /**
+     * @param Host $host
+     * @param String $fingerprint
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function getImageByFingerprint(Host $host, String $fingerprint){
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$fingerprint);
+        return Request::get($uri)
+            -> send();
+    }
+
 }
