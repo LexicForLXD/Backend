@@ -7,6 +7,7 @@ use AppBundle\Entity\Image;
 use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Service\LxdApi\ImageApi;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ImageCreationListener
 {
@@ -23,36 +24,47 @@ class ImageCreationListener
      * @param ImageCreationEvent $event
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function onLxdImageCreationUpdater(ImageCreationEvent $event){
+    public function onLxdImageCreationUpdate(ImageCreationEvent $event){
 
+        echo "START-UPDATE : ImageId ".$event->getImageId()." \n";
+
+        $operationsResponse = $this->api->getOperationsLink($event->getHost(), $event->getOperationId());
+
+        //VarDumper::dump($operationsResponse);
+
+        if ($operationsResponse->code != 200) {
+            //return new Response(json_encode($operationsResponse->body));
+            echo "FAILED-UPDATE \n";
+            return;
+        }
+
+        $operationsResponse = $this->api->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
+
+        if ($operationsResponse->body->metadata->status_code != 200) {
+            echo "FAILED-UPDATE : ".$operationsResponse->body->metadata->err."\n";
+            $image = $this->em->getRepository(Image::class)->find($event->getImageId());
+            $image->setError($operationsResponse->body->metadata->err);
+            $this->em->persist($image);
+            $this->em->flush($image);
+            return;
+        }
+
+        echo "UPDATING... \n";
         $image = $this->em->getRepository(Image::class)->find($event->getImageId());
 
-        $image->setSize(1500);
+        $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
+        //Parse architecture
+        $result = $this->api->getImageByFingerprint($event->getHost(), $image->getFingerprint());
+        $image->setArchitecture($result->body->metadata->architecture);
+        $image->setSize($operationsResponse->body->metadata->metadata->size);
+        $image->setFinished(true);
 
         $this->em->persist($image);
-        $this->em->flush();
+        $this->em->flush($image);
 
-//        $operationsResponse = $this->api->getOperationsLink($event->getHostId(), $result->body->operation);
-//
-//        if ($operationsResponse->code != 200) {
-//            return new Response(json_encode($operationsResponse->body));
-//        }
-//
-//        while ($operationsResponse->body->metadata->status_code == 103) {
-//            sleep(0.2);
-//            $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
-//        }
-//
-//        if ($operationsResponse->body->metadata->status_code != 200) {
-//            return new Response(json_encode($operationsResponse->body));
-//        }
-//
-//        $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
-//        $image->setArchitecture("amd64");
-//        //TODO Parse architecture
-//        $image->setSize($operationsResponse->body->metadata->metadata->size);
-        log("TEST");
+        echo "FINISH-UPDATE : ImageId ".$event->getImageId()."\n";
     }
 
 }

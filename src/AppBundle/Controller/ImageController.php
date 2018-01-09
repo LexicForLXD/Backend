@@ -8,6 +8,9 @@ use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
+use Httpful\Exception\ConnectionErrorException;
+use JMS\Serializer\SerializationContext;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -106,6 +109,12 @@ class ImageController extends Controller
      *     tags={"images"},
      *     description="TO BE DEFINED"
      * )
+     *
+     * @param $hostId
+     * @param Request $request
+     * @param ImageApi $api
+     * @param OperationsRelayApi $relayApi
+     * @return Response
      */
     public function createNewRemoteSourceImageOnHost($hostId, Request $request, ImageApi $api, OperationsRelayApi $relayApi){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
@@ -129,6 +138,10 @@ class ImageController extends Controller
             $image->setProperties($request->request->get('properties'));
         }
 
+        if ($errorArray = $this->validation($image)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
         $em = $this->getDoctrine()->getManager();
         //Create aliases
         if($request->request->get('aliases')) {
@@ -136,44 +149,37 @@ class ImageController extends Controller
 
             for($i=0; $i<sizeof($aliasArray); $i++){
                 $alias = new ImageAlias();
-                //TODO Validate if all necessary parameters were provided
                 $alias->setName($aliasArray[$i]['name']);
                 $alias->setDescription($aliasArray[$i]['description']);
+                if ($errorArray = $this->validation($alias)) {
+                    return new JsonResponse(['errors' => $errorArray], 400);
+                }
                 $em->persist($alias);
                 $image->addAlias($alias);
             }
         }
 
-        $result = $api->createRemoteImageFromSource($host, $request->getContent());
-        //$result->body->operation = $relayApi->createNewOperationsLink($hostId, $result->body->operation);
-        //return new Response(json_encode($result->body));
-
-        $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
-
-        if($operationsResponse->code != 200){
-            return new Response(json_encode($operationsResponse->body));
+        try{
+            $result = $api->createRemoteImageFromSource($host, $request->getContent());
+        }catch(ConnectionErrorException $e){
+            Return new Response(json_encode(['error' => $e->getMessage()]));
         }
 
-        while($operationsResponse->body->metadata->status_code == 103){
-            sleep(0.2);
-            $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
+        if ($result->code != 202) {
+            Return new Response(json_encode($result->body));
+        }
+        if ($result->body->metadata->status_code == 400) {
+            Return new Response(json_encode($result->body));
         }
 
-        if($operationsResponse->body->metadata->status_code != 200){
-            return new Response(json_encode($operationsResponse->body));
-        }
-
-        //$image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
-        //$image->setArchitecture("amd64");
-        //TODO Parse architecture
-        //$image->setSize($operationsResponse->body->metadata->metadata->size);
-        $image->setCreated(false);
+        $image->setFinished(false);
 
         $em->persist($image);
         $em->flush();
 
         $dispatcher = $this->get('sb_event_queue');
-        $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), 'operationID', $hostId, $image->getId());
+
+        $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($image, 'json');
@@ -263,5 +269,20 @@ class ImageController extends Controller
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($images, 'json');
         return new Response($response);
+    }
+
+    private function validation($object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
+
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $errorArray;
+        }
+        return false;
     }
 }

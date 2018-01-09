@@ -53,7 +53,7 @@ services:
             class: AppBundle\EventListener\ImageCreationListener
             arguments: [ "@doctrine.orm.entity_manager" ]
             tags:
-                - { name: kernel.event_listener, event: image.creation.operation }
+                - { name: kernel.event_listener, event: lxd.image.creation.update }
 
     platform.user.manager:
         class: Doctrine\ORM\EntityManager

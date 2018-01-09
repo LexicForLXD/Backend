@@ -3,29 +3,30 @@
 namespace AppBundle\Event;
 
 
+use AppBundle\Entity\Host;
 use SymfonyBundles\EventQueueBundle\Event;
 
 class ImageCreationEvent extends Event
 {
-    const NAME = 'lxd.image.creation.updater';
+    const NAME = 'lxd.image.creation.update';
 
     private $time;
     private $operationId;
-    private $hostId;
+    private $host;
     private $imageId;
 
     /**
      * ImageCreationEvent constructor.
      * @param $time
      * @param $operationId
-     * @param $hostId
+     * @param Host $host
      * @param $imageId
      */
-    public function __construct($time, $operationId, $hostId, $imageId)
+    public function __construct($time, $operationId, Host $host, $imageId)
     {
         $this->time = $time;
         $this->operationId = $operationId;
-        $this->hostId = $hostId;
+        $this->host = $host;
         $this->imageId = $imageId;
     }
 
@@ -46,11 +47,11 @@ class ImageCreationEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return Host
      */
-    public function getHostId()
+    public function getHost() : Host
     {
-        return $this->hostId;
+        return $this->host;
     }
 
     /**

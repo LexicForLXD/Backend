@@ -23,3 +23,5 @@ parameters:
     cert_location: /path/to/fullchain.pem
     cert_key_location: /path/to/privkey.pem
     cert_passphrase: ~
+
+    redis_hostname: redis
