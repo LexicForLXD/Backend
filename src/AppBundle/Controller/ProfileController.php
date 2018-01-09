@@ -225,12 +225,13 @@ class ProfileController extends Controller
      * @param Request $request
      * @return Response
      * @throws \Httpful\Exception\ConnectionErrorException
+     * @throws ElementNotFoundException
      */
     public function editProfile($profileId, Request $request){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
         if (!$profile) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No LXC-Profile for ID '.$profileId.' found'
             );
         }
@@ -306,12 +307,13 @@ class ProfileController extends Controller
      * ),
      *)
      * @throws \Httpful\Exception\ConnectionErrorException
+     * @throws ElementNotFoundException
      */
     public function deleteProfile($profileId){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
 
         if (!$profile) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No LXC-Profile found for id ' . $profileId
             );
         }
