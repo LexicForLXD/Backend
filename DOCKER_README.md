@@ -6,6 +6,8 @@
 
 - Update the path to the LXD-certificate "/path/to/cert/" with your local path in docker-compose.yml 
 
+- Optional (remove not required cert volume links)
+
 - Start all containers
 ```
 docker-compose up -d
