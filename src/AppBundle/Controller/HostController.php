@@ -294,6 +294,10 @@ class HostController extends Controller
             );
         }
 
+        if($host->hasAnything()) {
+            return new JsonResponse(['errors' => 'Host has an association with one or more of the following: images, containers, profiles'], Response::HTTP_BAD_REQUEST);
+        }
+
         $em->remove($host);
         $em->flush();
 
