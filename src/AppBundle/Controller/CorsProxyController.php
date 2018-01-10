@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 
-use AppBundle\Service\LxdApi\CorsProxyApi;
+use AppBundle\Service\CorsProxyApi;
 use Httpful\Exception\ConnectionErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;

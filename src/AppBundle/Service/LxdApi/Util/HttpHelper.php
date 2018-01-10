@@ -3,6 +3,7 @@
 
 namespace AppBundle\Service\LxdApi\Util;
 
+use AppBundle\Exception\WrongInputException;
 use Httpful\Request;
 
 class HttpHelper
@@ -11,11 +12,22 @@ class HttpHelper
     private $cert_key_location;
     private $cert_passphrase;
 
+    /**
+     * HttpHelper constructor.
+     * @param $cert_location
+     * @param $cert_key_location
+     * @param $cert_passphrase
+     * @throws WrongInputException
+     */
     public function __construct($cert_location, $cert_key_location, $cert_passphrase)
     {
         $this->cert_location = $cert_location;
         $this->cert_key_location = $cert_key_location;
         $this->cert_passphrase = $cert_passphrase;
+        if(!is_readable($cert_location) || !is_readable($cert_key_location)){
+            throw new WrongInputException("Couldn't read the server certificate files for LXD-Host connection");
+        }
+
     }
 
 

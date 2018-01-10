@@ -1,15 +1,11 @@
 <?php
 
-namespace AppBundle\Service\LxdApi;
+namespace AppBundle\Service;
 
 use Httpful\Request;
 
 class CorsProxyApi
 {
-    public function __construct($cert_location, $cert_key_location, $cert_passphrase)
-    {
-    }
-
     /**
      * @param String $url
      * @return \Httpful\Response
