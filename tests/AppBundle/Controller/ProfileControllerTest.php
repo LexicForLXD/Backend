@@ -329,6 +329,51 @@ class ProfileControllerTest extends WebTestCase
 //        $this->em->flush();
 //    }
 
+    public function testCreateProfile(){
+        $client = static::createClient();
+
+        $randomNumber = mt_rand();
+
+        $client->request(
+            'POST',
+            '/profiles',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),
+            '{
+                    "name": "my-profile'.$randomNumber.'",
+                    "description": "This is my first LXC-Profile'.$randomNumber.'",
+                    "config": {
+                      "limits.memory": "2GB"
+                    },
+                    "devices": {
+                      "kvm": {
+                              "type": "unix-char",
+                              "path": "/dev/kvm"
+                        }
+                    }
+                }'
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode());
+
+        $json = json_decode($client->getResponse()->getContent());
+
+        $profile = $this->em->getRepository(Profile::class)->find($json->id);
+
+        $this->assertEquals("my-profile".$randomNumber, $profile->getName());
+        $this->assertEquals("This is my first LXC-Profile".$randomNumber, $profile->getDescription());
+        $this->assertEquals("my-profile".$randomNumber, $profile->getName());
+        $this->assertEquals(['limits.memory' => '2GB'], $profile->getConfig());
+        $this->assertEquals(['kvm' => ['type' => 'unix-char', 'path' => '/dev/kvm']], $profile->getDevices());
+
+        $this->em->remove($profile);
+        $this->em->flush();
+    }
+
     /**
      * {@inheritDoc}
      */
