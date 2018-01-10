@@ -21,17 +21,15 @@ class CorsProxyController extends Controller
      * @param CorsProxyApi $api
      * @param Request $request
      * @return Response
+     *
+     * @throws ConnectionErrorException
      */
     public function corsProxy(CorsProxyApi $api, Request $request){
         $url = $request->query->get('url');
         if(!$url){
             return new Response(json_encode(['error' => 'no url provided']));
         }
-        try{
-            $result = $api->getUrl($url);
-        }catch(ConnectionErrorException $e){
-            return new Response(json_encode(['error' => $e->getMessage()]));
-        }
+        $result = $api->getUrl($url);
 
         return new Response($result);
     }
