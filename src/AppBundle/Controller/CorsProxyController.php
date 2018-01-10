@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 
+use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\CorsProxyApi;
 use Httpful\Exception\ConnectionErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -27,7 +28,7 @@ class CorsProxyController extends Controller
     public function corsProxy(CorsProxyApi $api, Request $request){
         $url = $request->query->get('url');
         if(!$url){
-            return new Response(json_encode(['error' => 'no url provided']));
+            throw new WrongInputException("No URL provided");
         }
         $result = $api->getUrl($url);
 
