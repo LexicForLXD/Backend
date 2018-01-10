@@ -1,7 +1,9 @@
 SYP-LXC Backend
 ========================
 
-#Installation
+[![pipeline status](https://git.janrtr.de/syp-lxc/Backend/badges/master/pipeline.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
+[![coverage report](https://git.janrtr.de/syp-lxc/Backend/badges/master/coverage.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
+# Installation
 
 ### Resolve dependencies
 
@@ -26,7 +28,7 @@ php bin/console server:run
 php bin/console doctrine:fixtures:load     
 ```
 
-#Documentation
+# Documentation
 ### Create up to date Swagger documentation
 ```php
 ./vendor/bin/swagger -e vendor   
