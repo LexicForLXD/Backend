@@ -168,6 +168,6 @@ class CorsProxyControllerTest extends WebTestCase
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
-        $this->assertContains('{ "error": "no url provided" }', $client->getResponse()->getContent());
+        $this->assertContains('{"error":{"code":400,"message":"No URL provided"}}', $client->getResponse()->getContent());
     }
 }
