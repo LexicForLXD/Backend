@@ -29,7 +29,9 @@ class HostApi extends HttpHelper
     /**
      *  Server configuration and environment information
      *
+     * @param Host $host
      * @return object
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function info(Host $host)
     {
@@ -41,6 +43,7 @@ class HostApi extends HttpHelper
      * Does the server trust the client
      *
      * @return bool
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function trusted()
     {
