@@ -15,6 +15,13 @@ class ImageApi extends HttpHelper
         return 'images';
     }
 
+    /**
+     * ImageApi constructor.
+     * @param $cert_location
+     * @param $cert_key_location
+     * @param $cert_passphrase
+     * @throws \AppBundle\Exception\WrongInputException
+     */
     public function __construct($cert_location, $cert_key_location, $cert_passphrase)
     {
         parent::__construct($cert_location, $cert_key_location, $cert_passphrase);
@@ -68,6 +75,18 @@ class ImageApi extends HttpHelper
     public function getImageByFingerprint(Host $host, String $fingerprint){
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$fingerprint);
         return Request::get($uri)
+            -> send();
+    }
+
+    /**
+     * @param Host $host
+     * @param String $fingerprint
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function removeImageByFingerprint(Host $host, String $fingerprint){
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$fingerprint);
+        return Request::delete($uri)
             -> send();
     }
 
