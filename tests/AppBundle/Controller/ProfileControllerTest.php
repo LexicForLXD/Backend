@@ -328,6 +328,11 @@ class ProfileControllerTest extends WebTestCase
 //        $this->em->flush();
 //    }
 
+    /**
+     * Positive test for createProfile
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function testCreateProfile(){
         $client = static::createClient();
 
@@ -373,6 +378,11 @@ class ProfileControllerTest extends WebTestCase
         $this->em->flush();
     }
 
+    /**
+     * Negative test for createProfile - validation failed
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function testCreateProfileValidationError(){
         $client = static::createClient();
         $randomNumber = mt_rand();
