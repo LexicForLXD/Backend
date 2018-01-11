@@ -5,7 +5,6 @@ use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\VarDumper\VarDumper;
 
 class ProfileControllerTest extends WebTestCase
 {
@@ -370,6 +369,52 @@ class ProfileControllerTest extends WebTestCase
         $this->assertEquals(['limits.memory' => '2GB'], $profile->getConfig());
         $this->assertEquals(['kvm' => ['type' => 'unix-char', 'path' => '/dev/kvm']], $profile->getDevices());
 
+        $this->em->remove($profile);
+        $this->em->flush();
+    }
+
+    public function testCreateProfileValidationError(){
+        $client = static::createClient();
+        $randomNumber = mt_rand();
+
+        $profile = new Profile();
+        $profile->setName("my-profile".$randomNumber);
+        $profile->setDescription("testDescription");
+        $profile->setDevices(array("kvm" => (array("type" => "unix-char"))));
+        $profile->setConfig(array("limits.memory" => "2GB"));
+
+        $this->em->persist($profile);
+        $this->em->flush();
+
+        $client->request(
+            'POST',
+            '/profiles',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),
+            '{
+                    "name": "my-profile'.$randomNumber.'",
+                    "description": "This is my first LXC-Profile'.$randomNumber.'",
+                    "config": {
+                      "limits.memory": "2GB"
+                    },
+                    "devices": {
+                      "kvm": {
+                              "type": "unix-char",
+                              "path": "/dev/kvm"
+                        }
+                    }
+                }'
+        );
+
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+
+        $this->assertContains('{"errors":{"name":"This value is already used."}}', $client->getResponse()->getContent());
+
+        $profile = $this->em->getRepository(Profile::class)->find($profile->getId());
         $this->em->remove($profile);
         $this->em->flush();
     }
