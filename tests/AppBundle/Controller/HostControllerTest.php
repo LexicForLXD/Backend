@@ -9,6 +9,11 @@ class HostControllerTest extends WebTestCase
 
     protected $token;
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    private $em;
+
     protected function setUp()
     {
         $client = static::createClient();
@@ -31,10 +36,15 @@ class HostControllerTest extends WebTestCase
         $result = json_decode($client->getResponse()->getContent());
         $this->token = 'Bearer ' . $result->access_token;
 
-
+        static::$kernel = static::createKernel();
+        static::$kernel->boot();
+        $this->em = static::$kernel->getContainer()
+            ->get('doctrine')
+            ->getManager()
+        ;
     }
 
-    public function testIndex()
+    public function testIndexNoHosts()
     {
         $client = static::createClient();
 
@@ -53,10 +63,44 @@ class HostControllerTest extends WebTestCase
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
-    public function testStoreValid()
+    public function testIndex()
     {
         $client = static::createClient();
-        $crawler = $client->request(
+
+        $host = new Host();
+        $host->setIpv4('192.168.10.1');
+        $host->setName('testHost');
+        $host->setMac('someMac');
+
+        $this->em->persist($host);
+        $this->em->flush();
+
+
+        $client->request(
+            'GET',
+            '/hosts',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertContains("testHost", $client->getResponse()->getContent());
+
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->flush();
+    }
+
+    public function testStoreValid()
+    {
+
+        $client = static::createClient();
+        $client->request(
             'POST',
             '/hosts',
             [],
@@ -76,13 +120,38 @@ class HostControllerTest extends WebTestCase
         );
 
         $this->assertEquals(201, $client->getResponse()->getStatusCode());
+
+        $json = json_decode($client->getResponse()->getContent());
+
+        $host = $this->em->getRepository(Host::class)->find($json->id);
+
+        $this->assertEquals("192.168.1.21", $host->getIpv4());
+        $this->assertEquals("fe80::1", $host->getIpv6());
+        $this->assertEquals("test1.local", $host->getDomainName());
+        $this->assertEquals("blabla1", $host->getMac());
+        $this->assertEquals("c11", $host->getName());
+
+
+        $this->em->remove($host);
+        $this->em->flush();
     }
 
 
     public function testStoreDuplicate()
     {
+        $host = new Host();
+        $host->setIpv4('192.168.1.21');
+        $host->setIpv6('fe80::1');
+        $host->setDomainName('test.local');
+        $host->setName('c11');
+        $host->setMac('blabla1');
+
+        $this->em->persist($host);
+        $this->em->flush();
+
+
         $client = static::createClient();
-        $crawler = $client->request(
+        $client->request(
             'POST',
             '/hosts',
             [],
@@ -94,7 +163,7 @@ class HostControllerTest extends WebTestCase
             '{
                 "ipv4": "192.168.1.21",
                 "ipv6": "fe80::1",
-                "domain_name": "test1.local",
+                "domain_name": "test.local",
                 "mac": "blabla1",
                 "name": "c11",
                 "settings": "sldkasdaldk1"
@@ -102,6 +171,17 @@ class HostControllerTest extends WebTestCase
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
+
+
+        $this->assertContains("ipv4", $client->getResponse()->getContent());
+        $this->assertContains("ipv6", $client->getResponse()->getContent());
+        $this->assertContains("domainName", $client->getResponse()->getContent());
+        $this->assertContains("mac", $client->getResponse()->getContent());
+        $this->assertContains("name", $client->getResponse()->getContent());
+
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->flush();
     }
 
     public function testStoreWrongParameter()
@@ -127,6 +207,11 @@ class HostControllerTest extends WebTestCase
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
+
+
+        $this->assertContains("ipv4", $client->getResponse()->getContent());
+        $this->assertContains("ipv6", $client->getResponse()->getContent());
+
     }
 
     public function testShowValid()
@@ -134,10 +219,17 @@ class HostControllerTest extends WebTestCase
         $client = static::createClient();
 
         $host = new Host();
+        $host->setIpv4('192.168.10.1');
+        $host->setName('testHost');
+        $host->setMac('someMac');
+
+        $this->em->persist($host);
+        $this->em->flush();
+
 
         $client->request(
             'GET',
-            '/hosts/1',
+            '/hosts/'.$host->getId(),
             array(),
             array(),
             array(
@@ -147,6 +239,15 @@ class HostControllerTest extends WebTestCase
         );
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        $json = json_decode($client->getResponse()->getContent());
+
+        $this->assertEquals($json->name, $host->getName());
+        $this->assertEquals($json->ipv4, $host->getIpv4());
+        $this->assertEquals($json->mac, $host->getMac());
+
+        $this->em->remove($host);
+        $this->em->flush();
     }
 
 
@@ -170,10 +271,18 @@ class HostControllerTest extends WebTestCase
 
     public function testUpdateValid()
     {
+        $host = new Host();
+        $host->setIpv4('192.168.10.1');
+        $host->setName('testHost');
+        $host->setMac('someMac');
+
+        $this->em->persist($host);
+        $this->em->flush();
+
         $client = static::createClient();
-        $crawler = $client->request(
+        $client->request(
             'PUT',
-            '/hosts/1',
+            '/hosts/'.$host->getId(),
             [],
             [],
             [
@@ -192,12 +301,27 @@ class HostControllerTest extends WebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
+        $json = json_decode($client->getResponse()->getContent());
+
+        $host = $this->em->getRepository(Host::class)->find($json->id);
+
+        $this->assertEquals("192.168.1.20", $host->getIpv4());
+        $this->assertEquals("fe80::2", $host->getIpv6());
+        $this->assertEquals("test2.local", $host->getDomainName());
+        $this->assertEquals("blabla2", $host->getMac());
+        $this->assertEquals("host2", $host->getName());
+        $this->assertEquals("sldkasdaldk2", $host->getSettings());
+
+        $this->em->remove($host);
+        $this->em->flush();
     }
 
     public function testUpdateNotFound()
     {
+
+
         $client = static::createClient();
-        $crawler = $client->request(
+        $client->request(
             'PUT',
             '/hosts/99',
             [],
@@ -222,10 +346,18 @@ class HostControllerTest extends WebTestCase
 
     public function testUpdateWrongParameter()
     {
+        $host = new Host();
+        $host->setIpv4('192.168.10.1');
+        $host->setName('testHost');
+        $host->setMac('someMac');
+
+        $this->em->persist($host);
+        $this->em->flush();
+
         $client = static::createClient();
-        $crawler = $client->request(
+        $client->request(
             'PUT',
-            '/hosts/1',
+            '/hosts/'.$host->getId(),
             [],
             [],
             [
@@ -243,12 +375,16 @@ class HostControllerTest extends WebTestCase
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
+
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->flush();
     }
 
     public function testDeleteNotFound()
     {
         $client = static::createClient();
-        $crawler = $client->request(
+        $client->request(
             'DELETE',
             '/hosts/99',
             [],
@@ -264,10 +400,18 @@ class HostControllerTest extends WebTestCase
 
     public function testDeleteValid()
     {
+        $host = new Host();
+        $host->setIpv4('192.168.10.1');
+        $host->setName('testHost');
+        $host->setMac('someMac');
+
+        $this->em->persist($host);
+        $this->em->flush();
+
         $client = static::createClient();
-        $crawler = $client->request(
+        $client->request(
             'DELETE',
-            '/hosts/1',
+            '/hosts/'.$host->getId(),
             [],
             [],
             [
@@ -277,5 +421,8 @@ class HostControllerTest extends WebTestCase
         );
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode());
+
+        $this->em->remove($host);
+        $this->em->flush();
     }
 }
