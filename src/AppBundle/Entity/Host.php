@@ -116,7 +116,7 @@ class Host
     protected $profiles;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Image", mappedBy="hosts")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Image", mappedBy="host")
      * @JMS\Exclude()
      */
     protected $images;
@@ -126,6 +126,7 @@ class Host
     {
         $this->containers = new ArrayCollection();
         $this->profiles = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
 
@@ -375,7 +376,7 @@ class Host
     }
 
     /**
-     * Checks wether the Host has any Containers
+     * Checks whether the Host has any Containers
      * @return bool
      */
     public function hasContainers() : bool {
@@ -387,7 +388,7 @@ class Host
     }
 
     /**
-     * Checks wether the Host has any Profiles
+     * Checks whether the Host has any Profiles
      * @return bool
      */
     public function hasProfiles() : bool {
@@ -399,7 +400,7 @@ class Host
     }
 
     /**
-     * Checks wether the Host has any Images
+     * Checks whether the Host has any Images
      * @return bool
      */
     public function hasImages() : bool {

@@ -284,7 +284,7 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function deleteAction($hostId, EntityManagerInterface $em)
+    public function deleteAction(int $hostId, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -362,7 +362,8 @@ class HostController extends Controller
         if($result->code == '200'){
             return new JsonResponse(['message' => 'authentication successful']);
         } else {
-            return new JsonResponse(['error' => 'error while authentication'],500);
+            return new JsonResponse(['error' => 'error while authentication',
+                'body' => $result->body],500);
         }
     }
 
