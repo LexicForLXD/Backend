@@ -115,11 +115,18 @@ class Host
      */
     protected $profiles;
 
+    /**
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Image", mappedBy="host")
+     * @JMS\Exclude()
+     */
+    protected $images;
+
 
     public function __construct()
     {
         $this->containers = new ArrayCollection();
         $this->profiles = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
 
@@ -249,6 +256,40 @@ class Host
     }
 
     /**
+     * @return mixed
+     */
+    public function getProfiles()
+    {
+        return $this->profiles;
+    }
+
+    /**
+     * @param mixed $profiles
+     */
+    public function setProfiles($profiles)
+    {
+        $this->profiles = $profiles;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getImages()
+    {
+        return $this->images;
+    }
+
+    /**
+     * @param mixed $images
+     */
+    public function setImages($images)
+    {
+        $this->images = $images;
+    }
+
+
+
+    /**
      * Checks if the host has at least on URI
      *
      * @Assert\IsTrue(message = "You have to use at least one of the following: ipv4, ipv6, domainname")
@@ -284,6 +325,126 @@ class Host
         }
         $this->profiles->removeElement($profile);
         $profile->removeHost($this);
+    }
+
+    /**
+     * Adds a container to the Host.
+     * @param Container $container
+     */
+    public function addContainer(Container $container){
+        if ($this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->add($container);
+        $container->addHost($this);
+    }
+
+    /**
+     * Removes a container from the Host.
+     * @param Container $container
+     */
+    public function removeContainer(Container $container){
+        if (!$this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->removeElement($container);
+        $container->removeHost($this);
+    }
+
+    /**
+    * Adds a Image to the Host.
+    * @param Image $image
+    */
+    public function addImage(Image $image){
+        if ($this->images->contains($image)) {
+            return;
+        }
+        $this->images->add($image);
+        $image->addHost($this);
+    }
+
+    /**
+     * Removes a Image from the Host.
+     * @param Image $image
+     */
+    public function removeImage(Image $image){
+        if (!$this->images->contains($image)) {
+            return;
+        }
+        $this->images->removeElement($image);
+        $image->removeHost($this);
+    }
+
+    /**
+     * Checks whether the Host has any Containers
+     * @return bool
+     */
+    public function hasContainers() : bool {
+        if($this->containers->count() > 0){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    /**
+     * Checks whether the Host has any Profiles
+     * @return bool
+     */
+    public function hasProfiles() : bool {
+        if($this->profiles->count() > 0){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    /**
+     * Checks whether the Host has any Images
+     * @return bool
+     */
+    public function hasImages() : bool {
+        if($this->images->count() > 0){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public function hasAnything() : bool {
+        if($this->hasImages() || $this->hasContainers() || $this->hasProfiles()){
+            return true;
+        } else{
+            return false;
+        }
+
+    }
+
+    /**
+     * Deletes all associations
+     * @return bool
+     */
+    public function deleteAnything() : bool {
+
+        if($this->hasProfiles()) {
+            foreach ($this->profiles as $profile) {
+                $this->removeProfile($profile);
+            }
+        }
+
+        if($this->hasContainers()) {
+            foreach ($this->containers as $container) {
+                $this->removeContainer($container);
+            }
+        }
+
+        if($this->hasImages()) {
+            foreach ($this->images as $image) {
+                $this->removeImage($image);
+            }
+        }
+
+        return true;
     }
 
     /** @see \Serializable::serialize() */

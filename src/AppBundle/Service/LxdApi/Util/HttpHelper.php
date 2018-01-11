@@ -31,7 +31,13 @@ class HttpHelper
     }
 
 
-    public function buildUri($host, $endpoint, $apiVersion = null)
+    /**
+     * @param Host $host
+     * @param String $endpoint
+     * @param String|null $apiVersion
+     * @return string
+     */
+    public function buildUri(Host $host, String $endpoint, String $apiVersion = null)
     {
         $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
 
@@ -45,7 +51,7 @@ class HttpHelper
     public function init()
     {
 
-        if($this->cert_passphrase != NULL)
+        if($this->cert_passphrase != null)
         {
             $template = Request::init()
             ->sendsJson()    // Send application/x-www-form-urlencoded

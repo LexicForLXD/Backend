@@ -284,7 +284,7 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function deleteAction($hostId, EntityManagerInterface $em)
+    public function deleteAction(int $hostId, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -292,6 +292,10 @@ class HostController extends Controller
             throw $this->createNotFoundException(
                 'No host found for id ' . $hostId
             );
+        }
+
+        if($host->hasAnything()) {
+            return new JsonResponse(['errors' => 'Host has an association with one or more of the following: images, containers, profiles'], Response::HTTP_BAD_REQUEST);
         }
 
         $em->remove($host);
@@ -358,7 +362,8 @@ class HostController extends Controller
         if($result->code == '200'){
             return new JsonResponse(['message' => 'authentication successful']);
         } else {
-            return new JsonResponse(['error' => 'error while authentication'],500);
+            return new JsonResponse(['error' => 'error while authentication',
+                'body' => $result->body],500);
         }
     }
 

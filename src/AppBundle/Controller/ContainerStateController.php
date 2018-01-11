@@ -1,11 +1,12 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use AppBundle\Service\LxdApi\Endpoints\ContainerState as ContainerStateApi;
+use AppBundle\Service\LxdApi\ContainerStateApi;
 
 use AppBundle\Entity\Container;
 use AppBundle\Entity\ContainerStatus;
@@ -23,8 +24,11 @@ class ContainerStateController extends Controller
      *
      * @param Request $request
      * @param int $containerId
-     * @return Response
+     * @param EntityManagerInterface $em
+     * @param ContainerStateApi $api
+     * @return JsonResponse
      *
+     * @throws WrongInputException
      * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
      *
      *SWG\Put(path="/containers/{containerId}/state",
@@ -68,7 +72,7 @@ class ContainerStateController extends Controller
      * ),
      *)
      */
-    public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em)
+    public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateApi $api)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneById($containerId);
 
@@ -78,7 +82,6 @@ class ContainerStateController extends Controller
             );
         }
 
-        // $status = $this->getDoctrine()->getRepository(ContainerStatus::class)->findOneById($container->status->id);
 
         switch($request->get("action")){
             case "start":
@@ -91,30 +94,25 @@ class ContainerStateController extends Controller
                 $container->setState("running");
                 break;
             default:
-                return new JsonResponse(['error' => 'please use one of the following actions: state, stop, restart']);
+                throw new WrongInputException('please use one of the following actions: state, stop, restart');
                 break;
         }
 
-        $stateApi = new \AppBundle\Service\LxdApi\Endpoints\ContainerStateApi();
-        $response = $stateApi->update($container->host, $container->name, $request->get("action"));
+
+        $data = [
+            "action" => $request->get("action"),
+            "timeout" => $request->get("timeout") ? : 30,
+            "force" => $request->get("force") ? : false,
+            "stateful" => $request->get("stateful") ? : false
+        ];
+
+        $result = $api->update($container->host, $container->name, $data);
+
         //TODO mögliche Fehler abfangen
 
         $em->flush();
 
-
-        // $client = new ApiClient($container->host);
-        // $containerApi = new ContainerStateApi($client);
-
-        // $data = [
-        //     "action" => $request->get("action"),
-        //     "timeout" => $request->get("timeout") ? : 30,
-        //     "force" => $request->get("force") ? : false,
-        //     "stateful" => $request->get("stateful") ? : false
-        // ];
-
         return new JsonResponse(['message' => 'success']);
-
-        // return $containerApi->update($container->name, $data);
     }
 
 
@@ -143,7 +141,7 @@ class ContainerStateController extends Controller
      * ),
      *)
      */
-    public function showCurrentStateAction($containerId)
+    public function showCurrentStateAction(int $containerId, ContainerStateApi $api)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneById($containerId);
 
@@ -153,16 +151,12 @@ class ContainerStateController extends Controller
             );
         }
 
-
-        $stateApi  = new \AppBundle\Service\LxdApi\Endpoints\ContainerStateApi();
-        $response = $stateApi->actual($container->host, $container->name);
+        $result = $api->actual($container->host, $container->name);
 
 
-        // $serializer = $this->get('jms_serializer');
-        // $response = $serializer->serialize($container, 'json');
         return new JsonResponse([
-            'state' => $response->body->metadata->status,
-            'stateCode' => $response->body->metadata->status_code
+            'state' => $result->body->metadata->status,
+            'stateCode' => $result->body->metadata->status_code
         ]);
     }
 
