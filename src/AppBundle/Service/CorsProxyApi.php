@@ -12,6 +12,7 @@ class CorsProxyApi
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function getUrl(String $url){
+        Request::init();
         return Request::get($url)->send();
     }
 
