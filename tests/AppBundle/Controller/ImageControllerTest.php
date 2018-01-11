@@ -3,6 +3,7 @@ namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Entity\Host;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ImageControllerTest extends WebTestCase
 {
@@ -89,5 +90,27 @@ class ImageControllerTest extends WebTestCase
 
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * Negative test for deleteImage() - No image with id found
+     */
+    public function testDeleteImageNotFound()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/images/9999',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertContains('{"error":{"code":404,"message":"No Image found for id 9999"}}', $client->getResponse()->getContent());
     }
 }
