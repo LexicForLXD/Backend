@@ -91,6 +91,7 @@ class HostControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertContains("testHost", $client->getResponse()->getContent());
 
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
         $this->em->flush();
     }
@@ -130,6 +131,7 @@ class HostControllerTest extends WebTestCase
         $this->assertEquals("blabla1", $host->getMac());
         $this->assertEquals("c11", $host->getName());
 
+
         $this->em->remove($host);
         $this->em->flush();
     }
@@ -161,7 +163,7 @@ class HostControllerTest extends WebTestCase
             '{
                 "ipv4": "192.168.1.21",
                 "ipv6": "fe80::1",
-                "domain_name": "test1.local",
+                "domain_name": "test.local",
                 "mac": "blabla1",
                 "name": "c11",
                 "settings": "sldkasdaldk1"
@@ -170,14 +172,14 @@ class HostControllerTest extends WebTestCase
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
 
-        $json = json_decode($client->getResponse()->getContent());
 
-        $this->assertContains("ipv4", $json);
-        $this->assertContains("ipv6", $json);
-        $this->assertContains("domainName", $json);
-        $this->assertContains("mac", $json);
-        $this->assertEquals("name", $json);
+        $this->assertContains("ipv4", $client->getResponse()->getContent());
+        $this->assertContains("ipv6", $client->getResponse()->getContent());
+        $this->assertContains("domainName", $client->getResponse()->getContent());
+        $this->assertContains("mac", $client->getResponse()->getContent());
+        $this->assertContains("name", $client->getResponse()->getContent());
 
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
         $this->em->flush();
     }
@@ -206,10 +208,9 @@ class HostControllerTest extends WebTestCase
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
 
-        $json = json_decode($client->getResponse()->getContent());
 
-        $this->assertContains("ipv4", $json);
-        $this->assertContains("ipv6", $json);
+        $this->assertContains("ipv4", $client->getResponse()->getContent());
+        $this->assertContains("ipv6", $client->getResponse()->getContent());
 
     }
 
@@ -304,12 +305,12 @@ class HostControllerTest extends WebTestCase
 
         $host = $this->em->getRepository(Host::class)->find($json->id);
 
-        $this->assertsEquals("192.168.1.20", $host->getIpv4());
-        $this->assertsEquals("fe80::2", $host->getIpv6());
-        $this->assertsEquals("test2.local", $host->getDomainName());
-        $this->assertsEquals("blabla2", $host->getMac());
-        $this->assertsEquals("host2", $host->getName());
-        $this->assertsEquals("sldkasdaldk2", $host->getSettings());
+        $this->assertEquals("192.168.1.20", $host->getIpv4());
+        $this->assertEquals("fe80::2", $host->getIpv6());
+        $this->assertEquals("test2.local", $host->getDomainName());
+        $this->assertEquals("blabla2", $host->getMac());
+        $this->assertEquals("host2", $host->getName());
+        $this->assertEquals("sldkasdaldk2", $host->getSettings());
 
         $this->em->remove($host);
         $this->em->flush();
@@ -354,7 +355,7 @@ class HostControllerTest extends WebTestCase
         $this->em->flush();
 
         $client = static::createClient();
-        $crawler = $client->request(
+        $client->request(
             'PUT',
             '/hosts/'.$host->getId(),
             [],
@@ -375,6 +376,7 @@ class HostControllerTest extends WebTestCase
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
 
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
         $this->em->flush();
     }
