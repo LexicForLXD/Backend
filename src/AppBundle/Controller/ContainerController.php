@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -58,9 +59,9 @@ class ContainerController extends Controller
     /**
      * Get all Containers from one host
      *
-     *@Route("/hosts/{hostId}/containers", name="containers_from_host", methods={"GET"})
+     * @Route("/hosts/{hostId}/containers", name="containers_from_host", methods={"GET"})
      *
-     *@OAS\Get(path="/hosts/{hostId}/containers?fresh={fresh}",
+     * @OAS\Get(path="/hosts/{hostId}/containers?fresh={fresh}",
      *  tags={"containers"},
      *  @OAS\Response(
      *      response=200,
@@ -87,8 +88,11 @@ class ContainerController extends Controller
      *      ),
      *  ),
      *)
+     * @param Request $request
+     * @param int $hostId
+     * @return Response
      */
-    public function listFromHostAction(Request $request, $hostId)
+    public function listFromHostAction(Request $request, int $hostId, ContainerApi $api)
     {
 
         $fresh = $request->query->get('fresh');
@@ -104,15 +108,15 @@ class ContainerController extends Controller
             }
 
 
-            $containerApi = new ContainerApi();
 
 
 
-            $containers = $containerApi->list($host);
+
+            $result = $api->list($host);
 
             //TODO in DB aktualisieren
 
-            return containers;
+            return new Response($result->body);
         } else {
             $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
 
@@ -138,47 +142,65 @@ class ContainerController extends Controller
      *
      * @OAS\Post(path="/hosts/{hostId}/containers",
      * tags={"containers"},
-         * @OAS\Parameter(
-         *  description="Parameters for the new Container",
-         *  in="body",
-         *  name="containerData",
-         *  required=true,
-         *  @OAS\Schema(
-         *      @OAS\Property(
-         *          property="action",
-         *          type="string",
-         *          enum={"image", "migration", "copy", "none"},
-         *          default="none"
-         *      ),
-         *      @OAS\Property(
-         *          property="name",
-         *          type="string"
-         *      ),
-         *      @OAS\Property(
-         *          property="architecture",
-         *          type="string"
-         *      ),
-         *  ),
-         *),
-         *
-         * @OAS\Parameter(
-         *  description="ID of the Host the container should be created on",
-         *  in="path",
-         *  name="hostId",
-         *  required=true,
-         *  @OAS\Schema(
-         *     type="integer"
-         *  ),
-         * ),
-         *
-         * @OAS\Response(
-         *  description="The Container was successfully created",
-         *  response=201
-         * ),
+     * @OAS\Parameter(
+     *  description="Parameters for the new Container",
+     *  in="body",
+     *  name="containerData",
+     *  required=true,
+     *  @OAS\Schema(
+     *      @OAS\Property(
+     *          property="action",
+     *          type="string",
+     *          enum={"image", "migration", "copy", "none"},
+     *          default="none"
+     *      ),
+     *      @OAS\Property(
+     *          property="name",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="architecture",
+     *          type="string"
+     *      ),
+     *  ),
+     * ),
+     *
+     * @OAS\Parameter(
+     *  description="ID of the Host the container should be created on",
+     *  in="path",
+     *  name="hostId",
+     *  required=true,
+     *  @OAS\Schema(
+     *     type="integer"
+     *  ),
+     * ),
+     *
+     * @OAS\Response(
+     *  description="The Container was successfully created",
+     *  response=201
+     * ),
+     *
+     * @OAS\Response(
+     *     description="The Host was not found",
+     *     response=404
+     * ),
+     *
+     * @OAS\Response(
+     *     description="The input was wrong",
+     *     response=400
+     * )
      * )
      *
+     * @param Request $request
+     * @param int $hostId
+     * @param EntityManagerInterface $em
+     * @param OperationsRelayApi $relayApi
+     * @param ContainerApi $api
+     * @return Response
+     * @throws WrongInputException
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, $hostId, EntityManagerInterface $em, OperationsRelayApi $relayApi, ContainerApi $api)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, OperationsRelayApi $relayApi, ContainerApi $api)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -188,15 +210,6 @@ class ContainerController extends Controller
             );
         }
 
-        // $containerStatus = new ContainerStatus;
-        // $containerStatus->setState('stopped');
-
-        // $em->persist($containerStatus);
-        // $em->flush();
-
-
-        // $client = new ApiClient($host);
-        // $containerApi = new ContainerApi($client);
         $type = $request->query->get('type');
 
         switch ($type) {
@@ -227,18 +240,27 @@ class ContainerController extends Controller
                 // $container->setStatus($containerStatus);
                 $container->setState('stopped');
 
-
-                if($errorArray = $this->validation($container))
-                {
-                    return new JsonResponse(['errors' => $errorArray], 400);
-                }
-
                 break;
             case 'migration':
                 return new JsonResponse(["message" => "migration"]);
                 break;
             case 'copy':
-                
+                //TODO make it copy something
+                $data = [
+                    "name" => $request->get("name"),
+                    "architecture" => $request->get("architecture") ? : 'x86_64',
+                    "profiles" => $request->get("profiles") ? : array('default'),
+                    "ephermeral" => $request->get("ephermeral") ? : false,
+                    "config" => $request->get("config"),
+                    "devices" => $request->get("devices"),
+                ];
+
+                $container = new Container();
+                $container->setHost($host);
+                $container->setIpv4($request->get("ipv4"));
+                $container->setName($request->get("name"));
+                $container->setSettings($data);
+
                 return new JsonResponse(["message" => "copy"]);
                 break;
             default:
@@ -246,6 +268,10 @@ class ContainerController extends Controller
         }
 
 
+        if($errorArray = $this->validation($container))
+        {
+            throw new WrongInputException($errorArray);
+        }
 
         $result = $api->create($host, $data);
 
@@ -281,7 +307,7 @@ class ContainerController extends Controller
      *
      * @Route("/containers/{containerId}", name="containers_show", methods={"GET"})
      *
-     *@OAS\Get(path="/containers/{containerId}",
+     * @OAS\Get(path="/containers/{containerId}",
      * tags={"containers"},
      * @OAS\Parameter(
      *  description="ID of the Container",
@@ -299,9 +325,12 @@ class ContainerController extends Controller
      *      @OAS\JsonContent(ref="#/components/schemas/container"),
      * ),
      *)
-     *
+     * @param Request $request
+     * @param int $containerId
+     * @param ContainerApi $api
+     * @return Object|Response
      */
-    public function showSingleAction(Request $request, $containerId, ContainerApi $api)
+    public function showSingleAction(Request $request, int $containerId, ContainerApi $api)
     {
         $fresh = $request->query->get('fresh');
 
@@ -315,11 +344,11 @@ class ContainerController extends Controller
 
         if ($fresh == 'true') {
 
-            $container = $api->show($container->host, $container->name);
+            $result = $api->show($container->host, $container->name);
 
             //TODO in DB aktualisieren
 
-            return $container;
+            return new Response($result->body);
         }
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
@@ -349,9 +378,11 @@ class ContainerController extends Controller
      *      description="show a single container"
      * ),
      *)
-     *
+     * @param int $containerId
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
      */
-    public function deleteAction($containerId, EntityManagerInterface $em)
+    public function deleteAction(int $containerId, EntityManagerInterface $em)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
 
@@ -375,9 +406,12 @@ class ContainerController extends Controller
     }
 
 
-
-
-    private function validation($object)
+    /**
+     * Validates a Container Object and returns array with errors.
+     * @param Container $object
+     * @return array|bool
+     */
+    private function validation(Container $object)
     {
         $validator = $this->get('validator');
         $errors = $validator->validate($object);
