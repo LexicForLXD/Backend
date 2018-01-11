@@ -4,6 +4,7 @@ namespace Tests\AppBundle\Controller;
 
 use AppBundle\Service\CorsProxyApi;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\VarDumper\VarDumper;
 
 class CorsProxyApiTest extends WebTestCase
 {
@@ -20,9 +21,10 @@ class CorsProxyApiTest extends WebTestCase
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function testGetUrl(){
-        $result = $this->instance->getUrl("http://example.com/");
+        $result = $this->instance->getUrl("https://jsonplaceholder.typicode.com/posts/1");
 
         $this->assertEquals(200, $result->code);
-        $this->assertContains("Example Domain", $result->body);
+        $this->assertContains("1", json_encode($result->body->userId));
+        $this->assertContains("sunt aut facere repellat provident occaecati excepturi optio reprehenderit", json_encode($result->body->title));
     }
 }
