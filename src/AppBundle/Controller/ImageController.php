@@ -7,17 +7,17 @@ use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Exception\ElementNotFoundException;
+use AppBundle\Exception\WrongInputException;
+use AppBundle\Service\LxdApi\ImageAliasApi;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
 use Httpful\Exception\ConnectionErrorException;
-use JMS\Serializer\SerializationContext;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Swagger\Annotations as OAS;
-use Symfony\Component\VarDumper\VarDumper;
 
 class ImageController extends Controller
 {
@@ -216,9 +216,14 @@ class ImageController extends Controller
      *      ),
      * )
      *
+     * @param $imageId
+     * @param ImageApi $api
+     * @return JsonResponse
+     * @throws ConnectionErrorException
      * @throws ElementNotFoundException
+     * @throws WrongInputException
      */
-    public function deleteImage($imageId){
+    public function deleteImage($imageId, ImageApi $api, ImageAliasApi $aliasApi){
         $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
         if (!$image) {
@@ -228,10 +233,40 @@ class ImageController extends Controller
         }
 
         $em = $this->getDoctrine()->getManager();
+
+        //Image is not created on the Host
+        if(!$image->isFinished()){
+            $aliases = $image->getAliases();
+            for($i = 0; $i < $aliases->count(); $i++){
+                $image->removeAlias($aliases->get($i));
+                $em->remove($aliases->get($i));
+            }
+
+            $em->remove($image);
+            $em->flush();
+
+            return $this->json([], 204);
+        }
+
+        $aliases = $image->getAliases();
+        for($i = 0; $i < $aliases->count(); $i++){
+            $result = $aliasApi->removeAliasByName($image->getHost(), $aliases->get($i)->getName());
+            if($result->code != 200){
+                throw new WrongInputException("Couldn't delete alias - ".$result->body->error);
+            }
+            $image->removeAlias($aliases->get($i));
+            $em->remove($aliases->get($i));
+        }
+        $result = $api->removeImageByFingerprint($image->getHost(), $image->getFingerprint());
+
+        $result = $api->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
+
+        if($result->body->metadata->status_code != 200){
+            throw new WrongInputException("Couldn't delete image - ".$result->body->metadata->err);
+        }
+
         $em->remove($image);
         $em->flush();
-
-        //TODO Delete Image from Host
 
         return $this->json([], 204);
     }

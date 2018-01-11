@@ -22,6 +22,10 @@ test:php7.1:
 
    stage: test
    before_script:
+    #Create Test cert
+     - mkdir -p /srv/lexic
+     - echo $CERT_CRT >> /srv/lexic/client.crt
+     - echo $CERT_KEY >> /srv/lexic/client.key
      - composer install
      - php bin/console doctrine:schema:update --force
      - php bin/console doctrine:fixtures:load

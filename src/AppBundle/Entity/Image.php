@@ -2,8 +2,10 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Service\LxdApi\ImageAliasApi;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
 use Swagger\Annotations as OAS;
 
@@ -125,9 +127,9 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return PersistentCollection
      */
-    public function getAliases()
+    public function getAliases() : PersistentCollection
     {
         return $this->aliases;
     }
@@ -244,6 +246,10 @@ class Image
         }
         $this->aliases->add($imageAlias);
         $imageAlias->setImage($this);
+    }
+
+    public function removeAlias(ImageAlias $imageAlias){
+        $this->aliases->remove($imageAlias);
     }
 
     /**
