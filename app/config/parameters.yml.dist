@@ -25,3 +25,6 @@ parameters:
     cert_passphrase: ~
 
     redis_hostname: redis
+
+    #Custom options for JMS
+    jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
