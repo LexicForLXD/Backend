@@ -275,6 +275,9 @@ class ImageControllerTest extends WebTestCase
 
     }
 
+    /**
+     * Negative test for getSingleImage() - No Images
+     */
     public function testGetSingleImageNoImages()
     {
         $client = static::createClient();
@@ -293,6 +296,78 @@ class ImageControllerTest extends WebTestCase
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
         $this->assertEquals('{"error":{"code":404,"message":"No Image for ID 9999 found"}}', $client->getResponse()->getContent());
+    }
+
+    /**
+     * Positive test for getSingleImage()
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function testGetSingleImage(){
+        $client = static::createClient();
+
+        $host = new Host();
+        $host->setName("Test-Host1".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $this->em->persist($host);
+
+        $imageAlias = new ImageAlias();
+        $imageAlias->setDescription("Test description");
+        $imageAlias->setName("TEST-ALIAS");
+
+        $this->em->persist($imageAlias);
+
+        $image = new Image();
+        $image->setFilename("TestName");
+        $image->setProperties(['os' => 'alpine']);
+        $image->setPublic(true);
+        $image->setFinished(false);
+        $image->setHost($host);
+        $image->addAlias($imageAlias);
+
+        $this->em->persist($image);
+        $this->em->flush();
+
+        $client->request(
+            'GET',
+            '/images/'.$image->getId(),
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        $object = json_decode($client->getResponse()->getContent());
+
+        $this->assertEquals($host->getId(), $object->hostId);
+        $this->assertEquals($image->getId(), $object->id);
+        $this->assertEquals(true, $object->public);
+        $this->assertEquals("TestName", $object->filename);
+        $this->assertEquals(false, $object->finished);
+
+        //properties
+        $this->assertEquals('alpine', $object->properties->os);
+
+        //aliases
+        $aliasObject = $object->aliases[0];
+        $this->assertEquals($imageAlias->getId(), $aliasObject->id);
+        $this->assertEquals("TEST-ALIAS", $aliasObject->name);
+        $this->assertEquals("Test description", $aliasObject->description);
+
+        $image = $this->em->getRepository(Image::class)->find($image->getId());
+        $imageAlias = $this->em->getRepository(ImageAlias::class)->find($imageAlias->getId());
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($imageAlias);
+        $this->em->remove($image);
+        $this->em->remove($host);
+        $this->em->flush();
     }
 
     /**
