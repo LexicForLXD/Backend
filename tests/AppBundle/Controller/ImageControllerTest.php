@@ -141,6 +141,7 @@ class ImageControllerTest extends WebTestCase
 
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No Images found"}}', $client->getResponse()->getContent());
     }
 
     /**
@@ -163,6 +164,7 @@ class ImageControllerTest extends WebTestCase
 
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No Images for Host 999999 found"}}', $client->getResponse()->getContent());
     }
 
     /**
@@ -193,7 +195,7 @@ class ImageControllerTest extends WebTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
-        //TODO Check error message
+        $this->assertEquals('{"error":{"code":404,"message":"No Images for Host '.$host->getId().' found"}}', $client->getResponse()->getContent());
 
         $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
@@ -218,6 +220,7 @@ class ImageControllerTest extends WebTestCase
 
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No Image for ID 9999 found"}}', $client->getResponse()->getContent());
     }
 
     /**
@@ -239,7 +242,7 @@ class ImageControllerTest extends WebTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
-        $this->assertContains('{"error":{"code":404,"message":"No Image found for id 9999"}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":404,"message":"No Image found for id 9999"}}', $client->getResponse()->getContent());
     }
 
     /**
