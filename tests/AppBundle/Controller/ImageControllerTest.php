@@ -393,6 +393,64 @@ class ImageControllerTest extends WebTestCase
     }
 
     /**
+     * Positive test for deleteImage() - Image finished = false
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function testDeleteImageFinishedFalse()
+    {
+        $client = static::createClient();
+
+        $host = new Host();
+        $host->setName("Test-Host1Delete".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $this->em->persist($host);
+
+        $imageAlias = new ImageAlias();
+        $imageAlias->setDescription("Test description");
+        $imageAlias->setName("TEST-ALIAS");
+
+        $this->em->persist($imageAlias);
+
+        $image = new Image();
+        $image->setFilename("TestName");
+        $image->setProperties(['os' => 'alpine']);
+        $image->setPublic(true);
+        $image->setFinished(false);
+        $image->setHost($host);
+        $image->addAlias($imageAlias);
+
+        $this->em->persist($image);
+        $this->em->flush();
+
+        $client->request(
+            'DELETE',
+            '/images/'.$image->getId(),
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        //Get new em to check if the entity's were deleted
+        $this->em = static::$kernel->getContainer()
+            ->get('doctrine')
+            ->getManager();
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode());
+        $this->assertEquals('', $client->getResponse()->getContent());
+
+        $this->assertTrue(!$this->em->getRepository(Image::class)->find($image->getId()));
+        $this->assertTrue(!$this->em->getRepository(ImageAlias::class)->find($imageAlias->getId()));
+        $this->assertTrue(!$this->em->getRepository(Image::class)->find($image->getId()));
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function tearDown()
