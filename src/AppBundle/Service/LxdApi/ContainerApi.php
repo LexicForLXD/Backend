@@ -92,7 +92,21 @@ class ContainerApi extends HttpHelper
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function getOperationsLink(Host $host, $operationsLink){
-        $uri = $this->buildUri($host, 'operations/'.substr($operationsLink, 16));
+        $uri = $this->buildUri($host, 'operations/'.$operationsLink);
+        return Request::get($uri)
+            -> send();
+    }
+
+
+
+    /**
+     * @param Host $host
+     * @param $operationsId
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function getOperationsLinkWithWait(Host $host, $operationsId){
+        $uri = $this->buildUri($host, 'operations/'.$operationsId.'/wait');
         return Request::get($uri)
             -> send();
     }
