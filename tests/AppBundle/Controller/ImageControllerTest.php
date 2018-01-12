@@ -143,7 +143,10 @@ class ImageControllerTest extends WebTestCase
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
-    public function testGetAllImagesOnHostNoImages()
+    /**
+     * Negative test for getAllImagesOnHost() - unknown Host
+     */
+    public function testGetAllImagesOnHostUnknownHost()
     {
         $client = static::createClient();
 
@@ -160,6 +163,42 @@ class ImageControllerTest extends WebTestCase
 
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * Negative test for getAllImagesOnHost() - no Images on Host
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testGetAllImagesOnHostNoImages(){
+        $client = static::createClient();
+
+        $host = new Host();
+        $host->setName("Test-Host1".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $this->em->persist($host);
+        $this->em->flush();
+
+        $client->request(
+            'GET',
+            '/hosts/'.$host->getId().'/images',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        //TODO Check error message
+
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->flush();
+
     }
 
     public function testGetSingleImageNoImages()
