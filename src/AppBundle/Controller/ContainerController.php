@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -237,8 +238,7 @@ class ContainerController extends Controller
                 $container->setIpv4($request->get("ipv4"));
                 $container->setName($request->get("name"));
                 $container->setSettings($data);
-                // $container->setStatus($containerStatus);
-                $container->setState('stopped');
+
 
                 break;
             case 'migration':
@@ -270,30 +270,21 @@ class ContainerController extends Controller
 
         if($errorArray = $this->validation($container))
         {
-            throw new WrongInputException($errorArray);
+            throw new WrongInputException(json_encode($errorArray));
         }
 
-        $result = $api->create($host, $data);
-
-        $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
-
-        if($operationsResponse->code != 200){
-            return new Response(json_encode($operationsResponse->body));
-        }
-
-        while($operationsResponse->body->metadata->status_code == 103){
-            sleep(0.2);
-            $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
-        }
-
-        if($operationsResponse->body->metadata->status_code != 200){
-            return new Response(json_encode($operationsResponse->body));
-        }
-
-
+        $container->setState('creating');
 
         $em->persist($container);
         $em->flush();
+
+        $result = $api->create($host, $data);
+
+        $dispatcher = $this->get('sb_event_queue');
+
+        $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
+
+
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
