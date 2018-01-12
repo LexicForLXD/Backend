@@ -55,6 +55,12 @@ services:
             tags:
                 - { name: kernel.event_listener, event: lxd.image.creation.update }
 
+    lxd.container.creation.updater:
+        class: AppBundle\EventListener\ContainerCreationListener
+        arguments: [ "@doctrine.orm.entity_manager" ]
+        tags:
+            - { name: kernel.event_listener, event: lxd.container.creation.update }
+
     platform.user.manager:
         class: Doctrine\ORM\EntityManager
         factory: ['@doctrine','getManagerForClass']
