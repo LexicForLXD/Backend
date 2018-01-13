@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Swagger\Annotations as OAS;
 
 /**
  * Class ImageAlias
