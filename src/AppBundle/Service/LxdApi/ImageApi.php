@@ -35,7 +35,7 @@ class ImageApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function createRemoteImageFromSource(Host $host, $body){
+    public function createImage(Host $host, $body){
         $uri = $this->buildUri($host, $this->getEndpoint());
         return Request::post($uri)
             -> body($body)
@@ -44,7 +44,7 @@ class ImageApi extends HttpHelper
 
     /**
      * @param Host $host
-     * @param $operationsLink
+     * @param $operationsId
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
