@@ -51,7 +51,8 @@ class ContainerApi extends HttpHelper
      *
      * @param Host $host
      * @param string $containerName
-     * @return Object
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function show(Host $host, $containerName)
     {
@@ -62,9 +63,10 @@ class ContainerApi extends HttpHelper
     /**
      * create a new container with given data
      *
-     * @param array $data
      * @param Host $host
-     * @return Object
+     * @param array $data
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function create(Host $host, $data)
     {
@@ -75,13 +77,15 @@ class ContainerApi extends HttpHelper
     /**
      * update a existing container with data
      *
+     * @param Host $host
+     * @param Container $container
      * @param [String] $containerName
-     * @param [type] $data
-     * @return Object
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function update($containerName, $data)
+    public function update(Host $host, Container $container, $data)
     {
-        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$container->getName());
         return Request::put($uri, $data)->send();
     }
 
