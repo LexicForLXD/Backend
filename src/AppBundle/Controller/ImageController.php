@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
@@ -167,7 +168,7 @@ class ImageController extends Controller
             }
         }
 
-        $result = $api->createRemoteImageFromSource($host, $request->getContent());
+        $result = $api->createImage($host, $request->getContent());
 
         if ($result->code != 202) {
             Return new Response(json_encode($result->body));
@@ -183,6 +184,88 @@ class ImageController extends Controller
 
         $dispatcher = $this->get('sb_event_queue');
 
+        $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($image, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * Create an Image from a stopped Container
+     * @Route("/hosts/{hostId}/images/container", name="create_image_from_contaniner_on_host", methods={"POST"})
+     *
+     * @throws ElementNotFoundException
+     * @throws ConnectionErrorException
+     */
+    public function createImageFromSourceContainer(int $hostId, Request $request, ImageApi $api){
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No Host for '.$hostId.' found'
+            );
+        }
+
+        //Check if container exists on host
+        if($request->request->get('source')){
+            $source = $request->request->get('source');
+        }
+        $container = $this->getDoctrine()->getRepository(Container::class)->findBy(['name' => $source['name'], 'host' => $host]);
+        if (!$container) {
+            throw new ElementNotFoundException(
+                'No Container for name '.$source['name'].' with host '.$host->getId().' found'
+            );
+        }
+
+        $image = new Image();
+        $image->setHost($host);
+
+        if($request->request->get('filename')) {
+            $image->setFilename($request->request->get('filename'));
+        }
+        if($request->request->get('public')) {
+            $image->setPublic($request->request->get('public'));
+        }
+        if($request->request->get('properties')) {
+            $image->setProperties($request->request->get('properties'));
+        }
+
+        if ($errorArray = $this->validation($image)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        //Create aliases
+        if($request->request->get('aliases')) {
+            $aliasArray = $request->request->get('aliases');
+
+            for($i=0; $i<sizeof($aliasArray); $i++){
+                $alias = new ImageAlias();
+                $alias->setName($aliasArray[$i]['name']);
+                $alias->setDescription($aliasArray[$i]['description']);
+                if ($errorArray = $this->validation($alias)) {
+                    return new JsonResponse(['errors' => $errorArray], 400);
+                }
+                $em->persist($alias);
+                $image->addAlias($alias);
+            }
+        }
+
+        $result = $api->createImage($host, $request->getContent());
+
+        if ($result->code != 202) {
+            Return new Response(json_encode($result->body));
+        }
+        if ($result->body->metadata->status_code == 400) {
+            Return new Response(json_encode($result->body));
+        }
+
+        $image->setFinished(false);
+        $em->persist($image);
+        $em->flush();
+
+        $dispatcher = $this->get('sb_event_queue');
         $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
 
         $serializer = $this->get('jms_serializer');
