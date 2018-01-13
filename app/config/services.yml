@@ -56,10 +56,11 @@ services:
                 - { name: kernel.event_listener, event: lxd.image.creation.update }
 
     lxd.container.creation.updater:
-        class: AppBundle\EventListener\ContainerCreationListener
+        class: AppBundle\EventListener\ContainerListener
         arguments: [ "@doctrine.orm.entity_manager" ]
         tags:
-            - { name: kernel.event_listener, event: lxd.container.creation.update }
+            - { name: kernel.event_listener, event: lxd.container.creation.update, method: onLxdContainerCreationUpdate }
+            - { name: kernel.event_listener, event: lxd.container.state.update, method: onLxdContainerStateUpdate }
 
     platform.user.manager:
         class: Doctrine\ORM\EntityManager
