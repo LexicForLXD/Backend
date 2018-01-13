@@ -244,7 +244,7 @@ class Profile
     /**
      * @return array
      *
-     * @OAS\Property(property="host_id", example="[1]")
+     * @OAS\Property(property="hostId", example="[1]")
      *
      * @JMS\VirtualProperty()
      */
