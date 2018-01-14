@@ -7,6 +7,7 @@
  */
 
 use AppBundle\Service\LxdApi\Util\HttpHelper;
+use AppBundle\Entity\Host;
 use Httpful\Request;
 
 class OperationApi extends HttpHelper
