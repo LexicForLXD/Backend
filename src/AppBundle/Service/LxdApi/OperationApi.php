@@ -5,6 +5,7 @@
  * Date: 14.01.2018
  * Time: 16:25
  */
+namespace AppBundle\Service\LxdApi;
 
 use AppBundle\Service\LxdApi\Util\HttpHelper;
 use AppBundle\Entity\Host;
