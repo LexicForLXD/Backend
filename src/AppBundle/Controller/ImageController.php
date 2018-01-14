@@ -468,6 +468,69 @@ class ImageController extends Controller
         return new Response($response);
     }
 
+    /**
+     * Update an Image by its id
+     *
+     * @Route("/images/{imageId}", name="update_single_image", methods={"PUT"})
+     *
+     * @OAS\Put(path="/images/{imageId}",
+     *     tags={"images"},
+     *     @OAS\Parameter(
+     *      description="ID of the Image",
+     *      in="path",
+     *      name="imageId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     * )
+     *
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws ConnectionErrorException
+     */
+    public function updateImage($imageId, Request $request, ImageApi $api){
+        $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
+
+        if (!$image) {
+            throw new ElementNotFoundException(
+                'No Image for ID '.$imageId.' found'
+            );
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        //Image is not created on the Host
+        if(!$image->isFinished()){
+            throw new WrongInputException("The Image is not yet created on the Host or there was an error creating it - You can't update the Image in this state");
+        }
+
+        $result = $api->putImageUpdate($image->getHost(), $image->getFingerprint(), $request->getContent());
+
+        if($result->code != 200){
+            throw new WrongInputException("Couldn't update Image - ".$result->body->error);
+        }
+        if($result->body->status_code != 200){
+            throw new WrongInputException("Couldn't update Image - ".$result->body->error);
+        }
+
+        //Update Image in DB
+        if($request->request->get('properties')) {
+            $image->setProperties($request->request->get('properties'));
+        }
+        if($request->request->has('public')) {
+            $image->setPublic($request->request->get('public'));
+        }
+
+        $em->merge($image);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($image, 'json');
+        return new Response($response);
+    }
+
     private function validation($object)
     {
         $validator = $this->get('validator');
