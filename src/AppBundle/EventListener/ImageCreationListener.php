@@ -29,16 +29,7 @@ class ImageCreationListener
     public function onLxdImageCreationUpdate(ImageCreationEvent $event){
 
         echo "START-UPDATE : ImageId ".$event->getImageId()." \n";
-
-        $operationsResponse = $this->api->getOperationsLink($event->getHost(), $event->getOperationId());
-
-        //VarDumper::dump($operationsResponse);
-
-        if ($operationsResponse->code != 200) {
-            //return new Response(json_encode($operationsResponse->body));
-            echo "FAILED-UPDATE \n";
-            return;
-        }
+        echo "UPDATING... \n";
 
         $operationsResponse = $this->api->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
 
@@ -51,7 +42,6 @@ class ImageCreationListener
             return;
         }
 
-        echo "UPDATING... \n";
         $image = $this->em->getRepository(Image::class)->find($event->getImageId());
 
         $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);

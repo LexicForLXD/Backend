@@ -3,12 +3,14 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Swagger\Annotations as OAS;
 
 /**
  * Class ImageAlias
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="imagealias")
+ * @OAS\Schema(schema="imageAlias", type="object")
  */
 class ImageAlias
 {
@@ -16,18 +18,21 @@ class ImageAlias
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @OAS\Property(example="3")
      * @var integer
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string")
+     * @OAS\Property(example="my-alias")
      * @var string
      */
     protected $name;
 
     /**
      * @ORM\Column(type="string")
+     * @OAS\Property(example="This is a description string")
      * @var string
      */
     protected $description;

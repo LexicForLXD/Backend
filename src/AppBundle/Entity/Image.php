@@ -2,7 +2,6 @@
 
 namespace AppBundle\Entity;
 
-use AppBundle\Service\LxdApi\ImageAliasApi;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
@@ -40,7 +39,7 @@ class Image
     /**
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\ImageAlias", mappedBy="image")
      * @ORM\JoinColumn(name="alias_id", referencedColumnName="id")
-     * @OAS\Property(example="alpine edge")
+     * @OAS\Property(ref="#/components/schemas/imageAlias")
      * var string
      */
     protected $aliases;
@@ -70,18 +69,21 @@ class Image
 
     /**
      * @ORM\Column(type="boolean")
+     * @OAS\Property(example="true")
      * @var bool
      */
     protected $public;
 
     /**
      * @ORM\Column(type="string")
+     * @OAS\Property(example="imageFilename")
      * @var string
      */
     protected $filename;
 
     /**
      * @ORM\Column(type="json")
+     * @OAS\Property(example="{json-Object}")
      * @var array
      */
     protected $properties;
@@ -93,6 +95,7 @@ class Image
     protected $error;
     /**
      * @ORM\Column(type="boolean")
+     * @OAS\Property(example="true")
      * @var bool
      */
     protected $finished;
@@ -168,7 +171,7 @@ class Image
 
     /**
      * @return mixed
-     * /**
+     * @OAS\Property(property="hostId", example="1")
      * @JMS\VirtualProperty()
      */
     public function getHostId()
