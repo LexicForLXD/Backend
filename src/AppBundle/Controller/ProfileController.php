@@ -3,17 +3,14 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Container;
-use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
 use AppBundle\Exception\ElementNotFoundException;
-use AppBundle\Service\LxdApi\ProfileApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
-use Symfony\Component\VarDumper\VarDumper;
 
 class ProfileController extends Controller
 {

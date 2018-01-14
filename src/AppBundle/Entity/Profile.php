@@ -9,7 +9,6 @@ use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Class Profile
