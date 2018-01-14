@@ -282,53 +282,6 @@ class ProfileControllerTest extends WebTestCase
     }
 
     /**
-     * Negative test for deleteProfile($profileId) with linked host - the host domainName cannot be resolved
-     */
-    public function testDeleteProfileHostDomainNotResolved()
-    {
-        $profile = new Profile();
-        $profile->setName("testProfileDelete".mt_rand());
-        $profile->setDescription("testDescription");
-        $profile->setDevices(array("kvm" => (array("type" => "unix-char"))));
-        $profile->setConfig(array("limits.memory" => "2GB"));
-
-        $host = new Host();
-        $host->setName("Test-Host".mt_rand());
-        $host->setDomainName("test.".mt_rand().".de");
-        $host->setPort(8443);
-        $host->setSettings("settings");
-
-        $profile->addHost($host);
-
-        $this->em->persist($profile);
-        $this->em->persist($host);
-        $this->em->flush();
-
-        $client = static::createClient();
-
-        $client->request(
-            'DELETE',
-            '/profiles/'.$profile->getId(),
-            array(),
-            array(),
-            array(
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_Authorization' => $this->token
-            )
-        );
-
-        $this->assertEquals(503, $client->getResponse()->getStatusCode());
-        $this->assertEquals('{"error":{"code":503,"message":"Unable to connect to \u0022https:\/\/'.$host->getDomainName().':8443\/1.0\/profiles\/'.$profile->getName().'\u0022: 6 Could not resolve host: '.$host->getDomainName().'"}}', $client->getResponse()->getContent());
-        $host = $this->em->getRepository(Host::class)->find($host->getId());
-
-        $profile = $this->em->getRepository(Profile::class)->find($profile->getId());
-        $host = $this->em->getRepository(Host::class)->find($host->getId());
-        $this->em->remove($host);
-        $this->em->remove($profile);
-        $this->em->flush();
-    }
-
-    /**
      * Positive test for createProfile
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
