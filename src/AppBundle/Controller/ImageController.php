@@ -129,16 +129,20 @@ class ImageController extends Controller
      *      required=true,
      *      ),
      *      @OAS\Response(
-     *          response=200,
+     *          response=202,
      *          description="The placeholder image - some elements will be added after the image was async created - finished will then change to true - if the creation fails, finished stays false and an error attribute displays the error",
      *          @OAS\JsonContent(ref="#/components/schemas/image"),
      *          @OAS\Schema(
      *              type="array"
      *          ),
      *      ),
+     *     @OAS\Response(
+     *          response=404,
+     *          description="No Host for the provided id found",
+     *      ),
      *      @OAS\Response(
      *          response=400,
-     *          description="Validation failed or the Host is unknown",
+     *          description="Validation failed or there is a direct LXD error which gets redirected to the output",
      *      ),
      * )
      *
@@ -197,10 +201,10 @@ class ImageController extends Controller
         $result = $api->createImage($host, $request->getContent());
 
         if ($result->code != 202) {
-            Return new Response(json_encode($result->body));
+            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
         }
         if ($result->body->metadata->status_code == 400) {
-            Return new Response(json_encode($result->body));
+            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
         }
 
         $image->setFinished(false);
@@ -214,7 +218,7 @@ class ImageController extends Controller
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($image, 'json');
-        return new Response($response);
+        return new Response($response, Response::HTTP_ACCEPTED);
     }
 
     /**
