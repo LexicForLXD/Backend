@@ -451,6 +451,137 @@ class ImageControllerTest extends WebTestCase
     }
 
     /**
+     * Negative test for createNewRemoteSourceImage() - No Host with Id
+     */
+    public function createNewRemoteSourceImageOnHostUnknownHost()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'POST',
+            '/hosts/9999/images/remote',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),
+            '{
+                    "filename": "filename",                   
+                    "public": true,                        
+                    "auto_update": true,                  
+                    "properties": {                         
+                        "os": "Alpine"
+                    },
+                    "aliases": [                           
+                        {"name": "alpine",
+                         "description": "A description"}
+                    ],
+                    "source": {
+                        "type": "image",
+                        "mode": "pull",                     
+                        "server": "https://uk.images.linuxcontainers.org:8443",  
+                        "protocol": "lxd",
+                        "alias": "alpine/3.7/amd64"
+                    }
+                }'
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No Host for 9999 found"}}', $client->getResponse()->getContent());
+    }
+
+    /**
+     * Negative test for createImageFromSourceContainer() - No Host with Id
+     */
+    public function createImageFromSourceContainerUnknownHost()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'POST',
+            '/hosts/9999/images/container',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),
+            '{
+                        "compression_algorithm": "xz",  
+                        "filename": "myName",          
+                        "public":   true,               
+                        "properties": {                
+                            "os": "Ubuntu"
+                        },
+                        "aliases": [                    
+                            {"name": "my-alias1",
+                             "description": "A description"}
+                        ],
+                        "source": {
+                            "type": "container",        
+                            "name": "testContainer"
+                        }
+                    }'
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No Host for 9999 found"}}', $client->getResponse()->getContent());
+    }
+
+    /**
+     * Negative test for createImageFromSourceContainer() - No Container with name on Host
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function createImageFromSourceContainerUnknownContainer()
+    {
+        $client = static::createClient();
+
+        $host = new Host();
+        $host->setName("Test-Host1CreateFromContainer".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $this->em->persist($host);
+        $this->em->flush();
+
+        $client->request(
+            'POST',
+            '/hosts/9999/images/container',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),
+            '{
+                        "compression_algorithm": "xz",  
+                        "filename": "myName",          
+                        "public":   true,               
+                        "properties": {                
+                            "os": "Ubuntu"
+                        },
+                        "aliases": [                    
+                            {"name": "my-alias1",
+                             "description": "A description"}
+                        ],
+                        "source": {
+                            "type": "container",        
+                            "name": "testContainer"
+                        }
+                    }'
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No Container for name testContainer with host '.$host->getId().' found"}}', $client->getResponse()->getContent());
+
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->flush();
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function tearDown()
