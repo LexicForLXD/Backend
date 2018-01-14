@@ -339,6 +339,8 @@ class HostController extends Controller
      *
      * @param Request $request
      * @param [integer] $hostId
+     * @param HostApi $api
+     * @param EntityManagerInterface $em
      * @return Response
      *
      *SWG\Post(path="/hosts/{hostId}/authorization",
@@ -367,7 +369,7 @@ class HostController extends Controller
      * ),
      *)
      */
-    public function authorizeAction(Request $request, $hostId, HostApi $api)
+    public function authorizeAction(Request $request, $hostId, HostApi $api, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -380,16 +382,19 @@ class HostController extends Controller
 
         $data = [
             "type" => "client",
+            "name" => "LEXIC",
             "password" => $request->get("password")
         ];
 
         $result = $api->authenticate($host, $data);
 
         if($result->code == '200'){
+            $host->setAuthenticated(true);
+            $em->flush();
             return new JsonResponse(['message' => 'authentication successful']);
         } else {
             return new JsonResponse(['error' => 'error while authentication',
-                'body' => $result->body],500);
+                'body' => $result->body],400);
         }
     }
 
