@@ -61,6 +61,7 @@ class HostController extends Controller
      * @Route("/hosts", name="hosts_store", methods={"POST"})
      * @param Request $request
      * @param EntityManagerInterface $em
+     * @param HostApi $api
      * @return Response
      *
      *SWG\POST(path="/hosts",
@@ -103,11 +104,16 @@ class HostController extends Controller
      *          property="port",
      *          type="integer"
      *      ),
+     *      SWG\Property(
+     *          property="password",
+     *          type="string"
+     *      ),
      *  ),
      * ),
      *)
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, EntityManagerInterface $em)
+    public function storeAction(Request $request, EntityManagerInterface $em, HostApi $api)
     {
 
         $host = new Host();
@@ -121,6 +127,26 @@ class HostController extends Controller
 
         if ($errorArray = $this->validation($host)) {
             return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
+        $em->persist($host);
+        $em->flush();
+
+        if($api->trusted()){
+            $host->setAuthenticated(true);
+        } elseif ($request->get('password')) {
+            $data = [
+                "type" => "client",
+                "name" => "LEXIC_",
+                "password" => $request->get('password')
+            ];
+
+            $result = $api->authenticate($host, $data);
+
+            if($result->code == 200) {
+                $host->setAuthenticated(true);
+            }
+
         }
 
         $em->persist($host);
