@@ -123,7 +123,7 @@ class ImageController extends Controller
      *        ),
      *     ),
      *     @OAS\Parameter(
-     *      description="Same body as the LXD Request body to create an Image from remote",
+     *      description="Same body as the LXD Request body for source image case",
      *      name="body",
      *      in="body",
      *      required=true,
@@ -465,6 +465,91 @@ class ImageController extends Controller
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($images, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * Update an Image by its id
+     *
+     * @Route("/images/{imageId}", name="update_single_image", methods={"PUT"})
+     *
+     * @OAS\Put(path="/images/{imageId}",
+     *     tags={"images"},
+     *     @OAS\Parameter(
+     *      description="ID of the Image",
+     *      in="path",
+     *      name="imageId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Parameter(
+     *      description="Same body as the LXD Request body to update an Image via Put",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      ),
+     *      @OAS\Response(
+     *          response=202,
+     *          description="The updated Image",
+     *          @OAS\JsonContent(ref="#/components/schemas/image"),
+     *          @OAS\Schema(
+     *              type="array"
+     *          ),
+     *      ),
+     *     @OAS\Response(
+     *          response=404,
+     *          description="No Image for the provided id found",
+     *      ),
+     *      @OAS\Response(
+     *          response=400,
+     *          description="Image update on LXD Api failed, the error message is 'Couldn't update Image - {LXD-Error}'",
+     *      ),
+     * )
+     *
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws ConnectionErrorException
+     */
+    public function updateImage($imageId, Request $request, ImageApi $api){
+        $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
+
+        if (!$image) {
+            throw new ElementNotFoundException(
+                'No Image for ID '.$imageId.' found'
+            );
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        //Image is not created on the Host
+        if(!$image->isFinished()){
+            throw new WrongInputException("The Image is not yet created on the Host or there was an error creating it - You can't update the Image in this state");
+        }
+
+        $result = $api->putImageUpdate($image->getHost(), $image->getFingerprint(), $request->getContent());
+
+        if($result->code != 200){
+            throw new WrongInputException("Couldn't update Image - ".$result->body->error);
+        }
+        if($result->body->status_code != 200){
+            throw new WrongInputException("Couldn't update Image - ".$result->body->error);
+        }
+
+        //Update Image in DB
+        if($request->request->get('properties')) {
+            $image->setProperties($request->request->get('properties'));
+        }
+        if($request->request->has('public')) {
+            $image->setPublic($request->request->get('public'));
+        }
+
+        $em->merge($image);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($image, 'json');
         return new Response($response);
     }
 
