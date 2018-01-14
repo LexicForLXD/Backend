@@ -48,7 +48,8 @@ class HostApi extends HttpHelper
     public function trusted()
     {
         $info = $this->info();
-        return $info['auth'] === 'trusted' ? true : false;
+
+        return $info->body->metadata->auth === 'trusted' ? true : false;
     }
 
     public function authenticate(Host $host, $data)
