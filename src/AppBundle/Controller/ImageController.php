@@ -484,6 +484,28 @@ class ImageController extends Controller
      *              type="integer"
      *          ),
      *      ),
+     *      @OAS\Parameter(
+     *      description="Same body as the LXD Request body to update an Image via Put",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      ),
+     *      @OAS\Response(
+     *          response=202,
+     *          description="The updated Image",
+     *          @OAS\JsonContent(ref="#/components/schemas/image"),
+     *          @OAS\Schema(
+     *              type="array"
+     *          ),
+     *      ),
+     *     @OAS\Response(
+     *          response=404,
+     *          description="No Image for the provided id found",
+     *      ),
+     *      @OAS\Response(
+     *          response=400,
+     *          description="Image update on LXD Api failed, the error message is 'Couldn't update Image - {LXD-Error}'",
+     *      ),
      * )
      *
      * @throws ElementNotFoundException
