@@ -167,13 +167,13 @@ class ImageController extends Controller
         $image = new Image();
         $image->setHost($host);
 
-        if($request->request->get('filename')) {
+        if($request->request->has('filename')) {
             $image->setFilename($request->request->get('filename'));
         }
-        if($request->request->get('public')) {
+        if($request->request->has('public')) {
             $image->setPublic($request->request->get('public'));
         }
-        if($request->request->get('properties')) {
+        if($request->request->has('properties')) {
             $image->setProperties($request->request->get('properties'));
         }
 
@@ -183,7 +183,7 @@ class ImageController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         //Create aliases
-        if($request->request->get('aliases')) {
+        if($request->request->has('aliases')) {
             $aliasArray = $request->request->get('aliases');
 
             for($i=0; $i<sizeof($aliasArray); $i++){
@@ -273,7 +273,7 @@ class ImageController extends Controller
         }
 
         //Check if container exists on host
-        if($request->request->get('source')){
+        if($request->request->has('source')){
             $source = $request->request->get('source');
         }
         $container = $this->getDoctrine()->getRepository(Container::class)->findBy(['name' => $source['name'], 'host' => $host]);
@@ -286,13 +286,13 @@ class ImageController extends Controller
         $image = new Image();
         $image->setHost($host);
 
-        if($request->request->get('filename')) {
+        if($request->request->has('filename')) {
             $image->setFilename($request->request->get('filename'));
         }
-        if($request->request->get('public')) {
+        if($request->request->has('public')) {
             $image->setPublic($request->request->get('public'));
         }
-        if($request->request->get('properties')) {
+        if($request->request->has('properties')) {
             $image->setProperties($request->request->get('properties'));
         }
 
@@ -302,7 +302,7 @@ class ImageController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         //Create aliases
-        if($request->request->get('aliases')) {
+        if($request->request->has('aliases')) {
             $aliasArray = $request->request->get('aliases');
 
             for($i=0; $i<sizeof($aliasArray); $i++){
@@ -538,7 +538,7 @@ class ImageController extends Controller
         }
 
         //Update Image in DB
-        if($request->request->get('properties')) {
+        if($request->request->has('properties')) {
             $image->setProperties($request->request->get('properties'));
         }
         if($request->request->has('public')) {
