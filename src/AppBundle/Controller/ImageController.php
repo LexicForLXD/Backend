@@ -123,7 +123,7 @@ class ImageController extends Controller
      *        ),
      *     ),
      *     @OAS\Parameter(
-     *      description="Same body as the LXD Request body to create an Image from remote",
+     *      description="Same body as the LXD Request body for source image case",
      *      name="body",
      *      in="body",
      *      required=true,
