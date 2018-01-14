@@ -230,7 +230,37 @@ class ImageController extends Controller
      *
      * @OAS\Post(path="/hosts/{hostId}/images/container",
      *     tags={"images"},
-     *     description="TO BE DEFINED"
+     *     @OAS\Parameter(
+     *      description="ID of the Host",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *        @OAS\Schema(
+     *          type="integer"
+     *        ),
+     *     ),
+     *     @OAS\Parameter(
+     *      description="Same body as the LXD Request body to create an Image from stopped Container",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      ),
+     *      @OAS\Response(
+     *          response=202,
+     *          description="The placeholder image - some elements will be added after the image was async created - finished will then change to true - if the creation fails, finished stays false and an error attribute displays the error",
+     *          @OAS\JsonContent(ref="#/components/schemas/image"),
+     *          @OAS\Schema(
+     *              type="array"
+     *          ),
+     *      ),
+     *     @OAS\Response(
+     *          response=404,
+     *          description="No Host for the provided id found",
+     *      ),
+     *      @OAS\Response(
+     *          response=400,
+     *          description="Validation failed or there is a direct LXD error which gets redirected to the output",
+     *      ),
      * )
      */
     public function createImageFromSourceContainer(int $hostId, Request $request, ImageApi $api){
@@ -290,10 +320,10 @@ class ImageController extends Controller
         $result = $api->createImage($host, $request->getContent());
 
         if ($result->code != 202) {
-            Return new Response(json_encode($result->body));
+            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
         }
         if ($result->body->metadata->status_code == 400) {
-            Return new Response(json_encode($result->body));
+            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
         }
 
         $image->setFinished(false);
@@ -305,7 +335,7 @@ class ImageController extends Controller
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($image, 'json');
-        return new Response($response);
+        return new Response($response, Response::HTTP_ACCEPTED);
     }
 
     /**
@@ -330,7 +360,11 @@ class ImageController extends Controller
      *      ),
      *      @OAS\Response(
      *          response=404,
-     *          description="No Image with the ImageId found or the image couldn't be deleted ",
+     *          description="No Image with the ImageId found",
+     *      ),
+     *     @OAS\Response(
+     *          response=400,
+     *          description="There was an error deleting the Image, the error contains the message 'Couldn't delete alias - {LXD-Error}' or 'Couldn't delete image - {LXD-Error}'",
      *      ),
      * )
      *
