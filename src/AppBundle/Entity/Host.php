@@ -101,7 +101,7 @@ class Host
     protected $settings;
 
     /**
-     * @ORM\Column(type="boolean", default=false)
+     * @ORM\Column(type="boolean", options={"default":false})
      *
      *
      * @var boolean
