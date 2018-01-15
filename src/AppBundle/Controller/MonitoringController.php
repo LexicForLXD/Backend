@@ -175,7 +175,8 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Configure a ContainerStatus
+     * Configure a StatusCheck for Container
+     *
      * @Route("/monitoring/checks/containers/{containerId}", name="create_status_check_container", methods={"PUT"})
      * @param $containerId
      * @param Request $request
@@ -191,21 +192,36 @@ class MonitoringController extends Controller
             );
         }
 
-        if($request->request->get('healthCheckEnabled')) {
-            if($container->getStatus() == null){
-                $containerStatus = new ContainerStatus();
-                $container->setStatus($containerStatus);
-                $serializer = $this->get('jms_serializer');
-                $response = $serializer->serialize($containerStatus, 'json');
-                return new Response($response);
-            }
+        $em = $this->getDoctrine()->getManager();
+
+        $containerStatus = null;
+        if($container->getStatus() == null){
+            $containerStatus = new ContainerStatus();
         }else{
-            if($container->getStatus() != null){
-                $container->setStatus(null);
-                return new Response('', Response::HTTP_NO_CONTENT);
-            }
+            $containerStatus = $container->getStatus();
         }
-        return new Response('', Response::HTTP_BAD_REQUEST);
+
+        if($request->request->get('healthCheckEnabled')) {
+            $containerStatus->setHealthCheckEnabled(true);
+            $container->setStatus($containerStatus);
+            $em->persist($containerStatus);
+            $em->persist($container);
+            $em->flush();
+
+            $serializer = $this->get('jms_serializer');
+            $response = $serializer->serialize($containerStatus, 'json');
+            return new Response($response);
+        }
+
+        $containerStatus->setHealthCheckEnabled(false);
+        $container->setStatus($containerStatus);
+        $em->persist($containerStatus);
+        $em->persist($container);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($containerStatus, 'json');
+        return new Response($response);
     }
 
     /**
