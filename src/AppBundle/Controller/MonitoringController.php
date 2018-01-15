@@ -9,14 +9,45 @@ use AppBundle\Service\LxdApi\MonitoringApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Swagger\Annotations as OAS;
 
 class MonitoringController extends Controller
 {
     /**
+     * List all available Logfiles for a Container
+     *
      * @Route("/monitoring/logs/containers/{containerId}", name="list_all_logfiles_from_container", methods={"GET"})
      * @throws ElementNotFoundException
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws WrongInputException
+     *
+     * @OAS\Get(path="/monitoring/logs/containers/{containerId}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="List of all available logfiles for the Container as an array under the attribute logs",
+     *          @OAS\Schema(
+     *              type="array"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found",
+     *      ),
+     *     @OAS\Response(
+     *          response=400,
+     *          description="Returns an LXD Error 'LXD-Error - {LXD-Response}' ",
+     *      ),
+     * )
      */
     public function listAllLogfilesForContainer($containerId, MonitoringApi $api){
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
@@ -46,6 +77,72 @@ class MonitoringController extends Controller
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($response, 'json');
         return new Response($response);
+    }
+
+    /**
+     * Get the content of a single Logfile
+     *
+     * @Route("/monitoring/logs/containers/{containerId}/{logfile}", name="get_single_log_from_container", methods={"GET"})
+     * @param $containerId
+     * @param $logfile
+     * @param MonitoringApi $api
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @return Response
+     *
+     * @OAS\Get(path="/monitoring/logs/containers/{containerId}/{logfile}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *     @OAS\Parameter(
+     *      description="Filename of the Logfile, including type",
+     *      in="path",
+     *      name="logfile",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="string"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the File content as text/plain",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found",
+     *      ),
+     *     @OAS\Response(
+     *          response=400,
+     *          description="Returns an LXD Error 'LXD-Error - {LXD-Response}' ",
+     *      ),
+     * )
+     */
+    public function getSingleLogfileFromContainer($containerId, $logfile, MonitoringApi $api){
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
+        if (!$container) {
+            throw new ElementNotFoundException(
+                'No Container for ID '.$containerId.' found'
+            );
+        }
+        $result = $api->getSingleLogfileFromContainer($container, $logfile);
+
+        if($result->code != 200){
+            $result = json_decode($result->body);
+            throw new WrongInputException("LXD-Error - ".$result->error);
+        }
+
+        $response = new Response();
+        $response->setContent($result->body);
+        $response->headers->set('Content-Type', 'text/plain');
+        return $response;
     }
 
     /**
