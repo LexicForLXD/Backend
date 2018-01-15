@@ -33,4 +33,16 @@ class MonitoringApi extends HttpHelper
         return Request::get($uri)
             -> send();
     }
+
+    /**
+     * @param Container $container
+     * @param String $logfile
+     * @return \Httpful\Response
+     */
+    public function getSingleLogfileFromContainer(Container $container, String $logfile){
+        $uri = $this->buildUri($container->getHost(), 'containers/'.$container->getName().'/logs/'.$logfile);
+        return Request::get($uri)
+            -> expectsHtml()
+            -> send();
+    }
 }

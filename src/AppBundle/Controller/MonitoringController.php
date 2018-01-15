@@ -49,6 +49,36 @@ class MonitoringController extends Controller
     }
 
     /**
+     * @Route("/monitoring/logs/containers/{containerId}/{logfile}", name="get_single_log_from_container", methods={"GET"})
+     * @param $containerId
+     * @param $logfile
+     * @param MonitoringApi $api
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @return Response
+     */
+    public function getSingleLogfileFromContainer($containerId, $logfile, MonitoringApi $api){
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
+        if (!$container) {
+            throw new ElementNotFoundException(
+                'No Container for ID '.$containerId.' found'
+            );
+        }
+        $result = $api->getSingleLogfileFromContainer($container, $logfile);
+
+        if($result->code != 200){
+            $result = json_decode($result->body);
+            throw new WrongInputException("LXD-Error - ".$result->error);
+        }
+
+        $response = new Response();
+        $response->setContent($result->body);
+        $response->headers->set('Content-Type', 'text/plain');
+        return $response;
+    }
+
+    /**
      * @param String $logfileUrl
      * @return null|string|string[]
      */
