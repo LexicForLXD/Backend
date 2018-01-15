@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Container;
+use AppBundle\Entity\ContainerStatus;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\LxdApi\MonitoringApi;
@@ -143,6 +144,33 @@ class MonitoringController extends Controller
         $response->setContent($result->body);
         $response->headers->set('Content-Type', 'text/plain');
         return $response;
+    }
+
+    /**
+     * Get the StatusCheck results for a Container
+     * @Route("/monitoring/checks/containers/{containerId}", name="get_status_check_container", methods={"GET"})
+     * @throws ElementNotFoundException
+     */
+    public function getStatusCheckContainer($containerId){
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
+        if (!$container) {
+            throw new ElementNotFoundException(
+                'No Container for ID '.$containerId.' found'
+            );
+        }
+
+        $containerStatus = $container->getStatus();
+
+        if (!$containerStatus) {
+            throw new ElementNotFoundException(
+                'No StatusCheck for Container with ID '.$containerId.' found'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($containerStatus, 'json');
+        return new Response($response);
     }
 
     /**
