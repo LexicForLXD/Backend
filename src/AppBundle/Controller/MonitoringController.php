@@ -9,6 +9,7 @@ use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\LxdApi\MonitoringApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
 
@@ -171,6 +172,40 @@ class MonitoringController extends Controller
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($containerStatus, 'json');
         return new Response($response);
+    }
+
+    /**
+     * Configure a ContainerStatus
+     * @Route("/monitoring/checks/containers/{containerId}", name="create_status_check_container", methods={"PUT"})
+     * @param $containerId
+     * @param Request $request
+     * @return Response
+     * @throws ElementNotFoundException
+     */
+    public function configureStatusCheckForContainer($containerId, Request $request) {
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
+        if (!$container) {
+            throw new ElementNotFoundException(
+                'No Container for ID '.$containerId.' found'
+            );
+        }
+
+        if($request->request->get('healthCheckEnabled')) {
+            if($container->getStatus() == null){
+                $containerStatus = new ContainerStatus();
+                $container->setStatus($containerStatus);
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($containerStatus, 'json');
+                return new Response($response);
+            }
+        }else{
+            if($container->getStatus() != null){
+                $container->setStatus(null);
+                return new Response('', Response::HTTP_NO_CONTENT);
+            }
+        }
+        return new Response('', Response::HTTP_BAD_REQUEST);
     }
 
     /**
