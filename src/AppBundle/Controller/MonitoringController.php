@@ -9,14 +9,45 @@ use AppBundle\Service\LxdApi\MonitoringApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Swagger\Annotations as OAS;
 
 class MonitoringController extends Controller
 {
     /**
+     * List all available Logfiles for a Container
+     *
      * @Route("/monitoring/logs/containers/{containerId}", name="list_all_logfiles_from_container", methods={"GET"})
      * @throws ElementNotFoundException
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws WrongInputException
+     *
+     * @OAS\Get(path="/monitoring/logs/containers/{containerId}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="List of all available logfiles for the Container as an array under the attribute logs",
+     *          @OAS\Schema(
+     *              type="array"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found",
+     *      ),
+     *     @OAS\Response(
+     *          response=400,
+     *          description="Returns an LXD Error 'LXD-Error - {LXD-Response}' ",
+     *      ),
+     * )
      */
     public function listAllLogfilesForContainer($containerId, MonitoringApi $api){
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
