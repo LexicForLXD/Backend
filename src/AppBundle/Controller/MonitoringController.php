@@ -80,6 +80,8 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Get the content of a single Logfile
+     *
      * @Route("/monitoring/logs/containers/{containerId}/{logfile}", name="get_single_log_from_container", methods={"GET"})
      * @param $containerId
      * @param $logfile
@@ -87,6 +89,40 @@ class MonitoringController extends Controller
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @return Response
+     *
+     * @OAS\Get(path="/monitoring/logs/containers/{containerId}/{logfile}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *     @OAS\Parameter(
+     *      description="Filename of the Logfile, including type",
+     *      in="path",
+     *      name="logfile",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="string"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the File content as text/plain",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found",
+     *      ),
+     *     @OAS\Response(
+     *          response=400,
+     *          description="Returns an LXD Error 'LXD-Error - {LXD-Response}' ",
+     *      ),
+     * )
      */
     public function getSingleLogfileFromContainer($containerId, $logfile, MonitoringApi $api){
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
