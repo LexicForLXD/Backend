@@ -10,6 +10,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Host;
+use AppBundle\Exception\ElementNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Service\LxdApi\HostApi;
-use Swagger\Annotations as SWG;
+use Swagger\Annotations as OAS;
 
 
 class HostController extends Controller
@@ -28,23 +29,30 @@ class HostController extends Controller
      * @Route("/hosts", name="hosts_index", methods={"GET"})
      * @return Response
      *
-     * SWG\Get(path="/hosts",
-     * tags={"hosts"},
-     *      SWG\Response(
+     * @OAS\Get(path="/hosts",
+     *      tags={"hosts"},
+     *      @OAS\Response(
      *          response=200,
      *          description="Zeigt eine Liste aller Hosts an",
-     *          SWG\Schema(
+     *          @OAS\JsonContent(ref="#/components/schemas/host"),
+     *          @OAS\Schema(
      *              type="array"
      *          ),
      *      ),
+     *     @OAS\Response(
+     *          response=404,
+     *          description="No Images found",
+     *      ),
      *)
+     *
+     * @throws ElementNotFoundException
      */
     public function indexAction()
     {
         $hosts = $this->getDoctrine()->getRepository(Host::class)->findAll();
 
         if (!$hosts) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No Hosts found'
             );
         }
@@ -64,51 +72,55 @@ class HostController extends Controller
      * @param HostApi $api
      * @return Response
      *
-     *SWG\POST(path="/hosts",
-     *tags={"hosts"},
-     * SWG\Response(
+     * @OAS\POST(path="/hosts",
+     *  tags={"hosts"},
+     *  @OAS\Response(
      *     response=201,
-     *     description="gibt den neu gespeicherten Host zurück"
-     * ),
-     *
-     * SWG\Parameter(
-     *  name="hostStoreData",
-     *  in="body",
-     *  required=true,
-     *  SWG\Schema(
-     *      SWG\Property(
-     *          property="ipv4",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="ipv6",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="domainName",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="name",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="mac",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="settings",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="port",
-     *          type="integer"
-     *      ),
-     *      SWG\Property(
-     *          property="password",
-     *          type="string"
-     *      ),
+     *     description="gibt den neu gespeicherten Host zurück",
+     *     @OAS\JsonContent(ref="#/components/schemas/host"),
+     *     @OAS\Schema(
+     *         type="array"
+     *     ),
      *  ),
+     *
+     *  @OAS\Parameter(
+     *      name="hostStoreData",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="ipv4",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="ipv6",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="domainName",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="name",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="mac",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="settings",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="port",
+     *              type="integer"
+     *          ),
+     *          @OAS\Property(
+     *              property="password",
+     *              type="string"
+     *          ),
+     *      ),
      * ),
      *)
      * @throws \Httpful\Exception\ConnectionErrorException
@@ -132,7 +144,7 @@ class HostController extends Controller
         $em->persist($host);
         $em->flush();
 
-        if($api->trusted()){
+        if($api->trusted($host)){
             $host->setAuthenticated(true);
         } elseif ($request->get('password')) {
             $data = [
@@ -163,30 +175,35 @@ class HostController extends Controller
      * @param int $hostId
      * @return Response
      *
-     *SWG\Get(path="/hosts/{hostId}",
-     *tags={"hosts"},
-     * SWG\Parameter(
-     *         description="ID von anzuzeigendem Host",
-     *         format="int64",
-     *         in="path",
-     *         name="hostId",
-     *          parameter="hostId",
-     *         required=true,
-     *         type="integer"
-     * ),
+     * @OAS\Get(path="/hosts/{hostId}",
+     *  tags={"hosts"},
+     *  @OAS\Parameter(
+     *     description="ID von anzuzeigendem Host",
+     *     format="int64",
+     *     in="path",
+     *     name="hostId",
+     *     parameter="hostId",
+     *     required=true,
+     *     type="integer"
+     *  ),
      *
-     * SWG\Response(
-     *     response=200,
-     *     description="gibt einen Host zurück"
-     * ),
-     *)
+     *  @OAS\Response(
+     *      response=200,
+     *      description="gibt einen Host zurück",
+     *      @OAS\JsonContent(ref="#/components/schemas/host"),
+     *      @OAS\Schema(
+     *          type="array"
+     *      ),
+     *  ),
+     * )
+     * @throws ElementNotFoundException
      */
     public function showAction($hostId)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No host found for id ' . $hostId
             );
         }
@@ -204,64 +221,76 @@ class HostController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      *
-     *SWG\Put(path="/hosts/{hostId}",
-     *tags={"hosts"},
-     * SWG\Parameter(
-     *     description="ID von upzudaten Host",
+     * @OAS\PUT(path="/hosts/{hostId}",
+     *  tags={"hosts"},
+     *
+     *  @OAS\Parameter(
+     *     description="ID von anzuzeigendem Host",
      *     format="int64",
      *     in="path",
      *     name="hostId",
+     *     parameter="hostId",
      *     required=true,
      *     type="integer"
-     * ),
-     * SWG\Parameter(
-     *  name="hostUpdateData",
-     *  in="body",
-     *  required=true,
-     *  SWG\Schema(
-     *      SWG\Property(
-     *          property="ipv4",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="ipv6",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="domainName",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="name",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="mac",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="settings",
-     *          type="string"
-     *      ),
-     *      SWG\Property(
-     *          property="port",
-     *          type="integer"
-     *      ),
      *  ),
-     * ),
      *
-     * SWG\Response(
-     *  response=200,
-     *  description="Erfolgsmeldung,dass der Host erfolgreich geupdated wurde"
+     *  @OAS\Response(
+     *     response=201,
+     *     description="gibt den neu gespeicherten Host zurück",
+     *     @OAS\JsonContent(ref="#/components/schemas/host"),
+     *     @OAS\Schema(
+     *         type="array"
+     *     ),
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *      name="hostUpdateData",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="ipv4",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="ipv6",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="domainName",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="name",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="mac",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="settings",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="port",
+     *              type="integer"
+     *          ),
+     *          @OAS\Property(
+     *              property="password",
+     *              type="string"
+     *          ),
+     *      ),
      * ),
      *)
+     * @throws ElementNotFoundException
      */
     public function updateAction(Request $request, $hostId, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No host found for id ' . $hostId
             );
         }
@@ -293,29 +322,30 @@ class HostController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      *
-     * SWG\Delete(path="/hosts/{hostId}",
-     *tags={"hosts"},
-     * SWG\Parameter(
-     *     description="ID des zu löschenden Host",
-     *     format="int64",
-     *     in="path",
-     *     name="hostId",
-     *     required=true,
-     *     type="integer"
-     * ),
+     * @OAS\Delete(path="/hosts/{hostId}",
+     *  tags={"hosts"},
+     *  @OAS\Parameter(
+     *      description="ID des zu löschenden Host",
+     *      format="int64",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *      type="integer"
+     *  ),
      *
-     * SWG\Response(
-     *     response=200,
+     *  @OAS\Response(
+     *     response=204,
      *     description="löscht einen Host"
-     * ),
-     *)
+     *  ),
+     * )
+     * @throws ElementNotFoundException
      */
     public function deleteAction(int $hostId, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No host found for id ' . $hostId
             );
         }
@@ -343,38 +373,51 @@ class HostController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      *
-     *SWG\Post(path="/hosts/{hostId}/authorization",
-     *tags={"hosts"},
-     * SWG\Parameter(
-     *  description="ID des Host",
-     *  format="int64",
-     *  in="path",
-     *  name="hostId",
-     *  required=true,
-     *  type="integer"
-     * ),
+     * @throws ElementNotFoundException
+     * @throws \Httpful\Exception\ConnectionErrorException
      *
-     * SWG\Parameter(
-     *  description="password of lxd host",
-     *  format="int64",
-     *  in="body",
-     *  name="password",
-     *  required=true,
-     *  SWG\Schema(SWG\Property(type="string", property="password")),
-     * ),
      *
-     * SWG\Response(
-     *  response = 200,
-     *  description="erfolgsmeldung dass Host erfolgreich authorisiert"
-     * ),
-     *)
+     * @OAS\Post(path="/hosts/{hostId}/authorization",
+     *  tags={"hosts"},
+     *  @OAS\Parameter(
+     *      description="ID des Host",
+     *      format="int64",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *      type="integer"
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *      description="password of lxd host",
+     *      format="int64",
+     *      in="body",
+     *      name="password",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              type="string",
+     *              property="password"
+     *          )
+     *      ),
+     *  ),
+     *
+     *  @OAS\Response(
+     *      response = 200,
+     *      description="erfolgsmeldung dass Host erfolgreich authorisiert"
+     *  ),
+     *  @OAS\Response(
+     *      response = 400,
+     *      description="liefert den Fehler zurück."
+     * )
+     *
      */
     public function authorizeAction(Request $request, $hostId, HostApi $api, EntityManagerInterface $em)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No host found for id ' . $hostId
             );
         }
@@ -398,6 +441,10 @@ class HostController extends Controller
         }
     }
 
+    /**
+     * @param $object
+     * @return array|bool
+     */
     private function validation($object)
     {
         $validator = $this->get('validator');
