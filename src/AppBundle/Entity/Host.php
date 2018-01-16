@@ -456,9 +456,9 @@ class Host
     }
 
     /**
-     * @return HostStatus
+     * @return HostStatus | null
      */
-    public function getStatus(): HostStatus
+    public function getStatus()
     {
         return $this->status;
     }
