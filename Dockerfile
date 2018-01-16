@@ -1,6 +1,6 @@
 FROM janrtr/docker-symfony-php7-composer
 
-RUN apk --no-cache add php7-simplexml
+RUN apk --no-cache add php7-simplexml php7-ssh2
 
 ADD /app /www/symfony/app
 
