@@ -177,7 +177,7 @@ class MonitoringController extends Controller
     /**
      * Configure a StatusCheck for Container
      *
-     * @Route("/monitoring/checks/containers/{containerId}", name="create_status_check_container", methods={"PUT"})
+     * @Route("/monitoring/checks/containers/{containerId}", name="configure_status_check_container", methods={"PUT"})
      * @param $containerId
      * @param Request $request
      * @return Response
@@ -194,11 +194,9 @@ class MonitoringController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $containerStatus = null;
-        if($container->getStatus() == null){
+        $containerStatus = $container->getStatus();
+        if(!$containerStatus){
             $containerStatus = new ContainerStatus();
-        }else{
-            $containerStatus = $container->getStatus();
         }
 
         if($request->request->get('healthCheckEnabled')) {
