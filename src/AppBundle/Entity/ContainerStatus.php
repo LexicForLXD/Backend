@@ -4,9 +4,8 @@ namespace AppBundle\Entity;
 
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Swagger\Annotations as OAS;
 
 
 /**
@@ -15,6 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="container_status")
  *
  * @ORM\Entity
+ * @OAS\Schema(schema="containerStatus", type="object")
  */
 class ContainerStatus
 {
@@ -22,6 +22,7 @@ class ContainerStatus
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @OAS\Property(example="4")
      */
     protected $id;
 
@@ -31,6 +32,7 @@ class ContainerStatus
      * @var boolean
      *
      * @ORM\Column(type="boolean")
+     * @OAS\Property(example="true")
      */
     protected $healthCheckEnabled;
 
@@ -39,7 +41,8 @@ class ContainerStatus
      *
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
+     * @OAS\Property(example="true")
      */
     protected $healthCheck;
 
@@ -48,8 +51,10 @@ class ContainerStatus
      * gibt an, wann der letzte erfolgreiche Ping ausgeführt wurde
      *
      * @var datetime
+     * @Assert\DateTime(format="Y-m-d\TH:i:sP")
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
+     * @OAS\Property(example="2017-08-15T15:52:01+00:00")
      */
     protected $lastSuccessfullPing;
 
@@ -57,8 +62,10 @@ class ContainerStatus
      * gibt an, wann der letzte fehlgeschlagene Ping ausgeführt wurde
      *
      * @var datetime
+     * @Assert\DateTime(format="Y-m-d\TH:i:sP")
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
+     * @OAS\Property(example="2017-08-14T11:50:01+00:00")
      */
     protected $lastFailedPing;
 
@@ -67,18 +74,10 @@ class ContainerStatus
      *
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
+     * @OAS\Property(example="18")
      */
     protected $lastRtt;
-
-    /**
-     * gibt den state des Container laut lxc an
-     *
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    protected $state;
 
     /**
      * @return mixed
@@ -174,22 +173,6 @@ class ContainerStatus
     public function setLastRtt(int $lastRtt)
     {
         $this->lastRtt = $lastRtt;
-    }
-
-    /**
-     * @return string
-     */
-    public function getState(): string
-    {
-        return $this->state;
-    }
-
-    /**
-     * @param string $state
-     */
-    public function setState(string $state)
-    {
-        $this->state = $state;
     }
 
     

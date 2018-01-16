@@ -3,11 +3,13 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Container;
+use AppBundle\Entity\ContainerStatus;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\LxdApi\MonitoringApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
 
@@ -143,6 +145,131 @@ class MonitoringController extends Controller
         $response->setContent($result->body);
         $response->headers->set('Content-Type', 'text/plain');
         return $response;
+    }
+
+    /**
+     * Get the StatusCheck results for a Container
+     * @Route("/monitoring/checks/containers/{containerId}", name="get_status_check_container", methods={"GET"})
+     * @throws ElementNotFoundException
+     *
+     * @OAS\Get(path="/monitoring/checks/containers/{containerId}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the ContainerStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found or no StatusCheck for Container found",
+     *      ),
+     * )
+     */
+    public function getStatusCheckContainer($containerId){
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
+        if (!$container) {
+            throw new ElementNotFoundException(
+                'No Container for ID '.$containerId.' found'
+            );
+        }
+
+        $containerStatus = $container->getStatus();
+
+        if (!$containerStatus) {
+            throw new ElementNotFoundException(
+                'No StatusCheck for Container with ID '.$containerId.' found'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($containerStatus, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * Configure a StatusCheck for Container
+     *
+     * @Route("/monitoring/checks/containers/{containerId}", name="configure_status_check_container", methods={"PUT"})
+     * @param $containerId
+     * @param Request $request
+     * @return Response
+     * @throws ElementNotFoundException
+     *
+     * @OAS\Put(path="/monitoring/checks/containers/{containerId}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *     @OAS\Parameter(
+     *      description="Json-Object with attribute healthCheckEnabled which should be true or false",
+     *      in="body",
+     *      name="body",
+     *      required=true,
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the ContainerStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found or no StatusCheck for Container found",
+     *      ),
+     * )
+     */
+    public function configureStatusCheckForContainer($containerId, Request $request) {
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
+        if (!$container) {
+            throw new ElementNotFoundException(
+                'No Container for ID '.$containerId.' found'
+            );
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $containerStatus = $container->getStatus();
+        if(!$containerStatus){
+            $containerStatus = new ContainerStatus();
+        }
+
+        if($request->request->get('healthCheckEnabled')) {
+            $containerStatus->setHealthCheckEnabled(true);
+            $container->setStatus($containerStatus);
+            $em->persist($containerStatus);
+            $em->persist($container);
+            $em->flush();
+
+            $serializer = $this->get('jms_serializer');
+            $response = $serializer->serialize($containerStatus, 'json');
+            return new Response($response);
+        }
+
+        $containerStatus->setHealthCheckEnabled(false);
+        $container->setStatus($containerStatus);
+        $em->persist($containerStatus);
+        $em->persist($container);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($containerStatus, 'json');
+        return new Response($response);
     }
 
     /**

@@ -336,7 +336,7 @@ class Host
             return;
         }
         $this->containers->add($container);
-        $container->addHost($this);
+        $container->setHost($this);
     }
 
     /**
