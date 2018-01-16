@@ -4,9 +4,7 @@ namespace AppBundle\Entity;
 
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Swagger\Annotations as OAS;
 
 
@@ -53,6 +51,7 @@ class ContainerStatus
      * gibt an, wann der letzte erfolgreiche Ping ausgeführt wurde
      *
      * @var datetime
+     * @Assert\DateTime(format="Y-m-d\TH:i:sP")
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @OAS\Property(example="2017-08-15T15:52:01+00:00")
@@ -63,6 +62,7 @@ class ContainerStatus
      * gibt an, wann der letzte fehlgeschlagene Ping ausgeführt wurde
      *
      * @var datetime
+     * @Assert\DateTime(format="Y-m-d\TH:i:sP")
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @OAS\Property(example="2017-08-14T11:50:01+00:00")
