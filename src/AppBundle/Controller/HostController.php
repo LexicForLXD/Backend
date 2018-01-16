@@ -388,7 +388,7 @@ class HostController extends Controller
 
         $result = $api->authenticate($host, $data);
 
-        if($result->code == '200'){
+        if($result->code == 200){
             $host->setAuthenticated(true);
             $em->flush();
             return new JsonResponse(['message' => 'authentication successful']);
