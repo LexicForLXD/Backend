@@ -121,6 +121,14 @@ class Host
      */
     protected $images;
 
+    /**
+     * @var HostStatus
+     * @ORM\OneToOne(targetEntity="HostStatus")
+     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
+     * @JMS\Exclude()
+     */
+    protected $status;
+
 
     public function __construct()
     {
@@ -446,6 +454,23 @@ class Host
 
         return true;
     }
+
+    /**
+     * @return HostStatus | null
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param HostStatus $status
+     */
+    public function setStatus(HostStatus $status)
+    {
+        $this->status = $status;
+    }
+
 
     /** @see \Serializable::serialize() */
     // public function serialize()

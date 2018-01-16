@@ -4,6 +4,8 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Container;
 use AppBundle\Entity\ContainerStatus;
+use AppBundle\Entity\Host;
+use AppBundle\Entity\HostStatus;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\LxdApi\MonitoringApi;
@@ -229,7 +231,7 @@ class MonitoringController extends Controller
      *      ),
      *      @OAS\Response(
      *          response=404,
-     *          description="No Container for the id found or no StatusCheck for Container found",
+     *          description="No Container for the id found",
      *      ),
      * )
      */
@@ -269,6 +271,132 @@ class MonitoringController extends Controller
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($containerStatus, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * Get the StatusCheck results for a Host
+     * @Route("/monitoring/checks/hosts/{hostId}", name="get_status_check_host", methods={"GET"})
+     * @param $hostId
+     * @return Response
+     * @throws ElementNotFoundException
+     * @OAS\Get(path="/monitoring/checks/hosts/{hostId}",
+     *     tags={"monitoring"},
+     * @OAS\Parameter(
+     *      description="ID of the Host",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     * @OAS\Response(
+     *          response=200,
+     *          description="Returns the HostStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/hostStatus"),
+     *      ),
+     * @OAS\Response(
+     *          response=404,
+     *          description="No Host for the id found or no StatusCheck for the Host found",
+     *      ),
+     * )
+     */
+    public function getStatusCheckHost($hostId){
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No Host for ID '.$hostId.' found'
+            );
+        }
+
+        $hostStatus = $host->getStatus();
+
+        if (!$hostStatus) {
+            throw new ElementNotFoundException(
+                'No StatusCheck for Host with ID '.$hostId.' found'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($hostStatus, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * Configure a StatusCheck for Host
+     *
+     * @Route("/monitoring/checks/hosts/{hostId}", name="configure_status_check_host", methods={"PUT"})
+     * @param $hostId
+     * @param Request $request
+     * @return Response
+     * @throws ElementNotFoundException
+     *
+     * @OAS\Put(path="/monitoring/checks/hosts/{hostId}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Host",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *     @OAS\Parameter(
+     *      description="Json-Object with attribute healthCheckEnabled which should be true or false",
+     *      in="body",
+     *      name="body",
+     *      required=true,
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the HostStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Host for the id found",
+     *      ),
+     * )
+     */
+    public function configureStatusCheckForHost($hostId, Request $request) {
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No Host for ID '.$hostId.' found'
+            );
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $hostStatus = $host->getStatus();
+        if(!$hostStatus){
+            $hostStatus = new HostStatus();
+        }
+
+        if($request->request->get('healthCheckEnabled')) {
+            $hostStatus->setHealthCheckEnabled(true);
+            $host->setStatus($hostStatus);
+            $em->persist($hostStatus);
+            $em->persist($host);
+            $em->flush();
+
+            $serializer = $this->get('jms_serializer');
+            $response = $serializer->serialize($hostStatus, 'json');
+            return new Response($response);
+        }
+
+        $hostStatus->setHealthCheckEnabled(false);
+        $host->setStatus($hostStatus);
+        $em->persist($hostStatus);
+        $em->persist($host);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($hostStatus, 'json');
         return new Response($response);
     }
 
