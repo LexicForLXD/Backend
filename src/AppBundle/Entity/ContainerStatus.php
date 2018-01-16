@@ -39,7 +39,7 @@ class ContainerStatus
      *
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     protected $healthCheck;
 
@@ -49,7 +49,7 @@ class ContainerStatus
      *
      * @var datetime
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     protected $lastSuccessfullPing;
 
@@ -58,7 +58,7 @@ class ContainerStatus
      *
      * @var datetime
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     protected $lastFailedPing;
 
@@ -67,18 +67,9 @@ class ContainerStatus
      *
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     protected $lastRtt;
-
-    /**
-     * gibt den state des Container laut lxc an
-     *
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    protected $state;
 
     /**
      * @return mixed
@@ -174,22 +165,6 @@ class ContainerStatus
     public function setLastRtt(int $lastRtt)
     {
         $this->lastRtt = $lastRtt;
-    }
-
-    /**
-     * @return string
-     */
-    public function getState(): string
-    {
-        return $this->state;
-    }
-
-    /**
-     * @param string $state
-     */
-    public function setState(string $state)
-    {
-        $this->state = $state;
     }
 
     
