@@ -151,6 +151,28 @@ class MonitoringController extends Controller
      * Get the StatusCheck results for a Container
      * @Route("/monitoring/checks/containers/{containerId}", name="get_status_check_container", methods={"GET"})
      * @throws ElementNotFoundException
+     *
+     * @OAS\Get(path="/monitoring/checks/containers/{containerId}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the ContainerStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found or no StatusCheck for Container found",
+     *      ),
+     * )
      */
     public function getStatusCheckContainer($containerId){
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
@@ -182,6 +204,34 @@ class MonitoringController extends Controller
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
+     *
+     * @OAS\Put(path="/monitoring/checks/containers/{containerId}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *     @OAS\Parameter(
+     *      description="Json-Object with attribute healthCheckEnabled which should be true or false",
+     *      in="body",
+     *      name="body",
+     *      required=true,
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the ContainerStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found or no StatusCheck for Container found",
+     *      ),
+     * )
      */
     public function configureStatusCheckForContainer($containerId, Request $request) {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
