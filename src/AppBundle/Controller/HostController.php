@@ -137,6 +137,7 @@ class HostController extends Controller
         $host->setName($request->request->get('name'));
         $host->setPort($request->request->get('port'));
         $host->setSettings($request->request->get('settings'));
+        $host->setAuthenticated(false);
 
         if ($errorArray = $this->validation($host)) {
             return new JsonResponse(['errors' => $errorArray], 400);
@@ -145,7 +146,14 @@ class HostController extends Controller
         $em->persist($host);
         $em->flush();
 
-        if($api->trusted($host)){
+        try{
+            $authenticated = $api->trusted($host);
+        } catch(\Httpful\Exception\ConnectionErrorException $e){
+            $authenticated = false;
+        }
+
+
+        if($authenticated){
             $host->setAuthenticated(true);
         } elseif ($request->get('password')) {
             $data = [
