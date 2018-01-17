@@ -9,14 +9,14 @@ use Swagger\Annotations as OAS;
 
 
 /**
- * Class ContainerStatus
+ * Class HostStatus
  * @package AppBundle\Entity
- * @ORM\Table(name="container_status")
+ * @ORM\Table(name="host_status")
  *
  * @ORM\Entity
- * @OAS\Schema(schema="containerStatus", type="object")
+ * @OAS\Schema(schema="hostStatus", type="object")
  */
-class ContainerStatus
+class HostStatus
 {
     /**
      * @ORM\Id
