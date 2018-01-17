@@ -9,6 +9,7 @@ use AppBundle\Entity\HostStatus;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\LxdApi\MonitoringApi;
+use AppBundle\Service\SSH\HostSSH;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -142,6 +143,30 @@ class MonitoringController extends Controller
             $result = json_decode($result->body);
             throw new WrongInputException("LXD-Error - ".$result->error);
         }
+
+        $response = new Response();
+        $response->setContent($result->body);
+        $response->headers->set('Content-Type', 'text/plain');
+        return $response;
+    }
+
+    /**
+     * @Route("/monitoring/logs/hosts/{hostId}/{logpath}", name="get_single_log_from_host", methods={"GET"})
+     * @param $hostId
+     * @param $logpath
+     * @param HostSSH $ssh
+     * @return Response
+     * @throws ElementNotFoundException
+     */
+    public function getSingleLogfileFromHost($hostId, $logpath, HostSSH $ssh){
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No Host for ID '.$hostId.' found'
+            );
+        }
+        $result = $ssh->getLogFileFromHost($host, $logpath);
 
         $response = new Response();
         $response->setContent($result->body);
