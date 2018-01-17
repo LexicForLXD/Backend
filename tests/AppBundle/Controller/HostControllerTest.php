@@ -112,7 +112,7 @@ class HostControllerTest extends WebTestCase
             '{
                 "ipv4": "192.168.1.21",
                 "ipv6": "fe80::1",
-                "domain_name": "test1.local",
+                "domainName": "test1.local",
                 "mac": "blabla1",
                 "name": "c11",
                 "settings": "sldkasdaldk1"
@@ -163,7 +163,7 @@ class HostControllerTest extends WebTestCase
             '{
                 "ipv4": "192.168.1.21",
                 "ipv6": "fe80::1",
-                "domain_name": "test.local",
+                "domainName": "test.local",
                 "mac": "blabla1",
                 "name": "c11",
                 "settings": "sldkasdaldk1"
@@ -199,7 +199,7 @@ class HostControllerTest extends WebTestCase
             '{
                 "ipv4": "hallo",
                 "ipv6": "wie",
-                "domain_name": "geht",
+                "domainName": "geht",
                 "mac": "es",
                 "name": "dir",
                 "settings": "?"
@@ -292,7 +292,7 @@ class HostControllerTest extends WebTestCase
             '{
                 "ipv4": "192.168.1.20",
                 "ipv6": "fe80::2",
-                "domain_name": "test2.local",
+                "domainName": "test2.local",
                 "mac": "blabla2",
                 "name": "host2",
                 "settings": "sldkasdaldk2"
@@ -333,7 +333,7 @@ class HostControllerTest extends WebTestCase
             '{
                 "ipv4": "192.168.1.20",
                 "ipv6": "fe80::2",
-                "domain_name": "test2.local",
+                "domainName": "test2.local",
                 "mac": "blabla2",
                 "name": "host2",
                 "settings": "sldkasdaldk2"
@@ -367,7 +367,7 @@ class HostControllerTest extends WebTestCase
             '{
                 "ipv4": "hallo",
                 "ipv6": "wie",
-                "domain_name": "geht",
+                "domainName": "geht",
                 "mac": "es",
                 "name": "dir",
                 "settings": "?"

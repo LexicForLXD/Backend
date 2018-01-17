@@ -131,7 +131,7 @@ class HostController extends Controller
         $host = new Host();
         $host->setIpv4($request->request->get('ipv4'));
         $host->setIpv6($request->request->get('ipv6'));
-        $host->setDomainName($request->request->get('domain_name'));
+        $host->setDomainName($request->request->get('domainName'));
         $host->setMac($request->request->get('mac'));
         $host->setName($request->request->get('name'));
         $host->setPort($request->request->get('port'));
@@ -297,7 +297,7 @@ class HostController extends Controller
 
         $host->setIpv4($request->request->get('ipv4'));
         $host->setIpv6($request->request->get('ipv6'));
-        $host->setDomainName($request->request->get('domain_name'));
+        $host->setDomainName($request->request->get('domainName'));
         $host->setMac($request->request->get('mac'));
         $host->setName($request->request->get('name'));
         $host->setPort($request->request->get('port'));
