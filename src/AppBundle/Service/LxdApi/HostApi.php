@@ -36,21 +36,29 @@ class HostApi extends HttpHelper
     public function info(Host $host)
     {
         $uri = $this->buildUri($host, $this->getEndpoint());
-        return Request::get($uri)->send();
+        return Request::get($uri)->timeoutIn(3)->send();
     }
 
     /**
      * Does the server trust the client
      *
+     * @param Host $host
      * @return bool
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function trusted()
+    public function trusted(Host $host)
     {
-        $info = $this->info();
-        return $info['auth'] === 'trusted' ? true : false;
+        $info = $this->info($host);
+
+        return $info->body->metadata->auth === 'trusted' ? true : false;
     }
 
+    /**
+     * @param Host $host
+     * @param $data
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
     public function authenticate(Host $host, $data)
     {
         $uri = $this->buildUri($host, 'certificates');

@@ -88,7 +88,7 @@ class Host
      * @ORM\Column(type="integer", nullable=true)
      *
      * @OAS\Property(example="22")
-     * var integer
+     * @var integer
      */
     protected $port;
 
@@ -96,9 +96,17 @@ class Host
      * @ORM\Column(type="json", nullable=true)
      *
      * @OAS\Property(example="TODO Settings")
-     * var string
+     * @var string
      */
     protected $settings;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default":false}, nullable=true)
+     *
+     *
+     * @var boolean
+     */
+    protected $authenticated;
 
     /**
      * Undocumented variable
@@ -252,6 +260,24 @@ class Host
     {
         $this->port = $port;
     }
+
+    /**
+     * @return bool
+     */
+    public function isAuthenticated(): bool
+    {
+        return $this->authenticated;
+    }
+
+    /**
+     * @param bool $authenticated
+     */
+    public function setAuthenticated(bool $authenticated): void
+    {
+        $this->authenticated = $authenticated;
+    }
+
+
 
     public function getContainers()
     {
