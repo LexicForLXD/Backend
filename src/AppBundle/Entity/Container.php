@@ -43,7 +43,7 @@ class Container
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
-     *
+     * @Assert\Ip
      * @OAS\Property(example="192.168.178.20")
      * var string
      */
@@ -51,6 +51,7 @@ class Container
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
+     * @Assert\Ip(version = 6)
      *
      * @OAS\Property(example="fe80::20")
      * var string
@@ -59,7 +60,7 @@ class Container
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
-     *
+     * @Assert\Regex("/[.]/")
      * @OAS\Property(example="container14.localnet.com")
      * var string
      */
