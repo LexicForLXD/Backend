@@ -221,7 +221,7 @@ class HostController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      *
-     * @OAS\PUT(path="/hosts/{hostId}",
+     * @OAS\Put(path="/hosts/{hostId}",
      *  tags={"hosts"},
      *
      *  @OAS\Parameter(
@@ -398,7 +398,7 @@ class HostController extends Controller
      *          @OAS\Property(
      *              type="string",
      *              property="password"
-     *          )
+     *          ),
      *      ),
      *  ),
      *
@@ -409,7 +409,7 @@ class HostController extends Controller
      *  @OAS\Response(
      *      response = 400,
      *      description="liefert den Fehler zurück."
-     * )
+     * ))
      *
      */
     public function authorizeAction(Request $request, $hostId, HostApi $api, EntityManagerInterface $em)
