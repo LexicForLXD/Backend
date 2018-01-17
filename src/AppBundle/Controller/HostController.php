@@ -43,7 +43,7 @@ class HostController extends Controller
      *          response=404,
      *          description="No Images found",
      *      ),
-     *)
+     * )
      *
      * @throws ElementNotFoundException
      */
@@ -84,7 +84,8 @@ class HostController extends Controller
      *  ),
      *
      *  @OAS\Parameter(
-     *      name="hostStoreData",
+     *      description="Parameters for new Host",
+     *      name="body",
      *      in="body",
      *      required=true,
      *      @OAS\Schema(
@@ -179,12 +180,12 @@ class HostController extends Controller
      *  tags={"hosts"},
      *  @OAS\Parameter(
      *     description="ID von anzuzeigendem Host",
-     *     format="int64",
      *     in="path",
      *     name="hostId",
-     *     parameter="hostId",
      *     required=true,
-     *     type="integer"
+     *     @OAS\Schema(
+     *         type="integer"
+     *     ),
      *  ),
      *
      *  @OAS\Response(
@@ -226,12 +227,12 @@ class HostController extends Controller
      *
      *  @OAS\Parameter(
      *     description="ID von anzuzeigendem Host",
-     *     format="int64",
      *     in="path",
      *     name="hostId",
-     *     parameter="hostId",
      *     required=true,
-     *     type="integer"
+     *     @OAS\Schema(
+     *         type="integer"
+     *     ),
      *  ),
      *
      *  @OAS\Response(
@@ -244,7 +245,7 @@ class HostController extends Controller
      *  ),
      *
      *  @OAS\Parameter(
-     *      name="hostUpdateData",
+     *      name="body",
      *      in="body",
      *      required=true,
      *      @OAS\Schema(
@@ -325,12 +326,13 @@ class HostController extends Controller
      * @OAS\Delete(path="/hosts/{hostId}",
      *  tags={"hosts"},
      *  @OAS\Parameter(
-     *      description="ID des zu löschenden Host",
-     *      format="int64",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *      type="integer"
+     *     description="ID von anzuzeigendem Host",
+     *     in="path",
+     *     name="hostId",
+     *     required=true,
+     *     @OAS\Schema(
+     *         type="integer"
+     *     ),
      *  ),
      *
      *  @OAS\Response(
@@ -380,19 +382,19 @@ class HostController extends Controller
      * @OAS\Post(path="/hosts/{hostId}/authorization",
      *  tags={"hosts"},
      *  @OAS\Parameter(
-     *      description="ID des Host",
-     *      format="int64",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *      type="integer"
+     *     description="ID von anzuzeigendem Host",
+     *     in="path",
+     *     name="hostId",
+     *     required=true,
+     *     @OAS\Schema(
+     *         type="integer"
+     *     ),
      *  ),
      *
      *  @OAS\Parameter(
      *      description="password of lxd host",
-     *      format="int64",
      *      in="body",
-     *      name="password",
+     *      name="body",
      *      required=true,
      *      @OAS\Schema(
      *          @OAS\Property(
