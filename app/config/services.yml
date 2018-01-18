@@ -57,6 +57,12 @@ services:
             $ssh_user: '%ssh_user%'
             $ssh_passphrase: '%ssh_passphrase%'
 
+    AppBundle\Service\Nagios\:
+            resource: '../../src/AppBundle/Service/Nagios'
+            arguments:
+                $nagiosUsername: '%nagiosUsername%'
+                $nagiosPassword: '%nagiosPassword%'
+
     lxd.image.creation.updater:
             class: AppBundle\EventListener\ImageCreationListener
             arguments: [ "@doctrine.orm.entity_manager" ]
