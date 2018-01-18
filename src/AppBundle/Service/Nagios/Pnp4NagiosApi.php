@@ -5,7 +5,6 @@ namespace AppBundle\Service\Nagios;
 
 use AppBundle\Entity\ContainerStatus;
 use Httpful\Request;
-use Symfony\Component\VarDumper\VarDumper;
 
 class Pnp4NagiosApi
 {
@@ -24,7 +23,7 @@ class Pnp4NagiosApi
      * @return
      */
     public function getNagiosImageForContainerTimerange(ContainerStatus $containerStatus, $timerange){
-        $uri = $containerStatus->getNagiosUrl().'/image?host='.$containerStatus->getNagiosName().'&srv=check_http&view=1&source=0&start='.$timerange;
+        $uri = $containerStatus->getNagiosUrl().'/image?host='.$containerStatus->getNagiosName().'&srv='.$containerStatus->getCheckName().'&view=1&source='.$containerStatus->getSourceNumber().'&start='.$timerange;
         $response = Request::get($uri)
             ->authenticateWith($this->username, $this->password)
             ->expectsHtml()
