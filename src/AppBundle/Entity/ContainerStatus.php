@@ -76,6 +76,12 @@ class ContainerStatus
     protected $nagiosUrl;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Container", inversedBy="statuses")
+     * @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     */
+    protected $container;
+
+    /**
      * @return mixed
      */
     public function getId()

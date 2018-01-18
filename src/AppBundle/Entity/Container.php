@@ -97,14 +97,9 @@ class Container
     protected $host;
 
     /**
-     * gibt den Status zu einem Container an
-     *
-     * @var
-     *
-     * @ORM\OneToOne(targetEntity="ContainerStatus")
-     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
+     * @ORM\OneToMany(targetEntity="ContainerStatus", mappedBy="container")
      */
-    protected $status;
+    protected $statuses;
 
     /**
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Profile", mappedBy="containers")
@@ -115,6 +110,7 @@ class Container
     public function __construct()
     {
         $this->profiles = new ArrayCollection();
+        $this->statuses = new ArrayCollection();
     }
 
     /**
@@ -196,19 +192,14 @@ class Container
         return $this->host;
     }
 
-    public function getStatus()
+    public function getStatuses()
     {
-        return $this->status;
+        return $this->statuses;
     }
 
     public function setHost($host)
     {
         $this->host = $host;
-    }
-
-    public function setStatus($status)
-    {
-        $this->status = $status;
     }
 
     public function getDomainName()
