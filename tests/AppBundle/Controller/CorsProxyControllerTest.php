@@ -30,13 +30,6 @@ class CorsProxyControllerTest extends WebTestCase
 
         $result = json_decode($client->getResponse()->getContent());
         $this->token = 'Bearer ' . $result->access_token;
-
-        static::$kernel = static::createKernel();
-        static::$kernel->boot();
-        $this->em = static::$kernel->getContainer()
-            ->get('doctrine')
-            ->getManager()
-        ;
     }
 
     public function testCorsProxyHTTPS(){
