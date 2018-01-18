@@ -6,7 +6,6 @@ namespace AppBundle\Service\LxdApi\Util;
 use AppBundle\Entity\Host;
 use AppBundle\Exception\WrongInputException;
 use Httpful\Request;
-use AppBundle\Entity\Host;
 
 class HttpHelper
 {
