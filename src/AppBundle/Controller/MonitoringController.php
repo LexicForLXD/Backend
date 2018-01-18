@@ -399,9 +399,9 @@ class MonitoringController extends Controller
      * )
      */
     public function configureStatusCheckForContainer($checkId, Request $request) {
-        $container = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
+        $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
 
-        if (!$container) {
+        if (!$containerStatus) {
             throw new ElementNotFoundException(
                 'No ContainerStatus for ID '.$checkId.' found'
             );
@@ -409,17 +409,20 @@ class MonitoringController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $containerStatus = $container->getStatus();
-        if(!$containerStatus){
-            $containerStatus = new ContainerStatus();
-        }
-
         if($request->request->has('nagiosEnabled')) {
             $containerStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
         }
 
         if($request->request->has('nagiosName')) {
             $containerStatus->setNagiosName($request->request->get('nagiosName'));
+        }
+
+        if($request->request->has('checkName')) {
+            $containerStatus->setCheckName($request->request->get('checkName'));
+        }
+
+        if($request->request->has('sourceNumber')) {
+            $containerStatus->setSourceNumber($request->request->get('sourceNumber'));
         }
 
         if($request->request->has('nagiosUrl')) {
@@ -431,9 +434,7 @@ class MonitoringController extends Controller
             return new JsonResponse(['errors' => $errorArray], 400);
         }
 
-        $container->setStatus($containerStatus);
         $em->persist($containerStatus);
-        $em->persist($container);
         $em->flush();
 
         $serializer = $this->get('jms_serializer');
