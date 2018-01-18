@@ -226,15 +226,15 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Create Nagios stats entity for Container
+     * Create ContainerStatus Nagios configuration
      *
-     * @Route("/monitoring/checks/containers/{containerId}", name="create_status_check_container", methods={"POST"})
+     * @Route("/monitoring/checks/containers/{containerId}", name="create_container_status", methods={"POST"})
      * @param $containerId
      * @param Request $request
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
      *
-     * @OAS\Put(path="/monitoring/checks/containers/{containerId}",
+     * @OAS\Post(path="/monitoring/checks/containers/{containerId}",
      *     tags={"monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the Container",
@@ -265,10 +265,20 @@ class MonitoringController extends Controller
      *          type="string",
      *          example="https://nagios.example.com/pnp4nagios/",
      *      ),
+     *      @OAS\Property(
+     *          property="checkName",
+     *          type="string",
+     *          example="check_http",
+     *      ),
+     *      @OAS\Property(
+     *          property="sourceNumber",
+     *          type="string",
+     *          example=0,
+     *      ),
      *      ),
      *      ),
      *      @OAS\Response(
-     *          response=200,
+     *          response=201,
      *          description="Returns the ContainerStatus",
      *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
      *      ),
@@ -278,7 +288,6 @@ class MonitoringController extends Controller
      *      ),
      * )
      */
-    //TODO APIDoc
     public function createStatusCheckForContainer($containerId, Request $request) {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
@@ -324,22 +333,21 @@ class MonitoringController extends Controller
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($containerStatus, 'json');
-        return new Response($response);
+        return new Response($response, Response::HTTP_CREATED);
     }
 
     /**
-     * Configure Nagios stats for Container or Host
+     * Edit ContainerStatus Nagios configuration
      *
-     * @Route("/monitoring/checks/{checkId}", name="configure_status_check", methods={"PUT"})
-     * @param $containerId
+     * @Route("/monitoring/checks/{checkId}/containers", name="configure_container_status", methods={"PUT"})
+     * @param $checkId
      * @param Request $request
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Put(path="/monitoring/checks/{checkId}",
+     * @OAS\Put(path="/monitoring/checks/{checkId}/containers",
      *     tags={"monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Nagios StatusCheck",
+     * @OAS\Parameter(
+     *      description="ID of the ContainerStatus",
      *      in="path",
      *      name="checkId",
      *      required=true,
@@ -347,7 +355,7 @@ class MonitoringController extends Controller
      *              type="integer"
      *          ),
      *      ),
-     *     @OAS\Parameter(
+     * @OAS\Parameter(
      *      in="body",
      *      name="body",
      *      required=true,
@@ -367,34 +375,39 @@ class MonitoringController extends Controller
      *          type="string",
      *          example="https://nagios.example.com/pnp4nagios/",
      *      ),
+     *      @OAS\Property(
+     *          property="checkName",
+     *          type="string",
+     *          example="check_http",
+     *      ),
+     *      @OAS\Property(
+     *          property="sourceNumber",
+     *          type="string",
+     *          example=0,
      *      ),
      *      ),
-     *      @OAS\Response(
+     *      ),
+     * @OAS\Response(
      *          response=200,
      *          description="Returns the ContainerStatus",
      *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
      *      ),
-     *      @OAS\Response(
+     * @OAS\Response(
      *          response=404,
-     *          description="No Container for the id found",
+     *          description="No ContainerStatus for the id found",
      *      ),
      * )
      */
-    public function configureStatusCheckForContainer($containerId, Request $request) {
-        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+    public function configureStatusCheckForContainer($checkId, Request $request) {
+        $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
 
-        if (!$container) {
+        if (!$containerStatus) {
             throw new ElementNotFoundException(
-                'No Container for ID '.$containerId.' found'
+                'No ContainerStatus for ID '.$checkId.' found'
             );
         }
 
         $em = $this->getDoctrine()->getManager();
-
-        $containerStatus = $container->getStatus();
-        if(!$containerStatus){
-            $containerStatus = new ContainerStatus();
-        }
 
         if($request->request->has('nagiosEnabled')) {
             $containerStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
@@ -402,6 +415,14 @@ class MonitoringController extends Controller
 
         if($request->request->has('nagiosName')) {
             $containerStatus->setNagiosName($request->request->get('nagiosName'));
+        }
+
+        if($request->request->has('checkName')) {
+            $containerStatus->setCheckName($request->request->get('checkName'));
+        }
+
+        if($request->request->has('sourceNumber')) {
+            $containerStatus->setSourceNumber($request->request->get('sourceNumber'));
         }
 
         if($request->request->has('nagiosUrl')) {
@@ -413,9 +434,7 @@ class MonitoringController extends Controller
             return new JsonResponse(['errors' => $errorArray], 400);
         }
 
-        $container->setStatus($containerStatus);
         $em->persist($containerStatus);
-        $em->persist($container);
         $em->flush();
 
         $serializer = $this->get('jms_serializer');
@@ -432,13 +451,39 @@ class MonitoringController extends Controller
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
+     *
+     * @OAS\Get(path="/monitoring/checks/{checkId}/containers/graph",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the ContainerStatus",
+     *      in="path",
+     *      name="checkId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the Nagios stats graph as png",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No ContainerStatus with ID found",
+     *      ),
+     *
+     *     @OAS\Response(
+     *          response=400,
+     *          description="Error getting the Nagios graph image",
+     *      ),
+     * )
      */
     public function getPnp4NagiosImageForContainer($checkId, Request $request, Pnp4NagiosApi $api){
         $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
 
         if (!$containerStatus) {
             throw new ElementNotFoundException(
-                'No StatusCheck with ID '.$checkId.' for Container found'
+                'No ContainerStatus with ID '.$checkId.' found'
             );
         }
 
