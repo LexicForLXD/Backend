@@ -23,7 +23,7 @@ class HostSSH
      * @param $ssh_passphrase
      * @throws WrongInputException
      */
-    public function __construct(String $ssh_key_location, String $ssh_location, String $ssh_user, String $ssh_passphrase)
+    public function __construct(String $ssh_key_location, String $ssh_location, String $ssh_user, $ssh_passphrase)
     {
         $this->ssh_key_location = $ssh_key_location;
         $this->ssh_location = $ssh_location;
