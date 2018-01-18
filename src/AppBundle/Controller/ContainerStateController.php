@@ -3,6 +3,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -106,7 +107,11 @@ class ContainerStateController extends Controller
             "stateful" => $request->get("stateful") ? : false
         ];
 
-        $result = $api->update($container->host, $container->name, $data);
+        $result = $api->update($container->getHost(), $container, $data);
+
+        if($result->code != 200){
+            return new JsonResponse(["error" => $result->body]);
+        }
 
         //TODO mögliche Fehler abfangen
 
@@ -151,7 +156,7 @@ class ContainerStateController extends Controller
             );
         }
 
-        $result = $api->actual($container->host, $container->name);
+        $result = $api->actual($container->getHost(), $container);
 
 
         return new JsonResponse([

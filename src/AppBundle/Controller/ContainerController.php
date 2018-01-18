@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Controller;
 
+
+use AppBundle\Entity\ImageAlias;
+use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -16,6 +19,8 @@ use AppBundle\Service\LxdApi\OperationsRelayApi;
 use AppBundle\Entity\Container;
 use AppBundle\Entity\ContainerStatus;
 use AppBundle\Entity\Host;
+use AppBundle\Entity\Profile;
+use AppBundle\Entity\Image;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
@@ -141,19 +146,24 @@ class ContainerController extends Controller
      * @Route("/hosts/{hostId}/containers", name="containers_store", methods={"POST"})
      *
      * @OAS\Post(path="/hosts/{hostId}/containers",
-     * tags={"containers"},
-     * @OAS\Parameter(
-     *  description="Parameters for the new Container",
-     *  in="body",
-     *  name="containerData",
-     *  required=true,
-     *  @OAS\Schema(
-     *      @OAS\Property(
-     *          property="action",
-     *          type="string",
-     *          enum={"image", "migration", "copy", "none"},
-     *          default="none"
+     *  tags={"containers"},
+     *
+     *  @OAS\Parameter(
+     *      description="Gibt die Art an, wie der Container erstellt wird. (image, migration, copy, none) Default ist none",
+     *      in="query",
+     *      name="type",
+     *      @OAS\Schema(
+     *          type="string"
      *      ),
+     *  ),
+     *
+     *
+     *
+     * @OAS\Parameter(
+     *  description="Parameters for the new Container with fingerprint",
+     *  in="body",
+     *  name="bodyFingerprint",
+     *  @OAS\Schema(
      *      @OAS\Property(
      *          property="name",
      *          type="string"
@@ -162,6 +172,26 @@ class ContainerController extends Controller
      *          property="architecture",
      *          type="string"
      *      ),
+     *      @OAS\Property(
+     *          property="profiles",
+     *          type="array",
+     *      ),
+     *      @OAS\Property(
+     *          property="ephemeral",
+     *          type="bool"
+     *      ),
+     *      @OAS\Property(
+     *          property="config",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="devices",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="fingerprint",
+     *          type="string"
+     *      )
      *  ),
      * ),
      *
@@ -214,22 +244,56 @@ class ContainerController extends Controller
 
         switch ($type) {
             case 'image':
+
+                $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
+
+                $profileNames = array();
+
+                foreach ($profiles as $profile){
+                    $profileNames[] = $profile->getName();
+                }
+
+
+                $image = $this->getDoctrine()->getRepository(Image::class)->find($request->get("image"));
+
                 $data = [
                     "name" => $request->get("name"),
                     "architecture" => $request->get("architecture") ? : 'x86_64',
-                    "profiles" => $request->get("profiles") ? : array('default'),
-                    "ephermeral" => $request->get("ephermeral") ? : false,
+                    "profiles" => $profileNames,
+                    "ephemeral" => $request->get("ephemeral") ? : false,
                     "config" => $request->get("config"),
                     "devices" => $request->get("devices"),
-                    "source" => [
-                        "type" => "image",
-                        "mode" => "pull",
-                        "server" => $request->get("imageServer") ? : 'https://images.linuxcontainers.org:8443',
-                        "protocol" => $request->get("protocol") ? : 'lxd',
-                        "alias" => $request->get("alias"),
-                        "fingerprint" => $request->get("fingerprint")
-                    ]
+                    "source" => []
                 ];
+
+                if($request->has("fingerprint")){
+                    $image = $this->getDoctrine()->getRepository(Image::class)->findBy(["fingerprint" => $request->get("fingerprint")]);
+                    $data["source"] = [
+                        "type" => "image",
+                        "fingerprint" => $image->getFingerPrint()
+                    ];
+                }
+
+                if($request->has("alias") && !$request->has("imageServer")){
+                    $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findBy(["name" => $request->get("alias")]);
+                    $image = $imageAlias->getImage();
+                    $data["source"] = [
+                        "type" => "image",
+                        "fingerprint" => $image->getFingerPrint()
+                    ];
+                }
+
+
+//
+//                        "type" => "image",
+//                        "mode" => "pull",
+//                        "server" => $request->get("imageServer") ? : 'https://images.linuxcontainers.org:8443',
+//                        "protocol" => $request->get("protocol") ? : 'lxd',
+//                        "alias" => $request->get("alias"),
+//                        "fingerprint" => $request->get("fingerprint")
+//                    ]
+//                ];
+
 
                 $container = new Container();
 
@@ -237,8 +301,11 @@ class ContainerController extends Controller
                 $container->setIpv4($request->get("ipv4"));
                 $container->setName($request->get("name"));
                 $container->setSettings($data);
-                // $container->setStatus($containerStatus);
-                $container->setState('stopped');
+
+                foreach ($profiles as $profile){
+                    $container->addProfile($profile);
+                }
+
 
                 break;
             case 'migration':
@@ -270,30 +337,21 @@ class ContainerController extends Controller
 
         if($errorArray = $this->validation($container))
         {
-            throw new WrongInputException($errorArray);
+            throw new WrongInputException(json_encode($errorArray));
         }
 
-        $result = $api->create($host, $data);
-
-        $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
-
-        if($operationsResponse->code != 200){
-            return new Response(json_encode($operationsResponse->body));
-        }
-
-        while($operationsResponse->body->metadata->status_code == 103){
-            sleep(0.2);
-            $operationsResponse = $api->getOperationsLink($host, $result->body->operation);
-        }
-
-        if($operationsResponse->body->metadata->status_code != 200){
-            return new Response(json_encode($operationsResponse->body));
-        }
-
-
+        $container->setState('creating');
 
         $em->persist($container);
         $em->flush();
+
+        $result = $api->create($host, $data);
+
+        $dispatcher = $this->get('sb_event_queue');
+
+        $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
+
+
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
