@@ -142,25 +142,45 @@ class ContainerController extends Controller
      * @Route("/hosts/{hostId}/containers", name="containers_store", methods={"POST"})
      *
      * @OAS\Post(path="/hosts/{hostId}/containers",
-     * tags={"containers"},
+     *  tags={"containers"},
+     *
+     *  @OAS\Parameter(
+     *      description="Gibt die Art an, wie der Container erstellt wird. (image, migration, copy, none)",
+     *      in="query",
+     *      default="none",
+     *      enum={"image", "migration", "copy", "none"}
+     *  ),
+     *
+     *
+     *
      * @OAS\Parameter(
      *  description="Parameters for the new Container",
      *  in="body",
-     *  name="containerData",
+     *  name="body",
      *  required=true,
      *  @OAS\Schema(
-     *      @OAS\Property(
-     *          property="action",
-     *          type="string",
-     *          enum={"image", "migration", "copy", "none"},
-     *          default="none"
-     *      ),
      *      @OAS\Property(
      *          property="name",
      *          type="string"
      *      ),
      *      @OAS\Property(
      *          property="architecture",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="profiles",
+     *          type="array",
+     *      ),
+     *      @OAS\Property(
+     *          property="ephermeral",
+     *          type="bool"
+     *      ),
+     *      @OAS\Property(
+     *          property="config",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="devices",
      *          type="string"
      *      ),
      *  ),
