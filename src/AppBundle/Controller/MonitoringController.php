@@ -226,7 +226,7 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Create Nagios stats entity for Container
+     * Create Nagios stats configuration for Container
      *
      * @Route("/monitoring/checks/containers/{containerId}", name="create_status_check_container", methods={"POST"})
      * @param $containerId
@@ -234,7 +234,7 @@ class MonitoringController extends Controller
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
      *
-     * @OAS\Put(path="/monitoring/checks/containers/{containerId}",
+     * @OAS\Post(path="/monitoring/checks/containers/{containerId}",
      *     tags={"monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the Container",
@@ -265,10 +265,20 @@ class MonitoringController extends Controller
      *          type="string",
      *          example="https://nagios.example.com/pnp4nagios/",
      *      ),
+     *      @OAS\Property(
+     *          property="checkName",
+     *          type="string",
+     *          example="check_http",
+     *      ),
+     *      @OAS\Property(
+     *          property="sourceNumber",
+     *          type="string",
+     *          example=0,
+     *      ),
      *      ),
      *      ),
      *      @OAS\Response(
-     *          response=200,
+     *          response=201,
      *          description="Returns the ContainerStatus",
      *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
      *      ),
@@ -278,7 +288,6 @@ class MonitoringController extends Controller
      *      ),
      * )
      */
-    //TODO APIDoc
     public function createStatusCheckForContainer($containerId, Request $request) {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
@@ -328,18 +337,17 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Configure Nagios stats for Container or Host
+     * Configure Nagios stats for Container
      *
-     * @Route("/monitoring/checks/{checkId}", name="configure_status_check", methods={"PUT"})
-     * @param $containerId
+     * @Route("/monitoring/checks/{checkId}/containers", name="configure_status_check_container", methods={"PUT"})
+     * @param $checkId
      * @param Request $request
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Put(path="/monitoring/checks/{checkId}",
+     * @OAS\Put(path="/monitoring/checks/{checkId}/containers",
      *     tags={"monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Nagios StatusCheck",
+     * @OAS\Parameter(
+     *      description="ID of the ContainerStatus",
      *      in="path",
      *      name="checkId",
      *      required=true,
@@ -347,7 +355,7 @@ class MonitoringController extends Controller
      *              type="integer"
      *          ),
      *      ),
-     *     @OAS\Parameter(
+     * @OAS\Parameter(
      *      in="body",
      *      name="body",
      *      required=true,
@@ -367,25 +375,35 @@ class MonitoringController extends Controller
      *          type="string",
      *          example="https://nagios.example.com/pnp4nagios/",
      *      ),
+     *      @OAS\Property(
+     *          property="checkName",
+     *          type="string",
+     *          example="check_http",
+     *      ),
+     *      @OAS\Property(
+     *          property="sourceNumber",
+     *          type="string",
+     *          example=0,
      *      ),
      *      ),
-     *      @OAS\Response(
+     *      ),
+     * @OAS\Response(
      *          response=200,
      *          description="Returns the ContainerStatus",
      *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
      *      ),
-     *      @OAS\Response(
+     * @OAS\Response(
      *          response=404,
-     *          description="No Container for the id found",
+     *          description="No ContainerStatus for the id found",
      *      ),
      * )
      */
-    public function configureStatusCheckForContainer($containerId, Request $request) {
-        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+    public function configureStatusCheckForContainer($checkId, Request $request) {
+        $container = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
 
         if (!$container) {
             throw new ElementNotFoundException(
-                'No Container for ID '.$containerId.' found'
+                'No ContainerStatus for ID '.$checkId.' found'
             );
         }
 
