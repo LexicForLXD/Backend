@@ -4,7 +4,7 @@ namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class CorsProxyControllerTest extends WebTestCase
+class CorsproxyControllerTest extends WebTestCase
 {
 
     protected $token;
