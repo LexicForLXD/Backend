@@ -17,6 +17,7 @@ use AppBundle\Service\LxdApi\OperationsRelayApi;
 use AppBundle\Entity\Container;
 use AppBundle\Entity\ContainerStatus;
 use AppBundle\Entity\Host;
+use AppBundle\Entity\Profile;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
@@ -145,10 +146,12 @@ class ContainerController extends Controller
      *  tags={"containers"},
      *
      *  @OAS\Parameter(
-     *      description="Gibt die Art an, wie der Container erstellt wird. (image, migration, copy, none)",
+     *      description="Gibt die Art an, wie der Container erstellt wird. (image, migration, copy, none) Default ist none",
      *      in="query",
-     *      default="none",
-     *      enum={"image", "migration", "copy", "none"}
+     *      name="type",
+     *      @OAS\Schema(
+     *          type="string"
+     *      ),
      *  ),
      *
      *
@@ -172,7 +175,7 @@ class ContainerController extends Controller
      *          type="array",
      *      ),
      *      @OAS\Property(
-     *          property="ephermeral",
+     *          property="ephemeral",
      *          type="bool"
      *      ),
      *      @OAS\Property(
@@ -235,11 +238,14 @@ class ContainerController extends Controller
 
         switch ($type) {
             case 'image':
+
+                $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
+
                 $data = [
                     "name" => $request->get("name"),
                     "architecture" => $request->get("architecture") ? : 'x86_64',
                     "profiles" => $request->get("profiles") ? : array('default'),
-                    "ephermeral" => $request->get("ephermeral") ? : false,
+                    "ephemeral" => $request->get("ephemeral") ? : false,
                     "config" => $request->get("config"),
                     "devices" => $request->get("devices"),
                     "source" => [
@@ -252,12 +258,17 @@ class ContainerController extends Controller
                     ]
                 ];
 
+
                 $container = new Container();
 
                 $container->setHost($host);
                 $container->setIpv4($request->get("ipv4"));
                 $container->setName($request->get("name"));
                 $container->setSettings($data);
+
+                foreach ($profiles as $profile){
+                    $container->addProfile($profile);
+                }
 
 
                 break;
