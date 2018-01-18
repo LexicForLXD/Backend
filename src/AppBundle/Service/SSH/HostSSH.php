@@ -30,7 +30,7 @@ class HostSSH
         $this->ssh_user = $ssh_user;
         $this->ssh_passphrase = $ssh_passphrase;
         if(!is_readable($this->ssh_key_location) || !is_readable($this->ssh_location)){
-            throw new WrongInputException("Couldn't read the server certificate files for LXD-Host connection");
+            throw new WrongInputException("Couldn't read the SSH keys");
         }
     }
 
