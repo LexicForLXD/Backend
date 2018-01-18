@@ -29,6 +29,8 @@ class ContainerStatus
     /**
      * @var boolean
      * @ORM\Column(type="boolean")
+     * @Assert\NotNull()
+     *
      * @OAS\Property(example="true")
      */
     protected $nagiosEnabled;
@@ -36,6 +38,9 @@ class ContainerStatus
     /**
      * @var String | null
      * @ORM\Column(type="string")
+     * @Assert\NotNull
+     * @Assert\NotBlank()
+     *
      * @OAS\Property(example="ContainerWebServer1")
      */
     protected $nagiosName;
@@ -43,6 +48,9 @@ class ContainerStatus
     /**
      * @var String | null
      * @ORM\Column(type="string")
+     * @Assert\NotNull
+     * @Assert\NotBlank()
+     *
      * @OAS\Property(example="https://nagios.example.com/pnp4nagios/")
      */
     protected $nagiosUrl;
