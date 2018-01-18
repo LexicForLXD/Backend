@@ -5,6 +5,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation as JMS;
 use Swagger\Annotations as OAS;
 
 
@@ -60,6 +61,7 @@ class ContainerStatus
      * @ORM\Column(type="integer")
      * @Assert\NotNull
      * @Assert\NotBlank()
+     * @Assert\Type("int")
      *
      * @OAS\Property(example="1")
      */
@@ -78,6 +80,8 @@ class ContainerStatus
     /**
      * @ORM\ManyToOne(targetEntity="Container", inversedBy="statuses")
      * @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     *
+     * @JMS\Exclude()
      */
     protected $container;
 
@@ -162,10 +166,26 @@ class ContainerStatus
     }
 
     /**
-     * @param int $sourceNumber
+     * @param $sourceNumber
      */
-    public function setSourceNumber(int $sourceNumber)
+    public function setSourceNumber( $sourceNumber)
     {
         $this->sourceNumber = $sourceNumber;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * @param mixed $container
+     */
+    public function setContainer($container)
+    {
+        $this->container = $container;
     }
 }

@@ -121,6 +121,15 @@ class Container
         return $this->id;
     }
 
+    /**
+     * @param ContainerStatus $containerStatus
+     */
+    public function addStatus(ContainerStatus $containerStatus){
+        if(!$this->statuses->contains($containerStatus)){
+            $containerStatus->setContainer($this);
+            $this->statuses->add($containerStatus);
+        }
+    }
 
     /**
      * @return mixed
