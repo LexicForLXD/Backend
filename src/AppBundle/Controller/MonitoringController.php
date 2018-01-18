@@ -9,9 +9,11 @@ use AppBundle\Entity\HostStatus;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\LxdApi\MonitoringApi;
+use AppBundle\Service\Nagios\Pnp4NagiosApi;
 use AppBundle\Service\SSH\HostSSH;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
@@ -175,7 +177,7 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Get the StatusCheck results for a Container
+     * Get the Nagios stats configuration for a Container
      * @Route("/monitoring/checks/containers/{containerId}", name="get_status_check_container", methods={"GET"})
      * @throws ElementNotFoundException
      *
@@ -224,12 +226,12 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Configure a StatusCheck for Container
+     * Create Nagios stats entity for Container
      *
-     * @Route("/monitoring/checks/containers/{containerId}", name="configure_status_check_container", methods={"PUT"})
+     * @Route("/monitoring/checks/containers/{containerId}", name="create_status_check_container", methods={"POST"})
      * @param $containerId
      * @param Request $request
-     * @return Response
+     * @return JsonResponse|Response
      * @throws ElementNotFoundException
      *
      * @OAS\Put(path="/monitoring/checks/containers/{containerId}",
@@ -244,10 +246,128 @@ class MonitoringController extends Controller
      *          ),
      *      ),
      *     @OAS\Parameter(
-     *      description="Json-Object with attribute healthCheckEnabled which should be true or false",
      *      in="body",
      *      name="body",
      *      required=true,
+     *      @OAS\Schema(
+     *      @OAS\Property(
+     *          property="nagiosEnabled",
+     *          type="boolean",
+     *          example=true,
+     *      ),
+     *      @OAS\Property(
+     *          property="nagiosName",
+     *          type="string",
+     *          example="ContainerWebServer1",
+     *      ),
+     *      @OAS\Property(
+     *          property="nagiosUrl",
+     *          type="string",
+     *          example="https://nagios.example.com/pnp4nagios/",
+     *      ),
+     *      ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the ContainerStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found",
+     *      ),
+     * )
+     */
+    //TODO APIDoc
+    public function createStatusCheckForContainer($containerId, Request $request) {
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
+        if (!$container) {
+            throw new ElementNotFoundException(
+                'No Container for ID '.$containerId.' found'
+            );
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $containerStatus = new ContainerStatus();
+
+        if($request->request->has('nagiosEnabled')) {
+            $containerStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
+        }
+
+        if($request->request->has('nagiosName')) {
+            $containerStatus->setNagiosName($request->request->get('nagiosName'));
+        }
+
+        if($request->request->has('checkName')) {
+            $containerStatus->setCheckName($request->request->get('checkName'));
+        }
+
+        if($request->request->has('sourceNumber')) {
+            $containerStatus->setSourceNumber($request->request->get('sourceNumber'));
+        }
+
+        if($request->request->has('nagiosUrl')) {
+            $containerStatus->setNagiosUrl($request->request->get('nagiosUrl'));
+        }
+
+        //Validation
+        if ($errorArray = $this->validation($containerStatus)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
+        $container->addStatus($containerStatus);
+        $em->persist($containerStatus);
+        $em->persist($container);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($containerStatus, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * Configure Nagios stats for Container or Host
+     *
+     * @Route("/monitoring/checks/{checkId}", name="configure_status_check", methods={"PUT"})
+     * @param $containerId
+     * @param Request $request
+     * @return JsonResponse|Response
+     * @throws ElementNotFoundException
+     *
+     * @OAS\Put(path="/monitoring/checks/{checkId}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Nagios StatusCheck",
+     *      in="path",
+     *      name="checkId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *     @OAS\Parameter(
+     *      in="body",
+     *      name="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *      @OAS\Property(
+     *          property="nagiosEnabled",
+     *          type="boolean",
+     *          example=true,
+     *      ),
+     *      @OAS\Property(
+     *          property="nagiosName",
+     *          type="string",
+     *          example="ContainerWebServer1",
+     *      ),
+     *      @OAS\Property(
+     *          property="nagiosUrl",
+     *          type="string",
+     *          example="https://nagios.example.com/pnp4nagios/",
+     *      ),
+     *      ),
      *      ),
      *      @OAS\Response(
      *          response=200,
@@ -276,19 +396,23 @@ class MonitoringController extends Controller
             $containerStatus = new ContainerStatus();
         }
 
-        if($request->request->get('healthCheckEnabled')) {
-            $containerStatus->setHealthCheckEnabled(true);
-            $container->setStatus($containerStatus);
-            $em->persist($containerStatus);
-            $em->persist($container);
-            $em->flush();
-
-            $serializer = $this->get('jms_serializer');
-            $response = $serializer->serialize($containerStatus, 'json');
-            return new Response($response);
+        if($request->request->has('nagiosEnabled')) {
+            $containerStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
         }
 
-        $containerStatus->setHealthCheckEnabled(false);
+        if($request->request->has('nagiosName')) {
+            $containerStatus->setNagiosName($request->request->get('nagiosName'));
+        }
+
+        if($request->request->has('nagiosUrl')) {
+            $containerStatus->setNagiosUrl($request->request->get('nagiosUrl'));
+        }
+
+        //Validation
+        if ($errorArray = $this->validation($containerStatus)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
         $container->setStatus($containerStatus);
         $em->persist($containerStatus);
         $em->persist($container);
@@ -297,6 +421,43 @@ class MonitoringController extends Controller
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($containerStatus, 'json');
         return new Response($response);
+    }
+
+    /**
+     * Receive a Nagios stats graph by ContainerStatusId
+     *
+     * @Route("/monitoring/checks/{checkId}/containers/graph", name="get_pnp4nagios_container", methods={"GET"})
+     * @param $checkId
+     * @param Pnp4NagiosApi $api
+     * @return Response
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     */
+    public function getPnp4NagiosImageForContainer($checkId, Request $request, Pnp4NagiosApi $api){
+        $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
+
+        if (!$containerStatus) {
+            throw new ElementNotFoundException(
+                'No StatusCheck with ID '.$checkId.' for Container found'
+            );
+        }
+
+        $timerange = $request->query->get('timerange');
+
+        if(!$timerange){
+            $timerange = '-1day';
+        }
+
+        $result = $api->getNagiosImageForContainerTimerange($containerStatus, $timerange);
+
+        if($result->code != 200){
+            throw new WrongInputException("Error loading the Graph - HTTP-Code ".$result->code);
+        }
+
+        $response = new Response();
+        $response->setContent($result->body);
+        $response->headers->set('Content-Type', 'image/png');
+        return $response;
     }
 
     /**
@@ -431,5 +592,20 @@ class MonitoringController extends Controller
      */
     private function parseLogfileUrlToLogfileName(String $logfileUrl){
         return preg_replace('"\/1.0\/containers\/.*\/logs\/"', '', $logfileUrl);
+    }
+
+    private function validation($object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
+
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $errorArray;
+        }
+        return false;
     }
 }
