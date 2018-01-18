@@ -95,6 +95,13 @@ class Image
      */
     protected $finished;
 
+    /**
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Container", mappedBy="image")
+     * @var ArrayCollection
+     */
+    protected $containers;
+
+
     public function __construct()
     {
         $this->aliases = new ArrayCollection();
@@ -277,5 +284,31 @@ class Image
     {
         $this->error = $error;
     }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getContainers(): ArrayCollection
+    {
+        return $this->containers;
+    }
+
+    /**
+     * @param ArrayCollection $containers
+     */
+    public function setContainers(ArrayCollection $containers): void
+    {
+        $this->containers = $containers;
+    }
+
+    public function addContainer(Container $container)
+    {
+        if ($this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->add($container);
+        $container->setImage($this);
+    }
+
 
 }

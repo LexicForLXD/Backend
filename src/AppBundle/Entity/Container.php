@@ -111,6 +111,12 @@ class Container
      */
     protected $profiles;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Image", inversedBy="containers")
+     * @var Image
+     */
+    protected $image;
+
     public function __construct()
     {
         $this->profiles = new ArrayCollection();
@@ -229,6 +235,24 @@ class Container
     {
         $this->state = $state;
     }
+
+    /**
+     * @return Image
+     */
+    public function getImages(): Image
+    {
+        return $this->images;
+    }
+
+    /**
+     * @param Image $images
+     */
+    public function setImages(Image $images): void
+    {
+        $this->images = $images;
+    }
+
+
 
     /**
      * Checks if the host has at least on URI

@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Controller;
 
+
+use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -18,6 +20,7 @@ use AppBundle\Entity\Container;
 use AppBundle\Entity\ContainerStatus;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
+use AppBundle\Entity\Image;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
@@ -157,10 +160,9 @@ class ContainerController extends Controller
      *
      *
      * @OAS\Parameter(
-     *  description="Parameters for the new Container",
+     *  description="Parameters for the new Container with fingerprint",
      *  in="body",
-     *  name="body",
-     *  required=true,
+     *  name="bodyFingerprint",
      *  @OAS\Schema(
      *      @OAS\Property(
      *          property="name",
@@ -186,6 +188,10 @@ class ContainerController extends Controller
      *          property="devices",
      *          type="string"
      *      ),
+     *      @OAS\Property(
+     *          property="fingerprint",
+     *          type="string"
+     *      )
      *  ),
      * ),
      *
@@ -241,22 +247,52 @@ class ContainerController extends Controller
 
                 $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
 
+                $profileNames = array();
+
+                foreach ($profiles as $profile){
+                    $profileNames[] = $profile->getName();
+                }
+
+
+                $image = $this->getDoctrine()->getRepository(Image::class)->find($request->get("image"));
+
                 $data = [
                     "name" => $request->get("name"),
                     "architecture" => $request->get("architecture") ? : 'x86_64',
-                    "profiles" => $request->get("profiles") ? : array('default'),
+                    "profiles" => $profileNames,
                     "ephemeral" => $request->get("ephemeral") ? : false,
                     "config" => $request->get("config"),
                     "devices" => $request->get("devices"),
-                    "source" => [
-                        "type" => "image",
-                        "mode" => "pull",
-                        "server" => $request->get("imageServer") ? : 'https://images.linuxcontainers.org:8443',
-                        "protocol" => $request->get("protocol") ? : 'lxd',
-                        "alias" => $request->get("alias"),
-                        "fingerprint" => $request->get("fingerprint")
-                    ]
+                    "source" => []
                 ];
+
+                if($request->has("fingerprint")){
+                    $image = $this->getDoctrine()->getRepository(Image::class)->findBy(["fingerprint" => $request->get("fingerprint")]);
+                    $data["source"] = [
+                        "type" => "image",
+                        "fingerprint" => $image->getFingerPrint()
+                    ];
+                }
+
+                if($request->has("alias") && !$request->has("imageServer")){
+                    $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findBy(["name" => $request->get("alias")]);
+                    $image = $imageAlias->getImage();
+                    $data["source"] = [
+                        "type" => "image",
+                        "fingerprint" => $image->getFingerPrint()
+                    ];
+                }
+
+
+//
+//                        "type" => "image",
+//                        "mode" => "pull",
+//                        "server" => $request->get("imageServer") ? : 'https://images.linuxcontainers.org:8443',
+//                        "protocol" => $request->get("protocol") ? : 'lxd',
+//                        "alias" => $request->get("alias"),
+//                        "fingerprint" => $request->get("fingerprint")
+//                    ]
+//                ];
 
 
                 $container = new Container();
