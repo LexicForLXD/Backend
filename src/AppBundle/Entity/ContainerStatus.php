@@ -36,7 +36,7 @@ class ContainerStatus
     protected $nagiosEnabled;
 
     /**
-     * @var String | null
+     * @var String
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\NotBlank()
@@ -46,7 +46,27 @@ class ContainerStatus
     protected $nagiosName;
 
     /**
-     * @var String | null
+     * @var String
+     * @ORM\Column(type="string")
+     * @Assert\NotNull
+     * @Assert\NotBlank()
+     *
+     * @OAS\Property(example="check_http")
+     */
+    protected $checkName;
+
+    /**
+     * @var int
+     * @ORM\Column(type="integer")
+     * @Assert\NotNull
+     * @Assert\NotBlank()
+     *
+     * @OAS\Property(example="1")
+     */
+    protected $sourceNumber;
+
+    /**
+     * @var String
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\NotBlank()
@@ -111,5 +131,35 @@ class ContainerStatus
         $this->nagiosUrl = $nagiosUrl;
     }
 
+    /**
+     * @return String
+     */
+    public function getCheckName(): String
+    {
+        return $this->checkName;
+    }
 
+    /**
+     * @param String $checkName
+     */
+    public function setCheckName(String $checkName)
+    {
+        $this->checkName = $checkName;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSourceNumber(): int
+    {
+        return $this->sourceNumber;
+    }
+
+    /**
+     * @param int $sourceNumber
+     */
+    public function setSourceNumber(int $sourceNumber)
+    {
+        $this->sourceNumber = $sourceNumber;
+    }
 }
