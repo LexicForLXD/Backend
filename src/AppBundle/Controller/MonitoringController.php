@@ -333,7 +333,7 @@ class MonitoringController extends Controller
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($containerStatus, 'json');
-        return new Response($response);
+        return new Response($response, Response::HTTP_CREATED);
     }
 
     /**
