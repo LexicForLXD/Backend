@@ -226,9 +226,9 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Create Nagios stats configuration for Container
+     * Create ContainerStatus Nagios configuration
      *
-     * @Route("/monitoring/checks/containers/{containerId}", name="create_status_check_container", methods={"POST"})
+     * @Route("/monitoring/checks/containers/{containerId}", name="create_container_status", methods={"POST"})
      * @param $containerId
      * @param Request $request
      * @return JsonResponse|Response
@@ -337,9 +337,9 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Configure Nagios stats for Container
+     * Edit ContainerStatus Nagios configuration
      *
-     * @Route("/monitoring/checks/{checkId}/containers", name="configure_status_check_container", methods={"PUT"})
+     * @Route("/monitoring/checks/{checkId}/containers", name="configure_container_status", methods={"PUT"})
      * @param $checkId
      * @param Request $request
      * @return JsonResponse|Response
@@ -451,13 +451,39 @@ class MonitoringController extends Controller
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
+     *
+     * @OAS\Get(path="/monitoring/checks/{checkId}/containers/graph",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the ContainerStatus",
+     *      in="path",
+     *      name="checkId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the Nagios stats graph as png",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No ContainerStatus with ID found",
+     *      ),
+     *
+     *     @OAS\Response(
+     *          response=400,
+     *          description="Error getting the Nagios graph image",
+     *      ),
+     * )
      */
     public function getPnp4NagiosImageForContainer($checkId, Request $request, Pnp4NagiosApi $api){
         $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
 
         if (!$containerStatus) {
             throw new ElementNotFoundException(
-                'No StatusCheck with ID '.$checkId.' for Container found'
+                'No ContainerStatus with ID '.$checkId.' found'
             );
         }
 
