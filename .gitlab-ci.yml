@@ -95,7 +95,10 @@ deploy:dev:
     - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/composer.lock  /var/www/html/composer.lock" 
 
     #Install composer dependencies
-    - ssh deploy@2a02:c207:3002:3224::4 "cd /var/www/html && composer install" 
+    - ssh deploy@2a02:c207:3002:3224::4 "cd /var/www/html && composer install"
+
+    #Update database schema
+    - ssh deploy@2a02:c207:3002:3224::4 "cd /var/www/html && php bin/console doctrine:schema:update --force"
 
     #change permissions for html folder
     - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S chown -R www-data:www-data /var/www/html"

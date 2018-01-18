@@ -26,5 +26,11 @@ parameters:
 
     redis_hostname: redis
 
+    # Location of the SSH Files to access Host-Logs
+    ssh_location: /srv/lexic/ssh/logssh.pub
+    ssh_key_location: /srv/lexic/ssh/logssh
+    ssh_passphrase: null
+    ssh_user: logUser
+
     #Custom options for JMS
     jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy

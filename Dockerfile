@@ -1,6 +1,6 @@
-FROM janrtr/docker-symfony-php7-composer
+FROM janrtr/docker-symfony-php7-composer:3.7
 
-RUN apk --no-cache add php7-simplexml
+RUN apk --no-cache add git php7-simplexml php7-ssh2
 
 ADD /app /www/symfony/app
 
@@ -17,6 +17,11 @@ ADD /composer.lock /www/symfony/composer.lock
 #Add cert volume
 RUN mkdir -p /srv/lexic
 RUN chown -R www:www /srv/lexic
+
+# Add phpunit
+RUN wget https://phar.phpunit.de/phpunit.phar
+RUN chmod +x phpunit.phar
+RUN mv phpunit.phar /usr/local/bin/phpunit
 
 WORKDIR /www/symfony
 ENV SYMFONY_ENV=dev
