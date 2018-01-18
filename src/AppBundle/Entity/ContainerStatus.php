@@ -27,57 +27,25 @@ class ContainerStatus
     protected $id;
 
     /**
-     * gibt an, ob für den Container healthCheck aktiviert oder deaktiviert sein soll (true/false)
-     *
      * @var boolean
-     *
      * @ORM\Column(type="boolean")
      * @OAS\Property(example="true")
      */
-    protected $healthCheckEnabled;
+    protected $nagiosEnabled;
 
     /**
-     * gibt an, ob der Container den HealthCheck besteht oder nicht
-     *
-     * @var boolean
-     *
-     * @ORM\Column(type="boolean", nullable=true)
-     * @OAS\Property(example="true")
+     * @var String | null
+     * @ORM\Column(type="string")
+     * @OAS\Property(example="ContainerWebServer1")
      */
-    protected $healthCheck;
-
+    protected $nagiosName;
 
     /**
-     * gibt an, wann der letzte erfolgreiche Ping ausgeführt wurde
-     *
-     * @var datetime
-     * @Assert\DateTime(format="Y-m-d\TH:i:sP")
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @OAS\Property(example="2017-08-15T15:52:01+00:00")
+     * @var String | null
+     * @ORM\Column(type="string")
+     * @OAS\Property(example="https://nagios.example.com/pnp4nagios/")
      */
-    protected $lastSuccessfullPing;
-
-    /**
-     * gibt an, wann der letzte fehlgeschlagene Ping ausgeführt wurde
-     *
-     * @var datetime
-     * @Assert\DateTime(format="Y-m-d\TH:i:sP")
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @OAS\Property(example="2017-08-14T11:50:01+00:00")
-     */
-    protected $lastFailedPing;
-
-    /**
-     * gibt die zuletzt gemessen RoundTripTime an (bei erfolgreichem Ping)
-     *
-     * @var integer
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @OAS\Property(example="18")
-     */
-    protected $lastRtt;
+    protected $nagiosUrl;
 
     /**
      * @return mixed
@@ -88,95 +56,52 @@ class ContainerStatus
     }
 
     /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return bool
      */
-    public function isHealthCheckEnabled(): bool
+    public function isNagiosEnabled(): bool
     {
-        return $this->healthCheckEnabled;
+        return $this->nagiosEnabled;
     }
 
     /**
-     * @param bool $healthCheckEnabled
+     * @param bool $nagiosEnabled
      */
-    public function setHealthCheckEnabled(bool $healthCheckEnabled)
+    public function setNagiosEnabled(bool $nagiosEnabled)
     {
-        $this->healthCheckEnabled = $healthCheckEnabled;
+        $this->nagiosEnabled = $nagiosEnabled;
     }
 
     /**
-     * @return bool
+     * @return null|String
      */
-    public function isHealthCheck(): bool
+    public function getNagiosName(): String
     {
-        return $this->healthCheck;
+        return $this->nagiosName;
     }
 
     /**
-     * @param bool $healthCheck
+     * @param null|String $nagiosName
      */
-    public function setHealthCheck(bool $healthCheck)
+    public function setNagiosName(String $nagiosName)
     {
-        $this->healthCheck = $healthCheck;
+        $this->nagiosName = $nagiosName;
     }
 
     /**
-     * @return datetime
+     * @return null|String
      */
-    public function getLastSuccessfullPing()
+    public function getNagiosUrl(): String
     {
-        return $this->lastSuccessfullPing;
+        return $this->nagiosUrl;
     }
 
     /**
-     * @param datetime $lastSuccessfullPing
+     * @param null|String $nagiosUrl
      */
-    public function setLastSuccessfullPing($lastSuccessfullPing)
+    public function setNagiosUrl(String $nagiosUrl)
     {
-        $this->lastSuccessfullPing = $lastSuccessfullPing;
+        $this->nagiosUrl = $nagiosUrl;
     }
-
-    /**
-     * @return datetime
-     */
-    public function getLastFailedPing()
-    {
-        return $this->lastFailedPing;
-    }
-
-    /**
-     * @param datetime $lastFailedPing
-     */
-    public function setLastFailedPing($lastFailedPing)
-    {
-        $this->lastFailedPing = $lastFailedPing;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLastRtt(): int
-    {
-        return $this->lastRtt;
-    }
-
-    /**
-     * @param int $lastRtt
-     */
-    public function setLastRtt(int $lastRtt)
-    {
-        $this->lastRtt = $lastRtt;
-    }
-
-    
-
 
 
 }
