@@ -3,29 +3,41 @@
 namespace AppBundle\Service\SSH;
 
 use AppBundle\Entity\Host;
+use AppBundle\Exception\WrongInputException;
 use Ssh\Authentication\PublicKeyFile;
 use Ssh\Configuration;
 use Ssh\Session;
 
 class HostSSH
 {
-    private $privateKey;
-    private $publicKey;
-    private $username;
-    private $passphrase;
+    private $ssh_key_location;
+    private $ssh_location;
+    private $ssh_user;
+    private $ssh_passphrase;
 
-    public function __construct($privateKey, $publicKey, $username, $passphrase)
+    /**
+     * HostSSH constructor.
+     * @param $ssh_key_location
+     * @param $ssh_location
+     * @param $ssh_user
+     * @param $ssh_passphrase
+     * @throws WrongInputException
+     */
+    public function __construct(String $ssh_key_location, String $ssh_location, String $ssh_user, String $ssh_passphrase)
     {
-        $this->privateKey = $privateKey;
-        $this->publicKey = $publicKey;
-        $this->username = $username;
-        $this->passphrase = $passphrase;
+        $this->ssh_key_location = $ssh_key_location;
+        $this->ssh_location = $ssh_location;
+        $this->ssh_user = $ssh_user;
+        $this->ssh_passphrase = $ssh_passphrase;
+        if(!is_readable($this->ssh_key_location) || !is_readable($this->ssh_location)){
+            throw new WrongInputException("Couldn't read the server certificate files for LXD-Host connection");
+        }
     }
 
     public function getLogFileFromHost(Host $host, String $logpath){
         $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
         $configuration = new Configuration($hostname);
-        $authentication = new PublicKeyFile($this->username, $this->publicKey, $this->privateKey, $this->passphrase);
+        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
         $session = new Session($configuration, $authentication);
 

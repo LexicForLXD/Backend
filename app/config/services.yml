@@ -49,14 +49,13 @@ services:
             $cert_key_location: '%cert_key_location%'
             $cert_passphrase: '%cert_passphrase%'
 
-    ssh.host.logs:
-        class: AppBundle\Service\SSH\HostSSH
-        public: true
+    AppBundle\Service\SSH\:
+        resource: '../../src/AppBundle/Service/SSH'
         arguments:
-            $publicKey: '%ssh_public_location%'
-            $privateKey: '%ssh_private_location%'
-            $passphrase: '%ssh_passphrase%'
-            $username: '%ssh_user%'
+            $ssh_location: '%ssh_location%'
+            $ssh_key_location: '%ssh_key_location%'
+            $ssh_user: '%ssh_user%'
+            $ssh_passphrase: '%ssh_passphrase%'
 
     lxd.image.creation.updater:
             class: AppBundle\EventListener\ImageCreationListener

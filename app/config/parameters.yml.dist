@@ -27,8 +27,8 @@ parameters:
     redis_hostname: redis
 
     # Location of the SSH Files to access Host-Logs
-    ssh_public_location: /srv/lexic/ssh/logssh.pub
-    ssh_private_location: /srv/lexic/ssh/logssh
+    ssh_location: /srv/lexic/ssh/logssh.pub
+    ssh_key_location: /srv/lexic/ssh/logssh
     ssh_passphrase: null
     ssh_user: logUser
 
