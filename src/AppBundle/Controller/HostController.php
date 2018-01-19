@@ -248,7 +248,9 @@ class HostController extends Controller
      * @return Response
      *
      * @throws ElementNotFoundException
-     * @throws \Httpful\Exception\ConnectionErrorException* @OAS\Put(path="/hosts/{hostId}",
+     * @throws \Httpful\Exception\ConnectionErrorException
+     *
+     * @OAS\Put(path="/hosts/{hostId}",
      *  tags={"hosts"},
      *
      * @OAS\Parameter(
@@ -344,7 +346,7 @@ class HostController extends Controller
         }
 
 
-        if(!$host->getAuthenticated())
+        if(!$host->isAuthenticated())
         {
             if($request->request->has("password"))
             {
