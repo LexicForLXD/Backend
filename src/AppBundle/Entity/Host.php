@@ -147,116 +147,121 @@ class Host
 
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
 
     /**
-     * @return mixed
+     * @return string | null
      */
-    public function getIpv4()
+    public function getIpv4() : ?string
     {
         return $this->ipv4;
     }
 
     /**
-     * @return mixed
+     * @return string | null
      */
-    public function getIpv6()
+    public function getIpv6() : ?string
     {
         return $this->ipv6;
     }
 
     /**
-     * @return mixed
+     * @return string | null
      */
-    public function getDomainName()
+    public function getDomainName() : ?string
     {
         return $this->domainName;
     }
 
     /**
-     * @param mixed $domainName
+     * @param string $domainName
      */
-    public function setDomainName($domainName)
+    public function setDomainName(string $domainName)
     {
         $this->domainName = $domainName;
     }
 
     /**
-     * @param mixed $ipv4
+     * @param string $ipv4
      */
-    public function setIpv4($ipv4)
+    public function setIpv4(string $ipv4)
     {
         $this->ipv4 = $ipv4;
     }
 
     /**
-     * @param mixed $ipv6
+     * @param string $ipv6
      */
-    public function setIpv6($ipv6)
+    public function setIpv6(string $ipv6)
     {
         $this->ipv6 = $ipv6;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getMac()
+    public function getMac() : ?string
     {
         return $this->mac;
     }
 
     /**
-     * @param mixed $mac
+     * @param string $mac
      */
-    public function setMac($mac)
+    public function setMac(string $mac)
     {
         $this->mac = $mac;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getSettings()
+    public function getSettings() : ?string
     {
         return $this->settings;
     }
 
     /**
-     * @param mixed $settings
+     * @param string $settings
      */
-    public function setSettings($settings)
+    public function setSettings(string $settings)
     {
         $this->settings = $settings;
     }
 
-
-    public function getPort()
+    /**
+     * @return int
+     */
+    public function getPort() : ?int
     {
         return $this->port;
     }
 
-    public function setPort($port)
+    /**
+     * @param int $port
+     */
+    public function setPort(int $port)
     {
         $this->port = $port;
     }
@@ -278,45 +283,50 @@ class Host
     }
 
 
-
-    public function getContainers()
+    /**
+     * @return ArrayCollection
+     */
+    public function getContainers() : ArrayCollection
     {
         return $this->containers;
     }
 
-    public function setContainers($containers)
+    /**
+     * @param ArrayCollection $containers
+     */
+    public function setContainers(ArrayCollection $containers)
     {
         $this->containers = $containers;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getProfiles()
+    public function getProfiles() : ArrayCollection
     {
         return $this->profiles;
     }
 
     /**
-     * @param mixed $profiles
+     * @param ArrayCollection $profiles
      */
-    public function setProfiles($profiles)
+    public function setProfiles(ArrayCollection $profiles)
     {
         $this->profiles = $profiles;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getImages()
+    public function getImages() : ArrayCollection
     {
         return $this->images;
     }
 
     /**
-     * @param mixed $images
+     * @param ArrayCollection $images
      */
-    public function setImages($images)
+    public function setImages(ArrayCollection $images)
     {
         $this->images = $images;
     }
@@ -330,7 +340,8 @@ class Host
      *
      * @return boolean
      */
-    public function hasUri(){
+    public function hasUri() : bool
+    {
         if($this->ipv4 || $this->ipv6 || $this->domainName)
         {
             return true;
@@ -445,6 +456,10 @@ class Host
         }
     }
 
+    /**
+     * Checks whether the Host has any images or profiles or containers
+     * @return bool
+     */
     public function hasAnything() : bool {
         if($this->hasImages() || $this->hasContainers() || $this->hasProfiles()){
             return true;
