@@ -180,7 +180,7 @@ class HostController extends Controller
 
             $result = $api->authenticate($host, $data);
 
-            if($result->code == 200) {
+            if($result->code == 201) {
                 $host->setAuthenticated(true);
             }
 
@@ -244,12 +244,16 @@ class HostController extends Controller
      * @param Request $request
      * @param int $hostId
      * @param EntityManagerInterface $em
+     * @param HostApi $api
      * @return Response
+     *
+     * @throws ElementNotFoundException
+     * @throws \Httpful\Exception\ConnectionErrorException
      *
      * @OAS\Put(path="/hosts/{hostId}",
      *  tags={"hosts"},
      *
-     *  @OAS\Parameter(
+     * @OAS\Parameter(
      *     description="ID von anzuzeigendem Host",
      *     in="path",
      *     name="hostId",
@@ -259,7 +263,7 @@ class HostController extends Controller
      *     ),
      *  ),
      *
-     *  @OAS\Response(
+     * @OAS\Response(
      *     response=201,
      *     description="gibt den neu gespeicherten Host zurück",
      *     @OAS\JsonContent(ref="#/components/schemas/host"),
@@ -268,7 +272,7 @@ class HostController extends Controller
      *     ),
      *  ),
      *
-     *  @OAS\Parameter(
+     * @OAS\Parameter(
      *      name="body",
      *      in="body",
      *      required=true,
@@ -308,9 +312,8 @@ class HostController extends Controller
      *      ),
      * ),
      *)
-     * @throws ElementNotFoundException
      */
-    public function updateAction(Request $request, $hostId, EntityManagerInterface $em)
+    public function updateAction(Request $request, $hostId, EntityManagerInterface $em, HostApi $api)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -342,9 +345,31 @@ class HostController extends Controller
             $host->setSettings($request->request->get('settings'));
         }
 
+
+        if(!$host->isAuthenticated())
+        {
+            if($request->request->has("password"))
+            {
+                $data = [
+                    "type" => "client",
+                    "name" => "LEXIC_",
+                    "password" => $request->get('password')
+                ];
+
+                $result = $api->authenticate($host, $data);
+
+                if($result->code == 201) {
+                    $host->setAuthenticated(true);
+                }
+            }
+        }
+
+
+
         if ($errorArray = $this->validation($host)) {
             return new JsonResponse(['errors' => $errorArray], 400);
         }
+
 
         $em->flush();
 
@@ -471,7 +496,7 @@ class HostController extends Controller
 
         $result = $api->authenticate($host, $data);
 
-        if($result->code == 200){
+        if($result->code == 201){
             $host->setAuthenticated(true);
             $em->flush();
             return new JsonResponse(['message' => 'authentication successful']);
