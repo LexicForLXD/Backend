@@ -17,7 +17,8 @@ class ContainerRepository extends EntityRepository
      * returns one container associated with the host
      *
      * @param [int] $containerId
-     * @return void
+     * @return Container | null
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findOneByIdJoinedToHost($containerId)
     {
@@ -29,7 +30,7 @@ class ContainerRepository extends EntityRepository
         )->setParameter('id', $containerId);
 
         try {
-            return $query->getArrayResult();
+            return $query->getSingleResult();
         } catch (\Doctrine\ORM\NoResultException $e) {
             return null;
         }

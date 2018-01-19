@@ -13,7 +13,7 @@ use SymfonyBundles\EventQueueBundle\Event;
 
 class ContainerDeleteEvent extends Event
 {
-    const NAME = 'lxd.container.state.update';
+    const NAME = 'lxd.container.delete.update';
 
     private $time;
     private $operationId;
@@ -22,7 +22,7 @@ class ContainerDeleteEvent extends Event
 
 
     /**
-     * ImageCreationEvent constructor.
+     * ContainerDeleteEvent constructor.
      * @param $time
      * @param $operationId
      * @param Host $host

@@ -10,6 +10,7 @@ namespace AppBundle\EventListener;
 
 use AppBundle\Entity\Container;
 use AppBundle\Event\ContainerCreationEvent;
+use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Event\ContainerStateEvent;
 use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
@@ -103,12 +104,12 @@ class ContainerListener
         echo "FINISH-STATE-UPDATE : ContainerId ".$event->getContainerId()."\n";
     }
 
-    public function onLxdContainerDeleteUpdate(ContainerStateEvent $event)
+    public function onLxdContainerDeleteUpdate(ContainerDeleteEvent $event)
     {
         echo "START-CONTAINER-DELETE: ContainerId ".$event->getContainerId()." \n";
 
 
-        echo "DELETING STATE... \n";
+        echo "DELETING Container... \n";
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
 
