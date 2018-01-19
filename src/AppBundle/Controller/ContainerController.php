@@ -309,7 +309,36 @@ class ContainerController extends Controller
 
                 break;
             case 'migration':
-                return new JsonResponse(["message" => "migration"]);
+                $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
+
+                $data = [
+                    "name" => $request->get("name"),
+                    "migration" => true,
+                    "live" => $request->get("live", false)
+
+                ];
+                $oldHost = $oldContainer->getHost();
+                $pushResult = $api->migrate($oldHost, $oldContainer, $data);
+
+
+                $data = [
+                    "name" => $request->get("name"),
+                    "profiles" => $profileNames,
+                    "ephemeral" => $request->get("ephemeral", false),
+                    "config" => $request->get("config"),
+                    "devices" => $request->get("devices"),
+                    "source" => [
+                        "type" => "migration",
+                        "mode" => "pull",
+                        "operation" => $oldHost->getUri().$pushResult->body->operation,
+                        "base-image" => $oldContainer->getImage()->getFingerprint(),
+                        "container_only" => $request->get("containerOnly", true),
+                        "live" => $request->get("live", false),
+                        "secrets" =>  $pushResult->body->metadata->metadata
+
+                    ]
+                ];
+
                 break;
             case 'copy':
                 $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
