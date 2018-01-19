@@ -138,17 +138,17 @@ class Container
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getIpv4() :string
+    public function getIpv4() : ?string
     {
         return $this->ipv4;
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getIpv6() :string
+    public function getIpv6() : ?string
     {
         return $this->ipv6;
     }
@@ -172,7 +172,7 @@ class Container
     /**
      * @return string
      */
-    public function getName() :string
+    public function getName() : string
     {
         return $this->name;
     }
@@ -227,9 +227,9 @@ class Container
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getDomainName() :string
+    public function getDomainName() : ?string
     {
         return $this->domainName;
     }
@@ -245,7 +245,7 @@ class Container
     /**
      * @return string
      */
-    public function getState() :string
+    public function getState() : string
     {
         return $this->state;
     }

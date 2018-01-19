@@ -155,65 +155,65 @@ class Host
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getIpv4() :string
+    public function getIpv4() : ?string
     {
         return $this->ipv4;
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getIpv6() : string
+    public function getIpv6() : ?string
     {
         return $this->ipv6;
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getDomainName() : string
+    public function getDomainName() : ?string
     {
         return $this->domainName;
     }
 
     /**
-     * @param mixed $domainName
+     * @param string $domainName
      */
-    public function setDomainName($domainName)
+    public function setDomainName(string $domainName)
     {
         $this->domainName = $domainName;
     }
 
     /**
-     * @param mixed $ipv4
+     * @param string $ipv4
      */
-    public function setIpv4($ipv4)
+    public function setIpv4(string $ipv4)
     {
         $this->ipv4 = $ipv4;
     }
 
     /**
-     * @param mixed $ipv6
+     * @param string $ipv6
      */
-    public function setIpv6($ipv6)
+    public function setIpv6(string $ipv6)
     {
         $this->ipv6 = $ipv6;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -221,15 +221,15 @@ class Host
     /**
      * @return string
      */
-    public function getMac() : string
+    public function getMac() : ?string
     {
         return $this->mac;
     }
 
     /**
-     * @param mixed $mac
+     * @param string $mac
      */
-    public function setMac($mac)
+    public function setMac(string $mac)
     {
         $this->mac = $mac;
     }
@@ -237,15 +237,15 @@ class Host
     /**
      * @return string
      */
-    public function getSettings() : string
+    public function getSettings() : ?string
     {
         return $this->settings;
     }
 
     /**
-     * @param mixed $settings
+     * @param string $settings
      */
-    public function setSettings($settings)
+    public function setSettings(string $settings)
     {
         $this->settings = $settings;
     }
@@ -253,7 +253,7 @@ class Host
     /**
      * @return int
      */
-    public function getPort() : int
+    public function getPort() : ?int
     {
         return $this->port;
     }
