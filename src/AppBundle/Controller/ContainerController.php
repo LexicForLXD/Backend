@@ -197,6 +197,126 @@ class ContainerController extends Controller
      * ),
      *
      * @OAS\Parameter(
+     *  description="Parameters for the new Container with alias",
+     *  in="body",
+     *  name="bodyAlias",
+     *  @OAS\Schema(
+     *      @OAS\Property(
+     *          property="name",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="architecture",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="profiles",
+     *          type="array",
+     *      ),
+     *      @OAS\Property(
+     *          property="ephemeral",
+     *          type="bool"
+     *      ),
+     *      @OAS\Property(
+     *          property="config",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="devices",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="alias",
+     *          type="string"
+     *      )
+     *  ),
+     * ),
+     *
+     * @OAS\Parameter(
+     *  description="Parameters for the new Container with migration",
+     *  in="body",
+     *  name="bodyMigration",
+     *  @OAS\Schema(
+     *      @OAS\Property(
+     *          property="name",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="architecture",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="profiles",
+     *          type="array",
+     *      ),
+     *      @OAS\Property(
+     *          property="ephemeral",
+     *          type="bool"
+     *      ),
+     *      @OAS\Property(
+     *          property="config",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="devices",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="oldContainerId",
+     *          type="int"
+     *      ),
+     *      @OAS\Property(
+     *          property="containerOnly",
+     *          type="bool"
+     *      ),
+     *      @OAS\Property(
+     *          property="live",
+     *          type="bool"
+     *      )
+     *  ),
+     * ),
+     *
+     *  @OAS\Parameter(
+     *  description="Parameters for copying a Container",
+     *  in="body",
+     *  name="bodyCopy",
+     *  @OAS\Schema(
+     *      @OAS\Property(
+     *          property="name",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="architecture",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="profiles",
+     *          type="array",
+     *      ),
+     *      @OAS\Property(
+     *          property="ephemeral",
+     *          type="bool"
+     *      ),
+     *      @OAS\Property(
+     *          property="config",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="devices",
+     *          type="string"
+     *      ),
+     *      @OAS\Property(
+     *          property="oldContainerId",
+     *          type="int"
+     *      ),
+     *      @OAS\Property(
+     *          property="containerOnly",
+     *          type="bool"
+     *      )
+     *  ),
+     * ),
+     *
+     * @OAS\Parameter(
      *  description="ID of the Host the container should be created on",
      *  in="path",
      *  name="hostId",
@@ -339,10 +459,22 @@ class ContainerController extends Controller
                     ]
                 ];
 
+                $container = new Container();
+                $container->setHost($host);
+                $container->setIpv4($request->get("ipv4"));
+
+                $container->setName($request->get("name"));
+                $container->setSettings($data);
+
+
+                foreach ($profiles as $profile){
+                    $profileController->enableProfile($profile, $container);
+                }
+
                 break;
             case 'copy':
                 $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
-                //TODO make it copy something
+
                 $data = [
                     "name" => $request->get("name"),
                     "profiles" => $profileNames,
