@@ -512,6 +512,20 @@ class Host
         $this->status = $status;
     }
 
+    /**
+     * Returns the url for a host.
+     * @return string
+     */
+    public function getUri() : string
+    {
+        $hostname = $this->getIpv4() ?: $this->getIpv6() ?: $this->getDomainName() ?: 'localhost';
+
+        $port = $this->getPort() ?: '8443';
+        $apiVersion = '1.0';
+        $url = 'https://'.$hostname.':'.$port.'/'.$apiVersion.'/';
+
+        return $url;
+    }
 
     /** @see \Serializable::serialize() */
     // public function serialize()
