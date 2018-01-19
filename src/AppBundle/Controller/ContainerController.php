@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ContainerCreationEvent;
+use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -242,25 +243,22 @@ class ContainerController extends Controller
 
         $type = $request->query->get('type');
 
+        $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
+
+        $profileNames = array();
+
+        foreach ($profiles as $profile){
+            $profileNames[] = $profile->getName();
+        }
+
         switch ($type) {
             case 'image':
 
-                $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
-
-                $profileNames = array();
-
-                foreach ($profiles as $profile){
-                    $profileNames[] = $profile->getName();
-                }
-
-
-                $image = $this->getDoctrine()->getRepository(Image::class)->find($request->get("image"));
-
                 $data = [
                     "name" => $request->request->get("name"),
-                    "architecture" => $request->get("architecture") ? : 'x86_64',
+                    "architecture" => $request->get("architecture", 'x86_64'),
                     "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral") ? : false,
+                    "ephemeral" => $request->get("ephemeral", false),
                     "config" => $request->get("config"),
                     "devices" => $request->get("devices"),
                     "source" => []
@@ -275,7 +273,7 @@ class ContainerController extends Controller
                 }
 
                 if($request->request->has("alias") && !$request->request->has("imageServer")){
-                    $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findBy(["name" => $request->get("alias")]);
+                    $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findOneBy(["name" => $request->get("alias")]);
                     $image = $imageAlias->getImage();
                     $data["source"] = [
                         "type" => "image",
@@ -296,9 +294,9 @@ class ContainerController extends Controller
 
 
                 $container = new Container();
-
                 $container->setHost($host);
                 $container->setIpv4($request->get("ipv4"));
+
                 $container->setName($request->get("name"));
                 $container->setSettings($data);
 
@@ -312,23 +310,32 @@ class ContainerController extends Controller
                 return new JsonResponse(["message" => "migration"]);
                 break;
             case 'copy':
+                $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
                 //TODO make it copy something
                 $data = [
                     "name" => $request->get("name"),
-                    "architecture" => $request->get("architecture") ? : 'x86_64',
-                    "profiles" => $request->get("profiles") ? : array('default'),
-                    "ephermeral" => $request->get("ephermeral") ? : false,
+                    "profiles" => $profileNames,
+                    "ephemeral" => $request->get("ephemeral", false),
                     "config" => $request->get("config"),
                     "devices" => $request->get("devices"),
+                    "source" => [
+                        "type" => "copy",
+                        "container_only" => $request->get("containerOnly", true),
+                        "source" => $oldContainer->getName()
+                    ]
                 ];
 
                 $container = new Container();
                 $container->setHost($host);
-                $container->setIpv4($request->get("ipv4"));
                 $container->setName($request->get("name"));
+                $container->setIpv4($request->get("ipv4"));
                 $container->setSettings($data);
 
-                return new JsonResponse(["message" => "copy"]);
+                foreach ($profiles as $profile){
+                    $container->addProfile($profile);
+                }
+
+
                 break;
             default:
                 return new JsonResponse(["message" => "none"]);
@@ -440,7 +447,7 @@ class ContainerController extends Controller
      * @param EntityManagerInterface $em
      * @return JsonResponse
      */
-    public function deleteAction(int $containerId, EntityManagerInterface $em)
+    public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
 
@@ -450,17 +457,13 @@ class ContainerController extends Controller
             );
         }
 
-        $containerApi = new ContainerApi();
-        $response = $containerApi->remove($container->host, $container->name);
+        $result = $api->remove($container->host, $container->name);
 
-        if ($response->getStatusCode() == 202) {
-            $em->remove($container);
-            $em->flush();
 
-            return $this->json([], 204);
-        }
+        $dispatcher = $this->get('sb_event_queue');
+        $dispatcher->on(ContainerDeleteEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
 
-        return $this->json(['error' => 'Leider konnte der Container nicht gelöschtwerden.'], 500);
+        return $this->json(['message' => 'Deletion is ongoing'], 200);
     }
 
 

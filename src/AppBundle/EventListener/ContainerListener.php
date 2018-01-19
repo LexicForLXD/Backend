@@ -13,6 +13,7 @@ use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerStateEvent;
 use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
+use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManager;
 
 class ContainerListener
@@ -20,12 +21,14 @@ class ContainerListener
     protected $em;
     protected $api;
     protected $stateApi;
+    protected $operationApi;
 
-    public function __construct(EntityManager $em, ContainerApi $api, ContainerStateApi $stateApi)
+    public function __construct(EntityManager $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi)
     {
         $this->em = $em;
         $this->api = $api;
         $this->stateApi = $stateApi;
+        $this->operationApi = $operationApi;
     }
 
     /**
@@ -98,6 +101,33 @@ class ContainerListener
         $this->em->flush($container);
 
         echo "FINISH-STATE-UPDATE : ContainerId ".$event->getContainerId()."\n";
+    }
+
+    public function onLxdContainerDeleteUpdate(ContainerStateEvent $event)
+    {
+        echo "START-CONTAINER-DELETE: ContainerId ".$event->getContainerId()." \n";
+
+
+        echo "DELETING STATE... \n";
+
+        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
+
+        if ($operationsResponse->body->metadata->status_code != 200) {
+            echo "FAILED-CONTAINER-DELETE : ".$operationsResponse->body->metadata->err."\n";
+            $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
+            $container->setState($operationsResponse->body->metadata->err);
+            $this->em->persist($container);
+            $this->em->flush($container);
+            return;
+        }
+
+        $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
+
+
+        $this->em->remove($container);
+        $this->em->flush($container);
+
+        echo "FINISH-CONTAINER-DELETE : ContainerId ".$event->getContainerId()."\n";
     }
 
 }
