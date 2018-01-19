@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Controller;
 
+use AppBundle\Event\ContainerStateEvent;
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,6 +31,7 @@ class ContainerStateController extends Controller
      * @return JsonResponse
      *
      * @throws WrongInputException
+     * @throws \Httpful\Exception\ConnectionErrorException
      * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
      *
      *SWG\Put(path="/containers/{containerId}/state",
@@ -109,15 +111,17 @@ class ContainerStateController extends Controller
 
         $result = $api->update($container->getHost(), $container, $data);
 
-        if($result->code != 200){
-            return new JsonResponse(["error" => $result->body]);
-        }
+        $dispatcher = $this->get('sb_event_queue');
+
+        $dispatcher->on(ContainerStateEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
+
+
 
         //TODO mögliche Fehler abfangen
 
         $em->flush();
 
-        return new JsonResponse(['message' => 'success']);
+        return new JsonResponse(['message' => 'update is ongoing']);
     }
 
 
