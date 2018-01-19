@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service\LxdApi;
 
+use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Service\LxdApi\Util\HttpHelper;
 use Httpful\Request;
@@ -87,6 +88,21 @@ class ContainerApi extends HttpHelper
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$container->getName());
         return Request::put($uri, $data)->send();
+    }
+
+    /**
+     * Puts the container in migration mode
+     *
+     * @param Host $host
+     * @param Container $container
+     * @param $data
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function migrate(Host $host, Container $container, $data)
+    {
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$container->getName());
+        return Request::post($uri, $data)->send();
     }
 
     /**
