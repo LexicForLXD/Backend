@@ -120,9 +120,9 @@ class Container
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getId()
+    public function getId() :int
     {
         return $this->id;
     }
@@ -138,49 +138,49 @@ class Container
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getIpv4()
+    public function getIpv4() :string
     {
         return $this->ipv4;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getIpv6()
+    public function getIpv6() :string
     {
         return $this->ipv6;
     }
 
     /**
-     * @param mixed $ipv4
+     * @param string $ipv4
      */
-    public function setIpv4($ipv4)
+    public function setIpv4(string $ipv4)
     {
         $this->ipv4 = $ipv4;
     }
 
     /**
-     * @param mixed $ipv6
+     * @param string $ipv6
      */
-    public function setIpv6($ipv6)
+    public function setIpv6(string $ipv6)
     {
         $this->ipv6 = $ipv6;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName() :string
     {
         return $this->name;
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -202,37 +202,58 @@ class Container
         $this->settings = $settings;
     }
 
-    public function getHost()
+    /**
+     * @return Host | null
+     */
+    public function getHost() : Host
     {
         return $this->host;
     }
 
-    public function getStatuses()
+    /**
+     * @return ArrayCollection
+     */
+    public function getStatuses() :ArrayCollection
     {
         return $this->statuses;
     }
 
-    public function setHost($host)
+    /**
+     * @param Host $host
+     */
+    public function setHost(Host $host)
     {
         $this->host = $host;
     }
 
-    public function getDomainName()
+    /**
+     * @return string
+     */
+    public function getDomainName() :string
     {
         return $this->domainName;
     }
 
-    public function setDomainName($domainName)
+    /**
+     * @param string $domainName
+     */
+    public function setDomainName(string $domainName)
     {
         $this->domainName = $domainName;
     }
 
-    public function getState()
+    /**
+     * @return string
+     */
+    public function getState() :string
     {
         return $this->state;
     }
 
-    public function setState($state)
+    /**
+     * @param string $state
+     */
+    public function setState(string $state)
     {
         $this->state = $state;
     }
@@ -240,23 +261,23 @@ class Container
     /**
      * @return Image
      */
-    public function getImages(): Image
+    public function getImage(): Image
     {
-        return $this->images;
+        return $this->image;
     }
 
     /**
-     * @param Image $images
+     * @param Image $image
      */
-    public function setImages(Image $images): void
+    public function setImages(Image $image): void
     {
-        $this->images = $images;
+        $this->image = $image;
     }
 
 
 
     /**
-     * Checks if the host has at least on URI
+     * Checks if the container has at least on URI
      *
      * @Assert\IsTrue(message = "You have to use at least one of the following: ipv4, ipv6, domainname")
      *
