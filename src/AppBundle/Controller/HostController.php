@@ -487,23 +487,31 @@ class HostController extends Controller
             );
         }
 
-
-        $data = [
-            "type" => "client",
-            "name" => "LEXIC",
-            "password" => $request->get("password")
-        ];
-
-        $result = $api->authenticate($host, $data);
-
-        if($result->code == 201){
+        if($api->trusted())
+        {
             $host->setAuthenticated(true);
-            $em->flush();
-            return new JsonResponse(['message' => 'authentication successful']);
-        } else {
-            return new JsonResponse(['error' => 'error while authentication',
-                'body' => $result->body],400);
+        } else
+        {
+            $data = [
+                "type" => "client",
+                "name" => "LEXIC",
+                "password" => $request->get("password")
+            ];
+
+            $result = $api->authenticate($host, $data);
+
+            if($result->code != 201)
+            {
+                $host->setAuthenticated(false);
+                return new JsonResponse([
+                    'error' => 'error while authentication',
+                    'body' => $result->body],400);
+            }
         }
+
+        $em->flush();
+        return new JsonResponse(['message' => 'authentication successful']);
+
     }
 
     /**
