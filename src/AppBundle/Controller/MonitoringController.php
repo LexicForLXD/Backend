@@ -153,12 +153,48 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Get the content of a single Logfile
+     *
      * @Route("/monitoring/logs/hosts/{hostId}/{logpath}", name="get_single_log_from_host", methods={"GET"})
      * @param $hostId
      * @param $logpath
      * @param HostSSH $ssh
      * @return Response
      * @throws ElementNotFoundException
+     *
+     *@OAS\Get(path="/monitoring/logs/hosts/{hostId}/{logpath}",
+     *     tags={"monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Host",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *     @OAS\Parameter(
+     *      description="Path of the logfile on the Host",
+     *      in="path",
+     *      name="logpath",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="string"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the File content as text/plain",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Host for the id found",
+     *      ),
+     *     @OAS\Response(
+     *          response=400,
+     *          description="Error getting the logfile",
+     *      ),
+     * )
      */
     public function getSingleLogfileFromHost($hostId, $logpath, HostSSH $ssh){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
@@ -170,6 +206,8 @@ class MonitoringController extends Controller
         }
         $result = $ssh->getLogFileFromHost($host, $logpath);
 
+        //TODO Add 400 Error
+
         $response = new Response();
         $response->setContent($result->body);
         $response->headers->set('Content-Type', 'text/plain');
@@ -177,7 +215,7 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Get the Nagios stats configuration for a Container
+     * Get the ContainerStatus Nagios configuration for a Container
      * @Route("/monitoring/checks/containers/{containerId}", name="get_status_check_container", methods={"GET"})
      * @throws ElementNotFoundException
      *
@@ -443,7 +481,7 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Receive a Nagios stats graph by ContainerStatusId
+     * Receive a Nagios stats graph by ContainerStatus
      *
      * @Route("/monitoring/checks/{checkId}/containers/graph", name="get_pnp4nagios_container", methods={"GET"})
      * @param $checkId
@@ -452,7 +490,7 @@ class MonitoringController extends Controller
      * @throws ElementNotFoundException
      * @throws WrongInputException
      *
-     * @OAS\Get(path="/monitoring/checks/{checkId}/containers/graph",
+     * @OAS\Get(path="/monitoring/checks/{checkId}/containers/graph?timerange={timerange}",
      *     tags={"monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the ContainerStatus",
@@ -463,18 +501,27 @@ class MonitoringController extends Controller
      *              type="integer"
      *          ),
      *      ),
+     *      @OAS\Parameter(
+     *      description="Define a custom timerange for the output graph, examples : -1day or -3weeks or -1year or yesterday",
+     *      in="path",
+     *      name="timerange",
+     *      required=false,
+     *          @OAS\Schema(
+     *              type="string"
+     *          ),
+     *      ),
      *      @OAS\Response(
      *          response=200,
-     *          description="Returns the Nagios stats graph as png",
+     *          description="Returns the Nagios stats graph as png with mime-type image/png",
      *      ),
      *      @OAS\Response(
      *          response=404,
-     *          description="No ContainerStatus with ID found",
+     *          description="No ContainerStatus with ID found - returns json error with mime-type application/json",
      *      ),
      *
      *     @OAS\Response(
      *          response=400,
-     *          description="Error getting the Nagios graph image",
+     *          description="Error getting the Nagios graph image - returns json error with mime-type application/json",
      *      ),
      * )
      */
@@ -511,27 +558,6 @@ class MonitoringController extends Controller
      * @param $hostId
      * @return Response
      * @throws ElementNotFoundException
-     * @OAS\Get(path="/monitoring/checks/hosts/{hostId}",
-     *     tags={"monitoring"},
-     * @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     * @OAS\Response(
-     *          response=200,
-     *          description="Returns the HostStatus",
-     *          @OAS\JsonContent(ref="#/components/schemas/hostStatus"),
-     *      ),
-     * @OAS\Response(
-     *          response=404,
-     *          description="No Host for the id found or no StatusCheck for the Host found",
-     *      ),
-     * )
      */
     public function getStatusCheckHost($hostId){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
@@ -563,34 +589,7 @@ class MonitoringController extends Controller
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Put(path="/monitoring/checks/hosts/{hostId}",
-     *     tags={"monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *     @OAS\Parameter(
-     *      description="Json-Object with attribute healthCheckEnabled which should be true or false",
-     *      in="body",
-     *      name="body",
-     *      required=true,
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Returns the HostStatus",
-     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Host for the id found",
-     *      ),
-     * )
+
      */
     public function configureStatusCheckForHost($hostId, Request $request) {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
