@@ -75,6 +75,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: lxd.container.creation.update, method: onLxdContainerCreationUpdate }
             - { name: kernel.event_listener, event: lxd.container.state.update, method: onLxdContainerStateUpdate }
+            - { name: kernel.event_listener, event: lxd.container.delete.update, method: onLxdContainerDeleteUpdate }
 
     platform.user.manager:
         class: Doctrine\ORM\EntityManager

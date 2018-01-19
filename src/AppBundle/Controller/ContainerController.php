@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ContainerCreationEvent;
+use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -446,7 +447,7 @@ class ContainerController extends Controller
      * @param EntityManagerInterface $em
      * @return JsonResponse
      */
-    public function deleteAction(int $containerId, EntityManagerInterface $em)
+    public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
 
@@ -456,17 +457,13 @@ class ContainerController extends Controller
             );
         }
 
-        $containerApi = new ContainerApi();
-        $response = $containerApi->remove($container->host, $container->name);
+        $result = $api->remove($container->host, $container->name);
 
-        if ($response->getStatusCode() == 202) {
-            $em->remove($container);
-            $em->flush();
 
-            return $this->json([], 204);
-        }
+        $dispatcher = $this->get('sb_event_queue');
+        $dispatcher->on(ContainerDeleteEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
 
-        return $this->json(['error' => 'Leider konnte der Container nicht gelöschtwerden.'], 500);
+        return $this->json(['message' => 'Deletion is ongoing'], 200);
     }
 
 
