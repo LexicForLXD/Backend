@@ -130,13 +130,29 @@ class HostController extends Controller
     {
 
         $host = new Host();
-        $host->setIpv4($request->request->get('ipv4'));
-        $host->setIpv6($request->request->get('ipv6'));
-        $host->setDomainName($request->request->get('domainName'));
-        $host->setMac($request->request->get('mac'));
-        $host->setName($request->request->get('name'));
-        $host->setPort($request->request->get('port'));
-        $host->setSettings($request->request->get('settings'));
+        if($request->has("ipv4")) {
+            $host->setIpv4($request->request->get('ipv4'));
+        }
+        if($request->has("ipv6")) {
+            $host->setIpv6($request->request->get('ipv6'));
+        }
+        if($request->has("domainName")) {
+            $host->setDomainName($request->request->get('domainName'));
+        }
+        if($request->has("mac")) {
+            $host->setMac($request->request->get('mac'));
+        }
+        if($request->has("name")) {
+            $host->setName($request->request->get('name'));
+        }
+        if($request->has("port")) {
+            $host->setPort($request->request->get('port'));
+        }
+        if($request->has("settings")) {
+            $host->setSettings($request->request->get('settings'));
+        }
+
+
         $host->setAuthenticated(false);
 
         if ($errorArray = $this->validation($host)) {
@@ -304,13 +320,27 @@ class HostController extends Controller
             );
         }
 
-        $host->setIpv4($request->request->get('ipv4'));
-        $host->setIpv6($request->request->get('ipv6'));
-        $host->setDomainName($request->request->get('domainName'));
-        $host->setMac($request->request->get('mac'));
-        $host->setName($request->request->get('name'));
-        $host->setPort($request->request->get('port'));
-        $host->setSettings($request->request->get('settings'));
+        if($request->has("ipv4")) {
+            $host->setIpv4($request->request->get('ipv4'));
+        }
+        if($request->has("ipv6")) {
+            $host->setIpv6($request->request->get('ipv6'));
+        }
+        if($request->has("domainName")) {
+            $host->setDomainName($request->request->get('domainName'));
+        }
+        if($request->has("mac")) {
+            $host->setMac($request->request->get('mac'));
+        }
+        if($request->has("name")) {
+            $host->setName($request->request->get('name'));
+        }
+        if($request->has("port")) {
+            $host->setPort($request->request->get('port'));
+        }
+        if($request->has("settings")) {
+            $host->setSettings($request->request->get('settings'));
+        }
 
         if ($errorArray = $this->validation($host)) {
             return new JsonResponse(['errors' => $errorArray], 400);
