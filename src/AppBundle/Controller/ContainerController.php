@@ -247,6 +247,8 @@ class ContainerController extends Controller
 
         $profileNames = array();
 
+        $profileController = new ProfileController();
+
         foreach ($profiles as $profile){
             $profileNames[] = $profile->getName();
         }
@@ -301,7 +303,7 @@ class ContainerController extends Controller
                 $container->setSettings($data);
 
                 foreach ($profiles as $profile){
-                    $container->addProfile($profile);
+                    $profileController->enableProfile($profile, $container);
                 }
 
 
@@ -332,7 +334,7 @@ class ContainerController extends Controller
                 $container->setSettings($data);
 
                 foreach ($profiles as $profile){
-                    $container->addProfile($profile);
+                    $profileController->enableProfile($profile, $container);
                 }
 
 
@@ -445,6 +447,7 @@ class ContainerController extends Controller
      *)
      * @param int $containerId
      * @param EntityManagerInterface $em
+     * @param ContainerApi $api
      * @return JsonResponse
      */
     public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api)
@@ -457,7 +460,7 @@ class ContainerController extends Controller
             );
         }
 
-        $result = $api->remove($container->host, $container->name);
+        $result = $api->remove($container->getHost(), $container->getName());
 
 
         $dispatcher = $this->get('sb_event_queue');
