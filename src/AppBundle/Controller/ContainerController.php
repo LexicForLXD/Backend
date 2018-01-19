@@ -257,7 +257,7 @@ class ContainerController extends Controller
                 $image = $this->getDoctrine()->getRepository(Image::class)->find($request->get("image"));
 
                 $data = [
-                    "name" => $request->get("name"),
+                    "name" => $request->request->get("name"),
                     "architecture" => $request->get("architecture") ? : 'x86_64',
                     "profiles" => $profileNames,
                     "ephemeral" => $request->get("ephemeral") ? : false,
@@ -266,7 +266,7 @@ class ContainerController extends Controller
                     "source" => []
                 ];
 
-                if($request->has("fingerprint")){
+                if($request->request->has("fingerprint")){
                     $image = $this->getDoctrine()->getRepository(Image::class)->findBy(["fingerprint" => $request->get("fingerprint")]);
                     $data["source"] = [
                         "type" => "image",
@@ -274,7 +274,7 @@ class ContainerController extends Controller
                     ];
                 }
 
-                if($request->has("alias") && !$request->has("imageServer")){
+                if($request->request->has("alias") && !$request->request->has("imageServer")){
                     $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findBy(["name" => $request->get("alias")]);
                     $image = $imageAlias->getImage();
                     $data["source"] = [
