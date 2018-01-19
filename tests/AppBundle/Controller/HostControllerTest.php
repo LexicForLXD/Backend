@@ -275,6 +275,7 @@ class HostControllerTest extends WebTestCase
         $host->setIpv4('192.168.10.1');
         $host->setName('testHost');
         $host->setMac('someMac');
+        $host->setAuthenticated(true);
 
         $this->em->persist($host);
         $this->em->flush();
@@ -350,6 +351,7 @@ class HostControllerTest extends WebTestCase
         $host->setIpv4('192.168.10.1');
         $host->setName('testHost');
         $host->setMac('someMac');
+        $host->setAuthenticated(true);
 
         $this->em->persist($host);
         $this->em->flush();
