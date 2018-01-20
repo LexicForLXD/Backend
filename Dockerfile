@@ -28,5 +28,8 @@ ENV SYMFONY_ENV=dev
 
 RUN chown -R www:www /www
 
+# Configure supervisord
+COPY docker/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 RUN composer install --no-interaction
 RUN chown -R www:www /www
