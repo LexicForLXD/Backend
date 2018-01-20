@@ -253,9 +253,9 @@ class MonitoringController extends Controller
 
         $containerStatuses = $container->getStatuses();
 
-        if (!$containerStatuses) {
+        if ($containerStatuses->count() == 0) {
             throw new ElementNotFoundException(
-                'No StatusCheck for Container with ID '.$containerId.' found'
+                'No ContainerStatuses for Container with ID '.$containerId.' found'
             );
         }
 
@@ -593,9 +593,9 @@ class MonitoringController extends Controller
 
         $hostStatuses = $host->getStatuses();
 
-        if (!$hostStatuses) {
+        if ($hostStatuses->count() == 0) {
             throw new ElementNotFoundException(
-                'No StatusChecks for Host with ID '.$hostId.' found'
+                'No HostStatuses for Host with ID '.$hostId.' found'
             );
         }
 
