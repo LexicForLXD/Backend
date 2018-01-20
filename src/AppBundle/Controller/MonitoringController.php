@@ -29,7 +29,7 @@ class MonitoringController extends Controller
      * @throws WrongInputException
      *
      * @OAS\Get(path="/monitoring/logs/containers/{containerId}",
-     *     tags={"monitoring"},
+     *     tags={"container-monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the Container",
      *      in="path",
@@ -98,7 +98,7 @@ class MonitoringController extends Controller
      * @return Response
      *
      * @OAS\Get(path="/monitoring/logs/containers/{containerId}/{logfile}",
-     *     tags={"monitoring"},
+     *     tags={"container-monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the Container",
      *      in="path",
@@ -163,7 +163,7 @@ class MonitoringController extends Controller
      * @throws ElementNotFoundException
      *
      *@OAS\Get(path="/monitoring/logs/hosts/{hostId}/{logpath}",
-     *     tags={"monitoring"},
+     *     tags={"host-monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the Host",
      *      in="path",
@@ -215,12 +215,12 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Get the ContainerStatus Nagios configuration for a Container
+     * Get all ContainerStatus Nagios configurations for a Container
      * @Route("/monitoring/checks/containers/{containerId}", name="get_status_check_container", methods={"GET"})
      * @throws ElementNotFoundException
      *
      * @OAS\Get(path="/monitoring/checks/containers/{containerId}",
-     *     tags={"monitoring"},
+     *     tags={"container-monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the Container",
      *      in="path",
@@ -241,7 +241,7 @@ class MonitoringController extends Controller
      *      ),
      * )
      */
-    public function getStatusCheckContainer($containerId){
+    public function getStatusChecksContainer($containerId){
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
@@ -250,16 +250,16 @@ class MonitoringController extends Controller
             );
         }
 
-        $containerStatus = $container->getStatus();
+        $containerStatuses = $container->getStatuses();
 
-        if (!$containerStatus) {
+        if (!$containerStatuses) {
             throw new ElementNotFoundException(
                 'No StatusCheck for Container with ID '.$containerId.' found'
             );
         }
 
         $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($containerStatus, 'json');
+        $response = $serializer->serialize($containerStatuses, 'json');
         return new Response($response);
     }
 
@@ -273,7 +273,7 @@ class MonitoringController extends Controller
      * @throws ElementNotFoundException
      *
      * @OAS\Post(path="/monitoring/checks/containers/{containerId}",
-     *     tags={"monitoring"},
+     *     tags={"container-monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the Container",
      *      in="path",
@@ -383,7 +383,7 @@ class MonitoringController extends Controller
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
      * @OAS\Put(path="/monitoring/checks/{checkId}/containers",
-     *     tags={"monitoring"},
+     *     tags={"container-monitoring"},
      * @OAS\Parameter(
      *      description="ID of the ContainerStatus",
      *      in="path",
@@ -491,7 +491,7 @@ class MonitoringController extends Controller
      * @throws WrongInputException
      *
      * @OAS\Get(path="/monitoring/checks/{checkId}/containers/graph?timerange={timerange}",
-     *     tags={"monitoring"},
+     *     tags={"container-monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the ContainerStatus",
      *      in="path",
