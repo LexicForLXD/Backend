@@ -6,6 +6,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Swagger\Annotations as OAS;
+use JMS\Serializer\Annotation as JMS;
 
 
 /**
@@ -27,57 +28,62 @@ class HostStatus
     protected $id;
 
     /**
-     * gibt an, ob für den Container healthCheck aktiviert oder deaktiviert sein soll (true/false)
-     *
      * @var boolean
-     *
      * @ORM\Column(type="boolean")
+     * @Assert\NotNull()
+     *
      * @OAS\Property(example="true")
      */
-    protected $healthCheckEnabled;
+    protected $nagiosEnabled;
 
     /**
-     * gibt an, ob der Container den HealthCheck besteht oder nicht
+     * @var String
+     * @ORM\Column(type="string")
+     * @Assert\NotNull
+     * @Assert\NotBlank()
      *
-     * @var boolean
-     *
-     * @ORM\Column(type="boolean", nullable=true)
-     * @OAS\Property(example="true")
+     * @OAS\Property(example="LXC-Host1")
      */
-    protected $healthCheck;
-
-
-    /**
-     * gibt an, wann der letzte erfolgreiche Ping ausgeführt wurde
-     *
-     * @var datetime
-     * @Assert\DateTime(format="Y-m-d\TH:i:sP")
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @OAS\Property(example="2017-08-15T15:52:01+00:00")
-     */
-    protected $lastSuccessfullPing;
+    protected $nagiosName;
 
     /**
-     * gibt an, wann der letzte fehlgeschlagene Ping ausgeführt wurde
+     * @var String
+     * @ORM\Column(type="string")
+     * @Assert\NotNull
+     * @Assert\NotBlank()
      *
-     * @var datetime
-     * @Assert\DateTime(format="Y-m-d\TH:i:sP")
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @OAS\Property(example="2017-08-14T11:50:01+00:00")
+     * @OAS\Property(example="check_http")
      */
-    protected $lastFailedPing;
+    protected $checkName;
 
     /**
-     * gibt die zuletzt gemessen RoundTripTime an (bei erfolgreichem Ping)
+     * @var int
+     * @ORM\Column(type="integer")
+     * @Assert\NotNull
+     * @Assert\NotBlank()
+     * @Assert\Type("int")
      *
-     * @var integer
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @OAS\Property(example="18")
+     * @OAS\Property(example="1")
      */
-    protected $lastRtt;
+    protected $sourceNumber;
+
+    /**
+     * @var String
+     * @ORM\Column(type="string")
+     * @Assert\NotNull
+     * @Assert\NotBlank()
+     *
+     * @OAS\Property(example="https://nagios.example.com/pnp4nagios/")
+     */
+    protected $nagiosUrl;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Host", inversedBy="statuses")
+     * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     *
+     * @JMS\Exclude()
+     */
+    protected $host;
 
     /**
      * @return mixed
@@ -88,95 +94,98 @@ class HostStatus
     }
 
     /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return bool
      */
-    public function isHealthCheckEnabled(): bool
+    public function isNagiosEnabled(): bool
     {
-        return $this->healthCheckEnabled;
+        return $this->nagiosEnabled;
     }
 
     /**
-     * @param bool $healthCheckEnabled
+     * @param bool $nagiosEnabled
      */
-    public function setHealthCheckEnabled(bool $healthCheckEnabled)
+    public function setNagiosEnabled(bool $nagiosEnabled)
     {
-        $this->healthCheckEnabled = $healthCheckEnabled;
+        $this->nagiosEnabled = $nagiosEnabled;
     }
 
     /**
-     * @return bool
+     * @return String
      */
-    public function isHealthCheck(): bool
+    public function getNagiosName(): String
     {
-        return $this->healthCheck;
+        return $this->nagiosName;
     }
 
     /**
-     * @param bool $healthCheck
+     * @param String $nagiosName
      */
-    public function setHealthCheck(bool $healthCheck)
+    public function setNagiosName(String $nagiosName)
     {
-        $this->healthCheck = $healthCheck;
+        $this->nagiosName = $nagiosName;
     }
 
     /**
-     * @return datetime
+     * @return String
      */
-    public function getLastSuccessfullPing()
+    public function getCheckName(): String
     {
-        return $this->lastSuccessfullPing;
+        return $this->checkName;
     }
 
     /**
-     * @param datetime $lastSuccessfullPing
+     * @param String $checkName
      */
-    public function setLastSuccessfullPing($lastSuccessfullPing)
+    public function setCheckName(String $checkName)
     {
-        $this->lastSuccessfullPing = $lastSuccessfullPing;
-    }
-
-    /**
-     * @return datetime
-     */
-    public function getLastFailedPing()
-    {
-        return $this->lastFailedPing;
-    }
-
-    /**
-     * @param datetime $lastFailedPing
-     */
-    public function setLastFailedPing($lastFailedPing)
-    {
-        $this->lastFailedPing = $lastFailedPing;
+        $this->checkName = $checkName;
     }
 
     /**
      * @return int
      */
-    public function getLastRtt(): int
+    public function getSourceNumber(): int
     {
-        return $this->lastRtt;
+        return $this->sourceNumber;
     }
 
     /**
-     * @param int $lastRtt
+     * @param int $sourceNumber
      */
-    public function setLastRtt(int $lastRtt)
+    public function setSourceNumber(int $sourceNumber)
     {
-        $this->lastRtt = $lastRtt;
+        $this->sourceNumber = $sourceNumber;
     }
 
-    
+    /**
+     * @return String
+     */
+    public function getNagiosUrl(): String
+    {
+        return $this->nagiosUrl;
+    }
 
+    /**
+     * @param String $nagiosUrl
+     */
+    public function setNagiosUrl(String $nagiosUrl)
+    {
+        $this->nagiosUrl = $nagiosUrl;
+    }
 
+    /**
+     * @return mixed
+     */
+    public function getHost() : Host
+    {
+        return $this->host;
+    }
 
+    /**
+     * @param mixed $host
+     */
+    public function setHost($host)
+    {
+        $this->host = $host;
+    }
 }
