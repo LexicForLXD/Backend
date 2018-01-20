@@ -716,46 +716,105 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Configure a StatusCheck for Host
+     * Edit HostStatus Nagios configuration
      *
-     * @Route("/monitoring/checks/hosts/{hostId}", name="configure_status_check_host", methods={"PUT"})
-     * @param $hostId
+     * @Route("/monitoring/checks/{checkId}/hosts", name="configure_host_check", methods={"PUT"})
+     * @param $checkId
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
+     *
+     * @OAS\Put(path="/monitoring/checks/{checkId}/hosts",
+     *     tags={"host-monitoring"},
+     *      @OAS\Parameter(
+     *      description="ID of the HostStatus",
+     *      in="path",
+     *      name="checkId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Parameter(
+     *      in="body",
+     *      name="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *      @OAS\Property(
+     *          property="nagiosEnabled",
+     *          type="boolean",
+     *          example=true,
+     *      ),
+     *      @OAS\Property(
+     *          property="nagiosName",
+     *          type="string",
+     *          example="LXC-Host1",
+     *      ),
+     *      @OAS\Property(
+     *          property="nagiosUrl",
+     *          type="string",
+     *          example="https://nagios.example.com/pnp4nagios/",
+     *      ),
+     *      @OAS\Property(
+     *          property="checkName",
+     *          type="string",
+     *          example="check_http",
+     *      ),
+     *      @OAS\Property(
+     *          property="sourceNumber",
+     *          type="string",
+     *          example=0,
+     *      ),
+     *      ),
+     *      ),
+     * @OAS\Response(
+     *          response=200,
+     *          description="Returns the HostStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/hostStatus"),
+     *      ),
+     * @OAS\Response(
+     *          response=404,
+     *          description="No HostStatus for the id found",
+     *      ),
+     * )
      */
-    public function configureStatusCheckForHost($hostId, Request $request) {
-        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+    public function configureStatusCheckForHost($checkId, Request $request) {
+        $hostStatus = $this->getDoctrine()->getRepository(HostStatus::class)->find($checkId);
 
-        if (!$host) {
+        if (!$hostStatus) {
             throw new ElementNotFoundException(
-                'No Host for ID '.$hostId.' found'
+                'No HostStatus for ID '.$checkId.' found'
             );
         }
 
         $em = $this->getDoctrine()->getManager();
 
-        $hostStatus = $host->getStatus();
-        if(!$hostStatus){
-            $hostStatus = new HostStatus();
+        if($request->request->has('nagiosEnabled')) {
+            $hostStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
         }
 
-        if($request->request->get('healthCheckEnabled')) {
-            $hostStatus->setHealthCheckEnabled(true);
-            $host->setStatus($hostStatus);
-            $em->persist($hostStatus);
-            $em->persist($host);
-            $em->flush();
-
-            $serializer = $this->get('jms_serializer');
-            $response = $serializer->serialize($hostStatus, 'json');
-            return new Response($response);
+        if($request->request->has('nagiosName')) {
+            $hostStatus->setNagiosName($request->request->get('nagiosName'));
         }
 
-        $hostStatus->setHealthCheckEnabled(false);
-        $host->setStatus($hostStatus);
+        if($request->request->has('checkName')) {
+            $hostStatus->setCheckName($request->request->get('checkName'));
+        }
+
+        if($request->request->has('sourceNumber')) {
+            $hostStatus->setSourceNumber($request->request->get('sourceNumber'));
+        }
+
+        if($request->request->has('nagiosUrl')) {
+            $hostStatus->setNagiosUrl($request->request->get('nagiosUrl'));
+        }
+
+        //Validation
+        if ($errorArray = $this->validation($hostStatus)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
         $em->persist($hostStatus);
-        $em->persist($host);
         $em->flush();
 
         $serializer = $this->get('jms_serializer');
