@@ -605,6 +605,78 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Receive a Nagios stats graph by HostStatus
+     *
+     * @Route("/monitoring/checks/{checkId}/hosts/graph", name="get_pnp4nagios_host", methods={"GET"})
+     * @param $checkId
+     * @param Pnp4NagiosApi $api
+     * @return Response
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     *
+     * @OAS\Get(path="/monitoring/checks/{checkId}/hosts/graph?timerange={timerange}",
+     *     tags={"host-monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the HostStatus",
+     *      in="path",
+     *      name="checkId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Parameter(
+     *      description="Define a custom timerange for the output graph, examples : -1day or -3weeks or -1year or yesterday",
+     *      in="path",
+     *      name="timerange",
+     *      required=false,
+     *          @OAS\Schema(
+     *              type="string"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the Nagios stats graph as png with mime-type image/png",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No HostStatus with ID found - returns json error with mime-type application/json",
+     *      ),
+     *
+     *     @OAS\Response(
+     *          response=400,
+     *          description="Error getting the Nagios graph image - returns json error with mime-type application/json",
+     *      ),
+     * )
+     */
+    public function getPnp4NagiosImageForHost($checkId, Request $request, Pnp4NagiosApi $api){
+        $hostStatus = $this->getDoctrine()->getRepository(HostStatus::class)->find($checkId);
+
+        if (!$hostStatus) {
+            throw new ElementNotFoundException(
+                'No HostStatus with ID '.$checkId.' found'
+            );
+        }
+
+        $timerange = $request->query->get('timerange');
+
+        if(!$timerange){
+            $timerange = '-1day';
+        }
+
+        $result = $api->getNagiosImageForHostTimerange($hostStatus, $timerange);
+
+        if($result->code != 200){
+            throw new WrongInputException("Error loading the Graph - HTTP-Code ".$result->code);
+        }
+
+        $response = new Response();
+        $response->setContent($result->body);
+        $response->headers->set('Content-Type', 'image/png');
+        return $response;
+    }
+
+    /**
      * Create HostStatus Nagios configuration
      *
      * @Route("/monitoring/checks/hosts/{hostId}", name="create_host_status", methods={"POST"})
