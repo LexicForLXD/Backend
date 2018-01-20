@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
+use Symfony\Component\VarDumper\VarDumper;
 
 class MonitoringController extends Controller
 {
@@ -553,13 +554,35 @@ class MonitoringController extends Controller
     }
 
     /**
-     * Get the StatusCheck results for a Host
-     * @Route("/monitoring/checks/hosts/{hostId}", name="get_status_check_host", methods={"GET"})
+     * Get all HostStatus Nagios configurations for a Host
+     * @Route("/monitoring/checks/hosts/{hostId}", name="get_status_checks_host", methods={"GET"})
      * @param $hostId
      * @return Response
      * @throws ElementNotFoundException
+     *
+     * @OAS\Get(path="/monitoring/checks/hosts/{hostId}",
+     *     tags={"host-monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Host",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Returns the HostStatuses",
+     *          @OAS\JsonContent(ref="#/components/schemas/hostStatus"),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Container for the id found or no HostStatus configuration for Host found",
+     *      ),
+     * )
      */
-    public function getStatusCheckHost($hostId){
+    public function getStatusChecksHost($hostId){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
@@ -568,16 +591,16 @@ class MonitoringController extends Controller
             );
         }
 
-        $hostStatus = $host->getStatus();
+        $hostStatuses = $host->getStatuses();
 
-        if (!$hostStatus) {
+        if (!$hostStatuses) {
             throw new ElementNotFoundException(
-                'No StatusCheck for Host with ID '.$hostId.' found'
+                'No StatusChecks for Host with ID '.$hostId.' found'
             );
         }
 
         $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($hostStatus, 'json');
+        $response = $serializer->serialize($hostStatuses, 'json');
         return new Response($response);
     }
 
