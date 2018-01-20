@@ -131,12 +131,10 @@ class Host
     protected $images;
 
     /**
-     * @var HostStatus
-     * @ORM\OneToOne(targetEntity="HostStatus")
-     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
+     * @ORM\OneToMany(targetEntity="HostStatus", mappedBy="host")
      * @JMS\Exclude()
      */
-    protected $status;
+    protected $statuses;
 
 
     public function __construct()
@@ -144,6 +142,7 @@ class Host
         $this->containers = new ArrayCollection();
         $this->profiles = new ArrayCollection();
         $this->images = new ArrayCollection();
+        $this->statuses = new ArrayCollection();
     }
 
 
@@ -332,7 +331,25 @@ class Host
         $this->images = $images;
     }
 
+    /**
+     * @param HostStatus $hostStatus
+     */
+    public function addStatus(HostStatus $hostStatus){
+        if(!$this->statuses->contains($hostStatus)){
+            $hostStatus->setHost($this);
+            $this->statuses->add($hostStatus);
+        }
+    }
 
+    /**
+     * @param HostStatus $hostStatus
+     */
+    public function removeStatus(HostStatus $hostStatus){
+        if(!$this->statuses->contains($hostStatus)){
+            $hostStatus->setHost(null);
+            $this->statuses->remove($hostStatus);
+        }
+    }
 
     /**
      * Checks if the host has at least on URI
@@ -495,22 +512,6 @@ class Host
         }
 
         return true;
-    }
-
-    /**
-     * @return HostStatus | null
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * @param HostStatus $status
-     */
-    public function setStatus(HostStatus $status)
-    {
-        $this->status = $status;
     }
 
     /**
