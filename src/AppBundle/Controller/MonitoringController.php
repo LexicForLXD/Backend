@@ -578,7 +578,7 @@ class MonitoringController extends Controller
      *      ),
      *      @OAS\Response(
      *          response=404,
-     *          description="No Container for the id found or no HostStatus configuration for Host found",
+     *          description="No Host for the id found or no HostStatus configuration for Host found",
      *      ),
      * )
      */
