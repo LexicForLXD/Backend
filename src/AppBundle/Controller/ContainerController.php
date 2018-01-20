@@ -17,10 +17,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 
 use AppBundle\Service\LxdApi\ContainerApi;
-use AppBundle\Service\LxdApi\OperationsRelayApi;
 
 use AppBundle\Entity\Container;
-use AppBundle\Entity\ContainerStatus;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
 use AppBundle\Entity\Image;
@@ -352,6 +350,8 @@ class ContainerController extends Controller
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi)
