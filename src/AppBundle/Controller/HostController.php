@@ -487,7 +487,7 @@ class HostController extends Controller
             );
         }
 
-        if($api->trusted())
+        if($api->trusted($host))
         {
             $host->setAuthenticated(true);
         } else
