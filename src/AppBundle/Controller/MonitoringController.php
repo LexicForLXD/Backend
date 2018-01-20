@@ -605,6 +605,117 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Create HostStatus Nagios configuration
+     *
+     * @Route("/monitoring/checks/hosts/{hostId}", name="create_host_status", methods={"POST"})
+     * @param $hostId
+     * @param Request $request
+     * @return JsonResponse|Response
+     * @throws ElementNotFoundException
+     *
+     * @OAS\Post(path="/monitoring/checks/hosts/{hostId}",
+     *     tags={"host-monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the Host",
+     *      in="path",
+     *      name="hostId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *     @OAS\Parameter(
+     *      in="body",
+     *      name="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *      @OAS\Property(
+     *          property="nagiosEnabled",
+     *          type="boolean",
+     *          example=true,
+     *      ),
+     *      @OAS\Property(
+     *          property="nagiosName",
+     *          type="string",
+     *          example="LXC-Host1",
+     *      ),
+     *      @OAS\Property(
+     *          property="nagiosUrl",
+     *          type="string",
+     *          example="https://nagios.example.com/pnp4nagios/",
+     *      ),
+     *      @OAS\Property(
+     *          property="checkName",
+     *          type="string",
+     *          example="check_http",
+     *      ),
+     *      @OAS\Property(
+     *          property="sourceNumber",
+     *          type="string",
+     *          example=0,
+     *      ),
+     *      ),
+     *      ),
+     *      @OAS\Response(
+     *          response=201,
+     *          description="Returns the HostStatus",
+     *          @OAS\JsonContent(ref="#/components/schemas/hostStatus"),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Host for the id found",
+     *      ),
+     * )
+     */
+    public function createStatusCheckForHost($hostId, Request $request) {
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No Host for ID '.$hostId.' found'
+            );
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $hostStatus = new HostStatus();
+
+        if($request->request->has('nagiosEnabled')) {
+            $hostStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
+        }
+
+        if($request->request->has('nagiosName')) {
+            $hostStatus->setNagiosName($request->request->get('nagiosName'));
+        }
+
+        if($request->request->has('checkName')) {
+            $hostStatus->setCheckName($request->request->get('checkName'));
+        }
+
+        if($request->request->has('sourceNumber')) {
+            $hostStatus->setSourceNumber($request->request->get('sourceNumber'));
+        }
+
+        if($request->request->has('nagiosUrl')) {
+            $hostStatus->setNagiosUrl($request->request->get('nagiosUrl'));
+        }
+
+        //Validation
+        if ($errorArray = $this->validation($hostStatus)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
+        $host->addStatus($hostStatus);
+        $em->persist($hostStatus);
+        $em->persist($host);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($hostStatus, 'json');
+        return new Response($response, Response::HTTP_CREATED);
+    }
+
+    /**
      * Configure a StatusCheck for Host
      *
      * @Route("/monitoring/checks/hosts/{hostId}", name="configure_status_check_host", methods={"PUT"})
@@ -612,7 +723,6 @@ class MonitoringController extends Controller
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
-
      */
     public function configureStatusCheckForHost($hostId, Request $request) {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
