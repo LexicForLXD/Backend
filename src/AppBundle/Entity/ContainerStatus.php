@@ -176,7 +176,7 @@ class ContainerStatus
     /**
      * @return mixed
      */
-    public function getContainer()
+    public function getContainer() : Container
     {
         return $this->container;
     }
