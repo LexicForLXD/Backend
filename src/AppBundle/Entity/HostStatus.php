@@ -176,7 +176,7 @@ class HostStatus
     /**
      * @return mixed
      */
-    public function getHost()
+    public function getHost() : Host
     {
         return $this->host;
     }

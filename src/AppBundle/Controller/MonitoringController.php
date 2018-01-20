@@ -823,6 +823,57 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Delete HostStatus Nagios configuration
+     *
+     * @Route("/monitoring/checks/{checkId}/hosts", name="delete_host_check", methods={"DELETE"})
+     * @param $checkId
+     * @return Response
+     * @throws ElementNotFoundException
+     *
+     * @OAS\Delete(path="/monitoring/checks/{checkId}/hosts",
+     *     tags={"host-monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the HostStatus",
+     *      in="path",
+     *      name="checkId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=204,
+     *          description="HostStatus deleted",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No HostStatus for the provided id found",
+     *      ),
+     * )
+     */
+    public function deleteHostStatus($checkId){
+        $hostStatus = $this->getDoctrine()->getRepository(HostStatus::class)->find($checkId);
+
+        if (!$hostStatus) {
+            throw new ElementNotFoundException(
+                'No HostStatus for ID '.$checkId.' found'
+            );
+        }
+
+        $host = $hostStatus->getHost();
+        $host->removeStatus($hostStatus);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($host);
+        $em->remove($hostStatus);
+
+        $em->flush();
+
+        return new Response('', Response::HTTP_NO_CONTENT);
+    }
+
+    /**
      * @param String $logfileUrl
      * @return null|string|string[]
      */
