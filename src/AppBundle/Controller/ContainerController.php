@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerDeleteEvent;
+use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -350,13 +351,14 @@ class ContainerController extends Controller
      * @return Response
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
+     * @throws ElementNotFoundException
      */
-    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, OperationsRelayApi $relayApi, ContainerApi $api)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No host found for id ' . $hostId
             );
         }
@@ -388,32 +390,34 @@ class ContainerController extends Controller
 
                 if($request->request->has("fingerprint")){
                     $image = $this->getDoctrine()->getRepository(Image::class)->findBy(["fingerprint" => $request->get("fingerprint")]);
+
+                    if (!$image) {
+                        throw new ElementNotFoundException(
+                            'No Image found for fingerprint ' . $request->get("fingerprint")
+                        );
+                    }
+
                     $data["source"] = [
                         "type" => "image",
                         "fingerprint" => $image->getFingerPrint()
                     ];
                 }
 
-                if($request->request->has("alias") && !$request->request->has("imageServer")){
+                if($request->request->has("alias")){
                     $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findOneBy(["name" => $request->get("alias")]);
+
+                    if (!$imageAlias) {
+                        throw new ElementNotFoundException(
+                            'No Image found for Alias ' . $request->get("alias")
+                        );
+                    }
+
                     $image = $imageAlias->getImage();
                     $data["source"] = [
                         "type" => "image",
                         "fingerprint" => $image->getFingerPrint()
                     ];
                 }
-
-
-//
-//                        "type" => "image",
-//                        "mode" => "pull",
-//                        "server" => $request->get("imageServer") ? : 'https://images.linuxcontainers.org:8443',
-//                        "protocol" => $request->get("protocol") ? : 'lxd',
-//                        "alias" => $request->get("alias"),
-//                        "fingerprint" => $request->get("fingerprint")
-//                    ]
-//                ];
-
 
                 $container = new Container();
                 $container->setHost($host);
@@ -430,6 +434,12 @@ class ContainerController extends Controller
                 break;
             case 'migration':
                 $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
+
+                if (!$oldContainer) {
+                    throw new ElementNotFoundException(
+                        'No Container found for containerId ' . $request->get("oldContainerId")
+                    );
+                }
 
                 $data = [
                     "name" => $request->get("name"),
@@ -474,6 +484,12 @@ class ContainerController extends Controller
                 break;
             case 'copy':
                 $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
+
+                if (!$oldContainer) {
+                    throw new ElementNotFoundException(
+                        'No Container found for containerId ' . $request->get("oldContainerId")
+                    );
+                }
 
                 $data = [
                     "name" => $request->get("name"),
