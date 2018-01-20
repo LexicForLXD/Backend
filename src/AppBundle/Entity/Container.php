@@ -98,6 +98,7 @@ class Container
 
     /**
      * @ORM\OneToMany(targetEntity="ContainerStatus", mappedBy="container")
+     * @JMS\Exclude()
      */
     protected $statuses;
 
@@ -134,6 +135,16 @@ class Container
         if(!$this->statuses->contains($containerStatus)){
             $containerStatus->setContainer($this);
             $this->statuses->add($containerStatus);
+        }
+    }
+
+    /**
+     * @param ContainerStatus $containerStatus
+     */
+    public function removeStatus(ContainerStatus $containerStatus){
+        if(!$this->statuses->contains($containerStatus)){
+            $containerStatus->setContainer(null);
+            $this->statuses->remove($containerStatus);
         }
     }
 
