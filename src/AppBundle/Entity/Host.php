@@ -529,6 +529,22 @@ class Host
         return $url;
     }
 
+    /**
+     * @return PersistentCollection
+     */
+    public function getStatuses() : PersistentCollection
+    {
+        return $this->statuses;
+    }
+
+    /**
+     * @param ArrayCollection $statuses
+     */
+    public function setStatuses(ArrayCollection $statuses)
+    {
+        $this->statuses = $statuses;
+    }
+
     /** @see \Serializable::serialize() */
     // public function serialize()
     // {
