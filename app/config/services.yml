@@ -63,6 +63,11 @@ services:
                 $nagiosUsername: '%nagiosUsername%'
                 $nagiosPassword: '%nagiosPassword%'
 
+    profile.manager:
+          class: AppBundle\Service\Profile\ProfileManagerApi
+          public: true
+          arguments: [ "@doctrine.orm.entity_manager" ]
+
     lxd.image.creation.updater:
             class: AppBundle\EventListener\ImageCreationListener
             arguments: [ "@doctrine.orm.entity_manager" ]

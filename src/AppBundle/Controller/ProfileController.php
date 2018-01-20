@@ -337,53 +337,6 @@ class ProfileController extends Controller
         return $this->json([], 204);
     }
 
-    /**
-     * Used internally in the container creation process to link the profile to host and container
-     * and publish the profile to the host if needed
-     * @param Profile $profile
-     * @param Container $container
-     * @throws \Httpful\Exception\ConnectionErrorException
-     */
-    public function enableProfile(Profile $profile, Container $container){
-        $profile->addContainer($container);
-        $host = $container->getHost();
-        if($profile->isHostLinked($host)){
-            return;
-        }
-
-        //Create Profile via LXD-API
-        $profileApi = $this->container->get('lxd.api.profile');
-        $profileApi->createProfileOnHost($host, $profile);
-
-        $profile->addHost($host);
-
-        $em = $this->getDoctrine()->getManager();
-
-        $em->persist($profile);
-        $em->flush();
-    }
-
-    /**
-     * Used internally to remove the link from a Profile to a Container and Host, it will also remove the Profile from the Host
-     * if this was the last Container using it
-     * @param Profile $profile
-     * @param Container $container
-     * @throws \Httpful\Exception\ConnectionErrorException
-     */
-    public function disableProfileForContainer(Profile $profile, Container $container){
-        $profile->removeContainer($container);
-        $host = $container->getHost();
-        //Check if this container was the only one using this profile on the host
-        if($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1){
-            $profile->removeHost($host);
-            //Remove Profile via LXD-API
-            $profileApi = $this->container->get('lxd.api.profile');
-            $profileApi->deleteProfileOnHost($host, $profile);
-            return;
-        }
-        //LXC-Profile should remain on Host
-    }
-
     private function validation($object)
     {
         $validator = $this->get('validator');

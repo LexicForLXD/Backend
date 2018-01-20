@@ -9,6 +9,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Swagger\Annotations as OAS;
@@ -284,9 +285,9 @@ class Host
 
 
     /**
-     * @return ArrayCollection
+     * @return PersistentCollection
      */
-    public function getContainers() : ArrayCollection
+    public function getContainers() : PersistentCollection
     {
         return $this->containers;
     }
@@ -300,9 +301,9 @@ class Host
     }
 
     /**
-     * @return ArrayCollection
+     * @return PersistentCollection
      */
-    public function getProfiles() : ArrayCollection
+    public function getProfiles() : PersistentCollection
     {
         return $this->profiles;
     }
@@ -316,9 +317,9 @@ class Host
     }
 
     /**
-     * @return ArrayCollection
+     * @return PersistentCollection
      */
-    public function getImages() : ArrayCollection
+    public function getImages() : PersistentCollection
     {
         return $this->images;
     }
