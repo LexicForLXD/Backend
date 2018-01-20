@@ -482,6 +482,57 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Delete ContainerStatus Nagios configuration
+     *
+     * @Route("/monitoring/checks/{checkId}/containers", name="delete_container_check", methods={"DELETE"})
+     * @param $checkId
+     * @return Response
+     * @throws ElementNotFoundException
+     *
+     * @OAS\Delete(path="/monitoring/checks/{checkId}/containers",
+     *     tags={"container-monitoring"},
+     *     @OAS\Parameter(
+     *      description="ID of the ContainerStatus",
+     *      in="path",
+     *      name="checkId",
+     *      required=true,
+     *          @OAS\Schema(
+     *              type="integer"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=204,
+     *          description="ContainerStatus deleted",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No ContainerStatus for the provided id found",
+     *      ),
+     * )
+     */
+    public function deleteContainerStatus($checkId){
+        $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
+
+        if (!$containerStatus) {
+            throw new ElementNotFoundException(
+                'No ContainerStatus for ID '.$checkId.' found'
+            );
+        }
+
+        $container = $containerStatus->getContainer();
+        $container->removeStatus($containerStatus);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($container);
+        $em->remove($containerStatus);
+
+        $em->flush();
+
+        return new Response('', Response::HTTP_NO_CONTENT);
+    }
+
+    /**
      * Receive a Nagios stats graph by ContainerStatus
      *
      * @Route("/monitoring/checks/{checkId}/containers/graph", name="get_pnp4nagios_container", methods={"GET"})
