@@ -11,6 +11,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Swagger\Annotations as OAS;
@@ -224,7 +225,7 @@ class Container
     /**
      * @return ArrayCollection
      */
-    public function getStatuses() :ArrayCollection
+    public function getStatuses() :PersistentCollection
     {
         return $this->statuses;
     }
