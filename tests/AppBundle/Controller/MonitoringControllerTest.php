@@ -179,6 +179,34 @@ class MonitoringControllerTest extends WebTestCase
     }
 
     /**
+     * Negative test for createStatusCheckForContainer() - No Container with id found
+     */
+    public function testCreateStatusCheckForContainer()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'POST',
+            '/monitoring/checks/containers/99999',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),'{
+                          "nagiosEnabled": true,
+                          "nagiosName": "my-nagios-device",
+                          "nagiosUrl": "https://nagios.example.com",
+                          "checkName" : "check_http",
+                          "sourceNumber" : 0
+                        }'
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No Container for ID 99999 found"}}', $client->getResponse()->getContent());
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function tearDown()
