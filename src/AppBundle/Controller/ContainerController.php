@@ -5,7 +5,9 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerDeleteEvent;
+use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
+use AppBundle\Service\Profile\ProfileManagerApi;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +17,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 
 use AppBundle\Service\LxdApi\ContainerApi;
-use AppBundle\Service\LxdApi\OperationsRelayApi;
 
 use AppBundle\Entity\Container;
-use AppBundle\Entity\ContainerStatus;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
 use AppBundle\Entity\Image;
@@ -345,18 +345,23 @@ class ContainerController extends Controller
      * @param Request $request
      * @param int $hostId
      * @param EntityManagerInterface $em
-     * @param OperationsRelayApi $relayApi
      * @param ContainerApi $api
+     * @param ProfileManagerApi $profileManagerApi
      * @return Response
+     * @throws ElementNotFoundException
      * @throws WrongInputException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, OperationsRelayApi $relayApi, ContainerApi $api)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api)
     {
+        $profileManagerApi = $this->container->get('profile.manager');
+
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No host found for id ' . $hostId
             );
         }
@@ -367,7 +372,6 @@ class ContainerController extends Controller
 
         $profileNames = array();
 
-        $profileController = new ProfileController();
 
         foreach ($profiles as $profile){
             $profileNames[] = $profile->getName();
@@ -388,14 +392,28 @@ class ContainerController extends Controller
 
                 if($request->request->has("fingerprint")){
                     $image = $this->getDoctrine()->getRepository(Image::class)->findBy(["fingerprint" => $request->get("fingerprint")]);
+
+                    if (!$image) {
+                        throw new ElementNotFoundException(
+                            'No Image in our system found for fingerprint ' . $request->get("fingerprint")
+                        );
+                    }
+
                     $data["source"] = [
                         "type" => "image",
                         "fingerprint" => $image->getFingerPrint()
                     ];
                 }
 
-                if($request->request->has("alias") && !$request->request->has("imageServer")){
+                if($request->request->has("alias")){
                     $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findOneBy(["name" => $request->get("alias")]);
+
+                    if (!$imageAlias) {
+                        throw new ElementNotFoundException(
+                            'No Image in our system found for alias ' . $request->get("alias")
+                        );
+                    }
+
                     $image = $imageAlias->getImage();
                     $data["source"] = [
                         "type" => "image",
@@ -403,33 +421,15 @@ class ContainerController extends Controller
                     ];
                 }
 
-
-//
-//                        "type" => "image",
-//                        "mode" => "pull",
-//                        "server" => $request->get("imageServer") ? : 'https://images.linuxcontainers.org:8443',
-//                        "protocol" => $request->get("protocol") ? : 'lxd',
-//                        "alias" => $request->get("alias"),
-//                        "fingerprint" => $request->get("fingerprint")
-//                    ]
-//                ];
-
-
-                $container = new Container();
-                $container->setHost($host);
-                $container->setIpv4($request->get("ipv4"));
-
-                $container->setName($request->get("name"));
-                $container->setSettings($data);
-
-                foreach ($profiles as $profile){
-                    $profileController->enableProfile($profile, $container);
-                }
-
-
                 break;
             case 'migration':
                 $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
+
+                if (!$oldContainer) {
+                    throw new ElementNotFoundException(
+                        'No Container found for containerId ' . $request->get("oldContainerId")
+                    );
+                }
 
                 $data = [
                     "name" => $request->get("name"),
@@ -459,21 +459,16 @@ class ContainerController extends Controller
                     ]
                 ];
 
-                $container = new Container();
-                $container->setHost($host);
-                $container->setIpv4($request->get("ipv4"));
-
-                $container->setName($request->get("name"));
-                $container->setSettings($data);
-
-
-                foreach ($profiles as $profile){
-                    $profileController->enableProfile($profile, $container);
-                }
 
                 break;
             case 'copy':
                 $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
+
+                if (!$oldContainer) {
+                    throw new ElementNotFoundException(
+                        'No Container found for containerId ' . $request->get("oldContainerId")
+                    );
+                }
 
                 $data = [
                     "name" => $request->get("name"),
@@ -488,20 +483,19 @@ class ContainerController extends Controller
                     ]
                 ];
 
-                $container = new Container();
-                $container->setHost($host);
-                $container->setName($request->get("name"));
-                $container->setIpv4($request->get("ipv4"));
-                $container->setSettings($data);
-
-                foreach ($profiles as $profile){
-                    $profileController->enableProfile($profile, $container);
-                }
-
-
                 break;
             default:
                 return new JsonResponse(["message" => "none"]);
+        }
+
+        $container = new Container();
+        $container->setHost($host);
+        $container->setName($request->get("name"));
+        $container->setIpv4($request->get("ipv4"));
+        $container->setSettings($data);
+
+        foreach ($profiles as $profile){
+            $profileManagerApi->enableProfileForContainer($profile, $container);
         }
 
 
@@ -557,6 +551,7 @@ class ContainerController extends Controller
      * @param int $containerId
      * @param ContainerApi $api
      * @return Object|Response
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function showSingleAction(Request $request, int $containerId, ContainerApi $api)
     {
