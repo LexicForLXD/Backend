@@ -354,8 +354,10 @@ class ContainerController extends Controller
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api)
     {
+        $profileManagerApi = $this->container->get('profile.manager');
+
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
