@@ -44,4 +44,29 @@ class ProfileManagerApi
         $this->em->flush();
     }
 
+    /**
+     * Used internally to remove the link from a Profile to a Container and Host, it will also remove the Profile from the Host
+     * if this was the last Container using it
+     *
+     * @param Profile $profile
+     * @param Container $container
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function disableProfileForContainer(Profile $profile, Container $container){
+        $host = $container->getHost();
+        //Check if this container was the only one using this profile on the host
+        if($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1){
+            $profile->removeHost($host);
+            $this->injectedService->deleteProfileOnHost($host, $profile);
+        }
+        //ELSE LXC-Profile should remain on Host
+
+        //General operation
+        $profile->removeContainer($container);
+        $this->em->persist($profile);
+        $this->em->flush();
+    }
+
 }
