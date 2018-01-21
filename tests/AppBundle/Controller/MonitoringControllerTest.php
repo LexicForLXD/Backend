@@ -483,6 +483,29 @@ class MonitoringControllerTest extends WebTestCase
     }
 
     /**
+     * Negative test for deleteContainerStatus() - No ContainerStatuses for id found
+     */
+    public function testDeleteContainerStatusNoContainerStatus()
+    {
+        $client = static::createClient();
+
+
+        $client->request(
+            'DELETE',
+            '/monitoring/checks/9999999/containers',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No ContainerStatus for ID 9999999 found"}}', $client->getResponse()->getContent());
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function tearDown()
