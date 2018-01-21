@@ -12,6 +12,10 @@
 ```
 docker-compose up -d
 ```
+- Composer install
+```
+docker-compose exec web composer install
+```
 - Create the database schema 
 ```
 docker-compose exec web php bin/console doctrine:schema:update --force
@@ -19,10 +23,6 @@ docker-compose exec web php bin/console doctrine:schema:update --force
 - Create the database fixtures 
 ```
 docker-compose exec web php bin/console doctrine:fixtures:load
-```
-- Start the event queue daemon
-```
-docker-compose exec web php bin/console event:queue:daemon:start
 ```
 
 - Done :)
