@@ -96,7 +96,7 @@ class ContainerListener
         $result = $this->stateApi->actual($event->getHost(), $container);
 
 
-        $container->setState($result->body->metadata->status);
+        $container->setState(strtolower($result->body->metadata->status));
 
         $this->em->persist($container);
         $this->em->flush($container);
