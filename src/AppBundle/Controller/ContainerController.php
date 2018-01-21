@@ -627,6 +627,85 @@ class ContainerController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @param int $containerId
+     * @param EntityManagerInterface $em
+     * @param ContainerApi $api
+     * @param OperationApi $operationApi
+     * @return WrongInputException|JsonResponse
+     * @throws \Httpful\Exception\ConnectionErrorException
+     *
+     * @Route("/containers/{containerId}", name="containers_update", methods={"PUT"})
+     *
+     * @OAS\Get(path="/containers/{containerId}",
+     *  tags={"containers"},
+     *  @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *      @OAS\Schema(
+     *         type="integer"
+     *      ),
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *      description="Body für die Namensaenderung eines Containers.",
+     *      in="body",
+     *      name="bodyName",
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="name",
+     *              type="string"
+     *          ),
+     *      ),
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *      description="Body für die Aenderung eines Containers.",
+     *      in="body",
+     *      name="bodyProps",
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="architecture",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="config",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="devices",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="ephemeral",
+     *              type="bool"
+     *          ),
+     *          @OAS\Property(
+     *              property="profiles",
+     *              type="array"
+     *          ),
+     *      ),
+     *  ),
+     *
+     *  @OAS\Response(
+     *      response=200,
+     *      description="Returns the informationen of a single Container",
+     *      @OAS\JsonContent(ref="#/components/schemas/container"),
+     *  ),
+     *  @OAS\Response(
+     *      response=400,
+     *      description="Returns an 400 error if the new is already chosen."
+     *  ),
+     *  @OAS\Response(
+     *      response=400,
+     *      description="Returns an 400 error if something else was wrong."
+     *  ),
+     * )
+     *
+     */
     public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ContainerApi $api, OperationApi $operationApi)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
@@ -658,7 +737,9 @@ class ContainerController extends Controller
                     return new WrongInputException($operationResult->body->error);
                 }
 
-                return new JsonResponse(["message" => "name successfully changed"]);
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($container, 'json');
+                return new Response($response, Response::HTTP_OK);
             } else {
                 return new WrongInputException("The name is already taken.");
             }
@@ -691,7 +772,9 @@ class ContainerController extends Controller
 
             $em->flush();
 
-            return new JsonResponse(["message" => "container successfully updated"]);
+            $serializer = $this->get('jms_serializer');
+            $response = $serializer->serialize($container, 'json');
+            return new Response($response, Response::HTTP_OK);
 
         }
 
