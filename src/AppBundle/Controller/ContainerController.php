@@ -7,6 +7,7 @@ use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
+use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\Profile\ProfileManagerApi;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -623,6 +624,163 @@ class ContainerController extends Controller
         $dispatcher->on(ContainerDeleteEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
 
         return $this->json(['message' => 'Deletion is ongoing'], 200);
+    }
+
+
+    /**
+     * @param Request $request
+     * @param int $containerId
+     * @param EntityManagerInterface $em
+     * @param ContainerApi $api
+     * @param OperationApi $operationApi
+     * @return WrongInputException|JsonResponse
+     * @throws \Httpful\Exception\ConnectionErrorException
+     *
+     * @Route("/containers/{containerId}", name="containers_update", methods={"PUT"})
+     *
+     * @OAS\Get(path="/containers/{containerId}",
+     *  tags={"containers"},
+     *  @OAS\Parameter(
+     *      description="ID of the Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *      @OAS\Schema(
+     *         type="integer"
+     *      ),
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *      description="Body für die Namensaenderung eines Containers.",
+     *      in="body",
+     *      name="bodyName",
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="name",
+     *              type="string"
+     *          ),
+     *      ),
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *      description="Body für die Aenderung eines Containers.",
+     *      in="body",
+     *      name="bodyProps",
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="architecture",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="config",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="devices",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="ephemeral",
+     *              type="bool"
+     *          ),
+     *          @OAS\Property(
+     *              property="profiles",
+     *              type="array"
+     *          ),
+     *      ),
+     *  ),
+     *
+     *  @OAS\Response(
+     *      response=200,
+     *      description="Returns the informationen of a single Container",
+     *      @OAS\JsonContent(ref="#/components/schemas/container"),
+     *  ),
+     *  @OAS\Response(
+     *      response=400,
+     *      description="Returns an 400 error if the new is already chosen."
+     *  ),
+     *  @OAS\Response(
+     *      response=400,
+     *      description="Returns an 400 error if something else was wrong."
+     *  ),
+     * )
+     *
+     */
+    public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ContainerApi $api, OperationApi $operationApi)
+    {
+        $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+
+
+        if (!$container) {
+            throw $this->createNotFoundException(
+                'No container found for id ' . $containerId
+            );
+        }
+
+        if($request->request->has("name"))
+        {
+            if($container->getName() != $request->get("name"))
+            {
+                $container->setName($request->get("name"));
+                $data = ["name" => $request->get("name")];
+
+                $result = $api->migrate($container->getHost(), $container, $data);
+
+                if($result->code == 409)
+                {
+                    return new WrongInputException("The name is already taken.");
+                }
+
+                $operationResult = $operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
+                if($operationResult->code != 200)
+                {
+                    return new WrongInputException($operationResult->body->error);
+                }
+
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($container, 'json');
+                return new Response($response, Response::HTTP_OK);
+            } else {
+                return new WrongInputException("The name is already taken.");
+            }
+
+
+        } else {
+            $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
+            $profileNames = array();
+            foreach ($profiles as $profile){
+                $profileNames[] = $profile->getName();
+            }
+
+            $data = [
+                "architecture" => $request->get("architecture"),
+                "config" => $request->get("config"),
+                "devices" => $request->get("devices"),
+                "ephemeral" => $request->get("ephemeral"),
+                "profiles" => $profileNames
+            ];
+
+            $result = $api->update($container->getHost(), $container, $data);
+
+            $operationResult = $operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
+
+            if($operationResult->code != 200){
+                return new WrongInputException($operationResult->body->error);
+            }
+
+            $container->setSettings($data);
+
+            $em->flush();
+
+            $serializer = $this->get('jms_serializer');
+            $response = $serializer->serialize($container, 'json');
+            return new Response($response, Response::HTTP_OK);
+
+        }
+
+
+
+
     }
 
 
