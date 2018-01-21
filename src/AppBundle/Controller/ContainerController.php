@@ -492,7 +492,6 @@ class ContainerController extends Controller
         $container = new Container();
         $container->setHost($host);
         $container->setName($request->get("name"));
-        $container->setIpv4($request->get("ipv4"));
         $container->setSettings($data);
 
         foreach ($profiles as $profile){
