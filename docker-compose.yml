@@ -2,6 +2,7 @@ version: '2'
 services:
   web:
     image: "git.janrtr.de:4567/syp-lxc/backend"
+    build: .
     ports:
       - "80:80"
       - "443:443"
@@ -10,7 +11,7 @@ services:
       - "./client.key:/srv/lexic/client.key"
       - "./:/www/symfony"
   postgres:
-    image: "postgres"
+    image: "postgres:9.6.6-alpine"
     ports:
       - "5432:5432"
     environment:
