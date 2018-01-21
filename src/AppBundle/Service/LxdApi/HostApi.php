@@ -30,12 +30,12 @@ class HostApi extends HttpHelper
      *  Server configuration and environment information
      *
      * @param Host $host
-     * @return object
+     * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function info(Host $host)
     {
-        $uri = $this->buildUri($host, $this->getEndpoint());
+        $uri = $this->buildUriWithoutEndpoint($host);
         return Request::get($uri)->timeoutIn(3)->send();
     }
 
@@ -50,7 +50,7 @@ class HostApi extends HttpHelper
     {
         $info = $this->info($host);
 
-        return $info->body->metadata->auth === 'trusted' ? true : false;
+       return $info->body->metadata->auth == "trusted" ? true : false;
     }
 
     /**

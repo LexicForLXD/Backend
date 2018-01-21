@@ -49,6 +49,22 @@ class HttpHelper
         return $url;
     }
 
+    /**
+     * @param Host $host
+     * @param String|null $apiVersion
+     * @return string
+     */
+    public function buildUriWithoutEndpoint(Host $host, String $apiVersion = null)
+    {
+        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
+
+        $port = $host->getPort() ?: '8443';
+        $apiVersion = $apiVersion ?: '1.0';
+        $url = 'https://'.$hostname.':'.$port.'/'.$apiVersion;
+
+        return $url;
+    }
+
     public function init()
     {
 
@@ -69,4 +85,5 @@ class HttpHelper
 
         Request::ini($template);
     }
+
 }
