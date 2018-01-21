@@ -291,7 +291,7 @@ class Container
     /**
      * Checks if the container has at least on URI
      *
-     * @Assert\IsTrue(message = "You have to use at least one of the following: ipv4, ipv6, domainname")
+     *
      *
      * @return boolean
      */
