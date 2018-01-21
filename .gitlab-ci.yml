@@ -3,8 +3,8 @@ image: janrtr/docker-phpunit-php7:7.1-phpunit6
 stages:
   - test
   - release
-  - deploy
   - build
+  - deploy
 
 variables:
   POSTGRES_DB: syp-lxc
@@ -49,10 +49,23 @@ release:
       - $(npm bin)/semantic-release-gitlab
     stage: release
 
+build_docker:
+  image: docker:git
+  stage: build
+  services:
+  - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY/syp-lxc/backend/tagged:$(git describe --abbrev=0) -t $CI_REGISTRY/syp-lxc/backend:latest .
+    - docker push $CI_REGISTRY/syp-lxc/backend/tagged:$(git describe --abbrev=0)
+    - docker push $CI_REGISTRY/syp-lxc/backend:latest
+  only:
+    - master
+
 deploy:dev:
   image: ruby:2.1
   stage: deploy
-  only: 
+  only:
     - master
   before_script:
   # install ssh-agent
@@ -71,51 +84,11 @@ deploy:dev:
 
   script:
     # try to connect as deploy
-    - ssh deploy@2a02:c207:3002:3224::4
+    - ssh deploy@2a02:c207:3002:3224::40
 
-    - ssh deploy@2a02:c207:3002:3224::4 "cd Backend && git checkout master && git pull"
-
-    #remove all files from html folder
-    - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S rm -rf /var/www/html/*"
-    
-    #copy app folder
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/app  /var/www/html/app" 
-
-    #copy bin folder
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/bin  /var/www/html/bin" 
-
-    #copy src folder
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/src  /var/www/html/src" 
-
-    #copy var folder
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/var  /var/www/html/var" 
-
-    #copy web folder
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/web  /var/www/html/web"  
-
-    #copy composer files to folder
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/composer.json  /var/www/html/composer.json"  
-    - ssh deploy@2a02:c207:3002:3224::4 "cp -R Backend/composer.lock  /var/www/html/composer.lock" 
-
-    #Install composer dependencies
-    - ssh deploy@2a02:c207:3002:3224::4 "cd /var/www/html && composer install"
+    # Get latest docker image
+    - ssh deploy@2a02:c207:3002:3224::40 "cd lxd-api && docker-compose pull && docker-compose up -d"
 
     #Update database schema
-    - ssh deploy@2a02:c207:3002:3224::4 "cd /var/www/html && php bin/console doctrine:schema:update --force"
-
-    #change permissions for html folder
-    - ssh deploy@2a02:c207:3002:3224::4 "echo $SUDO_PASS | sudo -S chown -R www-data:www-data /var/www/html"
-
-build_docker:
-  image: docker:git
-  stage: build
-  services:
-  - docker:dind
-  script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY/syp-lxc/backend/tagged:$(git describe --abbrev=0) -t $CI_REGISTRY/syp-lxc/backend:latest .
-    - docker push $CI_REGISTRY/syp-lxc/backend/tagged:$(git describe --abbrev=0)
-    - docker push $CI_REGISTRY/syp-lxc/backend:latest
-  only:
-    - master
+    - ssh deploy@2a02:c207:3002:3224::4 "cd lxd-api && docker-compose exec web php bin/console doctrine:schema:update --force"
 
