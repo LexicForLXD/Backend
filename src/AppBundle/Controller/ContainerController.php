@@ -637,7 +637,7 @@ class ContainerController extends Controller
      *
      * @Route("/containers/{containerId}", name="containers_update", methods={"PUT"})
      *
-     * @OAS\Get(path="/containers/{containerId}",
+     * @OAS\Put(path="/containers/{containerId}",
      *  tags={"containers"},
      *  @OAS\Parameter(
      *      description="ID of the Container",
