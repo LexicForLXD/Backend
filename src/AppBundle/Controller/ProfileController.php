@@ -144,10 +144,18 @@ class ProfileController extends Controller
 
         $profile = new Profile();
 
-        $profile->setName($request->request->get('name'));
-        $profile->setDescription($request->request->get('description'));
-        $profile->setConfig($request->request->get('config'));
-        $profile->setDevices($request->request->get('devices'));
+        if($request->request->has('name')) {
+            $profile->setName($request->request->get('name'));
+        }
+        if($request->request->has('description')) {
+            $profile->setDescription($request->request->get('description'));
+        }
+        if($request->request->has('config')) {
+            $profile->setConfig($request->request->get('config'));
+        }
+        if($request->request->has('devices')) {
+            $profile->setDevices($request->request->get('devices'));
+        }
 
         if ($errorArray = $this->validation($profile)) {
             return new JsonResponse(['errors' => $errorArray], 400);
@@ -232,17 +240,17 @@ class ProfileController extends Controller
                 'No LXC-Profile for ID '.$profileId.' found'
             );
         }
-        if($request->request->get('description')) {
+        if($request->request->has('description')) {
             $profile->setDescription($request->request->get('description'));
         }
-        if($request->request->get('config')) {
+        if($request->request->has('config')) {
             $profile->setConfig($request->request->get('config'));
         }
-        if($request->request->get('devices')) {
+        if($request->request->has('devices')) {
             $profile->setDevices($request->request->get('devices'));
         }
         $oldName = null;
-        if($request->request->get('name') && $request->request->get('name') != $profile->getName()) {
+        if($request->request->has('name') && $request->request->get('name') != $profile->getName()) {
             $oldName = $profile->getName();
             $profile->setName($request->request->get('name'));
         }
