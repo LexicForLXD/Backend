@@ -31,6 +31,7 @@ class HostStatus
      * @var boolean
      * @ORM\Column(type="boolean")
      * @Assert\NotNull()
+     * @Assert\Type("bool")
      *
      * @OAS\Property(example="true")
      */
@@ -41,6 +42,7 @@ class HostStatus
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\NotBlank()
+     * @Assert\Type("string")
      *
      * @OAS\Property(example="LXC-Host1")
      */
@@ -51,6 +53,7 @@ class HostStatus
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\NotBlank()
+     * @Assert\Type("string")
      *
      * @OAS\Property(example="check_http")
      */
@@ -72,6 +75,7 @@ class HostStatus
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\NotBlank()
+     * @Assert\Url()
      *
      * @OAS\Property(example="https://nagios.example.com/pnp4nagios/")
      */
@@ -102,9 +106,9 @@ class HostStatus
     }
 
     /**
-     * @param bool $nagiosEnabled
+     * @param mixed $nagiosEnabled
      */
-    public function setNagiosEnabled(bool $nagiosEnabled)
+    public function setNagiosEnabled($nagiosEnabled)
     {
         $this->nagiosEnabled = $nagiosEnabled;
     }
@@ -118,9 +122,9 @@ class HostStatus
     }
 
     /**
-     * @param String $nagiosName
+     * @param mixed $nagiosName
      */
-    public function setNagiosName(String $nagiosName)
+    public function setNagiosName($nagiosName)
     {
         $this->nagiosName = $nagiosName;
     }
@@ -134,9 +138,9 @@ class HostStatus
     }
 
     /**
-     * @param String $checkName
+     * @param mixed $checkName
      */
-    public function setCheckName(String $checkName)
+    public function setCheckName($checkName)
     {
         $this->checkName = $checkName;
     }
@@ -150,9 +154,9 @@ class HostStatus
     }
 
     /**
-     * @param int $sourceNumber
+     * @param mixed $sourceNumber
      */
-    public function setSourceNumber(int $sourceNumber)
+    public function setSourceNumber( $sourceNumber)
     {
         $this->sourceNumber = $sourceNumber;
     }
@@ -166,9 +170,9 @@ class HostStatus
     }
 
     /**
-     * @param String $nagiosUrl
+     * @param mixed $nagiosUrl
      */
-    public function setNagiosUrl(String $nagiosUrl)
+    public function setNagiosUrl($nagiosUrl)
     {
         $this->nagiosUrl = $nagiosUrl;
     }

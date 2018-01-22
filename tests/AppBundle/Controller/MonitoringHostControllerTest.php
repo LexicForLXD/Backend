@@ -1,13 +1,11 @@
 <?php
 namespace Tests\AppBundle\Controller;
 
-use AppBundle\Entity\Container;
-use AppBundle\Entity\ContainerStatus;
+use AppBundle\Entity\HostStatus;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Entity\Host;
-use Symfony\Component\VarDumper\VarDumper;
 
-class MonitoringControllerTest extends WebTestCase
+class MonitoringHostControllerTest extends WebTestCase
 {
 
     protected $token;
@@ -48,15 +46,15 @@ class MonitoringControllerTest extends WebTestCase
     }
 
     /**
-     * Negative test for getStatusChecksContainer() - No Container with id found
+     * Negative test for getStatusChecksHost() - No Host with id found
      */
-    public function testGetStatusChecksContainerNoContainer()
+    public function testGetStatusChecksHostNoHost()
     {
         $client = static::createClient();
 
         $client->request(
             'GET',
-            '/monitoring/checks/containers/999999',
+            '/monitoring/checks/hosts/999999',
             array(),
             array(),
             array(
@@ -66,36 +64,29 @@ class MonitoringControllerTest extends WebTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
-        $this->assertEquals('{"error":{"code":404,"message":"No Container for ID 999999 found"}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":404,"message":"No Host for ID 999999 found"}}', $client->getResponse()->getContent());
     }
 
     /**
-     * Negative test for getStatusChecksContainer() - No ContainerStatuses for Container with id found
+     * Negative test for getStatusChecksHost() - No HostStatus for Host with id found
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testGetStatusChecksContainerNoContainerStatuses()
+    public function testGetStatusChecksHostNoHostStatuses()
     {
         $client = static::createClient();
 
         $host = new Host();
-        $host->setName("Test-Hosst-monitor-1".mt_rand());
+        $host->setName("Test-Host-monitor-17".mt_rand());
         $host->setDomainName("test.".mt_rand().".de");
         $host->setPort(8443);
         $host->setSettings("settings");
 
-        $container = new Container();
-        $container->setName("testContainerGetStatus3".mt_rand());
-        $container->setHost($host);
-        $container->setIpv4("192.168.178.120");
-        $container->setState('stopped');
-
         $this->em->persist($host);
-        $this->em->persist($container);
         $this->em->flush();
 
         $client->request(
             'GET',
-            '/monitoring/checks/containers/'.$container->getId(),
+            '/monitoring/checks/hosts/'.$host->getId(),
             array(),
             array(),
             array(
@@ -105,52 +96,43 @@ class MonitoringControllerTest extends WebTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
-        $this->assertEquals('{"error":{"code":404,"message":"No ContainerStatuses for Container with ID '.$container->getId().' found"}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":404,"message":"No HostStatuses for Host with ID '.$host->getId().' found"}}', $client->getResponse()->getContent());
 
-        $container = $this->em->getRepository(Container::class)->find($container->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
-        $this->em->remove($container);
         $this->em->flush();
     }
 
     /**
-     * Positive test for getStatusChecksContainer()
+     * Positive test for getStatusChecksHost()
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testGetStatusChecksContainer()
+    public function testGetStatusChecksHost()
     {
         $client = static::createClient();
 
         $host = new Host();
-        $host->setName("Test-Hosst-monitor-1".mt_rand());
+        $host->setName("Test-Host-monitor-1".mt_rand());
         $host->setDomainName("test.".mt_rand().".de");
         $host->setPort(8443);
         $host->setSettings("settings");
 
-        $container = new Container();
-        $container->setName("testContainerGetStatus2".mt_rand());
-        $container->setHost($host);
-        $container->setIpv4("192.168.178.10");
-        $container->setState('stopped');
+        $hostStatus = new HostStatus();
+        $hostStatus->setNagiosEnabled(true);
+        $hostStatus->setNagiosName("myNagiosTestDevice");
+        $hostStatus->setCheckName("http");
+        $hostStatus->setSourceNumber(0);
+        $hostStatus->setNagiosUrl("nagios.example.com");
 
-        $containerStatus = new ContainerStatus();
-        $containerStatus->setNagiosEnabled(true);
-        $containerStatus->setNagiosName("myNagiosTestDevice");
-        $containerStatus->setCheckName("http");
-        $containerStatus->setSourceNumber(0);
-        $containerStatus->setNagiosUrl("nagios.example.com");
-
-        $container->addStatus($containerStatus);
+        $host->addStatus($hostStatus);
 
         $this->em->persist($host);
-        $this->em->persist($containerStatus);
-        $this->em->persist($container);
+        $this->em->persist($hostStatus);
         $this->em->flush();
 
         $client->request(
             'GET',
-            '/monitoring/checks/containers/'.$container->getId(),
+            '/monitoring/checks/hosts/'.$host->getId(),
             array(),
             array(),
             array(
@@ -163,31 +145,29 @@ class MonitoringControllerTest extends WebTestCase
         $array = json_decode($client->getResponse()->getContent());
         $object = $array[0];
 
-        $this->assertEquals($containerStatus->isNagiosEnabled(), $object->nagiosEnabled);
-        $this->assertEquals($containerStatus->getNagiosName(), $object->nagiosName);
-        $this->assertEquals($containerStatus->getCheckName(), $object->checkName);
-        $this->assertEquals($containerStatus->getSourceNumber(), $object->sourceNumber);
-        $this->assertEquals($containerStatus->getNagiosUrl(), $object->nagiosUrl);
+        $this->assertEquals($hostStatus->isNagiosEnabled(), $object->nagiosEnabled);
+        $this->assertEquals($hostStatus->getNagiosName(), $object->nagiosName);
+        $this->assertEquals($hostStatus->getCheckName(), $object->checkName);
+        $this->assertEquals($hostStatus->getSourceNumber(), $object->sourceNumber);
+        $this->assertEquals($hostStatus->getNagiosUrl(), $object->nagiosUrl);
 
-        $container = $this->em->getRepository(Container::class)->find($container->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
-        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());
+        $hostStatus = $this->em->getRepository(HostStatus::class)->find($hostStatus->getId());
         $this->em->remove($host);
-        $this->em->remove($container);
-        $this->em->remove($containerStatus);
+        $this->em->remove($hostStatus);
         $this->em->flush();
     }
 
     /**
-     * Negative test for createStatusCheckForContainer() - No Container with id found
+     * Negative test for createStatusCheckForHost() - No Host with id found
      */
-    public function testCreateStatusCheckForContainerNoContainer()
+    public function testCreateStatusCheckForHostNoHost()
     {
         $client = static::createClient();
 
         $client->request(
             'POST',
-            '/monitoring/checks/containers/99999',
+            '/monitoring/checks/hosts/99999',
             array(),
             array(),
             array(
@@ -203,14 +183,14 @@ class MonitoringControllerTest extends WebTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
-        $this->assertEquals('{"error":{"code":404,"message":"No Container for ID 99999 found"}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":404,"message":"No Host for ID 99999 found"}}', $client->getResponse()->getContent());
     }
 
     /**
-     * Negative test for createStatusCheckForContainer() - Validation failed - sourceNumber should be int
+     * Negative test for createStatusCheckForHost() - Validation failed - sourceNumber should be int
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testCreateStatusCheckForContainerValidationFailed()
+    public function testCreateStatusCheckForHostValidationFailed()
     {
         $client = static::createClient();
 
@@ -220,20 +200,13 @@ class MonitoringControllerTest extends WebTestCase
         $host->setPort(8443);
         $host->setSettings("settings");
 
-        $container = new Container();
-        $container->setName("testContainerCreateStatus".mt_rand());
-        $container->setHost($host);
-        $container->setIpv4("192.168.178.10");
-        $container->setState('stopped');
-
         $this->em->persist($host);
-        $this->em->persist($container);
         $this->em->flush();
 
 
         $client->request(
             'POST',
-            '/monitoring/checks/containers/'.$container->getId(),
+            '/monitoring/checks/hosts/'.$host->getId(),
             array(),
             array(),
             array(
@@ -251,18 +224,16 @@ class MonitoringControllerTest extends WebTestCase
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
         $this->assertEquals('{"errors":{"sourceNumber":"This value should be of type int."}}', $client->getResponse()->getContent());
 
-        $container = $this->em->getRepository(Container::class)->find($container->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
-        $this->em->remove($container);
         $this->em->flush();
     }
 
     /**
-     * Positive test for createStatusCheckForContainer()
+     * Positive test for createStatusCheckForHost()
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testCreateStatusCheckForContainer()
+    public function testCreateStatusCheckForHost()
     {
         $client = static::createClient();
 
@@ -272,20 +243,13 @@ class MonitoringControllerTest extends WebTestCase
         $host->setPort(8443);
         $host->setSettings("settings");
 
-        $container = new Container();
-        $container->setName("testContainerCreateStatus".mt_rand());
-        $container->setHost($host);
-        $container->setIpv4("192.168.178.11");
-        $container->setState('stopped');
-
         $this->em->persist($host);
-        $this->em->persist($container);
         $this->em->flush();
 
 
         $client->request(
             'POST',
-            '/monitoring/checks/containers/'.$container->getId(),
+            '/monitoring/checks/hosts/'.$host->getId(),
             array(),
             array(),
             array(
@@ -310,25 +274,23 @@ class MonitoringControllerTest extends WebTestCase
         $this->assertEquals("check_http", $object->checkName);
         $this->assertEquals(0, $object->sourceNumber);
 
-        $container = $this->em->getRepository(Container::class)->find($container->getId());
-        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($object->id);
+        $hostStatus = $this->em->getRepository(HostStatus::class)->find($object->id);
         $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
-        $this->em->remove($container);
-        $this->em->remove($containerStatus);
+        $this->em->remove($hostStatus);
         $this->em->flush();
     }
 
     /**
-     * Negative test for configureStatusCheckForContainer() - No ContainerStatus with id found
+     * Negative test for configureStatusCheckForHost() - No HostStatus with id found
      */
-    public function testConfigureStatusCheckForContainerNoContainerStatus()
+    public function testConfigureStatusCheckForHostNoHostStatus()
     {
         $client = static::createClient();
 
         $client->request(
             'PUT',
-            '/monitoring/checks/9999999/containers',
+            '/monitoring/checks/9999999/hosts',
             array(),
             array(),
             array(
@@ -344,14 +306,14 @@ class MonitoringControllerTest extends WebTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
-        $this->assertEquals('{"error":{"code":404,"message":"No ContainerStatus for ID 9999999 found"}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":404,"message":"No HostStatus for ID 9999999 found"}}', $client->getResponse()->getContent());
     }
 
     /**
-     * Negative test for configureStatusCheckForContainer() - Validation failed - sourceNumber should be int
+     * Negative test for configureStatusCheckForHost() - Validation failed - sourceNumber should be int
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testConfigureStatusCheckForContainerValidationFailed()
+    public function testConfigureStatusCheckForHostValidationFailed()
     {
         $client = static::createClient();
 
@@ -361,30 +323,23 @@ class MonitoringControllerTest extends WebTestCase
         $host->setPort(8443);
         $host->setSettings("settings");
 
-        $container = new Container();
-        $container->setName("testContainerCreateStatus".mt_rand());
-        $container->setHost($host);
-        $container->setIpv4("192.168.178.10");
-        $container->setState('stopped');
+        $hostStatus = new HostStatus();
+        $hostStatus->setNagiosEnabled(true);
+        $hostStatus->setNagiosName("myNagiosTestDevice123465798");
+        $hostStatus->setCheckName("http");
+        $hostStatus->setSourceNumber(0);
+        $hostStatus->setNagiosUrl("nagios.example.com");
 
-        $containerStatus = new ContainerStatus();
-        $containerStatus->setNagiosEnabled(true);
-        $containerStatus->setNagiosName("myNagiosTestDevice123465798");
-        $containerStatus->setCheckName("http");
-        $containerStatus->setSourceNumber(0);
-        $containerStatus->setNagiosUrl("nagios.example.com");
-
-        $container->addStatus($containerStatus);
+        $host->addStatus($hostStatus);
 
         $this->em->persist($host);
-        $this->em->persist($containerStatus);
-        $this->em->persist($container);
+        $this->em->persist($hostStatus);
         $this->em->flush();
 
 
         $client->request(
             'PUT',
-            '/monitoring/checks/'.$containerStatus->getId().'/containers',
+            '/monitoring/checks/'.$hostStatus->getId().'/hosts',
             array(),
             array(),
             array(
@@ -402,20 +357,18 @@ class MonitoringControllerTest extends WebTestCase
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
         $this->assertEquals('{"errors":{"sourceNumber":"This value should be of type int."}}', $client->getResponse()->getContent());
 
-        $container = $this->em->getRepository(Container::class)->find($container->getId());
-        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());
+        $hostStatus = $this->em->getRepository(HostStatus::class)->find($hostStatus->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
-        $this->em->remove($container);
-        $this->em->remove($containerStatus);
+        $this->em->remove($hostStatus);
         $this->em->flush();
     }
 
     /**
-     * Positive test for configureStatusCheckForContainer()
+     * Positive test for configureStatusCheckForHost()
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testConfigureStatusCheckForContainer()
+    public function testConfigureStatusCheckForHost()
     {
         $client = static::createClient();
 
@@ -425,30 +378,23 @@ class MonitoringControllerTest extends WebTestCase
         $host->setPort(8443);
         $host->setSettings("settings");
 
-        $container = new Container();
-        $container->setName("testContainerCreateStatus".mt_rand());
-        $container->setHost($host);
-        $container->setIpv4("192.168.178.10");
-        $container->setState('stopped');
+        $hostStatus = new HostStatus();
+        $hostStatus->setNagiosEnabled(true);
+        $hostStatus->setNagiosName("myNagiosTestDevice123465798");
+        $hostStatus->setCheckName("http");
+        $hostStatus->setSourceNumber(0);
+        $hostStatus->setNagiosUrl("nagios.example.com");
 
-        $containerStatus = new ContainerStatus();
-        $containerStatus->setNagiosEnabled(true);
-        $containerStatus->setNagiosName("myNagiosTestDevice123465798");
-        $containerStatus->setCheckName("http");
-        $containerStatus->setSourceNumber(0);
-        $containerStatus->setNagiosUrl("nagios.example.com");
-
-        $container->addStatus($containerStatus);
+        $host->addStatus($hostStatus);
 
         $this->em->persist($host);
-        $this->em->persist($containerStatus);
-        $this->em->persist($container);
+        $this->em->persist($hostStatus);
         $this->em->flush();
 
 
         $client->request(
             'PUT',
-            '/monitoring/checks/'.$containerStatus->getId().'/containers',
+            '/monitoring/checks/'.$hostStatus->getId().'/hosts',
             array(),
             array(),
             array(
@@ -466,33 +412,31 @@ class MonitoringControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $object = json_decode($client->getResponse()->getContent());
 
-        $this->assertEquals($containerStatus->getId(), $object->id);
+        $this->assertEquals($hostStatus->getId(), $object->id);
         $this->assertEquals(false, $object->nagiosEnabled);
         $this->assertEquals("my-nagios-device_newTest", $object->nagiosName);
         $this->assertEquals("https://nagios2.example.com", $object->nagiosUrl);
         $this->assertEquals("check_http2", $object->checkName);
         $this->assertEquals(1, $object->sourceNumber);
 
-        $container = $this->em->getRepository(Container::class)->find($container->getId());
-        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());
+        $hostStatus = $this->em->getRepository(HostStatus::class)->find($hostStatus->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
-        $this->em->remove($container);
-        $this->em->remove($containerStatus);
+        $this->em->remove($hostStatus);
         $this->em->flush();
     }
 
     /**
-     * Negative test for deleteContainerStatus() - No ContainerStatuses for id found
+     * Negative test for deleteHostStatus() - No HostStatuses for id found
      */
-    public function testDeleteContainerStatusNoContainerStatus()
+    public function testDeleteContainerStatusNoHostStatus()
     {
         $client = static::createClient();
 
 
         $client->request(
             'DELETE',
-            '/monitoring/checks/9999999/containers',
+            '/monitoring/checks/9999999/hosts',
             array(),
             array(),
             array(
@@ -502,14 +446,14 @@ class MonitoringControllerTest extends WebTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
-        $this->assertEquals('{"error":{"code":404,"message":"No ContainerStatus for ID 9999999 found"}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":404,"message":"No HostStatus for ID 9999999 found"}}', $client->getResponse()->getContent());
     }
 
     /**
-     * Positive test for deleteContainerStatus()
+     * Positive test for deleteHostStatus()
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testDeleteContainerStatus()
+    public function testDeleteHostStatus()
     {
         $client = static::createClient();
 
@@ -519,29 +463,22 @@ class MonitoringControllerTest extends WebTestCase
         $host->setPort(8443);
         $host->setSettings("settings");
 
-        $container = new Container();
-        $container->setName("testContainerGetStatus2".mt_rand());
-        $container->setHost($host);
-        $container->setIpv4("192.168.178.11");
-        $container->setState('stopped');
+        $hostStatus = new HostStatus();
+        $hostStatus->setNagiosEnabled(true);
+        $hostStatus->setNagiosName("myNagiosTestDevice".mt_rand());
+        $hostStatus->setCheckName("http");
+        $hostStatus->setSourceNumber(0);
+        $hostStatus->setNagiosUrl("nagios.example.com");
 
-        $containerStatus = new ContainerStatus();
-        $containerStatus->setNagiosEnabled(true);
-        $containerStatus->setNagiosName("myNagiosTestDevice".mt_rand());
-        $containerStatus->setCheckName("http");
-        $containerStatus->setSourceNumber(0);
-        $containerStatus->setNagiosUrl("nagios.example.com");
-
-        $container->addStatus($containerStatus);
+        $host->addStatus($hostStatus);
 
         $this->em->persist($host);
-        $this->em->persist($containerStatus);
-        $this->em->persist($container);
+        $this->em->persist($hostStatus);
         $this->em->flush();
 
         $client->request(
             'DELETE',
-            '/monitoring/checks/'.$containerStatus->getId().'/containers',
+            '/monitoring/checks/'.$hostStatus->getId().'/hosts',
             array(),
             array(),
             array(
@@ -551,13 +488,11 @@ class MonitoringControllerTest extends WebTestCase
         );
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode());
-        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());
-        $this->assertEquals(false, !$containerStatus);
+        $hostStatus = $this->em->getRepository(HostStatus::class)->find($hostStatus->getId());
+        $this->assertEquals(false, !$hostStatus);
 
-        $container = $this->em->getRepository(Container::class)->find($container->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
         $this->em->remove($host);
-        $this->em->remove($container);
         $this->em->flush();
     }
 
