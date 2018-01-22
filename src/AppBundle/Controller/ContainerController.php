@@ -491,7 +491,9 @@ class ContainerController extends Controller
 
         $container = new Container();
         $container->setHost($host);
-        $container->setName($request->get("name"));
+        if($request->request->has("name")){
+            $container->setName($request->get("name"));
+        }
         $container->setSettings($data);
 
         foreach ($profiles as $profile){
@@ -633,8 +635,8 @@ class ContainerController extends Controller
      * @param ContainerApi $api
      * @param OperationApi $operationApi
      * @return WrongInputException|JsonResponse
+     * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
-     *
      * @Route("/containers/{containerId}", name="containers_update", methods={"PUT"})
      *
      * @OAS\Put(path="/containers/{containerId}",
@@ -703,7 +705,6 @@ class ContainerController extends Controller
      *      description="Returns an 400 error if something else was wrong."
      *  ),
      * )
-     *
      */
     public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ContainerApi $api, OperationApi $operationApi)
     {
@@ -749,6 +750,10 @@ class ContainerController extends Controller
             $profileNames = array();
             foreach ($profiles as $profile){
                 $profileNames[] = $profile->getName();
+            }
+
+            if(!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral")){
+                throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
             }
 
             $data = [
