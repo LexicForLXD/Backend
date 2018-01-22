@@ -5,9 +5,8 @@ use AppBundle\Entity\Container;
 use AppBundle\Entity\ContainerStatus;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Entity\Host;
-use Symfony\Component\VarDumper\VarDumper;
 
-class MonitoringControllerTest extends WebTestCase
+class MonitoringContainerControllerTest extends WebTestCase
 {
 
     protected $token;
