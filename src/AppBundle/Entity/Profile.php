@@ -44,7 +44,7 @@ class Profile
     protected $name;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      *
      * @OAS\Property(example="Some description string")
      * var string
@@ -52,7 +52,7 @@ class Profile
     protected $description;
 
     /**
-     * @ORM\Column(type="json_array")
+     * @ORM\Column(type="json_array", nullable=true)
      *
      * @OAS\Property(example="Config JSON Object")
      * var json_array
@@ -60,7 +60,7 @@ class Profile
     protected $config;
 
     /**
-     * @ORM\Column(type="json_array")
+     * @ORM\Column(type="json_array", nullable=true)
      *
      * @OAS\Property(example="Devices JSON Object")
      * var json_array
