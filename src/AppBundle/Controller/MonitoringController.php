@@ -435,6 +435,10 @@ class MonitoringController extends Controller
      *          response=404,
      *          description="No ContainerStatus for the id found",
      *      ),
+     * @OAS\Response(
+     *          response=400,
+     *          description="Validation for new ContainerStatus object failed, wrong input",
+     *      ),
      * )
      */
     public function configureStatusCheckForContainer($checkId, Request $request) {

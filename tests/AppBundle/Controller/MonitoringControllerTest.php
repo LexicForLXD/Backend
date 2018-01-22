@@ -320,6 +320,248 @@ class MonitoringControllerTest extends WebTestCase
     }
 
     /**
+     * Negative test for configureStatusCheckForContainer() - No ContainerStatus with id found
+     */
+    public function testConfigureStatusCheckForContainerNoContainerStatus()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'PUT',
+            '/monitoring/checks/9999999/containers',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),'{
+                          "nagiosEnabled": true,
+                          "nagiosName": "my-nagios-device",
+                          "nagiosUrl": "https://nagios.example.com",
+                          "checkName" : "check_http",
+                          "sourceNumber" : 0
+                        }'
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No ContainerStatus for ID 9999999 found"}}', $client->getResponse()->getContent());
+    }
+
+    /**
+     * Negative test for configureStatusCheckForContainer() - Validation failed - sourceNumber should be int
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testConfigureStatusCheckForContainerValidationFailed()
+    {
+        $client = static::createClient();
+
+        $host = new Host();
+        $host->setName("Test-Hosst-monitor-1".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $container = new Container();
+        $container->setName("testContainerCreateStatus".mt_rand());
+        $container->setHost($host);
+        $container->setIpv4("192.168.178.10");
+        $container->setState('stopped');
+
+        $containerStatus = new ContainerStatus();
+        $containerStatus->setNagiosEnabled(true);
+        $containerStatus->setNagiosName("myNagiosTestDevice123465798");
+        $containerStatus->setCheckName("http");
+        $containerStatus->setSourceNumber(0);
+        $containerStatus->setNagiosUrl("nagios.example.com");
+
+        $container->addStatus($containerStatus);
+
+        $this->em->persist($host);
+        $this->em->persist($containerStatus);
+        $this->em->persist($container);
+        $this->em->flush();
+
+
+        $client->request(
+            'PUT',
+            '/monitoring/checks/'.$containerStatus->getId().'/containers',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),'{
+                          "nagiosEnabled": true,
+                          "nagiosName": "my-nagios-device",
+                          "nagiosUrl": "https://nagios.example.com",
+                          "checkName" : "check_http",
+                          "sourceNumber" : "A"
+                        }'
+        );
+
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"errors":{"sourceNumber":"This value should be of type int."}}', $client->getResponse()->getContent());
+
+        $container = $this->em->getRepository(Container::class)->find($container->getId());
+        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->remove($container);
+        $this->em->remove($containerStatus);
+        $this->em->flush();
+    }
+
+    /**
+     * Positive test for configureStatusCheckForContainer()
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testConfigureStatusCheckForContainer()
+    {
+        $client = static::createClient();
+
+        $host = new Host();
+        $host->setName("Test-Hosst-monitor-1".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $container = new Container();
+        $container->setName("testContainerCreateStatus".mt_rand());
+        $container->setHost($host);
+        $container->setIpv4("192.168.178.10");
+        $container->setState('stopped');
+
+        $containerStatus = new ContainerStatus();
+        $containerStatus->setNagiosEnabled(true);
+        $containerStatus->setNagiosName("myNagiosTestDevice123465798");
+        $containerStatus->setCheckName("http");
+        $containerStatus->setSourceNumber(0);
+        $containerStatus->setNagiosUrl("nagios.example.com");
+
+        $container->addStatus($containerStatus);
+
+        $this->em->persist($host);
+        $this->em->persist($containerStatus);
+        $this->em->persist($container);
+        $this->em->flush();
+
+
+        $client->request(
+            'PUT',
+            '/monitoring/checks/'.$containerStatus->getId().'/containers',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            ),'{
+                          "nagiosEnabled": false,
+                          "nagiosName": "my-nagios-device_newTest",
+                          "nagiosUrl": "https://nagios2.example.com",
+                          "checkName" : "check_http2",
+                          "sourceNumber" : 1
+                        }'
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $object = json_decode($client->getResponse()->getContent());
+
+        $this->assertEquals($containerStatus->getId(), $object->id);
+        $this->assertEquals(false, $object->nagiosEnabled);
+        $this->assertEquals("my-nagios-device_newTest", $object->nagiosName);
+        $this->assertEquals("https://nagios2.example.com", $object->nagiosUrl);
+        $this->assertEquals("check_http2", $object->checkName);
+        $this->assertEquals(1, $object->sourceNumber);
+
+        $container = $this->em->getRepository(Container::class)->find($container->getId());
+        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->remove($container);
+        $this->em->remove($containerStatus);
+        $this->em->flush();
+    }
+
+    /**
+     * Negative test for deleteContainerStatus() - No ContainerStatuses for id found
+     */
+    public function testDeleteContainerStatusNoContainerStatus()
+    {
+        $client = static::createClient();
+
+
+        $client->request(
+            'DELETE',
+            '/monitoring/checks/9999999/containers',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No ContainerStatus for ID 9999999 found"}}', $client->getResponse()->getContent());
+    }
+
+    /**
+     * Positive test for deleteContainerStatus()
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testDeleteContainerStatus()
+    {
+        $client = static::createClient();
+
+        $host = new Host();
+        $host->setName("Test-Hosst-monitor-1".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $container = new Container();
+        $container->setName("testContainerGetStatus2".mt_rand());
+        $container->setHost($host);
+        $container->setIpv4("192.168.178.11");
+        $container->setState('stopped');
+
+        $containerStatus = new ContainerStatus();
+        $containerStatus->setNagiosEnabled(true);
+        $containerStatus->setNagiosName("myNagiosTestDevice".mt_rand());
+        $containerStatus->setCheckName("http");
+        $containerStatus->setSourceNumber(0);
+        $containerStatus->setNagiosUrl("nagios.example.com");
+
+        $container->addStatus($containerStatus);
+
+        $this->em->persist($host);
+        $this->em->persist($containerStatus);
+        $this->em->persist($container);
+        $this->em->flush();
+
+        $client->request(
+            'DELETE',
+            '/monitoring/checks/'.$containerStatus->getId().'/containers',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode());
+        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());
+        $this->assertEquals(false, !$containerStatus);
+
+        $container = $this->em->getRepository(Container::class)->find($container->getId());
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->remove($container);
+        $this->em->flush();
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function tearDown()
