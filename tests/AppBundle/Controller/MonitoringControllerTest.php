@@ -506,6 +506,62 @@ class MonitoringControllerTest extends WebTestCase
     }
 
     /**
+     * Positive test for deleteContainerStatus()
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testDeleteContainerStatus()
+    {
+        $client = static::createClient();
+
+        $host = new Host();
+        $host->setName("Test-Hosst-monitor-1".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $container = new Container();
+        $container->setName("testContainerGetStatus2".mt_rand());
+        $container->setHost($host);
+        $container->setIpv4("192.168.178.11");
+        $container->setState('stopped');
+
+        $containerStatus = new ContainerStatus();
+        $containerStatus->setNagiosEnabled(true);
+        $containerStatus->setNagiosName("myNagiosTestDevice".mt_rand());
+        $containerStatus->setCheckName("http");
+        $containerStatus->setSourceNumber(0);
+        $containerStatus->setNagiosUrl("nagios.example.com");
+
+        $container->addStatus($containerStatus);
+
+        $this->em->persist($host);
+        $this->em->persist($containerStatus);
+        $this->em->persist($container);
+        $this->em->flush();
+
+        $client->request(
+            'DELETE',
+            '/monitoring/checks/'.$containerStatus->getId().'/containers',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode());
+        $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());
+        $this->assertEquals(false, !$containerStatus);
+
+        $container = $this->em->getRepository(Container::class)->find($container->getId());
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->remove($container);
+        $this->em->flush();
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function tearDown()
