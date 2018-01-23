@@ -36,7 +36,11 @@ class ProfileManagerApi
             return;
         }
 
-        $this->injectedService->createProfileOnHost($host, $profile);
+        $result = $this->injectedService->createProfileOnHost($host, $profile);
+
+        if($result->code != 200){
+            return;
+        }
 
         $profile->addHost($host);
 
