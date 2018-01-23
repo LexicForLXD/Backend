@@ -82,7 +82,7 @@ class Container
     protected $settings;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      *
      * @OAS\Property(example="TODO Settings")
      * var string
@@ -265,7 +265,7 @@ class Container
     /**
      * @param string $state
      */
-    public function setState(string $state)
+    public function setState($state)
     {
         $this->state = $state;
     }
