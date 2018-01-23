@@ -557,10 +557,11 @@ class ContainerController extends Controller
      * @param Request $request
      * @param int $containerId
      * @param ContainerApi $api
+     * @param EntityManagerInterface $em
      * @return Object|Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function showSingleAction(Request $request, int $containerId, ContainerApi $api)
+    public function showSingleAction(Request $request, int $containerId, ContainerApi $api, EntityManagerInterface $em)
     {
         $fresh = $request->query->get('fresh');
 
@@ -574,12 +575,15 @@ class ContainerController extends Controller
 
         if ($fresh == 'true') {
 
-            $result = $api->show($container->host, $container->name);
+            $result = $api->show($container->getHost(), $container->getName());
 
-            //TODO in DB aktualisieren
+            $container->setSettings($result->body->metadata);
+            $container->setState(strtolower($result->body->metadata->status));
 
-            return new Response($result->body);
+
+            $em->flush($container);
         }
+
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
         return new Response($response);
