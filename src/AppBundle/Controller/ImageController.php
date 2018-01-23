@@ -391,9 +391,6 @@ class ImageController extends Controller
             $aliases = $image->getAliases();
             for($i = 0; $i < $aliases->count(); $i++){
                 $em->remove($aliases->get($i));
-                //TODO fix removeAlias function
-                //$image->removeAlias($aliases->get($i));
-                //$em->remove($aliases->get($i));
             }
 
             $em->remove($image);
