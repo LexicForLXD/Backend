@@ -515,6 +515,13 @@ class ContainerController extends Controller
 
         $dispatcher = $this->get('sb_event_queue');
 
+        if ($result->code != 202) {
+            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
+        }
+        if ($result->body->metadata->status_code == 400) {
+            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
+        }
+
         $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
 
 
