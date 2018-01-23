@@ -104,7 +104,7 @@ class ContainerStatus
     /**
      * @param bool $nagiosEnabled
      */
-    public function setNagiosEnabled(bool $nagiosEnabled)
+    public function setNagiosEnabled($nagiosEnabled)
     {
         $this->nagiosEnabled = $nagiosEnabled;
     }
@@ -118,9 +118,9 @@ class ContainerStatus
     }
 
     /**
-     * @param null|String $nagiosName
+     * @param string $nagiosName
      */
-    public function setNagiosName(String $nagiosName)
+    public function setNagiosName($nagiosName)
     {
         $this->nagiosName = $nagiosName;
     }
@@ -134,9 +134,9 @@ class ContainerStatus
     }
 
     /**
-     * @param null|String $nagiosUrl
+     * @param string $nagiosUrl
      */
-    public function setNagiosUrl(String $nagiosUrl)
+    public function setNagiosUrl($nagiosUrl)
     {
         $this->nagiosUrl = $nagiosUrl;
     }
@@ -144,15 +144,15 @@ class ContainerStatus
     /**
      * @return String
      */
-    public function getCheckName(): String
+    public function getCheckName(): string
     {
         return $this->checkName;
     }
 
     /**
-     * @param String $checkName
+     * @param string $checkName
      */
-    public function setCheckName(String $checkName)
+    public function setCheckName($checkName)
     {
         $this->checkName = $checkName;
     }
@@ -166,15 +166,15 @@ class ContainerStatus
     }
 
     /**
-     * @param $sourceNumber
+     * @param int $sourceNumber
      */
-    public function setSourceNumber( $sourceNumber)
+    public function setSourceNumber($sourceNumber)
     {
         $this->sourceNumber = $sourceNumber;
     }
 
     /**
-     * @return mixed
+     * @return Container
      */
     public function getContainer() : Container
     {
@@ -182,7 +182,7 @@ class ContainerStatus
     }
 
     /**
-     * @param mixed $container
+     * @param Container $container
      */
     public function setContainer($container)
     {

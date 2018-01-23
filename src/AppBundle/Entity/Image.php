@@ -213,7 +213,7 @@ class Image
     /**
      * @param bool $public
      */
-    public function setPublic(bool $public)
+    public function setPublic($public)
     {
         $this->public = $public;
     }
@@ -229,7 +229,7 @@ class Image
     /**
      * @param string $filename
      */
-    public function setFilename(string $filename)
+    public function setFilename($filename)
     {
         $this->filename = $filename;
     }
@@ -245,7 +245,7 @@ class Image
     /**
      * @param array $properties
      */
-    public function setProperties(array $properties)
+    public function setProperties($properties)
     {
         $this->properties = $properties;
     }
@@ -273,7 +273,7 @@ class Image
     /**
      * @param bool $finished
      */
-    public function setFinished(bool $finished)
+    public function setFinished($finished)
     {
         $this->finished = $finished;
     }

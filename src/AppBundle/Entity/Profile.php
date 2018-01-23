@@ -171,7 +171,7 @@ class Profile
     /**
      * @param string $description
      */
-    public function setDescription(string $description)
+    public function setDescription($description)
     {
         $this->description = $description;
     }
@@ -187,7 +187,7 @@ class Profile
     /**
      * @param array $config
      */
-    public function setConfig(array $config)
+    public function setConfig($config)
     {
         $this->config = $config;
     }
@@ -203,7 +203,7 @@ class Profile
     /**
      * @param array $devices
      */
-    public function setDevices(array $devices)
+    public function setDevices($devices)
     {
         $this->devices = $devices;
     }
