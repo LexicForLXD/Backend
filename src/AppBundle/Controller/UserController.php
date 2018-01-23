@@ -88,7 +88,7 @@ class UserController extends Controller
      * @return Response
      * @throws ElementNotFoundException
      */
-    public function showAction(integer $userId)
+    public function showAction($userId)
     {
         $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
 
