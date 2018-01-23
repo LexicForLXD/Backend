@@ -39,7 +39,7 @@ class ContainerRepository extends EntityRepository
     /**
      * returns all Containers with host associated
      *
-     * @return void
+     * @return array|null
      */
     public function findAllJoinedToHost()
     {
@@ -55,6 +55,10 @@ class ContainerRepository extends EntityRepository
         }
     }
 
+    /**
+     * @param $hostId
+     * @return array|null
+     */
     public function findAllByHostJoinedToHost($hostId)
     {
         $query = $this->getEntityManager()
