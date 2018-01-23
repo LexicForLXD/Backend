@@ -616,6 +616,7 @@ class ContainerController extends Controller
     public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+        $profiles = $container->getProfiles();
 
         if (!$container) {
             throw $this->createNotFoundException(
@@ -624,6 +625,18 @@ class ContainerController extends Controller
         }
 
         $result = $api->remove($container->getHost(), $container->getName());
+
+        if($result->code == 404)
+        {
+            $profiles = $container->getProfiles();
+
+            foreach ($profiles as $profile){
+                $this->profileManagerApi->disableProfileForContainer($profile, $container);
+            }
+            $em->remove($container);
+            $em->flush();
+            return new JsonResponse(["message" => "deleted because was not found on lxd-host"]);
+        }
 
 
         $dispatcher = $this->get('sb_event_queue');

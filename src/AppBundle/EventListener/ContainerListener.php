@@ -15,6 +15,7 @@ use AppBundle\Event\ContainerStateEvent;
 use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\OperationApi;
+use AppBundle\Service\Profile\ProfileManagerApi;
 use Doctrine\ORM\EntityManager;
 
 class ContainerListener
@@ -23,13 +24,15 @@ class ContainerListener
     protected $api;
     protected $stateApi;
     protected $operationApi;
+    protected $profileManagerApi;
 
-    public function __construct(EntityManager $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi)
+    public function __construct(EntityManager $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi, ProfileManagerApi $profileManagerApi)
     {
         $this->em = $em;
         $this->api = $api;
         $this->stateApi = $stateApi;
         $this->operationApi = $operationApi;
+        $this->profileManagerApi = $profileManagerApi;
     }
 
     /**
@@ -104,6 +107,12 @@ class ContainerListener
         echo "FINISH-STATE-UPDATE : ContainerId ".$event->getContainerId()."\n";
     }
 
+    /**
+     * @param ContainerDeleteEvent $event
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
     public function onLxdContainerDeleteUpdate(ContainerDeleteEvent $event)
     {
         echo "START-CONTAINER-DELETE: ContainerId ".$event->getContainerId()." \n";
@@ -117,13 +126,16 @@ class ContainerListener
             echo "FAILED-CONTAINER-DELETE : ".$operationsResponse->body->metadata->err."\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
             $container->setState($operationsResponse->body->metadata->err);
-            $this->em->persist($container);
             $this->em->flush($container);
             return;
         }
 
         $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
+        $profiles = $container->getProfiles();
 
+        foreach ($profiles as $profile){
+            $this->profileManagerApi->disableProfileForContainer($profile, $container);
+        }
 
         $this->em->remove($container);
         $this->em->flush($container);
