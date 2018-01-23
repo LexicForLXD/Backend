@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
-use Symfony\Component\VarDumper\VarDumper;
 
 class MonitoringController extends Controller
 {
@@ -156,14 +155,13 @@ class MonitoringController extends Controller
     /**
      * Get the content of a single Logfile
      *
-     * @Route("/monitoring/logs/hosts/{hostId}/{logpath}", name="get_single_log_from_host", methods={"GET"})
+     * @Route("/monitoring/logs/hosts/{hostId}", name="get_single_log_from_host", methods={"GET"})
      * @param $hostId
-     * @param $logpath
      * @param HostSSH $ssh
      * @return Response
      * @throws ElementNotFoundException
      *
-     *@OAS\Get(path="/monitoring/logs/hosts/{hostId}/{logpath}",
+     * @OAS\Get(path="/monitoring/logs/hosts/{hostId}?logpath={logpath}",
      *     tags={"host-monitoring"},
      *     @OAS\Parameter(
      *      description="ID of the Host",
@@ -196,8 +194,9 @@ class MonitoringController extends Controller
      *          description="Error getting the logfile",
      *      ),
      * )
+     * @throws WrongInputException
      */
-    public function getSingleLogfileFromHost($hostId, $logpath, HostSSH $ssh){
+    public function getSingleLogfileFromHost($hostId, Request $request, HostSSH $ssh){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
@@ -205,12 +204,17 @@ class MonitoringController extends Controller
                 'No Host for ID '.$hostId.' found'
             );
         }
-        $result = $ssh->getLogFileFromHost($host, $logpath);
-
-        //TODO Add 400 Error
+        if(!$request->query->has('logpath')) {
+            throw new WrongInputException("No logpath provided");
+        }
+        try {
+            $result = $ssh->getLogFileFromHost($host, $request->query->get('logpath'));
+        }catch (\Exception $e){
+            throw new WrongInputException($e->getMessage());
+        }
 
         $response = new Response();
-        $response->setContent($result->body);
+        $response->setContent($result);
         $response->headers->set('Content-Type', 'text/plain');
         return $response;
     }
