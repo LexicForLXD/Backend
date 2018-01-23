@@ -102,9 +102,9 @@ class ContainerStatus
     }
 
     /**
-     * @param bool $nagiosEnabled
+     * @param mixed $nagiosEnabled
      */
-    public function setNagiosEnabled(bool $nagiosEnabled)
+    public function setNagiosEnabled($nagiosEnabled)
     {
         $this->nagiosEnabled = $nagiosEnabled;
     }
@@ -118,9 +118,9 @@ class ContainerStatus
     }
 
     /**
-     * @param null|String $nagiosName
+     * @param mixed $nagiosName
      */
-    public function setNagiosName(String $nagiosName)
+    public function setNagiosName($nagiosName)
     {
         $this->nagiosName = $nagiosName;
     }
@@ -134,9 +134,9 @@ class ContainerStatus
     }
 
     /**
-     * @param null|String $nagiosUrl
+     * @param mixed $nagiosUrl
      */
-    public function setNagiosUrl(String $nagiosUrl)
+    public function setNagiosUrl($nagiosUrl)
     {
         $this->nagiosUrl = $nagiosUrl;
     }
@@ -150,9 +150,9 @@ class ContainerStatus
     }
 
     /**
-     * @param String $checkName
+     * @param mixed $checkName
      */
-    public function setCheckName(String $checkName)
+    public function setCheckName($checkName)
     {
         $this->checkName = $checkName;
     }
@@ -166,9 +166,9 @@ class ContainerStatus
     }
 
     /**
-     * @param $sourceNumber
+     * @param mixed $sourceNumber
      */
-    public function setSourceNumber( $sourceNumber)
+    public function setSourceNumber($sourceNumber)
     {
         $this->sourceNumber = $sourceNumber;
     }
