@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -184,6 +185,113 @@ class UserController extends Controller
 
         $em->persist($user);
         $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($user, 'json');
+        return new Response($response);
+    }
+
+
+    /**
+     * Updates existing User
+     *
+     * @Route("/users/{userId}", name="users_update", methods={"PUT"})
+     *
+     * @OAS\PUT(path="/users",
+     *  tags={"users"},
+     *  @OAS\Response(
+     *     response=200,
+     *     description="gibt den neu gespeicherten User zurück",
+     *     @OAS\JsonContent(ref="#/components/schemas/user"),
+     *     @OAS\Schema(
+     *         type="array"
+     *     ),
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *     description="ID von upzudatendem User",
+     *     in="path",
+     *     name="userId",
+     *     required=true,
+     *     @OAS\Schema(
+     *         type="integer"
+     *     ),
+     *  ),
+     *
+     *  @OAS\Parameter(
+     *      description="Parameters for updated User",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="firstName",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="lastName",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="username",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="email",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="password",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="roles",
+     *              type="array"
+     *          ),
+     *      ),
+     *  ),
+     * )
+     *
+     * @param Request $request
+     * @param $userId
+     * @param EntityManagerInterface $em
+     * @return JsonResponse|Response
+     * @throws ElementNotFoundException
+     */
+    public function updateAction(Request $request, $userId, EntityManagerInterface $em)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
+
+        if (!$user) {
+            throw new ElementNotFoundException(
+                'No User found'
+            );
+        }
+
+        $encoder = $this->container->get('security.password_encoder');
+
+        if($request->request->has("email")) {
+            $user->setEmail($request->request->get('email'));
+        }
+        if($request->request->has("firstName")) {
+            $user->setFirstName($request->request->get('firstName'));
+        }
+        if($request->request->has("lastName")) {
+            $user->setLastName($request->request->get('lastName'));
+        }
+        if($request->request->has("password")) {
+            $user->setPassword($encoder->encodePassword($user, $request->request->get('password')));
+        }
+        if($request->request->has("username")) {
+            $user->setUsername($request->request->get('username'));
+        }
+
+
+        if ($errorArray = $this->validation($user)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
+        $em->flush($user);
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($user, 'json');
