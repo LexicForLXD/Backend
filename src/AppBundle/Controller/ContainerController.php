@@ -97,13 +97,17 @@ class ContainerController extends Controller
      *)
      * @param Request $request
      * @param int $hostId
+     * @param ContainerApi $api
+     * @param EntityManagerInterface $em
      * @return Response
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function listFromHostAction(Request $request, int $hostId, ContainerApi $api)
+    public function listFromHostAction(Request $request, int $hostId, ContainerApi $api, EntityManagerInterface $em)
     {
 
         $fresh = $request->query->get('fresh');
 
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
 
         if ($fresh == 'true') {
             $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
@@ -115,30 +119,21 @@ class ContainerController extends Controller
             }
 
 
+            foreach ($containers as $container){
+                $result = $api->show($container->getHost(), $container->getName());
+
+                $container->setSettings($result->body->metadata);
+                $container->setState(strtolower($result->body->metadata->status));
 
 
-
-
-            $result = $api->list($host);
-
-            //TODO in DB aktualisieren
-
-            return new Response($result->body);
-        } else {
-            $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
-
-            if (!$containers) {
-                throw $this->createNotFoundException(
-                    'No containers found'
-                );
+                $em->flush($container);
             }
-            $serializer = $this->get('jms_serializer');
-            $response = $serializer->serialize($containers, 'json');
-            return new Response($response);
+
         }
 
-
-
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($containers, 'json');
+        return new Response($response);
     }
 
 
