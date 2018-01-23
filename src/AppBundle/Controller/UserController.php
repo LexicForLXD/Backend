@@ -297,4 +297,49 @@ class UserController extends Controller
         $response = $serializer->serialize($user, 'json');
         return new Response($response);
     }
+
+
+    /**
+     * Delete a existing User
+     *
+     * @Route("/users/{userId}", name="users_delete", methods={"DELETE"})
+     *
+     * @OAS\Delete(path="/users/{userId}",
+     *  tags={"users"},
+     *  @OAS\Parameter(
+     *     description="ID von zu löschendem User",
+     *     in="path",
+     *     name="userId",
+     *     required=true,
+     *     @OAS\Schema(
+     *         type="integer"
+     *     ),
+     *  ),
+     *
+     *  @OAS\Response(
+     *     response=204,
+     *     description="löscht einen User"
+     *  ),
+     * )
+     *
+     * @param $userId
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     * @throws ElementNotFoundException
+     */
+    public function deleteAction($userId, EntityManagerInterface $em)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
+
+        if (!$user) {
+            throw new ElementNotFoundException(
+                'No User found'
+            );
+        }
+
+        $em->remove($user);
+        $em->flush();
+
+        return $this->json([], 204);
+    }
 }
