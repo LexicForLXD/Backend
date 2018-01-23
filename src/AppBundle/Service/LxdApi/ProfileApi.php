@@ -16,6 +16,13 @@ class ProfileApi extends HttpHelper
         return 'profiles';
     }
 
+    /**
+     * ProfileApi constructor.
+     * @param $cert_location
+     * @param $cert_key_location
+     * @param $cert_passphrase
+     * @throws \AppBundle\Exception\WrongInputException
+     */
     public function __construct($cert_location, $cert_key_location, $cert_passphrase)
     {
         parent::__construct($cert_location, $cert_key_location, $cert_passphrase);
@@ -41,10 +48,24 @@ class ProfileApi extends HttpHelper
      */
     public function createProfileOnHost(Host $host, Profile $profile){
         $uri = $this->buildUri($host, $this->getEndpoint());
-        $body = '{ "name": "'.$profile->getName().'", "description": "'.$profile->getDescription().'", "config": '.json_encode($profile->getConfig()).', "devices": '.json_encode($profile->getDevices()).' }';
+
+        //Build body with provided values
+        $body = array();
+        if($profile->getName()) {
+            $body['name'] = $profile->getName();
+        }
+        if($profile->getDescription()) {
+            $body['description'] = $profile->getDescription();
+        }
+        if($profile->getConfig()) {
+            $body['config'] = $profile->getConfig();
+        }
+        if($profile->getDevices()) {
+            $body['devices'] = $profile->getDevices();
+        }
 
         return Request::post($uri)
-            -> body($body)
+            -> body(json_encode($body))
             -> send();
     }
 
@@ -56,10 +77,21 @@ class ProfileApi extends HttpHelper
      */
     public function updateProfileOnHost(Host $host, Profile $profile){
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$profile->getName());
-        $body = '{ "description": "'.$profile->getDescription().'", "config": '.json_encode($profile->getConfig()).', "devices": '.json_encode($profile->getDevices()).' }';
+
+        //Build body with provided values
+        $body = array();
+        if($profile->getDescription()) {
+            $body['description'] = $profile->getDescription();
+        }
+        if($profile->getConfig()) {
+            $body['config'] = $profile->getConfig();
+        }
+        if($profile->getDevices()) {
+            $body['devices'] = $profile->getDevices();
+        }
 
         return Request::put($uri)
-            -> body($body)
+            -> body(json_encode($body))
             -> send();
     }
 
