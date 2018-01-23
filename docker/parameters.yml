@@ -16,3 +16,9 @@ parameters:
     cert_passphrase: null
     redis_hostname: redis
     jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
+    ssh_location: /srv/lexic/ssh/logssh.pub
+    ssh_key_location: /srv/lexic/ssh/logssh
+    ssh_passphrase: null
+    ssh_user: loguser
+    nagiosUsername: nagiosUser
+    nagiosPassword: nagiosPassword
