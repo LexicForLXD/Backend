@@ -347,7 +347,6 @@ class ContainerController extends Controller
      * @param int $hostId
      * @param EntityManagerInterface $em
      * @param ContainerApi $api
-     * @param ProfileManagerApi $profileManagerApi
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
@@ -373,6 +372,9 @@ class ContainerController extends Controller
 
         $profileNames = array();
 
+        $container = new Container();
+        $container->setHost($host);
+
 
         foreach ($profiles as $profile){
             $profileNames[] = $profile->getName();
@@ -383,7 +385,7 @@ class ContainerController extends Controller
 
                 $data = [
                     "name" => $request->request->get("name"),
-                    "architecture" => $request->get("architecture", 'x86_64'),
+                    "architecture" => $request->get("architecture", "x86_64"),
                     "profiles" => $profileNames,
                     "ephemeral" => $request->get("ephemeral", false),
                     "config" => $request->get("config"),
@@ -392,7 +394,7 @@ class ContainerController extends Controller
                 ];
 
                 if($request->request->has("fingerprint")){
-                    $image = $this->getDoctrine()->getRepository(Image::class)->findBy(["fingerprint" => $request->get("fingerprint")]);
+                    $image = $this->getDoctrine()->getRepository(Image::class)->findOneBy(["fingerprint" => $request->get("fingerprint")]);
 
                     if (!$image) {
                         throw new ElementNotFoundException(
@@ -404,6 +406,8 @@ class ContainerController extends Controller
                         "type" => "image",
                         "fingerprint" => $image->getFingerPrint()
                     ];
+
+                    $container->setImage($image);
                 }
 
                 if($request->request->has("alias")){
@@ -420,6 +424,8 @@ class ContainerController extends Controller
                         "type" => "image",
                         "fingerprint" => $image->getFingerPrint()
                     ];
+
+                    $container->setImage($image);
                 }
 
                 break;
@@ -490,11 +496,23 @@ class ContainerController extends Controller
         }
 
         $container = new Container();
+
         $container->setHost($host);
+
         if($request->request->has("name")){
             $container->setName($request->get("name"));
         }
-        $container->setSettings($data);
+        if($request->request->has("config")){
+            $container->setConfig($request->get("config"));
+        }
+        if($request->request->has("devices")){
+            $container->setDevices($request->get("devices"));
+        }
+
+        $container->setEphemeral($request->get("ephemeral", false));
+
+        $container->setArchitecture($request->get("architecture", "x86_64"));
+
 
         foreach ($profiles as $profile){
             $profileManagerApi->enableProfileForContainer($profile, $container);
@@ -506,7 +524,7 @@ class ContainerController extends Controller
             throw new WrongInputException(json_encode($errorArray));
         }
 
-        $container->setState('creating');
+        $container->setState(["status" => "Creating", "status_code" => 100]);
 
         $em->persist($container);
         $em->flush();
@@ -552,10 +570,11 @@ class ContainerController extends Controller
      * @param Request $request
      * @param int $containerId
      * @param ContainerApi $api
+     * @param EntityManagerInterface $em
      * @return Object|Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function showSingleAction(Request $request, int $containerId, ContainerApi $api)
+    public function showSingleAction(Request $request, int $containerId, ContainerApi $api, EntityManagerInterface $em)
     {
         $fresh = $request->query->get('fresh');
 
@@ -569,16 +588,23 @@ class ContainerController extends Controller
 
         if ($fresh == 'true') {
 
-            $result = $api->show($container->host, $container->name);
+            $result = $api->show($container->getHost(), $container->getName());
 
-            //TODO in DB aktualisieren
+            $container->setArchitecture($result->body->architecture);
+            $container->setConfig($result->body->config);
+            $container->setDevices($result->body->devices);
+            $container->setEphemeral($result->body->ephemeral);
+            $container->setCreatedAt($result->body->created_at);
+            $container->setExpandedConfig($result->body->expanded_config);
+            $container->setExpandedDevices($result->body->expanded_devices);
+            $container->setName($result->body->name);
 
-            return new Response($result->body);
+            $em->flush($container);
         }
+
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
         return new Response($response);
-
     }
 
 
@@ -599,8 +625,8 @@ class ContainerController extends Controller
      * ),
      *
      * SWG\Response(
-     *      response=200,
-     *      description="show a single container"
+     *      response=204,
+     *      description="empty"
      * ),
      *)
      * @param int $containerId
@@ -620,6 +646,12 @@ class ContainerController extends Controller
 
         $result = $api->remove($container->getHost(), $container->getName());
 
+        if($result->code == 404)
+        {
+            $em->remove($container);
+            $em->flush();
+            return new JsonResponse(["message" => "deleted because was not found on lxd-host"]);
+        }
 
         $dispatcher = $this->get('sb_event_queue');
         $dispatcher->on(ContainerDeleteEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
@@ -708,6 +740,7 @@ class ContainerController extends Controller
      */
     public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ContainerApi $api, OperationApi $operationApi)
     {
+        $profileManagerApi = $this->container->get('profile.manager');
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
 
 
@@ -736,6 +769,7 @@ class ContainerController extends Controller
                 {
                     return new WrongInputException($operationResult->body->error);
                 }
+                $em->flush();
 
                 $serializer = $this->get('jms_serializer');
                 $response = $serializer->serialize($container, 'json');
@@ -766,15 +800,26 @@ class ContainerController extends Controller
 
             $result = $api->update($container->getHost(), $container, $data);
 
+            //TODO in EventListener auslagern
+
             $operationResult = $operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
             if($operationResult->code != 200){
                 return new WrongInputException($operationResult->body->error);
             }
 
+            $container->setConfig($request->get("config"));
+            $container->setDevices($request->get("devices"));
+            $container->setEphemeral($request->get("ephemeral"));
+            $container->setArchitecture($request->get("architecture"));
+            $container->setProfiles($profiles);
             $container->setSettings($data);
 
-            $em->flush();
+            foreach ($profiles as $profile){
+                $profileManagerApi->enableProfileForContainer($profile, $container);
+            }
+
+            $em->flush($container);
 
             $serializer = $this->get('jms_serializer');
             $response = $serializer->serialize($container, 'json');

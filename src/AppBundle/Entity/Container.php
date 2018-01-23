@@ -22,7 +22,7 @@ use JMS\Serializer\Annotation as JMS;
  * Class Container
  * @package AppBundle\Entity
  * @ORM\Table(name="containers")
- * @UniqueEntity("ipv4")
+ *
  * @UniqueEntity("ipv6")
  * @UniqueEntity("domainName")
  * @UniqueEntity("name")
@@ -82,12 +82,76 @@ class Container
     protected $settings;
 
     /**
-     * @ORM\Column(type="text")
-     *
+     * @ORM\Column(type="json")
      * @OAS\Property(example="TODO Settings")
-     * var string
      */
     protected $state;
+
+    /**
+     * @ORM\Column(type="json")
+     * @Assert\NotBlank()
+     * @OAS\Property(example="{'limits.cpu': '2'}")
+     * @var
+     */
+    protected $config;
+
+    /**
+     * @ORM\Column(type="json")
+     * @Assert\NotBlank()
+     * @OAS\Property(example="'kvm': {'path': '/dev/kvm','type': 'unix-char'}")
+     * @var
+     */
+    protected $devices;
+    /**
+     * @ORM\Column(type="boolean")
+     * @Assert\Type("bool")
+     * @OAS\Property(example="true")
+     * @var bool
+     */
+    protected $ephemeral;
+
+    /**
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
+     * @OAS\Property(example="x86_64")
+     * @var string
+     */
+    protected $architecture;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\DateTime()
+     * @var \DateTime
+     */
+    protected $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\DateTime()
+     * @var \DateTime
+     */
+    protected $updatedAt;
+
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     * @OAS\Property(example="aehnlich zu config allerdings mit config von profiles")
+     * @var
+     */
+    protected $expandedConfig;
+
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     * @OAS\Property(example="aehnlich zu devices allerdings mit devices von profiles")
+     * @var
+     */
+    protected $expandedDevices;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @OAS\Property(example="Beispiel Fehlermeldung")
+     * @var string
+     */
+    protected $error;
 
     /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
@@ -255,9 +319,9 @@ class Container
     }
 
     /**
-     * @return string
+     * @return
      */
-    public function getState() : string
+    public function getState()
     {
         return $this->state;
     }
@@ -265,10 +329,174 @@ class Container
     /**
      * @param string $state
      */
-    public function setState(string $state)
+    public function setState($state)
     {
         $this->state = $state;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param mixed $config
+     */
+    public function setConfig($config): void
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDevices()
+    {
+        return $this->devices;
+    }
+
+    /**
+     * @param mixed $devices
+     */
+    public function setDevices($devices): void
+    {
+        $this->devices = $devices;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEphemeral(): bool
+    {
+        return $this->ephemeral;
+    }
+
+    /**
+     * @param bool $ephemeral
+     */
+    public function setEphemeral(bool $ephemeral): void
+    {
+        $this->ephemeral = $ephemeral;
+    }
+
+    /**
+     * @return string
+     */
+    public function getArchitecture(): string
+    {
+        return $this->architecture;
+    }
+
+    /**
+     * @param string $architecture
+     */
+    public function setArchitecture(string $architecture): void
+    {
+        $this->architecture = $architecture;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     */
+    public function setCreatedAt(\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt(): \DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     */
+    public function setUpdatedAt(\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpandedConfig()
+    {
+        return $this->expandedConfig;
+    }
+
+    /**
+     * @param mixed $expandedConfig
+     */
+    public function setExpandedConfig($expandedConfig): void
+    {
+        $this->expandedConfig = $expandedConfig;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpandedDevices()
+    {
+        return $this->expandedDevices;
+    }
+
+    /**
+     * @param mixed $expandedDevices
+     */
+    public function setExpandedDevices($expandedDevices): void
+    {
+        $this->expandedDevices = $expandedDevices;
+    }
+
+
+
+    /**
+     * @return string
+     */
+    public function getError(): string
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param string $error
+     */
+    public function setError(string $error): void
+    {
+        $this->error = $error;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProfiles()
+    {
+        return $this->profiles;
+    }
+
+    /**
+     * @param mixed $profiles
+     */
+    public function setProfiles($profiles): void
+    {
+        $this->profiles = $profiles;
+    }
+
+
 
     /**
      * @return Image
@@ -281,7 +509,7 @@ class Container
     /**
      * @param Image $image
      */
-    public function setImages(Image $image): void
+    public function setImage(Image $image): void
     {
         $this->image = $image;
     }

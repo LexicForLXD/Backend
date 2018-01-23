@@ -16,6 +16,7 @@ use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManager;
+use Httpful\Response;
 
 class ContainerListener
 {
@@ -46,21 +47,31 @@ class ContainerListener
 
         $operationsResponse = $this->api->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
 
-        if ($operationsResponse->body->metadata->status_code != 200) {
-            echo "FAILED-UPDATE : ".$operationsResponse->body->metadata->err."\n";
+
+        if($operationsResponse->hasErrors()){
+            echo "FAILED-CREATION : ContainerId ".$event->getContainerId()." \n";
+            echo "FAILED-CREATION : Error: ".$operationsResponse->code." \n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
-            $this->em->persist($container);
+            $container->setError($operationsResponse->body->error);
+            $container->setState(["status" => "Failure", "status_code" =>$operationsResponse->code]);
             $this->em->flush($container);
             return;
         }
 
-
+        if ($operationsResponse->body->metadata->status_code != 200) {
+            echo "FAILED-CREATION : ".$operationsResponse->body->metadata->err."\n";
+            $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
+            $container->setError($operationsResponse->body->metadata->err);
+            $container->setState(["status" => "Failure", "status_code" => 400]);
+            $this->em->flush($container);
+            return;
+        }
         $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
+        $result = $this->stateApi->actual($event->getHost(), $container);
+        echo "BLA-BLI : ContainerId ".$result->body->type."\n";
 
-        $container->setState('created');
+        $container->setState($result->body->metadata);
 
-        $this->em->persist($container);
         $this->em->flush($container);
 
         echo "FINISH-CREATION : ContainerId ".$event->getContainerId()."\n";
@@ -82,28 +93,30 @@ class ContainerListener
 
         $operationsResponse = $this->stateApi->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
 
+        $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
+
+        $result = $this->stateApi->actual($event->getHost(), $container);
+        $container->setState($result->body->metadata);
+
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-STATE-UPDATE : ".$operationsResponse->body->metadata->err."\n";
-            $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
-            $this->em->persist($container);
+
+            $container->setError($operationsResponse->body->metadata->err);
             $this->em->flush($container);
             return;
         }
 
-        $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-
-        $result = $this->stateApi->actual($event->getHost(), $container);
-
-
-        $container->setState(strtolower($result->body->metadata->status));
-
-        $this->em->persist($container);
         $this->em->flush($container);
 
         echo "FINISH-STATE-UPDATE : ContainerId ".$event->getContainerId()."\n";
     }
 
+    /**
+     * @param ContainerDeleteEvent $event
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
     public function onLxdContainerDeleteUpdate(ContainerDeleteEvent $event)
     {
         echo "START-CONTAINER-DELETE: ContainerId ".$event->getContainerId()." \n";
@@ -116,14 +129,16 @@ class ContainerListener
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-CONTAINER-DELETE : ".$operationsResponse->body->metadata->err."\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
-            $this->em->persist($container);
+            $result = $this->stateApi->actual($event->getHost(), $container);
+            $container->setState($result->body->metadata);
+            $container->setError($operationsResponse->body->metadata->err);
             $this->em->flush($container);
             return;
         }
 
         $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-
+        $result = $this->stateApi->actual($event->getost(), $container);
+        $container->setState($result->body->metadata);
 
         $this->em->remove($container);
         $this->em->flush($container);
