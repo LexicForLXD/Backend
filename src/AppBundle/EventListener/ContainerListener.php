@@ -24,15 +24,13 @@ class ContainerListener
     protected $api;
     protected $stateApi;
     protected $operationApi;
-    protected $profileManagerApi;
 
-    public function __construct(EntityManager $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi, ProfileManagerApi $profileManagerApi)
+    public function __construct(EntityManager $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi)
     {
         $this->em = $em;
         $this->api = $api;
         $this->stateApi = $stateApi;
         $this->operationApi = $operationApi;
-        $this->profileManagerApi = $profileManagerApi;
     }
 
     /**
@@ -131,11 +129,7 @@ class ContainerListener
         }
 
         $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-        $profiles = $container->getProfiles();
 
-        foreach ($profiles as $profile){
-            $this->profileManagerApi->disableProfileForContainer($profile, $container);
-        }
 
         $this->em->remove($container);
         $this->em->flush($container);

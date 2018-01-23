@@ -617,6 +617,7 @@ class ContainerController extends Controller
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
         $profiles = $container->getProfiles();
+        $profileManagerApi = $this->container->get('profile.manager');
 
         if (!$container) {
             throw $this->createNotFoundException(
@@ -626,13 +627,15 @@ class ContainerController extends Controller
 
         $result = $api->remove($container->getHost(), $container->getName());
 
+        foreach ($profiles as $profile){
+            $profileManagerApi->disableProfileForContainer($profile, $container);
+        }
+
         if($result->code == 404)
         {
-            $profiles = $container->getProfiles();
 
-            foreach ($profiles as $profile){
-                $this->profileManagerApi->disableProfileForContainer($profile, $container);
-            }
+
+
             $em->remove($container);
             $em->flush();
             return new JsonResponse(["message" => "deleted because was not found on lxd-host"]);
