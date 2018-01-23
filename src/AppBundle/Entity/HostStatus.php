@@ -90,9 +90,9 @@ class HostStatus
     protected $host;
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
@@ -106,7 +106,7 @@ class HostStatus
     }
 
     /**
-     * @param mixed $nagiosEnabled
+     * @param string $nagiosEnabled
      */
     public function setNagiosEnabled($nagiosEnabled)
     {
@@ -114,15 +114,15 @@ class HostStatus
     }
 
     /**
-     * @return String
+     * @return string
      */
-    public function getNagiosName(): String
+    public function getNagiosName(): string
     {
         return $this->nagiosName;
     }
 
     /**
-     * @param mixed $nagiosName
+     * @param string $nagiosName
      */
     public function setNagiosName($nagiosName)
     {
@@ -130,15 +130,15 @@ class HostStatus
     }
 
     /**
-     * @return String
+     * @return string
      */
-    public function getCheckName(): String
+    public function getCheckName(): string
     {
         return $this->checkName;
     }
 
     /**
-     * @param mixed $checkName
+     * @param int $checkName
      */
     public function setCheckName($checkName)
     {
@@ -154,7 +154,7 @@ class HostStatus
     }
 
     /**
-     * @param mixed $sourceNumber
+     * @param int $sourceNumber
      */
     public function setSourceNumber( $sourceNumber)
     {
@@ -162,15 +162,15 @@ class HostStatus
     }
 
     /**
-     * @return String
+     * @return string
      */
-    public function getNagiosUrl(): String
+    public function getNagiosUrl(): string
     {
         return $this->nagiosUrl;
     }
 
     /**
-     * @param mixed $nagiosUrl
+     * @param string $nagiosUrl
      */
     public function setNagiosUrl($nagiosUrl)
     {
@@ -186,7 +186,7 @@ class HostStatus
     }
 
     /**
-     * @param mixed $host
+     * @param Host $host
      */
     public function setHost($host)
     {

@@ -102,7 +102,7 @@ class ContainerStatus
     }
 
     /**
-     * @param mixed $nagiosEnabled
+     * @param bool $nagiosEnabled
      */
     public function setNagiosEnabled($nagiosEnabled)
     {
@@ -118,7 +118,7 @@ class ContainerStatus
     }
 
     /**
-     * @param mixed $nagiosName
+     * @param string $nagiosName
      */
     public function setNagiosName($nagiosName)
     {
@@ -134,7 +134,7 @@ class ContainerStatus
     }
 
     /**
-     * @param mixed $nagiosUrl
+     * @param string $nagiosUrl
      */
     public function setNagiosUrl($nagiosUrl)
     {
@@ -144,13 +144,13 @@ class ContainerStatus
     /**
      * @return String
      */
-    public function getCheckName(): String
+    public function getCheckName(): string
     {
         return $this->checkName;
     }
 
     /**
-     * @param mixed $checkName
+     * @param string $checkName
      */
     public function setCheckName($checkName)
     {
@@ -166,7 +166,7 @@ class ContainerStatus
     }
 
     /**
-     * @param mixed $sourceNumber
+     * @param int $sourceNumber
      */
     public function setSourceNumber($sourceNumber)
     {
@@ -174,7 +174,7 @@ class ContainerStatus
     }
 
     /**
-     * @return mixed
+     * @return Container
      */
     public function getContainer() : Container
     {
@@ -182,7 +182,7 @@ class ContainerStatus
     }
 
     /**
-     * @param mixed $container
+     * @param Container $container
      */
     public function setContainer($container)
     {
