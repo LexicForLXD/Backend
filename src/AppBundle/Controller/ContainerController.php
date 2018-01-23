@@ -392,7 +392,7 @@ class ContainerController extends Controller
                 ];
 
                 if($request->request->has("fingerprint")){
-                    $image = $this->getDoctrine()->getRepository(Image::class)->findBy(["fingerprint" => $request->get("fingerprint")]);
+                    $image = $this->getDoctrine()->getRepository(Image::class)->findOneBy(["fingerprint" => $request->get("fingerprint")]);
 
                     if (!$image) {
                         throw new ElementNotFoundException(
@@ -491,25 +491,30 @@ class ContainerController extends Controller
 
         $container = new Container();
         $container->setHost($host);
+
         if($request->request->has("name")){
             $container->setName($request->get("name"));
         }
+
         $container->setSettings($data);
 
-        foreach ($profiles as $profile){
-            $profileManagerApi->enableProfileForContainer($profile, $container);
-        }
 
+
+
+        $container->setState('creating');
 
         if($errorArray = $this->validation($container))
         {
             throw new WrongInputException(json_encode($errorArray));
         }
 
-        $container->setState('creating');
 
         $em->persist($container);
         $em->flush();
+
+        foreach ($profiles as $profile){
+            $profileManagerApi->enableProfileForContainer($profile, $container);
+        }
 
         $result = $api->create($host, $data);
 
