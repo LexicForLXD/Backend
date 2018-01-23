@@ -82,7 +82,7 @@ class Container
     protected $settings;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      *
      * @OAS\Property(example="TODO Settings")
      * var string
@@ -265,7 +265,7 @@ class Container
     /**
      * @param string $state
      */
-    public function setState(string $state)
+    public function setState($state)
     {
         $this->state = $state;
     }
@@ -281,9 +281,25 @@ class Container
     /**
      * @param Image $image
      */
-    public function setImages(Image $image): void
+    public function setImage(Image $image): void
     {
         $this->image = $image;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProfiles()
+    {
+        return $this->profiles;
+    }
+
+    /**
+     * @param mixed $profiles
+     */
+    public function setProfiles($profiles): void
+    {
+        $this->profiles = $profiles;
     }
 
 

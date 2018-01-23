@@ -392,7 +392,7 @@ class ContainerController extends Controller
                 ];
 
                 if($request->request->has("fingerprint")){
-                    $image = $this->getDoctrine()->getRepository(Image::class)->findBy(["fingerprint" => $request->get("fingerprint")]);
+                    $image = $this->getDoctrine()->getRepository(Image::class)->findOneBy(["fingerprint" => $request->get("fingerprint")]);
 
                     if (!$image) {
                         throw new ElementNotFoundException(
@@ -491,25 +491,30 @@ class ContainerController extends Controller
 
         $container = new Container();
         $container->setHost($host);
+
         if($request->request->has("name")){
             $container->setName($request->get("name"));
         }
+
         $container->setSettings($data);
 
-        foreach ($profiles as $profile){
-            $profileManagerApi->enableProfileForContainer($profile, $container);
-        }
 
+
+
+        $container->setState('creating');
 
         if($errorArray = $this->validation($container))
         {
             throw new WrongInputException(json_encode($errorArray));
         }
 
-        $container->setState('creating');
 
         $em->persist($container);
         $em->flush();
+
+        foreach ($profiles as $profile){
+            $profileManagerApi->enableProfileForContainer($profile, $container);
+        }
 
         $result = $api->create($host, $data);
 
@@ -611,6 +616,8 @@ class ContainerController extends Controller
     public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+        $profiles = $container->getProfiles();
+        $profileManagerApi = $this->container->get('profile.manager');
 
         if (!$container) {
             throw $this->createNotFoundException(
@@ -619,6 +626,20 @@ class ContainerController extends Controller
         }
 
         $result = $api->remove($container->getHost(), $container->getName());
+
+        foreach ($profiles as $profile){
+            $profileManagerApi->disableProfileForContainer($profile, $container);
+        }
+
+        if($result->code == 404)
+        {
+
+
+
+            $em->remove($container);
+            $em->flush();
+            return new JsonResponse(["message" => "deleted because was not found on lxd-host"]);
+        }
 
 
         $dispatcher = $this->get('sb_event_queue');
