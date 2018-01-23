@@ -37,7 +37,7 @@ class Host
      * @ORM\Column(type="integer")
      *
      * @OAS\Property(example="2")
-     * var integer
+     * @var integer
      */
     protected $id;
 
@@ -45,8 +45,9 @@ class Host
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip
      *
+     * @Assert\Type(type="string")
      * @OAS\Property(example="192.168.178.5")
-     * var string
+     * @var string
      */
     protected $ipv4;
 
@@ -54,8 +55,9 @@ class Host
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip(version = 6)
      *
+     * @Assert\Type(type="string")
      * @OAS\Property(example="fe80::5")
-     * var string
+     * @var string
      */
     protected $ipv6;
 
@@ -63,8 +65,9 @@ class Host
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Regex("/[.]/")
      *
+     * @Assert\Type(type="string")
      * @OAS\Property(example="host2.localnet.com")
-     * var string
+     * @var string
      */
     protected $domainName;
 
@@ -72,22 +75,25 @@ class Host
      * @ORM\Column(type="string", unique=true)
      * @Assert\NotNull()
      *
+     * @Assert\Type(type="string")
      * @OAS\Property(example="host2")
-     * var string
+     * @var string
      */
     protected $name;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      *
+     * @Assert\Type(type="string")
      * @OAS\Property(example="82-75-93-4D-B8-6F")
-     * var string
+     * @var string
      */
     protected $mac;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      *
+     * @Assert\Type(type="int")
      * @OAS\Property(example="22")
      * @var integer
      */
@@ -104,7 +110,8 @@ class Host
     /**
      * @ORM\Column(type="boolean", options={"default":false}, nullable=true)
      *
-     *
+     * @Assert\Type(type="bool")
+     * @OAS\Property(example="true")
      * @var boolean
      */
     protected $authenticated;
@@ -179,25 +186,25 @@ class Host
     }
 
     /**
-     * @param string $domainName
+     * @param mixed $domainName
      */
-    public function setDomainName(string $domainName)
+    public function setDomainName($domainName)
     {
         $this->domainName = $domainName;
     }
 
     /**
-     * @param string $ipv4
+     * @param mixed $ipv4
      */
-    public function setIpv4(string $ipv4)
+    public function setIpv4($ipv4)
     {
         $this->ipv4 = $ipv4;
     }
 
     /**
-     * @param string $ipv6
+     * @param mixed $ipv6
      */
-    public function setIpv6(string $ipv6)
+    public function setIpv6($ipv6)
     {
         $this->ipv6 = $ipv6;
     }
@@ -211,9 +218,9 @@ class Host
     }
 
     /**
-     * @param string $name
+     * @param mixed $name
      */
-    public function setName(string $name)
+    public function setName( $name)
     {
         $this->name = $name;
     }
@@ -227,9 +234,9 @@ class Host
     }
 
     /**
-     * @param string $mac
+     * @param mixed $mac
      */
-    public function setMac(string $mac)
+    public function setMac( $mac)
     {
         $this->mac = $mac;
     }
@@ -243,9 +250,9 @@ class Host
     }
 
     /**
-     * @param string $settings
+     * @param mixed $settings
      */
-    public function setSettings(string $settings)
+    public function setSettings($settings)
     {
         $this->settings = $settings;
     }
@@ -259,9 +266,9 @@ class Host
     }
 
     /**
-     * @param int $port
+     * @param mixed $port
      */
-    public function setPort(int $port)
+    public function setPort( $port)
     {
         $this->port = $port;
     }
@@ -275,9 +282,9 @@ class Host
     }
 
     /**
-     * @param bool $authenticated
+     * @param mixed $authenticated
      */
-    public function setAuthenticated(bool $authenticated): void
+    public function setAuthenticated($authenticated): void
     {
         $this->authenticated = $authenticated;
     }
@@ -292,9 +299,9 @@ class Host
     }
 
     /**
-     * @param ArrayCollection $containers
+     * @param mixed $containers
      */
-    public function setContainers(ArrayCollection $containers)
+    public function setContainers( $containers)
     {
         $this->containers = $containers;
     }
@@ -308,9 +315,9 @@ class Host
     }
 
     /**
-     * @param ArrayCollection $profiles
+     * @param mixed $profiles
      */
-    public function setProfiles(ArrayCollection $profiles)
+    public function setProfiles( $profiles)
     {
         $this->profiles = $profiles;
     }
@@ -324,9 +331,9 @@ class Host
     }
 
     /**
-     * @param ArrayCollection $images
+     * @param mixed $images
      */
-    public function setImages(ArrayCollection $images)
+    public function setImages( $images)
     {
         $this->images = $images;
     }
@@ -538,9 +545,9 @@ class Host
     }
 
     /**
-     * @param ArrayCollection $statuses
+     * @param mixed $statuses
      */
-    public function setStatuses(ArrayCollection $statuses)
+    public function setStatuses( $statuses)
     {
         $this->statuses = $statuses;
     }

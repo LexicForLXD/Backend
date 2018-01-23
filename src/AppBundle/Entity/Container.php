@@ -38,15 +38,16 @@ class Container
      * @ORM\Column(type="integer")
      *
      * @OAS\Property(example="14")
-     * var integer
+     * @var integer
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip
+     * @Assert\Type(type="string")
      * @OAS\Property(example="192.168.178.20")
-     * var string
+     * @var string
      */
     protected $ipv4;
 
@@ -54,24 +55,26 @@ class Container
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Ip(version = 6)
      *
+     * @Assert\Type(type="string")
      * @OAS\Property(example="fe80::20")
-     * var string
+     * @var string
      */
     protected $ipv6;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\Regex("/[.]/")
+     * @Assert\Type(type="string")
      * @OAS\Property(example="container14.localnet.com")
-     * var string
+     * @var string
      */
     protected $domainName;
 
     /**
      * @ORM\Column(type="text")
-     *
+     * @Assert\Type(type="string")
      * @OAS\Property(example="WebServer1")
-     * var string
+     * @var string
      */
     protected $name;
 
@@ -83,9 +86,9 @@ class Container
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     *
+     * @Assert\Type(type="string")
      * @OAS\Property(example="TODO Settings")
-     * var string
+     * @var string
      */
     protected $state;
 
@@ -166,17 +169,17 @@ class Container
     }
 
     /**
-     * @param string $ipv4
+     * @param mixed $ipv4
      */
-    public function setIpv4(string $ipv4)
+    public function setIpv4($ipv4)
     {
         $this->ipv4 = $ipv4;
     }
 
     /**
-     * @param string $ipv6
+     * @param mixed $ipv6
      */
-    public function setIpv6(string $ipv6)
+    public function setIpv6($ipv6)
     {
         $this->ipv6 = $ipv6;
     }
@@ -190,9 +193,9 @@ class Container
     }
 
     /**
-     * @param string $name
+     * @param mixed $name
      */
-    public function setName(string $name)
+    public function setName($name)
     {
         $this->name = $name;
     }
@@ -247,9 +250,9 @@ class Container
     }
 
     /**
-     * @param string $domainName
+     * @param mixed $domainName
      */
-    public function setDomainName(string $domainName)
+    public function setDomainName($domainName)
     {
         $this->domainName = $domainName;
     }
@@ -263,7 +266,7 @@ class Container
     }
 
     /**
-     * @param string $state
+     * @param mixed $state
      */
     public function setState($state)
     {
