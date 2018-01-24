@@ -6,7 +6,9 @@ SYP-LXC Backend
 # Requirements
 - PostgreSQL
 - Redis
+
 #### Required PHP-Modules
+
 ```
 [PHP Modules]
 bcmath
@@ -26,7 +28,6 @@ json
 libxml
 mbstring
 mcrypt
-mysqli
 mysqlnd
 openssl
 pcre
@@ -35,7 +36,6 @@ pdo_dblib
 pdo_mysql
 PDO_ODBC
 pdo_pgsql
-pdo_sqlite
 Phar
 readline
 redis
@@ -44,7 +44,6 @@ session
 SimpleXML
 soap
 SPL
-sqlite3
 ssh2
 standard
 tokenizer
