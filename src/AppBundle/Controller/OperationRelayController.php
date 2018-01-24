@@ -12,6 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class OperationRelayController extends Controller
 {
     /**
+     * Get an operations link through the LEXIC-API
+     *
      * @Route("/operations/{hostId}/{operationsId}", name="relay_operations", methods={"GET"})
      * @throws \Httpful\Exception\ConnectionErrorException
      */

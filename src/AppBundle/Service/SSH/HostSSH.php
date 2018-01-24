@@ -34,6 +34,12 @@ class HostSSH
         }
     }
 
+    /**
+     * Receive the content of a file specified via path
+     * @param Host $host
+     * @param String $logpath
+     * @return null|string|string[]
+     */
     public function getLogFileFromHost(Host $host, String $logpath){
         $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
         $configuration = new Configuration($hostname);

@@ -15,6 +15,8 @@ class CorsProxyController extends Controller
 {
 
     /**
+     * Proxy to allow the Frontend to access urls without CORS headers
+     *
      * url = corsproxy?url={url}
      *
      * @Route("/corsproxy", name="cors_proxy", methods={"GET"})
@@ -24,6 +26,7 @@ class CorsProxyController extends Controller
      * @return Response
      *
      * @throws ConnectionErrorException
+     * @throws WrongInputException
      */
     public function corsProxy(CorsProxyApi $api, Request $request){
         $url = $request->query->get('url');

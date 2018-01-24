@@ -36,6 +36,8 @@ class OperationApi extends HttpHelper
     }
 
     /**
+     * Get a operations link with the LXD wait option
+     *
      * @param Host $host
      * @param $operationsId
      * @return \Httpful\Response
@@ -49,6 +51,8 @@ class OperationApi extends HttpHelper
 
 
     /**
+     * Get a operations link
+     *
      * @param Host $host
      * @param $operationsId
      * @return \Httpful\Response

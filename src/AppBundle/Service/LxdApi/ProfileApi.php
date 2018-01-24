@@ -30,6 +30,8 @@ class ProfileApi extends HttpHelper
     }
 
     /**
+     * List all profiles on a specific Host
+     *
      * @param Host $host
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
@@ -41,6 +43,8 @@ class ProfileApi extends HttpHelper
     }
 
     /**
+     * Create a given profile on a LXD-Host
+     *
      * @param Host $host
      * @param Profile $profile
      * @return \Httpful\Response
@@ -70,6 +74,8 @@ class ProfileApi extends HttpHelper
     }
 
     /**
+     * Updates a profile via put with the information of the given profile
+     *
      * @param Host $host
      * @param Profile $profile
      * @return \Httpful\Response
@@ -96,6 +102,8 @@ class ProfileApi extends HttpHelper
     }
 
     /**
+     * Delete a profile on a LXD-Host
+     *
      * @param Host $host
      * @param Profile $profile
      * @return \Httpful\Response
@@ -107,6 +115,8 @@ class ProfileApi extends HttpHelper
     }
 
     /**
+     * Rename a profile on a LXD-Host
+     *
      * @param Host $host
      * @param Profile $profile
      * @param String $oldName

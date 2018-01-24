@@ -19,9 +19,10 @@ class Pnp4NagiosApi
     }
 
     /**
+     * Get a Nagios graph based on a ContainerStatus
+     *
      * @param ContainerStatus $containerStatus
      * @param $timerange
-     * @return
      */
     public function getNagiosImageForContainerTimerange(ContainerStatus $containerStatus, $timerange){
         $uri = $containerStatus->getNagiosUrl().'/image?host='.$containerStatus->getNagiosName().'&srv='.$containerStatus->getCheckName().'&view=1&source='.$containerStatus->getSourceNumber().'&start='.$timerange;
@@ -34,9 +35,10 @@ class Pnp4NagiosApi
     }
 
     /**
+     * Get a Nagios graph based on a HostStatus
+     *
      * @param HostStatus $hostStatus
      * @param $timerange
-     * @return
      */
     public function getNagiosImageForHostTimerange(HostStatus $hostStatus, $timerange){
         $uri = $hostStatus->getNagiosUrl().'/image?host='.$hostStatus->getNagiosName().'&srv='.$hostStatus->getCheckName().'&view=1&source='.$hostStatus->getSourceNumber().'&start='.$timerange;

@@ -29,6 +29,8 @@ class ImageAliasApi extends HttpHelper
     }
 
     /**
+     * Function to remove an alias by its name from the given LXD-Host
+     *
      * @param Host $host
      * @param String $name
      * @return \Httpful\Response

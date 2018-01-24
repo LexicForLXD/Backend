@@ -30,6 +30,8 @@ class ImageApi extends HttpHelper
 
 
     /**
+     * Creates an Image on a LXD-Host
+     *
      * @param Host $host
      * @param $body
      * @return \Httpful\Response
@@ -43,6 +45,8 @@ class ImageApi extends HttpHelper
     }
 
     /**
+     * Receives the Operations-Link for the given operationsId
+     *
      * @param Host $host
      * @param $operationsId
      * @return \Httpful\Response
@@ -55,6 +59,8 @@ class ImageApi extends HttpHelper
     }
 
     /**
+     * Receives the Operations-Link for the given operationsId with the LXD-API wait function
+     *
      * @param Host $host
      * @param $operationsId
      * @return \Httpful\Response
@@ -67,6 +73,8 @@ class ImageApi extends HttpHelper
     }
 
     /**
+     * Get the Image information of the LXD-API by providing a Image-fingerprint
+     *
      * @param Host $host
      * @param String $fingerprint
      * @return \Httpful\Response
@@ -79,6 +87,8 @@ class ImageApi extends HttpHelper
     }
 
     /**
+     * Remove an Image by its fingerprint
+     *
      * @param Host $host
      * @param String $fingerprint
      * @return \Httpful\Response
@@ -91,6 +101,8 @@ class ImageApi extends HttpHelper
     }
 
     /**
+     * Update an Image on a LXD-Host via PUT
+     *
      * @param Host $host
      * @param String $fingerprint
      * @param $body

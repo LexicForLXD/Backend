@@ -1005,6 +1005,8 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Gets the Logfile name from the LXD Logfile-URL
+     *
      * @param String $logfileUrl
      * @return null|string|string[]
      */
