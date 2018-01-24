@@ -22,6 +22,8 @@ class OperationsRelayApi extends HttpHelper
     }
 
     /**
+     * Receive an operations link from a LXD-Host
+     *
      * @param Host $host
      * @param $operationsId
      * @return \Httpful\Response
@@ -34,6 +36,8 @@ class OperationsRelayApi extends HttpHelper
     }
 
     /**
+     * Create new operations link for LEXIC instead of LXD
+     *
      * @param $hostId
      * @param $oldOperationsLink
      *

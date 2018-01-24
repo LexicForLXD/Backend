@@ -24,6 +24,8 @@ class MonitoringApi extends HttpHelper
     }
 
     /**
+     * Get a list of all available logfiles from a Container
+     *
      * @param Container $container
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
@@ -35,6 +37,8 @@ class MonitoringApi extends HttpHelper
     }
 
     /**
+     * Get the content of a single logfile from a Container
+     *
      * @param Container $container
      * @param String $logfile
      * @return \Httpful\Response
