@@ -3,10 +3,10 @@ SYP-LXC Backend
 
 [![pipeline status](https://git.janrtr.de/syp-lxc/Backend/badges/master/pipeline.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
 [![coverage report](https://git.janrtr.de/syp-lxc/Backend/badges/master/coverage.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
-#Requirements
+# Requirements
 - PostgreSQL
 - Redis
-####Required PHP-Modules
+#### Required PHP-Modules
 ```
 [PHP Modules]
 bcmath
@@ -54,8 +54,6 @@ xmlrpc
 xmlwriter
 zip
 zlib
-
-[Zend Modules]
 ```
 
 
