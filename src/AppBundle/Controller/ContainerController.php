@@ -460,6 +460,8 @@ class ContainerController extends Controller
                     ]
                 ];
 
+                $container->setImage($oldContainer->getImage());
+
 
                 break;
             case 'copy':
@@ -483,6 +485,8 @@ class ContainerController extends Controller
                         "source" => $oldContainer->getName()
                     ]
                 ];
+
+                $container->setImage($oldContainer->getImage());
 
                 break;
             default:
