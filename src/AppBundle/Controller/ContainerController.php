@@ -373,6 +373,8 @@ class ContainerController extends Controller
             $profileNames[] = $profile->getName();
         }
 
+        $container = new Container();
+
         switch ($type) {
             case 'image':
 
@@ -395,6 +397,8 @@ class ContainerController extends Controller
                         );
                     }
 
+                    $container->setImage($image);
+
                     $data["source"] = [
                         "type" => "image",
                         "fingerprint" => $image->getFingerPrint()
@@ -411,6 +415,7 @@ class ContainerController extends Controller
                     }
 
                     $image = $imageAlias->getImage();
+                    $container->setImage($image);
                     $data["source"] = [
                         "type" => "image",
                         "fingerprint" => $image->getFingerPrint()
@@ -484,7 +489,6 @@ class ContainerController extends Controller
                 return new JsonResponse(["message" => "none"]);
         }
 
-        $container = new Container();
         $container->setHost($host);
 
         if($request->request->has("name")){
