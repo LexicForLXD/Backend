@@ -83,7 +83,7 @@ class HostStatus
 
     /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="statuses")
-     * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="host_id", referencedColumnName="id", onDelete="CASCADE")
      *
      * @JMS\Exclude()
      */
