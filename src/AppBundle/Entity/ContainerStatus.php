@@ -79,7 +79,7 @@ class ContainerStatus
 
     /**
      * @ORM\ManyToOne(targetEntity="Container", inversedBy="statuses")
-     * @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="container_id", referencedColumnName="id", onDelete="CASCADE")
      *
      * @JMS\Exclude()
      */
