@@ -26,6 +26,7 @@ use AppBundle\Entity\Image;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
+use AppBundle\Service\LxdApi\ContainerStateApi;
 
 
 
@@ -627,7 +628,7 @@ class ContainerController extends Controller
      * @param ContainerApi $api
      * @return JsonResponse
      */
-    public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api)
+    public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
         $profiles = $container->getProfiles();
@@ -638,6 +639,11 @@ class ContainerController extends Controller
                 'No container found for id ' . $containerId
             );
         }
+        $stateResult = $stateApi->actual($container->getHost(), $container->getName());
+
+        if($stateResult->body->metadata->status_code != 102){
+            return new JsonResponse(["error" => "Container is currently not stopped. Please stop the container before you delete it."], 400);
+        }
 
         $result = $api->remove($container->getHost(), $container->getName());
 
@@ -647,9 +653,6 @@ class ContainerController extends Controller
 
         if($result->code == 404)
         {
-
-
-
             $em->remove($container);
             $em->flush();
             return new JsonResponse(["message" => "deleted because was not found on lxd-host"]);
