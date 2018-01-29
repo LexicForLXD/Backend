@@ -57,16 +57,16 @@ services:
             $ssh_user: '%ssh_user%'
             $ssh_passphrase: '%ssh_passphrase%'
 
+    AppBundle\Service\Profile\:
+        resource: '../../src/AppBundle/Service/Profile'
+        public: true
+        arguments: [ "@doctrine.orm.entity_manager" ]
+
     AppBundle\Service\Nagios\:
             resource: '../../src/AppBundle/Service/Nagios'
             arguments:
                 $nagiosUsername: '%nagiosUsername%'
                 $nagiosPassword: '%nagiosPassword%'
-
-    profile.manager:
-          class: AppBundle\Service\Profile\ProfileManagerApi
-          public: true
-          arguments: [ "@doctrine.orm.entity_manager" ]
 
     lxd.image.creation.updater:
             class: AppBundle\EventListener\ImageCreationListener
