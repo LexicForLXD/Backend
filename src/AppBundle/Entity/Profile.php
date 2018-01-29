@@ -180,9 +180,9 @@ class Profile
     }
 
     /**
-     * @return array
+     * @return array | null
      */
-    public function getConfig() : array
+    public function getConfig()
     {
         return $this->config;
     }
@@ -196,9 +196,9 @@ class Profile
     }
 
     /**
-     * @return array
+     * @return array | null
      */
-    public function getDevices() : array
+    public function getDevices()
     {
         return $this->devices;
     }
