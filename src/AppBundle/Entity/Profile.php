@@ -47,6 +47,7 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      *
      * @OAS\Property(example="Some description string")
+     * @Assert\Type(type="string")
      * var string
      */
     protected $description;
@@ -55,6 +56,7 @@ class Profile
      * @ORM\Column(type="json_array", nullable=true)
      *
      * @OAS\Property(example="Config JSON Object")
+     * @Assert\Type(type="array")
      * var json_array
      */
     protected $config;
@@ -63,6 +65,7 @@ class Profile
      * @ORM\Column(type="json_array", nullable=true)
      *
      * @OAS\Property(example="Devices JSON Object")
+     * @Assert\Type(type="array")
      * var json_array
      */
     protected $devices;
@@ -161,9 +164,9 @@ class Profile
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getDescription() : string
+    public function getDescription()
     {
         return $this->description;
     }
@@ -177,9 +180,9 @@ class Profile
     }
 
     /**
-     * @return array
+     * @return array | null
      */
-    public function getConfig() : array
+    public function getConfig()
     {
         return $this->config;
     }
@@ -193,9 +196,9 @@ class Profile
     }
 
     /**
-     * @return array
+     * @return array | null
      */
-    public function getDevices() : array
+    public function getDevices()
     {
         return $this->devices;
     }
