@@ -448,6 +448,10 @@ class ImageControllerTest extends WebTestCase
         $this->assertTrue(!$this->em->getRepository(Image::class)->find($image->getId()));
         $this->assertTrue(!$this->em->getRepository(ImageAlias::class)->find($imageAlias->getId()));
         $this->assertTrue(!$this->em->getRepository(Image::class)->find($image->getId()));
+
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+        $this->em->remove($host);
+        $this->em->flush();
     }
 
     /**
@@ -467,20 +471,20 @@ class ImageControllerTest extends WebTestCase
                 'HTTP_Authorization' => $this->token
             ),
             '{
-                    "filename": "filename",                   
-                    "public": true,                        
-                    "auto_update": true,                  
-                    "properties": {                         
+                    "filename": "filename",
+                    "public": true,
+                    "auto_update": true,
+                    "properties": {
                         "os": "Alpine"
                     },
-                    "aliases": [                           
+                    "aliases": [
                         {"name": "alpine",
                          "description": "A description"}
                     ],
                     "source": {
                         "type": "image",
-                        "mode": "pull",                     
-                        "server": "https://uk.images.linuxcontainers.org:8443",  
+                        "mode": "pull",
+                        "server": "https://uk.images.linuxcontainers.org:8443",
                         "protocol": "lxd",
                         "alias": "alpine/3.7/amd64"
                     }
@@ -508,18 +512,18 @@ class ImageControllerTest extends WebTestCase
                 'HTTP_Authorization' => $this->token
             ),
             '{
-                        "compression_algorithm": "xz",  
-                        "filename": "myName",          
-                        "public":   true,               
-                        "properties": {                
+                        "compression_algorithm": "xz",
+                        "filename": "myName",
+                        "public":   true,
+                        "properties": {
                             "os": "Ubuntu"
                         },
-                        "aliases": [                    
+                        "aliases": [
                             {"name": "my-alias1",
                              "description": "A description"}
                         ],
                         "source": {
-                            "type": "container",        
+                            "type": "container",
                             "name": "testContainer"
                         }
                     }'
@@ -556,18 +560,18 @@ class ImageControllerTest extends WebTestCase
                 'HTTP_Authorization' => $this->token
             ),
             '{
-                        "compression_algorithm": "xz",  
-                        "filename": "myName",          
-                        "public":   true,               
-                        "properties": {                
+                        "compression_algorithm": "xz",
+                        "filename": "myName",
+                        "public":   true,
+                        "properties": {
                             "os": "Ubuntu"
                         },
-                        "aliases": [                    
+                        "aliases": [
                             {"name": "my-alias1",
                              "description": "A description"}
                         ],
                         "source": {
-                            "type": "container",        
+                            "type": "container",
                             "name": "testContainer"
                         }
                     }'
