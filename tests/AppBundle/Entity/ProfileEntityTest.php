@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AppBundle\Controller;
+namespace Tests\AppBundle\Entity;
 
 use AppBundle\Entity\Profile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
