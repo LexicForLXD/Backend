@@ -506,6 +506,8 @@ class HostController extends Controller
                 return new JsonResponse([
                     'error' => 'error while authentication',
                     'body' => $result->body],400);
+            } else {
+                $host->setAuthenticated(true);
             }
         }
 
