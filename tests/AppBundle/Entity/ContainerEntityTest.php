@@ -76,6 +76,7 @@ class ContainerEntityTest extends WebTestCase
 
 
         $container->addProfile($profile);
+        $this->em->persist($profile);
         $this->em->flush();
         $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
         $this->assertEquals($container->getProfiles(), $containerFromDb->getProfiles());
