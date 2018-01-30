@@ -38,7 +38,7 @@ class ProfileManagerApi
 
         $result = $this->injectedService->createProfileOnHost($host, $profile);
 
-        if($result->code != 200){
+        if($result->code != 201){
             return;
         }
 
