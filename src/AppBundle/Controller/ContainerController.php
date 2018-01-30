@@ -351,9 +351,8 @@ class ContainerController extends Controller
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi)
     {
-        $profileManagerApi = $this->container->get('profile.manager');
 
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -632,14 +631,21 @@ class ContainerController extends Controller
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
         $profiles = $container->getProfiles();
-        $profileManagerApi = $this->container->get('profile.manager');
+
 
         if (!$container) {
             throw $this->createNotFoundException(
                 'No container found for id ' . $containerId
             );
         }
-        $stateResult = $stateApi->actual($container->getHost(), $container->getName());
+        $stateResult = $stateApi->actual($container->getHost(), $container);
+
+        if($stateResult->code == 404)
+        {
+            $em->remove($container);
+            $em->flush();
+            return new JsonResponse(["message" => "deleted because was not found on lxd-host"]);
+        }
 
         if($stateResult->body->metadata->status_code != 102){
             return new JsonResponse(["error" => "Container is currently not stopped. Please stop the container before you delete it."], 400);
@@ -647,16 +653,7 @@ class ContainerController extends Controller
 
         $result = $api->remove($container->getHost(), $container->getName());
 
-        foreach ($profiles as $profile){
-            $profileManagerApi->disableProfileForContainer($profile, $container);
-        }
 
-        if($result->code == 404)
-        {
-            $em->remove($container);
-            $em->flush();
-            return new JsonResponse(["message" => "deleted because was not found on lxd-host"]);
-        }
 
 
         $dispatcher = $this->get('sb_event_queue');
