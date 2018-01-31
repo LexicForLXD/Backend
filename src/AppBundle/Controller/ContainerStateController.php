@@ -43,19 +43,19 @@ class ContainerStateController extends Controller
      *      @OAS\Schema(
      *          @OAS\Property(
      *              property="action",
-     *              type="string"
+     *              type="string",
      *          ),
      *          @OAS\Property(
      *              property="timeout",
-     *              type="integer"
+     *              type="integer",
      *          ),
      *          @OAS\Property(
      *              property="force",
-     *              type="boolean"
+     *              type="boolean",
      *          ),
      *          @OAS\Property(
      *              property="stateful",
-     *              type="boolean"
+     *              type="boolean",
      *          ),
      *      ),
      *  ),
@@ -64,13 +64,15 @@ class ContainerStateController extends Controller
      *      in="path",
      *      name="containerId",
      *      required=true,
-     *      type="integer"
+     *      @OAS\Schema(
+     *         type="integer"
+     *      ),
      *  ),
      *
      *
      *  @OAS\Response(
      *      response=200,
-     *      description="Erfolgsmeldung für Container Status Update."
+     *      description="Erfolgsmeldung für Container Status Update.",
      *  ),
      * )
      */
@@ -139,7 +141,9 @@ class ContainerStateController extends Controller
      *      in="path",
      *      name="containerId",
      *      required=true,
-     *      type="integer"
+     *      @OAS\Schema(
+     *         type="integer"
+     *      ),
      *  ),
      *
      *  @OAS\Response(
