@@ -16,7 +16,7 @@ use AppBundle\Entity\ContainerStatus;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Swagger\Annotations as SWG;
+use Swagger\Annotations as OAS;
 
 
 class ContainerStateController extends Controller
@@ -34,46 +34,45 @@ class ContainerStateController extends Controller
      * @throws \Httpful\Exception\ConnectionErrorException
      * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
      *
-     *SWG\Put(path="/containers/{containerId}/state",
-     *tags={"containerStates"},
-     * SWG\Parameter(
-     *  name="actionData",
-     *  in="body",
-     *  required=true,
-     *  SWG\Schema(
-     *      SWG\Property(
-     *          property="action",
-     *          type="string"
-     *      ),
-     *       SWG\Property(
-     *          property="timeout",
-     *          type="integer"
-     *      ),
-     *       SWG\Property(
-     *          property="force",
-     *          type="boolean"
-     *      ),
-     *       SWG\Property(
-     *          property="stateful",
-     *          type="boolean"
+     * @OAS\Put(path="/containers/{containerId}/state",
+     *  tags={"containerStates"},
+     *  @OAS\Parameter(
+     *      name="actionData",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="action",
+     *              type="string"
+     *          ),
+     *          @OAS\Property(
+     *              property="timeout",
+     *              type="integer"
+     *          ),
+     *          @OAS\Property(
+     *              property="force",
+     *              type="boolean"
+     *          ),
+     *          @OAS\Property(
+     *              property="stateful",
+     *              type="boolean"
+     *          ),
      *      ),
      *  ),
-     * ),
-     * SWG\Parameter(
-     *  description="ID von Container",
-     *  format="int64",
-     *  in="path",
-     *  name="containerId",
-     *  required=true,
-     *  type="integer"
-     * ),
+     *  @OAS\Parameter(
+     *      description="ID von Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *      type="integer"
+     *  ),
      *
      *
-     * SWG\Response(
-     *  response=200,
-     *  description="Erfolgsmeldung für Container Status Update."
-     * ),
-     *)
+     *  @OAS\Response(
+     *      response=200,
+     *      description="Erfolgsmeldung für Container Status Update."
+     *  ),
+     * )
      */
     public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateApi $api)
     {
@@ -133,22 +132,21 @@ class ContainerStateController extends Controller
      *
      * @Route("/containers/{containerId}/state", name="show_container_state", methods={"GET"})
      *
-     *SWG\Get(path="/containers/{containerId}/state",
-     *tags={"containerStates"},
-     * SWG\Parameter(
-     *  description="ID von Container",
-     *  format="int64",
-     *  in="path",
-     *  name="containerId",
-     *  required=true,
-     *  type="integer"
-     * ),
+     * @OAS\Get(path="/containers/{containerId}/state",
+     *  tags={"containerStates"},
+     *  @OAS\Parameter(
+     *      description="ID von Container",
+     *      in="path",
+     *      name="containerId",
+     *      required=true,
+     *      type="integer"
+     *  ),
      *
-     * SWG\Response(
-     *  response=200,
-     *  description="Aktueller Status des Contianers"
-     * ),
-     *)
+     *  @OAS\Response(
+     *      response=200,
+     *      description="Aktueller Status des Contianers"
+     *  ),
+     * )
      */
     public function showCurrentStateAction(int $containerId, ContainerStateApi $api)
     {
