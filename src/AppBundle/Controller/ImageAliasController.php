@@ -66,6 +66,46 @@ class ImageAliasController extends Controller
         return new Response($response);
     }
 
+    /**
+     * Delete a single ImageAlias by its id
+     *
+     * @Route("/images/aliases/{aliasId}", name="delete_alias_for_image", methods={"DELETE"})
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function deleteImageAlias($aliasId, ImageAliasApi $imageAliasApi){
+        $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->find($aliasId);
+
+        if (!$imageAlias) {
+            throw new ElementNotFoundException(
+                'No ImageAlias for ID ' . $aliasId . ' found'
+            );
+        }
+
+        $image = $imageAlias->getImage();
+
+        if(!$image->isFinished()){
+            throw new WrongInputException('Deleting of the ImageAlias for an Image which is in the creation process is not possible');
+        }
+
+        $result = $imageAliasApi->removeAliasByName($image->getHost(), $imageAlias->getName());
+
+        if($result->code != 200 || $result->body->status_code != 200){
+            throw new WrongInputException('LXD-Error - '.$result->body->error);
+        }
+
+        $image->removeAlias($imageAlias);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($image);
+        $em->remove($imageAlias);
+
+        $em->flush();
+
+        return new Response('', Response::HTTP_NO_CONTENT);
+    }
+
     private function validation($object)
     {
         $validator = $this->get('validator');
