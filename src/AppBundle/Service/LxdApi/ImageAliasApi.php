@@ -59,4 +59,34 @@ class ImageAliasApi extends HttpHelper
             -> send();
     }
 
+    /**
+     * Function to update the description for an ImageAlias
+     *
+     * @param Host $host
+     * @param ImageAlias $imageAlias
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function editAliasDescription(Host $host, ImageAlias $imageAlias){
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$imageAlias->getName());
+        return Request::patch($uri)
+            -> body('{"description":"'.$imageAlias->getDescription().'"}')
+            -> send();
+    }
+
+    /**
+     * Function to update the name for an ImageAlias
+     *
+     * @param Host $host
+     * @param ImageAlias $imageAlias
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function editAliasName(Host $host, ImageAlias $imageAlias, string $oldName){
+        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$oldName);
+        return Request::post($uri)
+            -> body('{"name":"'.$imageAlias->getName().'"}')
+            -> send();
+    }
+
 }
