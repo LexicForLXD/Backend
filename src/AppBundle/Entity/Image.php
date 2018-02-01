@@ -260,7 +260,7 @@ class Image
     }
 
     public function removeAlias(ImageAlias $imageAlias){
-        $this->aliases->remove($imageAlias);
+        $this->aliases->removeElement($imageAlias);
     }
 
     /**
