@@ -58,7 +58,7 @@ class ImageAliasController extends Controller
      * @OAS\Response(
      *  description="ImageAlias successfully created",
      *  response=201,
-     *  @OAS\JsonContent(ref="#/components/schemas/Image"),
+     *  @OAS\JsonContent(ref="#/components/schemas/image"),
      * ),
      * )
      *
@@ -116,6 +116,31 @@ class ImageAliasController extends Controller
      * Delete a single ImageAlias by its id
      *
      * @Route("/images/aliases/{aliasId}", name="delete_alias_for_image", methods={"DELETE"})
+     * @OAS\Delete(path="/images/aliases/{aliasId}",
+     *  tags={"image-alias"},
+     *  @OAS\Parameter(
+     *      description="ID of the ImageAlias",
+     *      in="path",
+     *      name="aliasId",
+     *      required=true,
+     *      @OAS\Schema(
+     *          type="integer"
+     *      ),
+     *  ),
+     *  @OAS\Response(
+     *      response=204,
+     *      description="The ImageAlias was successfully deleted",
+     *  ),
+     *  @OAS\Response(
+     *      response=400,
+     *      description="Deleting of the ImageAlias for an Image which is in the creation process is not possible or a LXD Error",
+     *  ),
+     *  @OAS\Response(
+     *      description="No ImageAlias for the provided id found",
+     *      response=404
+     * ),
+     *)
+     *
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
@@ -156,6 +181,47 @@ class ImageAliasController extends Controller
      * Change the description or name of an ImageAlias
      *
      * @Route("/images/aliases/{aliasId}", name="edit_alias_for_image", methods={"PUT"})
+     * @OAS\Put(path="/images/aliases/{aliasId}",
+     *     tags={"image-alias"},
+     *     @OAS\Parameter(
+     *      description="ID of the ImageAlias",
+     *      in="path",
+     *      name="aliasId",
+     *      required=true,
+     *        @OAS\Schema(
+     *          type="integer"
+     *        ),
+     *     ),
+     *     @OAS\Parameter(
+     *      description="Parameters for the ImageAlias",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *      @OAS\Property(
+     *          property="name",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="description",
+     *          type="string"
+     *      ),
+     *  ),
+     * ),
+     * @OAS\Response(
+     *  description="No ImageAlias for the provided id found",
+     *  response=404
+     * ),
+     * @OAS\Response(
+     *  description="Editing of the ImageAlias for an Image which is in the creation process is not possible or LXD-Error",
+     *  response=400,
+     * ),
+     * @OAS\Response(
+     *  description="ImageAlias successfully updated",
+     *  response=200,
+     *  @OAS\JsonContent(ref="#/components/schemas/imageAlias"),
+     * ),
+     * )
      *
      * @param $aliasId
      * @param ImageAliasApi $imageAliasApi
