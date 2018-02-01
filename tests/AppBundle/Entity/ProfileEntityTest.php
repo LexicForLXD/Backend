@@ -4,6 +4,7 @@ namespace Tests\AppBundle\Entity;
 
 use AppBundle\Entity\Profile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 class ProfileEntityTest extends WebTestCase
 {
@@ -50,6 +51,25 @@ class ProfileEntityTest extends WebTestCase
 
         $this->em->remove($profileFromDB);
         $this->em->flush();
+    }
+
+    /**
+     * Check if all setters allow wrong values to allow validation
+     */
+    public function testWrongAttributes()
+    {
+        $exception = false;
+        try {
+            $profile = new Profile();
+            $profile->setName(1);
+            $profile->setDescription(2);
+            $profile->setConfig("array");
+            $profile->setDevices("array");
+        }catch (Exception $e){
+            $exception = true;
+        }
+
+        $this->assertTrue(!$exception); // Should be false = no exception triggered
     }
 
     /**
