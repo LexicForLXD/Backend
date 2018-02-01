@@ -3,6 +3,7 @@
 namespace Tests\AppBundle\Entity;
 
 use AppBundle\Entity\Image;
+use AppBundle\Entity\ImageAlias;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
@@ -73,6 +74,40 @@ class ImageEntityTest extends WebTestCase
         }
 
         $this->assertTrue(!$exception); // Should be false = no exception triggered
+    }
+
+    /**
+     * Tests the function to add an ImageAlias to an Image - checks the relation
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function testAddImageAlias(){
+        $image = new Image();
+        $image->setPublic(true);
+        $image->setFinished(false);
+
+        $imageAlias = new ImageAlias();
+        $imageAlias->setName("TestAlias");
+        $imageAlias->setDescription("TestDescription");
+
+        $this->em->persist($imageAlias);
+        $this->em->flush();
+
+        $image->addAlias($imageAlias);
+
+        $this->em->persist($image);
+        $this->em->flush();
+
+        $aliaseFromImage = $image->getAliases();
+        $aliasFromImage = $aliaseFromImage->get(0);
+        $this->assertEquals($imageAlias, $aliasFromImage);
+        $this->assertEquals($image, $imageAlias->getImage());
+
+        $imageFromDB = $this->em->getRepository(Image::class)->find($image->getId());
+        $imageAlias = $this->em->getRepository(ImageAlias::class)->find($imageAlias->getId());
+        $this->em->remove($imageAlias);
+        $this->em->remove($imageFromDB);
+        $this->em->flush();
     }
 
     /**
