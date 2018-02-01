@@ -11,7 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Swagger\Annotations as SWG;
+use Swagger\Annotations as OAS;
 use Symfony\Component\HttpFoundation\Response;
 
 class ImageAliasController extends Controller
@@ -20,6 +20,48 @@ class ImageAliasController extends Controller
      * Create an ImageAlias for an existing Image
      *
      * @Route("/images/{imageId}/aliases", name="create_alias_for_image", methods={"POST"})
+     * @OAS\Post(path="/images/{imageId}/aliases",
+     *     tags={"image-alias"},
+     *     @OAS\Parameter(
+     *      description="ID of the Image",
+     *      in="path",
+     *      name="imageId",
+     *      required=true,
+     *        @OAS\Schema(
+     *          type="integer"
+     *        ),
+     *     ),
+     *     @OAS\Parameter(
+     *      description="Parameters for the new ImageAlias",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *      @OAS\Property(
+     *          property="name",
+     *          type="string",
+     *      ),
+     *      @OAS\Property(
+     *          property="description",
+     *          type="string"
+     *      ),
+     *  ),
+     * ),
+     * @OAS\Response(
+     *  description="No Image for the provided ImageId found",
+     *  response=404
+     * ),
+     * @OAS\Response(
+     *  description="ImageAlias creation is only supported for Images where the creation process is finished or LXD-Error",
+     *  response=400,
+     * ),
+     * @OAS\Response(
+     *  description="ImageAlias successfully created",
+     *  response=201,
+     *  @OAS\JsonContent(ref="#/components/schemas/Image"),
+     * ),
+     * )
+     *
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
@@ -63,7 +105,7 @@ class ImageAliasController extends Controller
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($image, 'json');
-        return new Response($response);
+        return new Response($response, Response::HTTP_CREATED);
     }
 
     /**
