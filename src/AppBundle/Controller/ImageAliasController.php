@@ -106,6 +106,58 @@ class ImageAliasController extends Controller
         return new Response('', Response::HTTP_NO_CONTENT);
     }
 
+    /**
+     * Change the description or name of an ImageAlias
+     *
+     * @Route("/images/aliases/{aliasId}", name="edit_alias_for_image", methods={"PUT"})
+     *
+     * @param $aliasId
+     * @param ImageAliasApi $imageAliasApi
+     * @return Response
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function editImageAlias($aliasId, Request $request,ImageAliasApi $imageAliasApi){
+        $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->find($aliasId);
+
+        if (!$imageAlias) {
+            throw new ElementNotFoundException(
+                'No ImageAlias for ID ' . $aliasId . ' found'
+            );
+        }
+
+        $image = $imageAlias->getImage();
+
+        if(!$image->isFinished()){
+            throw new WrongInputException('Editing of the ImageAlias for an Image which is in the creation process is not possible');
+        }
+
+        if ($request->request->has('name')) {
+            $oldName = $imageAlias->getName();
+            $imageAlias->setName($request->request->get('name'));
+            $result = $imageAliasApi->editAliasName($image->getHost(), $imageAlias, $oldName);
+            if($result->code != 201 || $result->body->status_code != 200){
+                throw new WrongInputException('LXD-Error - '.$result->body->error);
+            }
+        }
+        if ($request->request->has('description')) {
+            $imageAlias->setDescription($request->request->get('description'));
+            $result = $imageAliasApi->editAliasDescription($image->getHost(), $imageAlias);
+            if($result->code != 200 || $result->body->status_code != 200){
+                throw new WrongInputException('LXD-Error - '.$result->body->error);
+            }
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($imageAlias);
+        $em->flush();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($imageAlias, 'json');
+        return new Response($response);
+    }
+
     private function validation($object)
     {
         $validator = $this->get('validator');
