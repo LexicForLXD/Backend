@@ -85,7 +85,7 @@ class ImageAlias
     }
 
     /**
-     * @return mixed
+     * @return Image
      */
     public function getImage()
     {
@@ -93,7 +93,7 @@ class ImageAlias
     }
 
     /**
-     * @param mixed $image
+     * @param Image $image
      */
     public function setImage($image)
     {

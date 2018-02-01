@@ -63,6 +63,7 @@ class Image
     /**
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Host")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     * @var Host
      * @JMS\Exclude()
      */
     protected $host;
@@ -75,14 +76,14 @@ class Image
     protected $public;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @OAS\Property(example="imageFilename")
      * @var string
      */
     protected $filename;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="json", nullable=true)
      * @OAS\Property(example="{json-Object}")
      * @var array
      */
@@ -113,23 +114,23 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
 
     /**
-     * @return mixed
+     * @return string | null
      */
-    public function getFingerprint()
+    public function getFingerprint() : ?string
     {
         return $this->fingerprint;
     }
 
     /**
-     * @param mixed $fingerprint
+     * @param string $fingerprint
      */
     public function setFingerprint($fingerprint)
     {
@@ -145,15 +146,15 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return string | null
      */
-    public function getArchitecture()
+    public function getArchitecture() : ?string
     {
         return $this->architecture;
     }
 
     /**
-     * @param mixed $architecture
+     * @param string $architecture
      */
     public function setArchitecture($architecture)
     {
@@ -161,15 +162,15 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return int | null
      */
-    public function getSize()
+    public function getSize() : ?int
     {
         return $this->size;
     }
 
     /**
-     * @param mixed $size
+     * @param int $size
      */
     public function setSize($size)
     {
@@ -177,7 +178,7 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return int | null
      * @OAS\Property(property="hostId", example="1")
      * @JMS\VirtualProperty()
      */
@@ -187,7 +188,7 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return Host | null
      */
     public function getHost()
     {
@@ -219,9 +220,9 @@ class Image
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getFilename(): string
+    public function getFilename(): ?string
     {
         return $this->filename;
     }
@@ -235,9 +236,9 @@ class Image
     }
 
     /**
-     * @return array
+     * @return array | null
      */
-    public function getProperties(): array
+    public function getProperties(): ?array
     {
         return $this->properties;
     }
@@ -279,15 +280,15 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return string | null
      */
-    public function getError()
+    public function getError() : ?string
     {
         return $this->error;
     }
 
     /**
-     * @param mixed $error
+     * @param string $error
      */
     public function setError($error)
     {
@@ -295,9 +296,9 @@ class Image
     }
 
     /**
-     * @return ArrayCollection
+     * @return PersistentCollection
      */
-    public function getContainers(): ArrayCollection
+    public function getContainers(): PersistentCollection
     {
         return $this->containers;
     }
