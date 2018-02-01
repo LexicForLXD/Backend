@@ -405,8 +405,9 @@ class ImageController extends Controller
             if($result->code != 200){
                 throw new WrongInputException("Couldn't delete alias - ".$result->body->error);
             }
-            $image->removeAlias($aliases->get($i));
-            $em->remove($aliases->get($i));
+            $imageAlias = $aliases->get($i);
+            $image->removeAlias($imageAlias);
+            $em->remove($imageAlias);
         }
         $result = $api->removeImageByFingerprint($image->getHost(), $image->getFingerprint());
 

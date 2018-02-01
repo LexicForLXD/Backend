@@ -87,7 +87,7 @@ class ImageAlias
     /**
      * @return Image
      */
-    public function getImage()
+    public function getImage() : Image
     {
         return $this->image;
     }
