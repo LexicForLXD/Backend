@@ -130,7 +130,7 @@ class Image
     }
 
     /**
-     * @param mixed $fingerprint
+     * @param string $fingerprint
      */
     public function setFingerprint($fingerprint)
     {
@@ -154,7 +154,7 @@ class Image
     }
 
     /**
-     * @param mixed $architecture
+     * @param string $architecture
      */
     public function setArchitecture($architecture)
     {
@@ -170,7 +170,7 @@ class Image
     }
 
     /**
-     * @param mixed $size
+     * @param int $size
      */
     public function setSize($size)
     {
@@ -178,7 +178,7 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return int | null
      * @OAS\Property(property="hostId", example="1")
      * @JMS\VirtualProperty()
      */
@@ -188,7 +188,7 @@ class Image
     }
 
     /**
-     * @return mixed
+     * @return Host | null
      */
     public function getHost()
     {
@@ -288,7 +288,7 @@ class Image
     }
 
     /**
-     * @param mixed $error
+     * @param string $error
      */
     public function setError($error)
     {
