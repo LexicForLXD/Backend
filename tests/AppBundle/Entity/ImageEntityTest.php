@@ -110,6 +110,37 @@ class ImageEntityTest extends WebTestCase
         $this->em->flush();
     }
 
+    public function testRemoveImageAlias(){
+        $image = new Image();
+        $image->setPublic(true);
+        $image->setFinished(false);
+
+        $imageAlias = new ImageAlias();
+        $imageAlias->setName("TestAlias");
+        $imageAlias->setDescription("TestDescription");
+
+        $this->em->persist($imageAlias);
+        $this->em->flush();
+
+        $image->addAlias($imageAlias);
+
+        $this->em->persist($image);
+        $this->em->flush();
+
+        $image->removeAlias($imageAlias);
+
+        $this->em->persist($image);
+        $this->em->flush();
+
+        $this->assertEquals(0, $image->getAliases()->count());
+
+        $imageFromDB = $this->em->getRepository(Image::class)->find($image->getId());
+        $imageAlias = $this->em->getRepository(ImageAlias::class)->find($imageAlias->getId());
+        $this->em->remove($imageAlias);
+        $this->em->remove($imageFromDB);
+        $this->em->flush();
+    }
+
     /**
      * {@inheritDoc}
      */
