@@ -93,6 +93,12 @@ class ImageAliasController extends Controller
             return new JsonResponse(['errors' => $errorArray], 400);
         }
 
+        $result = $imageAliasApi->createAliasForImageByFingerprint($image->getHost(), $imageAlias, $image->getFingerprint());
+
+        if($result->code != 201 || $result->body->status_code != 200){
+            throw new WrongInputException('LXD-Error - '.$result->body->error);
+        }
+
         $em = $this->getDoctrine()->getManager();
         $em->persist($imageAlias);
 
@@ -100,8 +106,6 @@ class ImageAliasController extends Controller
         $em->persist($image);
 
         $em->flush();
-
-        $imageAliasApi->createAliasForImageByFingerprint($image->getHost(), $imageAlias, $image->getFingerprint());
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($image, 'json');
