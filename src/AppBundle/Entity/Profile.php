@@ -166,7 +166,7 @@ class Profile
     /**
      * @return string | null
      */
-    public function getDescription()
+    public function getDescription() : ?string
     {
         return $this->description;
     }
@@ -182,7 +182,7 @@ class Profile
     /**
      * @return array | null
      */
-    public function getConfig()
+    public function getConfig() : ?array
     {
         return $this->config;
     }
@@ -198,7 +198,7 @@ class Profile
     /**
      * @return array | null
      */
-    public function getDevices()
+    public function getDevices() : ?array
     {
         return $this->devices;
     }
