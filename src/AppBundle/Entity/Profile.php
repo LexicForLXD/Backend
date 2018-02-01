@@ -212,7 +212,7 @@ class Profile
     }
 
     /**
-     * @return ArrayCollection
+     * @return PersistentCollection
      */
     public function getHosts() : PersistentCollection
     {
@@ -220,7 +220,7 @@ class Profile
     }
 
     /**
-     * @return ArrayCollection
+     * @return PersistentCollection
      */
     public function getContainers() : PersistentCollection
     {
