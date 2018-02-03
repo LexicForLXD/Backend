@@ -323,27 +323,14 @@ class HostController extends Controller
             );
         }
 
-        if($request->request->has("ipv4")) {
-            $host->setIpv4($request->request->get('ipv4'));
-        }
-        if($request->request->has("ipv6")) {
-            $host->setIpv6($request->request->get('ipv6'));
-        }
-        if($request->request->has("domainName")) {
-            $host->setDomainName($request->request->get('domainName'));
-        }
-        if($request->request->has("mac")) {
-            $host->setMac($request->request->get('mac'));
-        }
-        if($request->request->has("name")) {
-            $host->setName($request->request->get('name'));
-        }
-        if($request->request->has("port")) {
-            $host->setPort($request->request->get('port'));
-        }
-        if($request->request->has("settings")) {
-            $host->setSettings($request->request->get('settings'));
-        }
+
+        $host->setIpv4($request->request->get('ipv4'));
+        $host->setIpv6($request->request->get('ipv6'));
+        $host->setDomainName($request->request->get('domainName'));
+        $host->setMac($request->request->get('mac'));
+        $host->setName($request->request->get('name'));
+        $host->setPort($request->request->get('port'));
+        $host->setSettings($request->request->get('settings'));
 
 
         if(!$host->isAuthenticated())
