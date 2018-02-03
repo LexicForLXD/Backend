@@ -2,13 +2,17 @@
 namespace AppBundle\Controller;
 
 
-use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
+
 use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\Profile\ProfileManagerApi;
+use AppBundle\Service\LxdApi\HostApi;
+use AppBundle\Service\LxdApi\ContainerStateApi;
+use AppBundle\Service\LxdApi\ContainerApi;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -17,16 +21,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use AppBundle\Service\LxdApi\ContainerApi;
-
 use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Profile;
 use AppBundle\Entity\Image;
+use AppBundle\Entity\ImageAlias;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
-use AppBundle\Service\LxdApi\ContainerStateApi;
+
+
+use \Symfony\Component\VarDumper\VarDumper;
+
 
 
 
@@ -351,7 +357,7 @@ class ContainerController extends Controller
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi, HostApi $hostApi, OperationApi $operationApi)
     {
 
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
@@ -441,9 +447,10 @@ class ContainerController extends Controller
                 $oldHost = $oldContainer->getHost();
                 $pushResult = $api->migrate($oldHost, $oldContainer, $data);
 
-
+                VarDumper::dump($pushResult);
                 $data = [
                     "name" => $request->get("name"),
+                    "architecture" => $request->get("architecture"),
                     "profiles" => $profileNames,
                     "ephemeral" => $request->get("ephemeral", false),
                     "config" => $request->get("config"),
@@ -451,7 +458,8 @@ class ContainerController extends Controller
                     "source" => [
                         "type" => "migration",
                         "mode" => "pull",
-                        "operation" => $oldHost->getUri().$pushResult->body->operation,
+                        "operation" => $operationApi->getOperationsLink($oldHost, $pushResult->body->metadata->id),
+                        "certificate" => $hostApi->getCertificate($oldHost),
                         "base-image" => $oldContainer->getImage()->getFingerprint(),
                         "container_only" => $request->get("containerOnly", true),
                         "live" => $request->get("live", false),
@@ -520,6 +528,8 @@ class ContainerController extends Controller
         }
 
         $result = $api->create($host, $data);
+
+        VarDumper::dump($result);
 
         $dispatcher = $this->get('sb_event_queue');
 
