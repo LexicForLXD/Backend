@@ -72,7 +72,12 @@ php bin/console doctrine:schema:update --force
 
 ### Test password grant client erzeugen
 ```php
-php bin/console doctrine:fixtures:load     
+php bin/console doctrine:fixtures:load
+```
+
+### User erzeugen
+```php
+php bin/console app:create-user
 ```
 
 # Installation via Docker
@@ -81,5 +86,5 @@ php bin/console doctrine:fixtures:load
 # Documentation
 ### Create up to date Swagger documentation
 ```php
-./vendor/bin/swagger -e vendor   
+./vendor/bin/swagger -e vendor
 ```
