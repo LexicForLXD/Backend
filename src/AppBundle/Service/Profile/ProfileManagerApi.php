@@ -57,16 +57,20 @@ class ProfileManagerApi
      *
      * @param Profile $profile
      * @param Container $container
+     * @return bool
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function disableProfileForContainer(Profile $profile, Container $container){
+    public function disableProfileForContainer(Profile $profile, Container $container) : bool {
         $host = $container->getHost();
         //Check if this container was the only one using this profile on the host
         if($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1){
             $profile->removeHost($host);
-            $this->injectedService->deleteProfileOnHost($host, $profile);
+            $result = $this->injectedService->deleteProfileOnHost($host, $profile);
+            if($result->code != 200){
+                return false;
+            }
         }
         //ELSE LXC-Profile should remain on Host
 
@@ -74,6 +78,7 @@ class ProfileManagerApi
         $profile->removeContainer($container);
         $this->em->persist($profile);
         $this->em->flush();
+        return true;
     }
 
 }
