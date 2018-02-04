@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
+use Symfony\Component\Validator\Constraints as Assert;
 use Swagger\Annotations as OAS;
 
 /**
@@ -70,6 +71,7 @@ class Image
 
     /**
      * @ORM\Column(type="boolean")
+     *
      * @OAS\Property(example="true")
      * @var bool
      */
@@ -103,6 +105,7 @@ class Image
 
     /**
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\Container", mappedBy="image")
+     * @JMS\Exclude()
      * @var ArrayCollection
      */
     protected $containers;
@@ -301,6 +304,28 @@ class Image
     public function getContainers(): PersistentCollection
     {
         return $this->containers;
+    }
+
+    /**
+     * @return array
+     *
+     * @OAS\Property(property="container_id", example="[1]")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getContainerId(){
+        $ids[] = null;
+
+        if($this->containers->isEmpty()){
+            return $ids;
+        }
+
+        $this->containers->first();
+        do{
+            $ids[] = $this->containers->current()->getId();
+        }while($this->containers->next());
+
+        return $ids;
     }
 
     /**
