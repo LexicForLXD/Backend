@@ -526,6 +526,14 @@ class ImageController extends Controller
             throw new WrongInputException("The Image is not yet created on the Host or there was an error creating it - You can't update the Image in this state");
         }
 
+        $image->setProperties($request->request->get('properties'));
+
+        $image->setPublic($request->request->get('public'));
+
+        if ($errorArray = $this->validation($image)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
         $result = $api->putImageUpdate($image->getHost(), $image->getFingerprint(), $request->getContent());
 
         if($result->code != 200){
@@ -536,13 +544,6 @@ class ImageController extends Controller
         }
 
         //Update Image in DB
-        if($request->request->has('properties')) {
-            $image->setProperties($request->request->get('properties'));
-        }
-        if($request->request->has('public')) {
-            $image->setPublic($request->request->get('public'));
-        }
-
         $em->merge($image);
         $em->flush();
 
