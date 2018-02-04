@@ -122,6 +122,7 @@ class Image
     public function __construct()
     {
         $this->aliases = new ArrayCollection();
+        $this->containers = new ArrayCollection();
     }
 
     /**
