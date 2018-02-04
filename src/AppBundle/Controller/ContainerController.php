@@ -63,7 +63,11 @@ class ContainerController extends Controller
     {
         $containers = $this->getDoctrine()->getRepository(Container::class)->findAllJoinedToHost();
 
-
+        if (!$hosts) {
+            throw new ElementNotFoundException(
+                'No Hosts found'
+            );
+        }
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($containers, 'json');
@@ -120,7 +124,7 @@ class ContainerController extends Controller
             $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
             if (!$host) {
-                throw $this->createNotFoundException(
+                throw new ElementNotFoundException(
                     'No host found for id ' . $hostId
                 );
             }
@@ -585,7 +589,7 @@ class ContainerController extends Controller
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
 
         if (!$container) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No container found for id ' . $containerId
             );
         }
@@ -641,7 +645,7 @@ class ContainerController extends Controller
 
 
         if (!$container) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No container found for id ' . $containerId
             );
         }
@@ -754,7 +758,7 @@ class ContainerController extends Controller
 
 
         if (!$container) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No container found for id ' . $containerId
             );
         }
