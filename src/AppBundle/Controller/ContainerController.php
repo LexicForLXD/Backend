@@ -63,7 +63,7 @@ class ContainerController extends Controller
     {
         $containers = $this->getDoctrine()->getRepository(Container::class)->findAllJoinedToHost();
 
-        if (!$hosts) {
+        if (!$containers) {
             throw new ElementNotFoundException(
                 'No Hosts found'
             );
@@ -119,6 +119,12 @@ class ContainerController extends Controller
         $fresh = $request->query->get('fresh');
 
         $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
+
+        if (!$containers) {
+            throw new ElementNotFoundException(
+                'No Containers for Host '. $hostId .' found'
+            );
+        }
 
         if ($fresh == 'true') {
             $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
