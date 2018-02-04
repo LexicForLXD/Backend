@@ -25,27 +25,30 @@ class ProfileManagerApi
      *
      * @param Profile $profile
      * @param Container $container
+     * @return bool
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function enableProfileForContainer(Profile $profile, Container $container){
+    public function enableProfileForContainer(Profile $profile, Container $container) : bool {
         $profile->addContainer($container);
         $host = $container->getHost();
         if($profile->isHostLinked($host)){
-            return;
+            return true;
         }
 
         $result = $this->injectedService->createProfileOnHost($host, $profile);
 
-        if($result->code != 201){
-            return;
+        if($result->code != 201 || $result->code != 400){
+            return false;
         }
+        //HTTP 400 - Profile is already located on the Host but was not linked in Lexic - create link in Lexic
 
         $profile->addHost($host);
 
         $this->em->persist($profile);
         $this->em->flush();
+        return true;
     }
 
     /**
@@ -54,16 +57,20 @@ class ProfileManagerApi
      *
      * @param Profile $profile
      * @param Container $container
+     * @return bool
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function disableProfileForContainer(Profile $profile, Container $container){
+    public function disableProfileForContainer(Profile $profile, Container $container) : bool {
         $host = $container->getHost();
         //Check if this container was the only one using this profile on the host
         if($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1){
             $profile->removeHost($host);
-            $this->injectedService->deleteProfileOnHost($host, $profile);
+            $result = $this->injectedService->deleteProfileOnHost($host, $profile);
+            if($result->code != 200){
+                return false;
+            }
         }
         //ELSE LXC-Profile should remain on Host
 
@@ -71,6 +78,7 @@ class ProfileManagerApi
         $profile->removeContainer($container);
         $this->em->persist($profile);
         $this->em->flush();
+        return true;
     }
 
 }
