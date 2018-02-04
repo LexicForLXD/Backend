@@ -34,9 +34,9 @@ class Profile
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=false)
-     *
      * @Assert\NotNull
      * @Assert\NotBlank()
+     * @Assert\Type("string")
      *
      * @OAS\Property(example="my-profilename")
      * var string
@@ -45,15 +45,16 @@ class Profile
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Type("string")
      *
      * @OAS\Property(example="Some description string")
-     * @Assert\Type(type="string")
      * var string
      */
     protected $description;
 
     /**
      * @ORM\Column(type="json_array", nullable=true)
+     * @Assert\Type("array")
      *
      * @OAS\Property(example="Config JSON Object")
      * @Assert\Type(type="array")
@@ -63,9 +64,9 @@ class Profile
 
     /**
      * @ORM\Column(type="json_array", nullable=true)
+     * @Assert\Type(type="array")
      *
      * @OAS\Property(example="Devices JSON Object")
-     * @Assert\Type(type="array")
      * var json_array
      */
     protected $devices;
