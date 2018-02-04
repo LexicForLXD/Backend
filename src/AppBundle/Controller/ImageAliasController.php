@@ -245,7 +245,7 @@ class ImageAliasController extends Controller
             throw new WrongInputException('Editing of the ImageAlias for an Image which is in the creation process is not possible');
         }
 
-        if ($request->request->has('name')) {
+        if ($request->request->has('name') && $request->request->get('name') != $imageAlias->getName()) {
             $oldName = $imageAlias->getName();
             $imageAlias->setName($request->request->get('name'));
             $result = $imageAliasApi->editAliasName($image->getHost(), $imageAlias, $oldName);
