@@ -920,25 +920,15 @@ class MonitoringController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        if($request->request->has('nagiosEnabled')) {
-            $hostStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
-        }
+        $hostStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
 
-        if($request->request->has('nagiosName')) {
-            $hostStatus->setNagiosName($request->request->get('nagiosName'));
-        }
+        $hostStatus->setNagiosName($request->request->get('nagiosName'));
 
-        if($request->request->has('checkName')) {
-            $hostStatus->setCheckName($request->request->get('checkName'));
-        }
+        $hostStatus->setCheckName($request->request->get('checkName'));
 
-        if($request->request->has('sourceNumber')) {
-            $hostStatus->setSourceNumber($request->request->get('sourceNumber'));
-        }
+        $hostStatus->setSourceNumber($request->request->get('sourceNumber'));
 
-        if($request->request->has('nagiosUrl')) {
-            $hostStatus->setNagiosUrl($request->request->get('nagiosUrl'));
-        }
+        $hostStatus->setNagiosUrl($request->request->get('nagiosUrl'));
 
         //Validation
         if ($errorArray = $this->validation($hostStatus)) {
