@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Swagger\Annotations as OAS;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class ImageAlias
@@ -25,6 +26,10 @@ class ImageAlias
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\NotNull()
+     * @Assert\NotBlank()
+     * @Assert\Type("string")
+     *
      * @OAS\Property(example="my-alias")
      * @var string
      */
@@ -32,6 +37,10 @@ class ImageAlias
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\NotNull()
+     * @Assert\NotBlank()
+     * @Assert\Type("string")
+     *
      * @OAS\Property(example="This is a description string")
      * @var string
      */
