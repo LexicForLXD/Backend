@@ -447,7 +447,6 @@ class ContainerController extends Controller
                 $oldHost = $oldContainer->getHost();
                 $pushResult = $api->migrate($oldHost, $oldContainer, $data);
 
-                VarDumper::dump($pushResult);
                 $data = [
                     "name" => $request->get("name"),
                     "architecture" => $request->get("architecture"),
@@ -458,7 +457,7 @@ class ContainerController extends Controller
                     "source" => [
                         "type" => "migration",
                         "mode" => "pull",
-                        "operation" => $operationApi->getOperationsLink($oldHost, $pushResult->body->metadata->id),
+                        "operation" => $operationApi->buildUri($oldHost,'operations/'.$pushResult->body->metadata->id),
                         "certificate" => $hostApi->getCertificate($oldHost),
                         "base-image" => $oldContainer->getImage()->getFingerprint(),
                         "container_only" => $request->get("containerOnly", true),
@@ -506,7 +505,6 @@ class ContainerController extends Controller
         if($request->request->has("name")){
             $container->setName($request->get("name"));
         }
-
         $container->setSettings($data);
 
 
@@ -529,7 +527,6 @@ class ContainerController extends Controller
 
         $result = $api->create($host, $data);
 
-        VarDumper::dump($result);
 
         $dispatcher = $this->get('sb_event_queue');
 
