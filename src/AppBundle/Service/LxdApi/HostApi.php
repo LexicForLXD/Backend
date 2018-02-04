@@ -64,4 +64,16 @@ class HostApi extends HttpHelper
         $uri = $this->buildUri($host, 'certificates');
         return Request::post($uri, $data)->send();
     }
+
+    /**
+     * get the certificate of a host
+     *
+     * @param Host $host
+     * @return string
+     */
+    public function getCertificate(Host $host)
+    {
+        $info = $this->info($host);
+        return $info->body->metadata->environment->certificate;
+    }
 }
