@@ -399,6 +399,11 @@ class ImageController extends Controller
             return $this->json([], 204);
         }
 
+        //Image is used by at least one Container
+        if($image->getContainers()->count() > 0){
+            throw new WrongInputException("The Image is still used by at least one Container");
+        }
+
         $aliases = $image->getAliases();
         for($i = 0; $i < $aliases->count(); $i++){
             $result = $aliasApi->removeAliasByName($image->getHost(), $aliases->get($i)->getName());
