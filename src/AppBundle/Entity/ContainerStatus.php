@@ -31,6 +31,7 @@ class ContainerStatus
      * @var boolean
      * @ORM\Column(type="boolean")
      * @Assert\NotNull()
+     * @Assert\Type("bool")
      *
      * @OAS\Property(example="true")
      */
@@ -41,6 +42,7 @@ class ContainerStatus
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\NotBlank()
+     * @Assert\Type("string")
      *
      * @OAS\Property(example="ContainerWebServer1")
      */
@@ -51,6 +53,7 @@ class ContainerStatus
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\NotBlank()
+     * @Assert\Type("string")
      *
      * @OAS\Property(example="check_http")
      */
@@ -72,6 +75,7 @@ class ContainerStatus
      * @ORM\Column(type="string")
      * @Assert\NotNull
      * @Assert\NotBlank()
+     * @Assert\Url()
      *
      * @OAS\Property(example="https://nagios.example.com/pnp4nagios/")
      */

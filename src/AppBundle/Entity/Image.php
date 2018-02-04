@@ -84,7 +84,6 @@ class Image
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\NotNull
      * @Assert\Type("string")
      *
      * @OAS\Property(example="imageFilename")
@@ -94,6 +93,8 @@ class Image
 
     /**
      * @ORM\Column(type="json", nullable=true)
+     * @Assert\Type("array")
+     *
      * @OAS\Property(example="{json-Object}")
      * @var array
      */
@@ -122,6 +123,7 @@ class Image
     public function __construct()
     {
         $this->aliases = new ArrayCollection();
+        $this->containers = new ArrayCollection();
     }
 
     /**

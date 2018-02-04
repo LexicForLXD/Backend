@@ -245,16 +245,33 @@ class ImageAliasController extends Controller
             throw new WrongInputException('Editing of the ImageAlias for an Image which is in the creation process is not possible');
         }
 
-        if ($request->request->has('name')) {
-            $oldName = $imageAlias->getName();
+        $previousName = null;
+        if ($request->request->has('name')){
+            $previousName = $imageAlias->getName();
             $imageAlias->setName($request->request->get('name'));
-            $result = $imageAliasApi->editAliasName($image->getHost(), $imageAlias, $oldName);
+        }
+
+        $previousDescription = null;
+        if ($request->request->has('description')) {
+            $previousDescription = $imageAlias->getDescription();
+            $imageAlias->setDescription($request->request->get('description'));
+        }
+
+        //Validation
+        if ($errorArray = $this->validation($imageAlias)) {
+            return new JsonResponse(['errors' => $errorArray], 400);
+        }
+
+        //Check if a name update via LXD is necessary
+        if($previousName != null && $previousName != $imageAlias->getName()){
+            $result = $imageAliasApi->editAliasName($image->getHost(), $imageAlias, $previousName);
             if($result->code != 201 || $result->body->status_code != 200){
                 throw new WrongInputException('LXD-Error - '.$result->body->error);
             }
         }
-        if ($request->request->has('description')) {
-            $imageAlias->setDescription($request->request->get('description'));
+
+        //Check if a description update via LXD is necessary
+        if($previousDescription != null && $previousDescription != $imageAlias->getDescription()){
             $result = $imageAliasApi->editAliasDescription($image->getHost(), $imageAlias);
             if($result->code != 200 || $result->body->status_code != 200){
                 throw new WrongInputException('LXD-Error - '.$result->body->error);
