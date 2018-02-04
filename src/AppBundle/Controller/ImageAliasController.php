@@ -180,8 +180,8 @@ class ImageAliasController extends Controller
     /**
      * Change the description or name of an ImageAlias
      *
-     * @Route("/images/aliases/{aliasId}", name="edit_alias_for_image", methods={"PUT"})
-     * @OAS\Put(path="/images/aliases/{aliasId}",
+     * @Route("/images/aliases/{aliasId}", name="edit_alias_for_image", methods={"PATCH"})
+     * @OAS\Patch(path="/images/aliases/{aliasId}",
      *     tags={"image-alias"},
      *     @OAS\Parameter(
      *      description="ID of the ImageAlias",

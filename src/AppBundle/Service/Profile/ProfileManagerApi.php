@@ -39,7 +39,7 @@ class ProfileManagerApi
 
         $result = $this->injectedService->createProfileOnHost($host, $profile);
 
-        if($result->code != 201 || $result->code != 400){
+        if($result->code != 201 && $result->code != 400){
             return false;
         }
         //HTTP 400 - Profile is already located on the Host but was not linked in Lexic - create link in Lexic

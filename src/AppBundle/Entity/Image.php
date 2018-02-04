@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
+use Symfony\Component\Validator\Constraints as Assert;
 use Swagger\Annotations as OAS;
 
 /**
@@ -30,6 +31,7 @@ class Image
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Type("string")
      *
      * @OAS\Property(example="a49d26ce5808075f5175bf31f5cb90561f5023dcd408da8ac5e834096d46b2d8")
      * var string
@@ -46,6 +48,7 @@ class Image
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Type("string")
      *
      * @OAS\Property(example="x86_64")
      * var string
@@ -54,6 +57,7 @@ class Image
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Type("int")
      *
      * @OAS\Property(example="1602345")
      * var int
@@ -70,6 +74,9 @@ class Image
 
     /**
      * @ORM\Column(type="boolean")
+     * @Assert\NotNull
+     * @Assert\Type("bool")
+     *
      * @OAS\Property(example="true")
      * @var bool
      */
@@ -77,6 +84,9 @@ class Image
 
     /**
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\NotNull
+     * @Assert\Type("string")
+     *
      * @OAS\Property(example="imageFilename")
      * @var string
      */
@@ -103,6 +113,7 @@ class Image
 
     /**
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\Container", mappedBy="image")
+     * @JMS\Exclude()
      * @var ArrayCollection
      */
     protected $containers;
@@ -301,6 +312,28 @@ class Image
     public function getContainers(): PersistentCollection
     {
         return $this->containers;
+    }
+
+    /**
+     * @return array
+     *
+     * @OAS\Property(property="container_id", example="[1]")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getContainerId(){
+        $ids[] = null;
+
+        if($this->containers->isEmpty()){
+            return $ids;
+        }
+
+        $this->containers->first();
+        do{
+            $ids[] = $this->containers->current()->getId();
+        }while($this->containers->next());
+
+        return $ids;
     }
 
     /**
