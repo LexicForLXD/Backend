@@ -97,6 +97,8 @@ class Container
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      *
      * @OAS\Property(ref="#/components/schemas/host")
+     *
+     * @JMS\Exclude()
      */
     protected $host;
 
@@ -343,6 +345,44 @@ class Container
         }
         $this->profiles->removeElement($profile);
         $profile->removeContainer($this);
+    }
+
+
+
+    /**
+     * @return int
+     *
+     * @OAS\Property(property="host_id", example="1")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getHostId(){
+        $id = $this->host->getId();
+
+        return $id;
+    }
+
+
+    /**
+     * @return array
+     *
+     * @OAS\Property(property="profile_id", example="[1]")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getProfileId(){
+        $ids[] = null;
+
+        if($this->profiles->isEmpty()){
+            return $ids;
+        }
+
+        $this->profiles->first();
+        do{
+            $ids[] = $this->profiles->current()->getId();
+        }while($this->profiles->next());
+
+        return $ids;
     }
 
     /** @see \Serializable::serialize() */

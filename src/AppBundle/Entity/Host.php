@@ -122,6 +122,7 @@ class Host
      * @var [type]
      *
      * @ORM\OneToMany(targetEntity="Container", mappedBy="host")
+     * @JMS\Exclude()
      */
     protected $containers;
 
@@ -551,6 +552,32 @@ class Host
     {
         $this->statuses = $statuses;
     }
+
+
+
+    /**
+     * @return array
+     *
+     * @OAS\Property(property="container_id", example="[1]")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getContainerId(){
+        $ids[] = null;
+
+        if($this->containers->isEmpty()){
+            return $ids;
+        }
+
+        $this->containers->first();
+        do{
+            $ids[] = $this->containers->current()->getId();
+        }while($this->containers->next());
+
+        return $ids;
+    }
+
+
 
     /** @see \Serializable::serialize() */
     // public function serialize()
