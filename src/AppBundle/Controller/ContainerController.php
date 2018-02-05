@@ -686,7 +686,6 @@ class ContainerController extends Controller
      * @param EntityManagerInterface $em
      * @param ContainerApi $api
      * @param OperationApi $operationApi
-     * @return WrongInputException|JsonResponse
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
      * @Route("/containers/{containerId}", name="containers_update", methods={"PUT"})
@@ -773,27 +772,37 @@ class ContainerController extends Controller
         {
             if($container->getName() != $request->get("name"))
             {
-                $container->setName($request->get("name"));
+
                 $data = ["name" => $request->get("name")];
 
                 $result = $api->migrate($container->getHost(), $container, $data);
-
                 if($result->code == 409)
                 {
-                    return new WrongInputException("The name is already taken.");
+                    throw new WrongInputException("The name is already taken.");
+                }
+                if($result->code != 202){
+                    throw new WrongInputException($result->body->error);
                 }
 
                 $operationResult = $operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
                 if($operationResult->code != 200)
                 {
-                    return new WrongInputException($operationResult->body->error);
+                    if($operationResult->code == 301)
+                    {
+                        throw new WrongInputException("No Container with this name exists on the host");
+                    }
+                    VarDumper::dump("help");
+
+                    throw new WrongInputException($operationResult->body->error);
                 }
+                $container->setName($request->get("name"));
+                $em->flush($container);
 
                 $serializer = $this->get('jms_serializer');
                 $response = $serializer->serialize($container, 'json');
                 return new Response($response, Response::HTTP_OK);
             } else {
-                return new WrongInputException("The name is already taken.");
+                throw new WrongInputException("The name is already taken.");
             }
 
 
@@ -821,7 +830,7 @@ class ContainerController extends Controller
             $operationResult = $operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
             if($operationResult->code != 200){
-                return new WrongInputException($operationResult->body->error);
+                throw new WrongInputException($operationResult->body->error);
             }
 
             $container->setSettings($data);
