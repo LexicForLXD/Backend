@@ -231,6 +231,7 @@ class ImageAliasController extends Controller
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
+     * @throws WrongInputExceptionArray
      */
     public function editImageAlias($aliasId, Request $request,ImageAliasApi $imageAliasApi){
         $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->find($aliasId);
@@ -261,7 +262,7 @@ class ImageAliasController extends Controller
 
         //Validation
         if ($errorArray = $this->validation($imageAlias)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         //Check if a name update via LXD is necessary
