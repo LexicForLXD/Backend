@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Service\LxdApi\HostApi;
 use Swagger\Annotations as OAS;
+use AppBundle\Exception\WrongInputException;
+use AppBundle\Exception\WrongInputExceptionArray;
 
 
 class HostController extends Controller
@@ -155,9 +157,7 @@ class HostController extends Controller
 
         $host->setAuthenticated(false);
 
-        if ($errorArray = $this->validation($host)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
-        }
+        $this->validation($host);
 
         $em->persist($host);
         $em->flush();
@@ -323,27 +323,14 @@ class HostController extends Controller
             );
         }
 
-        if($request->request->has("ipv4")) {
-            $host->setIpv4($request->request->get('ipv4'));
-        }
-        if($request->request->has("ipv6")) {
-            $host->setIpv6($request->request->get('ipv6'));
-        }
-        if($request->request->has("domainName")) {
-            $host->setDomainName($request->request->get('domainName'));
-        }
-        if($request->request->has("mac")) {
-            $host->setMac($request->request->get('mac'));
-        }
-        if($request->request->has("name")) {
-            $host->setName($request->request->get('name'));
-        }
-        if($request->request->has("port")) {
-            $host->setPort($request->request->get('port'));
-        }
-        if($request->request->has("settings")) {
-            $host->setSettings($request->request->get('settings'));
-        }
+
+        $host->setIpv4($request->request->get('ipv4'));
+        $host->setIpv6($request->request->get('ipv6'));
+        $host->setDomainName($request->request->get('domainName'));
+        $host->setMac($request->request->get('mac'));
+        $host->setName($request->request->get('name'));
+        $host->setPort($request->request->get('port'));
+        $host->setSettings($request->request->get('settings'));
 
 
         if(!$host->isAuthenticated())
@@ -366,9 +353,7 @@ class HostController extends Controller
 
 
 
-        if ($errorArray = $this->validation($host)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
-        }
+        $this->validation($host);
 
 
         $em->flush();
@@ -416,7 +401,7 @@ class HostController extends Controller
         }
 
         if($host->hasAnything()) {
-            return new JsonResponse(['errors' => 'Host has an association with one or more of the following: images, containers, profiles'], Response::HTTP_BAD_REQUEST);
+            throw new WrongInputException('Host has an association with one or more of the following: images, containers, profiles');
         }
 
         $em->remove($host);
@@ -503,9 +488,7 @@ class HostController extends Controller
             if($result->code != 201)
             {
                 $host->setAuthenticated(false);
-                return new JsonResponse([
-                    'error' => 'error while authentication',
-                    'body' => $result->body],400);
+                throw new WrongInputExceptionArray($result->body);
             } else {
                 $host->setAuthenticated(true);
             }
@@ -530,6 +513,7 @@ class HostController extends Controller
             foreach ($errors as $error) {
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
+            throw new WrongInputExceptionArray($errorArray);
             return $errorArray;
         }
         return false;
