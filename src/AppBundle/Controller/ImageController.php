@@ -143,7 +143,7 @@ class ImageController extends Controller
      *      ),
      *      @OAS\Response(
      *          response=400,
-     *          description="Validation failed or there is a direct LXD error which gets redirected to the output",
+     *          description="Validation failed or there is a LXD Error",
      *      ),
      * )
      *
@@ -156,6 +156,7 @@ class ImageController extends Controller
      * @throws ConnectionErrorException
      * @throws ElementNotFoundException
      * @throws WrongInputExceptionArray
+     * @throws WrongInputException
      */
     public function createNewRemoteSourceImageOnHost($hostId, Request $request, ImageApi $api, OperationsRelayApi $relayApi){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
@@ -193,7 +194,7 @@ class ImageController extends Controller
                 $alias->setName($aliasArray[$i]['name']);
                 $alias->setDescription($aliasArray[$i]['description']);
                 if ($errorArray = $this->validation($alias)) {
-                    return new JsonResponse(['errors' => $errorArray], 400);
+                    throw new WrongInputExceptionArray($errorArray);
                 }
                 $em->persist($alias);
                 $image->addAlias($alias);
@@ -203,10 +204,10 @@ class ImageController extends Controller
         $result = $api->createImage($host, $request->getContent());
 
         if ($result->code != 202) {
-            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
+            throw new WrongInputException($result->body->error);
         }
         if ($result->body->metadata->status_code == 400) {
-            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
+            throw new WrongInputException($result->body->error);
         }
 
         $image->setFinished(false);
@@ -230,6 +231,7 @@ class ImageController extends Controller
      * @throws ElementNotFoundException
      * @throws ConnectionErrorException
      * @throws WrongInputExceptionArray
+     * @throws WrongInputException
      *
      * @OAS\Post(path="/hosts/{hostId}/images/container",
      *     tags={"images"},
@@ -262,7 +264,7 @@ class ImageController extends Controller
      *      ),
      *      @OAS\Response(
      *          response=400,
-     *          description="Validation failed or there is a direct LXD error which gets redirected to the output",
+     *          description="Validation failed or there is a LXD Error",
      *      ),
      * )
      */
@@ -313,7 +315,7 @@ class ImageController extends Controller
                 $alias->setName($aliasArray[$i]['name']);
                 $alias->setDescription($aliasArray[$i]['description']);
                 if ($errorArray = $this->validation($alias)) {
-                    return new JsonResponse(['errors' => $errorArray], 400);
+                    throw new WrongInputExceptionArray($errorArray);
                 }
                 $em->persist($alias);
                 $image->addAlias($alias);
@@ -323,10 +325,10 @@ class ImageController extends Controller
         $result = $api->createImage($host, $request->getContent());
 
         if ($result->code != 202) {
-            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
+            throw new WrongInputException($result->body->error);
         }
         if ($result->body->metadata->status_code == 400) {
-            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
+            throw new WrongInputException($result->body->error);
         }
 
         $image->setFinished(false);
