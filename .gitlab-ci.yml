@@ -1,4 +1,4 @@
-image: FROM janrtr/docker-symfony-php7-composer:3.7
+image: janrtr/docker-symfony-php7-composer:3.7
  
 stages:
   - test
