@@ -32,7 +32,7 @@ test:php7.1:
      - echo $CERT_KEY >> /srv/lexic/client.key
      - composer install --no-interaction
      - php bin/console doctrine:schema:update --force
-     - php bin/console doctrine:fixtures:load
+     - php bin/console doctrine:fixtures:load --no-interaction
    script:
      - phpunit --coverage-text --colors=never
    only:
