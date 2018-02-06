@@ -2,9 +2,9 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Container;
 use AppBundle\Entity\Profile;
 use AppBundle\Exception\ElementNotFoundException;
+use AppBundle\Exception\WrongInputExceptionArray;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -139,6 +139,7 @@ class ProfileController extends Controller
      *
      * @param Request $request
      * @return JsonResponse|Response
+     * @throws WrongInputExceptionArray
      */
     public function createProfile(Request $request){
 
@@ -158,7 +159,7 @@ class ProfileController extends Controller
         }
 
         if ($errorArray = $this->validation($profile)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -231,6 +232,7 @@ class ProfileController extends Controller
      * @return Response
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws ElementNotFoundException
+     * @throws WrongInputExceptionArray
      */
     public function editProfile($profileId, Request $request){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -254,7 +256,7 @@ class ProfileController extends Controller
         }
 
         if ($errorArray = $this->validation($profile)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         if($profile->linkedToHost()){
