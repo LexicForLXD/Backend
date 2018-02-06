@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Profile;
 use AppBundle\Exception\ElementNotFoundException;
+use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -263,12 +264,12 @@ class ProfileController extends Controller
             if($oldName != null) {
                 $result = $this->renameProfileOnHosts($profile, $oldName);
                 if($result['status'] == 'failure'){
-                    return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+                    throw new WrongInputExceptionArray($result);
                 }
             }
             $result = $this->updateProfileOnHosts($profile);
             if($result['status'] == 'failure'){
-                return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+                throw new WrongInputExceptionArray($result);
             }
         }
 
@@ -313,6 +314,8 @@ class ProfileController extends Controller
      *)
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
     public function deleteProfile($profileId){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -324,13 +327,13 @@ class ProfileController extends Controller
         }
 
         if($profile->isUsedByContainer()){
-            return new JsonResponse(['errors' => 'The LXC-Profile is used by at least one Container'], Response::HTTP_BAD_REQUEST);
+            throw new WrongInputException("The LXC-Profile is used by at least one Container");
         }
 
         if($profile->linkedToHost()){
             $result = $this->removeProfileFromHosts($profile);
             if($result['status'] == 'failure'){
-                return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+                throw new WrongInputExceptionArray($result);
             }
         }
 
