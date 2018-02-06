@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Service\LxdApi\HostApi;
 use Swagger\Annotations as OAS;
+use AppBundle\Exception\WrongInputException;
+use AppBundle\Exception\WrongInputExceptionArray;
 
 
 class HostController extends Controller
@@ -155,9 +157,7 @@ class HostController extends Controller
 
         $host->setAuthenticated(false);
 
-        if ($errorArray = $this->validation($host)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
-        }
+        $this->validation($host);
 
         $em->persist($host);
         $em->flush();
@@ -353,9 +353,7 @@ class HostController extends Controller
 
 
 
-        if ($errorArray = $this->validation($host)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
-        }
+        $this->validation($host);
 
 
         $em->flush();
@@ -403,7 +401,7 @@ class HostController extends Controller
         }
 
         if($host->hasAnything()) {
-            return new JsonResponse(['errors' => 'Host has an association with one or more of the following: images, containers, profiles'], Response::HTTP_BAD_REQUEST);
+            throw new WrongInputException('Host has an association with one or more of the following: images, containers, profiles');
         }
 
         $em->remove($host);
@@ -490,9 +488,7 @@ class HostController extends Controller
             if($result->code != 201)
             {
                 $host->setAuthenticated(false);
-                return new JsonResponse([
-                    'error' => 'error while authentication',
-                    'body' => $result->body],400);
+                throw new WrongInputExceptionArray($result->body);
             } else {
                 $host->setAuthenticated(true);
             }
@@ -517,6 +513,7 @@ class HostController extends Controller
             foreach ($errors as $error) {
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
+            throw new WrongInputExceptionArray($errorArray);
             return $errorArray;
         }
         return false;

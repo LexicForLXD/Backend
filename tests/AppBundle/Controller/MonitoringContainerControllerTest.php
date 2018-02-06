@@ -248,7 +248,7 @@ class MonitoringContainerControllerTest extends WebTestCase
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
-        $this->assertEquals('{"errors":{"sourceNumber":"This value should be of type int."}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":400,"message":{"sourceNumber":"This value should be of type int."}}}', $client->getResponse()->getContent());
 
         $container = $this->em->getRepository(Container::class)->find($container->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
@@ -399,7 +399,7 @@ class MonitoringContainerControllerTest extends WebTestCase
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
-        $this->assertEquals('{"errors":{"sourceNumber":"This value should be of type int."}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":400,"message":{"sourceNumber":"This value should be of type int."}}}', $client->getResponse()->getContent());
 
         $container = $this->em->getRepository(Container::class)->find($container->getId());
         $containerStatus = $this->em->getRepository(ContainerStatus::class)->find($containerStatus->getId());

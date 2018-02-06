@@ -6,6 +6,7 @@ use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
+use AppBundle\Exception\WrongInputExceptionArray;
 
 use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\Profile\ProfileManagerApi;
@@ -65,7 +66,7 @@ class ContainerController extends Controller
 
         if (!$containers) {
             throw new ElementNotFoundException(
-                'No Hosts found'
+                'No Containers found'
             );
         }
 
@@ -522,10 +523,8 @@ class ContainerController extends Controller
 
         $container->setState('creating');
 
-        if($errorArray = $this->validation($container))
-        {
-            throw new WrongInputException(json_encode($errorArray));
-        }
+        $this->validation($container);
+
 
 
         $em->persist($container);
@@ -540,11 +539,13 @@ class ContainerController extends Controller
 
         $dispatcher = $this->get('sb_event_queue');
 
+
+
         if ($result->code != 202) {
-            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
+            throw new WrongInputExceptionArray($result->body);
         }
         if ($result->body->metadata->status_code == 400) {
-            Return new Response(json_encode($result->body), Response::HTTP_BAD_REQUEST);
+            throw new WrongInputExceptionArray($result->body);
         }
 
         $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
@@ -665,7 +666,7 @@ class ContainerController extends Controller
         }
 
         if($stateResult->body->metadata->status_code != 102){
-            return new JsonResponse(["error" => "Container is currently not stopped. Please stop the container before you delete it."], 400);
+            throw new WrongInputException("Container is currently not stopped. Please stop the container before you delete it.");
         }
 
         $result = $api->remove($container->getHost(), $container->getName());
@@ -791,7 +792,6 @@ class ContainerController extends Controller
                     {
                         throw new WrongInputException("No Container with this name exists on the host");
                     }
-                    VarDumper::dump("help");
 
                     throw new WrongInputException($operationResult->body->error);
                 }
@@ -826,6 +826,13 @@ class ContainerController extends Controller
             ];
 
             $result = $api->update($container->getHost(), $container, $data);
+
+            if ($result->code != 202) {
+                throw new WrongInputExceptionArray($result->body);
+            }
+            if ($result->body->metadata->status_code == 400) {
+                throw new WrongInputExceptionArray($result->body);
+            }
 
             $operationResult = $operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
@@ -864,7 +871,9 @@ class ContainerController extends Controller
             foreach ($errors as $error) {
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
+            throw new WrongInputExceptionArray($errorArray);
             return $errorArray;
+
         }
         return false;
     }

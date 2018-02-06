@@ -375,7 +375,7 @@ class ProfileControllerTest extends WebTestCase
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
 
-        $this->assertContains('{"errors":{"name":"This value is already used."}}', $client->getResponse()->getContent());
+        $this->assertEquals('{"error":{"code":400,"message":{"name":"This value is already used."}}}', $client->getResponse()->getContent());
 
         $profile = $this->em->getRepository(Profile::class)->find($profile->getId());
         $this->em->remove($profile);

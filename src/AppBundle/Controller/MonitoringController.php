@@ -8,6 +8,7 @@ use AppBundle\Entity\Host;
 use AppBundle\Entity\HostStatus;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
+use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\MonitoringApi;
 use AppBundle\Service\Nagios\Pnp4NagiosApi;
 use AppBundle\Service\SSH\HostSSH;
@@ -276,6 +277,7 @@ class MonitoringController extends Controller
      * @param Request $request
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
+     * @throws WrongInputExceptionArray
      *
      * @OAS\Post(path="/monitoring/checks/containers/{containerId}",
      *     tags={"container-monitoring"},
@@ -366,7 +368,7 @@ class MonitoringController extends Controller
 
         //Validation
         if ($errorArray = $this->validation($containerStatus)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $container->addStatus($containerStatus);
@@ -387,6 +389,8 @@ class MonitoringController extends Controller
      * @param Request $request
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
+     * @throws WrongInputExceptionArray
+     *
      * @OAS\Put(path="/monitoring/checks/{checkId}/containers",
      *     tags={"container-monitoring"},
      * @OAS\Parameter(
@@ -468,7 +472,7 @@ class MonitoringController extends Controller
 
         //Validation
         if ($errorArray = $this->validation($containerStatus)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $em->persist($containerStatus);
@@ -733,6 +737,7 @@ class MonitoringController extends Controller
      * @param Request $request
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
+     * @throws WrongInputExceptionArray
      *
      * @OAS\Post(path="/monitoring/checks/hosts/{hostId}",
      *     tags={"host-monitoring"},
@@ -823,7 +828,7 @@ class MonitoringController extends Controller
 
         //Validation
         if ($errorArray = $this->validation($hostStatus)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $host->addStatus($hostStatus);
@@ -844,6 +849,7 @@ class MonitoringController extends Controller
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
+     * @throws WrongInputExceptionArray
      *
      * @OAS\Put(path="/monitoring/checks/{checkId}/hosts",
      *     tags={"host-monitoring"},
@@ -922,7 +928,7 @@ class MonitoringController extends Controller
 
         //Validation
         if ($errorArray = $this->validation($hostStatus)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $em->persist($hostStatus);

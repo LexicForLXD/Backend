@@ -2,9 +2,10 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Container;
 use AppBundle\Entity\Profile;
 use AppBundle\Exception\ElementNotFoundException;
+use AppBundle\Exception\WrongInputException;
+use AppBundle\Exception\WrongInputExceptionArray;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -139,6 +140,7 @@ class ProfileController extends Controller
      *
      * @param Request $request
      * @return JsonResponse|Response
+     * @throws WrongInputExceptionArray
      */
     public function createProfile(Request $request){
 
@@ -158,7 +160,7 @@ class ProfileController extends Controller
         }
 
         if ($errorArray = $this->validation($profile)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -216,7 +218,7 @@ class ProfileController extends Controller
      *  response=404
      * ),
      * @OAS\Response(
-     *  description="The provided values for the LXC-Profile are not valid or the LXD Api call failed - forwards LXD API response",
+     *  description="The provided values for the LXC-Profile are not valid or the LXD Api call failed",
      *  response=400
      * ),
      * @OAS\Response(
@@ -231,6 +233,7 @@ class ProfileController extends Controller
      * @return Response
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws ElementNotFoundException
+     * @throws WrongInputExceptionArray
      */
     public function editProfile($profileId, Request $request){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -254,19 +257,19 @@ class ProfileController extends Controller
         }
 
         if ($errorArray = $this->validation($profile)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         if($profile->linkedToHost()){
             if($oldName != null) {
                 $result = $this->renameProfileOnHosts($profile, $oldName);
                 if($result['status'] == 'failure'){
-                    return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+                    throw new WrongInputExceptionArray($result);
                 }
             }
             $result = $this->updateProfileOnHosts($profile);
             if($result['status'] == 'failure'){
-                return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+                throw new WrongInputExceptionArray($result);
             }
         }
 
@@ -302,7 +305,7 @@ class ProfileController extends Controller
      *  ),
      *  @OAS\Response(
      *      response=400,
-     *      description="The LXC-Profile couldn't be deleted, because it is used by at least one Container or the LXD Api call failed - forwards LXD API response",
+     *      description="The LXC-Profile couldn't be deleted, because it is used by at least one Container or the LXD Api call failed",
      *  ),
      *  @OAS\Response(
      *      description="No LXC-Profile for the provided id found",
@@ -311,6 +314,8 @@ class ProfileController extends Controller
      *)
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
     public function deleteProfile($profileId){
         $profile = $this->getDoctrine()->getRepository(Profile::class)->find($profileId);
@@ -322,13 +327,13 @@ class ProfileController extends Controller
         }
 
         if($profile->isUsedByContainer()){
-            return new JsonResponse(['errors' => 'The LXC-Profile is used by at least one Container'], Response::HTTP_BAD_REQUEST);
+            throw new WrongInputException("The LXC-Profile is used by at least one Container");
         }
 
         if($profile->linkedToHost()){
             $result = $this->removeProfileFromHosts($profile);
             if($result['status'] == 'failure'){
-                return new Response(json_encode($result), Response::HTTP_BAD_REQUEST);
+                throw new WrongInputExceptionArray($result);
             }
         }
 

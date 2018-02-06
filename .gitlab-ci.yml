@@ -1,4 +1,4 @@
-image: janrtr/docker-phpunit-php7:7.1-phpunit6
+image: janrtr/docker-symfony-php7-composer:3.7
  
 stages:
   - test
@@ -22,18 +22,19 @@ test:php7.1:
 
    stage: test
    before_script:
+    #Install missing dependencies
+     - apk --no-cache add git php7-simplexml php7-ssh2
+    #Install phpunit
+     - wget https://phar.phpunit.de/phpunit.phar && chmod +x phpunit.phar && mv phpunit.phar /usr/local/bin/phpunit
     #Create Test cert
      - mkdir -p /srv/lexic
      - echo $CERT_CRT >> /srv/lexic/client.crt
      - echo $CERT_KEY >> /srv/lexic/client.key
-     - composer install
+     - composer install --no-interaction
      - php bin/console doctrine:schema:update --force
-     - php bin/console doctrine:fixtures:load
+     - php bin/console doctrine:fixtures:load --no-interaction
    script:
      - phpunit --coverage-text --colors=never
-   artifacts:
-     paths:
-     - var/logs/
    only:
      - master
      - /^feature.*$/
