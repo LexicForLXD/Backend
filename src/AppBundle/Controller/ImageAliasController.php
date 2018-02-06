@@ -6,6 +6,7 @@ use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
+use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\ImageAliasApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -65,6 +66,7 @@ class ImageAliasController extends Controller
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
+     * @throws WrongInputExceptionArray
      */
     public function createAliasForImage($imageId, Request $request, ImageAliasApi $imageAliasApi)
     {
@@ -90,7 +92,7 @@ class ImageAliasController extends Controller
         }
 
         if ($errorArray = $this->validation($imageAlias)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $result = $imageAliasApi->createAliasForImageByFingerprint($image->getHost(), $imageAlias, $image->getFingerprint());
