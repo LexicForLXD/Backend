@@ -1,4 +1,4 @@
-image: janrtr/docker-phpunit-php7:7.1-phpunit6
+image: janrtr/docker-symfony-php7-composer:3.7
  
 stages:
   - test
