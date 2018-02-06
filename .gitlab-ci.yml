@@ -30,7 +30,7 @@ test:php7.1:
      - mkdir -p /srv/lexic
      - echo $CERT_CRT >> /srv/lexic/client.crt
      - echo $CERT_KEY >> /srv/lexic/client.key
-     - composer install
+     - composer install --no-interaction
      - php bin/console doctrine:schema:update --force
      - php bin/console doctrine:fixtures:load
    script:
