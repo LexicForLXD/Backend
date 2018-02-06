@@ -9,6 +9,7 @@ use AppBundle\Entity\ImageAlias;
 use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
+use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\ImageAliasApi;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
@@ -154,6 +155,7 @@ class ImageController extends Controller
      *
      * @throws ConnectionErrorException
      * @throws ElementNotFoundException
+     * @throws WrongInputExceptionArray
      */
     public function createNewRemoteSourceImageOnHost($hostId, Request $request, ImageApi $api, OperationsRelayApi $relayApi){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
@@ -178,7 +180,7 @@ class ImageController extends Controller
         }
 
         if ($errorArray = $this->validation($image)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -227,6 +229,7 @@ class ImageController extends Controller
      *
      * @throws ElementNotFoundException
      * @throws ConnectionErrorException
+     * @throws WrongInputExceptionArray
      *
      * @OAS\Post(path="/hosts/{hostId}/images/container",
      *     tags={"images"},
@@ -297,7 +300,7 @@ class ImageController extends Controller
         }
 
         if ($errorArray = $this->validation($image)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -514,6 +517,7 @@ class ImageController extends Controller
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws ConnectionErrorException
+     * @throws WrongInputExceptionArray
      */
     public function updateImage($imageId, Request $request, ImageApi $api){
         $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
@@ -536,7 +540,7 @@ class ImageController extends Controller
         $image->setPublic($request->request->get('public'));
 
         if ($errorArray = $this->validation($image)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
+            throw new WrongInputExceptionArray($errorArray);
         }
 
         $result = $api->putImageUpdate($image->getHost(), $image->getFingerprint(), $request->getContent());
