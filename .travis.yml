@@ -12,11 +12,11 @@ services:
 
 before_install:
   - sudo apt -qq update
+  - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
   - sudo apt --yes install snapd
   - sudo snap install lxd
-  - pecl install ssh2
   - composer install --no-interaction
 
 
