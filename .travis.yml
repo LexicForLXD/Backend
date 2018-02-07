@@ -11,13 +11,12 @@ services:
   - redis-server
 
 before_install:
-  - sudo apt-get -qq update
+  - sudo apt -qq update
 
 install:
-  - sudo apt-get --yes install snapd
+  - sudo apt --yes install snapd
   - sudo snap install lxd
-  - sudo apt-get install -y --force-yes php-ssh2 php-curl php-xml php-zip php-dom
-  - composer install
+  - composer install --no-interaction
 
 
 before_script:
@@ -39,11 +38,4 @@ jobs:
   include:
     - stage: test
       script: phpunit
-    - stage: release
-      script: skip
-      deploy:
-        provider: releases
-        api_key: "$GITHUB_OAUTH_TOKEN"
-        skip_cleanup: true
-        on:
-          tags: true
+    
