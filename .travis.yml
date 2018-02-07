@@ -16,6 +16,7 @@ before_install:
 install:
   - sudo apt --yes install snapd
   - sudo snap install lxd
+  - pecl install ssh2
   - composer install --no-interaction
 
 
@@ -38,4 +39,3 @@ jobs:
   include:
     - stage: test
       script: phpunit
-    
