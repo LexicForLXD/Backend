@@ -16,7 +16,7 @@ before_install:
 install:
   - sudo apt-get --yes install snapd
   - sudo snap install lxd
-  - sudo apt-get install -y --force-yes php7-ssh2 php7-curl php7-xml php7-zip php7-dom
+  - sudo apt-get install -y --force-yes php-ssh2 php-curl php-xml php-zip php-dom
   - composer install
 
 
