@@ -34,6 +34,3 @@ parameters:
     #PNP4Nagios Configs
     nagiosUsername:
     nagiosPassword:
-
-    #Custom options for JMS
-    jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
