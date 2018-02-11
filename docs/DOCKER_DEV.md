@@ -7,6 +7,8 @@
 
 - Add link to local workspace <code>- ".:/www/symfony"</code> under volumes in docker-compose.yml
 
+- replace <code>image</code> line with <code>build: .</code>
+
 - Build and start all containers
 ```
 docker-compose up -d --build
