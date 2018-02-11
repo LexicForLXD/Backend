@@ -7,11 +7,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - "./client.crt:/srv/lexic/client.crt"
-      - "./client.key:/srv/lexic/client.key"
-      - "./:/www/symfony"
+      - "/path/to/cert/client.crt:/srv/lexic/client.crt"
+      - "/path/to/cert/client.key:/srv/lexic/client.key"
+      - "/path/to/servercert/server.key:/etc/nginx/server.key"
+      - "/path/to/servercert/server.key:/etc/nginx/server.key"
   postgres:
-    image: "postgres:9.6.6-alpine"
+    image: "postgres:9.6.7-alpine"
     ports:
       - "5432:5432"
     environment:
