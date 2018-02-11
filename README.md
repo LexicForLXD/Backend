@@ -31,7 +31,8 @@ php bin/console app:create-user
 ```
 
 # Installation via Docker
-- see documentation [here](docs/DOCKER.md)
+- see prod environment documentation [here](docs/DOCKER.md)
+- see backend development environment documentation [here](docs/DOCKER_DEV.md)
 
 # Documentation
 ### Create up to date Swagger documentation

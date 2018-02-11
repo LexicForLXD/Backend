@@ -1,16 +1,19 @@
-# Environment with Docker
+# DEV Environment with Docker
 
 ## Start Docker environment
-
-- Login to the Docker registry by using the command <code>docker login git.janrtr.de:4567</code>
-
 - Update the path to the LXD-certificate "/path/to/cert/" with your local path in docker-compose.yml
 
 - Optional (remove not required cert volume links)
 
-- Start all containers
+- Add link to local workspace <code>- ".:/www/symfony"</code> under volumes in docker-compose.yml
+
+- Build and start all containers
 ```
-docker-compose up -d
+docker-compose up -d --build
+```
+- Composer install
+```
+docker-compose exec web composer install
 ```
 - Create the database schema
 ```
