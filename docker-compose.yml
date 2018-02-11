@@ -2,7 +2,6 @@ version: '2'
 services:
   web:
     image: "git.janrtr.de:4567/syp-lxc/backend"
-    build: .
     ports:
       - "80:80"
       - "443:443"
