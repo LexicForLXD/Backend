@@ -8,7 +8,7 @@ SYP-LXC Backend
 
 # Installation from Source
 
-### Resolve dependencies
+### Resolve dependencies and set parameters  
 
 ```
 composer install
