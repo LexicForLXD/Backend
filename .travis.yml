@@ -13,6 +13,7 @@ services:
 before_install:
   - sudo apt update
   - php -m
+  - apt install libssh2
   - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - php -m
