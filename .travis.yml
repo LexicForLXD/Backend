@@ -11,7 +11,8 @@ services:
   - redis-server
 
 before_install:
-  - sudo apt -qq update
+  - sudo apt update
+  - php -m
   - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
