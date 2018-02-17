@@ -24,6 +24,7 @@ install:
 #  - sudo apt --yes install snapd
 #  - sudo snap install lxd
   - composer install --no-interaction
+  - composer require --dev phpunit/phpunit ^7.0
 
 
 before_script:
@@ -33,7 +34,7 @@ before_script:
   - php bin/console doctrine:fixtures:load -n --env=test
   
 #script: phpdbg -qrr ./vendor/bin/simple-phpunit
-script: SYMFONY_PHPUNIT_VERSION=6.4 phpdbg -rr ./vendor/bin/simple-phpunit --coverage-text
+script: phpdbg -rr ./vendor/bin/phpunit 
 
 stages:
   - test
