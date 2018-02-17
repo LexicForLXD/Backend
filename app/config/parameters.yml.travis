@@ -5,7 +5,7 @@ parameters:
     database_driver:  pdo_pgsql
     database_host: localhost
     database_port: 5432
-    database_name: travis_ci_test
+    database_name: travis_lexic_test
     database_user: postgres
     database_password: ~
     
