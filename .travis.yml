@@ -13,7 +13,9 @@ services:
 before_install:
   - sudo apt update
   - php -m
+  - pecl install ssh2
   - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - php -m
 
 install:
   - sudo apt --yes install snapd
