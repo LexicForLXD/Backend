@@ -13,13 +13,7 @@ services:
 before_install:
   - sudo apt update
   - php -m
-  - cd /usr/local/src/
-  - sudo wget https://libssh2.org/download/libssh2-1.8.0.tar.gz
-  - sudo tar -xzf libssh2-1.8.0.tar.gz
-  - cd libssh2-1.8.0
-  - sudo ./configure
-  - sudo make all install
-  - cd
+  - sudo apt install libssh2-php
   - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - php -m
