@@ -43,4 +43,4 @@ stages:
 jobs:
   include:
     - stage: test
-      script: phpunit
+      script: phpdbg -qrr phpunit --coverage-clover build/logs/clover.xml
