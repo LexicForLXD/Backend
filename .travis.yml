@@ -33,7 +33,7 @@ before_script:
   - php bin/console doctrine:fixtures:load -n --env=test
   
 #script: phpdbg -qrr ./vendor/bin/simple-phpunit
-script: SYMFONY_PHPUNIT_VERSION=6.4 phpdbg -qrr ./vendor/bin/simple-phpunit --coverage-text
+script: SYMFONY_PHPUNIT_VERSION=6.4 phpdbg -vqrr ./vendor/bin/simple-phpunit --coverage-text
 
 stages:
   - test
