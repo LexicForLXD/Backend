@@ -19,8 +19,8 @@ parameters:
     secret: ThisTokenIsNotSoSecretChangeIt
 
     # Location of the certificate for authorization to lxd
-    cert_location: /srv/lexic/client.crt
-    cert_key_location: /srv/lexic/client.key
+    cert_location: client.crt
+    cert_key_location: client.key
     cert_passphrase: ~
 
     redis_hostname: redis
