@@ -13,7 +13,6 @@ services:
 before_install:
   - sudo apt update
   - php -m
-  - sudo apt install php7.1-ssh2
   - cd /usr/local/src/
   - sudo wget https://libssh2.org/download/libssh2-1.8.0.tar.gz
   - sudo tar -xzf libssh2-1.8.0.tar.gz
