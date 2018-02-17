@@ -27,8 +27,7 @@ install:
 before_script:
   - psql -c 'create database travis_lexic_test;' -U postgres
   - cp app/config/parameters.yml.travis app/config/parameters.yml
-  - php bin/console doctrine:database:create --env=test
-  - php bin/console doctrine:schema:create --env=test
+  - php bin/console doctrine:schema:update --force --env=test
   - php bin/console doctrine:fixtures:load -n --env=test
 
 stages:
