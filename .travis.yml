@@ -32,7 +32,8 @@ before_script:
   - php bin/console doctrine:schema:update --force --env=test
   - php bin/console doctrine:fixtures:load -n --env=test
   
-script: phpdbg -qrr ./vendor/bin/simple-phpunit
+#script: phpdbg -qrr ./vendor/bin/simple-phpunit
+script: ./vendor/bin/simple-phpunit --coverage-text
 
 stages:
   - test
