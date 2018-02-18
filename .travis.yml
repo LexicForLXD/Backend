@@ -34,7 +34,7 @@ before_script:
   - php bin/console doctrine:fixtures:load -n --env=test
  
 #script: SYMFONY_PHPUNIT_VERSION=6.4 ./vendor/bin/simple-phpunit
-script: phpdbg -r ./vendor/bin/phpunit -v
+script: sudo phpdbg -r ./vendor/bin/phpunit -v
 
 stages:
   - test
