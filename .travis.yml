@@ -24,7 +24,7 @@ install:
 #  - sudo apt --yes install snapd
 #  - sudo snap install lxd
   - composer install --no-interaction
-  - composer require phpunit/phpunit
+#  - composer require phpunit/phpunit
 
 
 before_script:
