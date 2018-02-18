@@ -1,7 +1,8 @@
 SYP-LXC Backend
 ========================
 
-[![pipeline status](https://git.janrtr.de/syp-lxc/Backend/badges/master/pipeline.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
+[![Build Status](https://travis-ci.org/LexicForLXD/Backend.svg?branch=master)](https://travis-ci.org/LexicForLXD/Backend)
+
 [![coverage report](https://git.janrtr.de/syp-lxc/Backend/badges/master/coverage.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
 # Requirements
 - PostgreSQL
