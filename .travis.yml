@@ -17,7 +17,7 @@ before_install:
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo $CERT_CRT >> client.crt
   - echo echo $CERT_KEY >> client.key
-  - phpenv config-rm xdebug.ini
+#  - phpenv config-rm xdebug.ini
 
 
 install:
