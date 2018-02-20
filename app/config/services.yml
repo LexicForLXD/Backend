@@ -29,6 +29,9 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    jms_serializer.naming_strategy:
+            alias: jms_serializer.identical_property_naming_strategy
+
     # add more services, or override services that need manual wiring
     # AppBundle\Service\ExampleService:
     #     arguments:

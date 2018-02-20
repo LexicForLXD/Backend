@@ -1,8 +1,8 @@
-# DEV Env with Docker
+# Environment with Docker
 
-## Start Docker-DEV environment
+## Start Docker environment
 
-- If you want to run the the latest master based image from GitLab without rebuilding it locally remove the <code>build: .</code> line from the docker-compose.yml file - Info: login to the GitLab registry by using <code>docker login git.janrtr.de:4567</code> and providing your GitLab credentials
+- Login to the Docker registry by using the command <code>docker login git.janrtr.de:4567</code>
 
 - Update the path to the LXD-certificate "/path/to/cert/" with your local path in docker-compose.yml
 
@@ -12,10 +12,6 @@
 ```
 docker-compose up -d
 ```
-- Composer install
-```
-docker-compose exec web composer install
-```
 - Create the database schema
 ```
 docker-compose exec web php bin/console doctrine:schema:update --force
@@ -24,13 +20,21 @@ docker-compose exec web php bin/console doctrine:schema:update --force
 ```
 docker-compose exec web php bin/console doctrine:fixtures:load
 ```
-- Create new User
+- Default user - username : mmustermann - password : password
+
+- Done :)
+
+## Useful commands 
+
+- Create new user account 
 ```
 docker-compose exec web php bin/console app:create-user
 ```
 
-
-- Done :)
+- Execute shell commands in the Web Container
+```
+docker-compose exec web <command>
+```
 
 ## Access to Containers
 - WebServer : localhost port 80

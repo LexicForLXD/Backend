@@ -5,61 +5,11 @@ SYP-LXC Backend
 
 [![coverage report](https://git.janrtr.de/syp-lxc/Backend/badges/master/coverage.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
 # Requirements
-- PostgreSQL
-- Redis
-
-#### Required PHP-Modules
-
-```
-[PHP Modules]
-bcmath
-bz2
-Core
-ctype
-curl
-date
-dom
-filter
-gd
-gettext
-gmp
-hash
-intl
-json
-libxml
-mbstring
-mcrypt
-mysqlnd
-openssl
-pcre
-PDO
-pdo_dblib
-pdo_mysql
-PDO_ODBC
-pdo_pgsql
-Phar
-readline
-redis
-Reflection
-session
-SimpleXML
-soap
-SPL
-ssh2
-standard
-tokenizer
-xml
-xmlreader
-xmlrpc
-xmlwriter
-zip
-zlib
-```
-
+- see requirements [here](docs/REQUIREMENTS.md)
 
 # Installation from Source
 
-### Resolve dependencies
+### Resolve dependencies and set parameters  
 
 ```
 composer install
@@ -82,7 +32,8 @@ php bin/console app:create-user
 ```
 
 # Installation via Docker
-- see DOCKER_README.md
+- see prod environment documentation [here](docs/DOCKER.md)
+- see backend development environment documentation [here](docs/DOCKER_DEV.md)
 
 # Documentation
 ### Create up to date Swagger documentation
