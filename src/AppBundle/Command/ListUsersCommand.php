@@ -45,10 +45,10 @@ class ListUsersCommand extends Command
 
         foreach($users as $user) {
             $ouputArray[] = array(
-                $user->getFirstName() + ' ' + $user->getLastName(),
+                $user->getFirstName() . ' ' . $user->getLastName(),
                 $user->getEmail(),
                 $user->getUsername(),
-                $user->getRole()
+                '$user->getRoles()'
             );
         };
 
