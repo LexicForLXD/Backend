@@ -44,12 +44,12 @@ class DeleteUserCommand extends Command
             if($userDB == null) {
                 throw new \Exception('Dieser Benutzernamen existiert nicht in der Datenbank.');
             }
-            return $value;
+            return $userDB;
         });
 
         $user = $helper->ask($input, $output, $questionUsername);
 
-        $questionConfirmation = new Question('Sind Sie sicher, dass Sie den Benutzer "'+ $user->getUsername() + '" löschen wollen? (y/n)', 'n');
+        $questionConfirmation = new Question('Sind Sie sicher, dass Sie den Benutzer "'. $user->getUsername() . '" löschen wollen? (y/n)', 'n');
 
         $confirmation = $helper->ask($input, $output, $questionConfirmation);
 
