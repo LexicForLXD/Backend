@@ -96,7 +96,6 @@ class DeleteUserCommandTest extends KernelTestCase
         $output = $commandTester->getDisplay();
         $this->assertContains('Dieser Benutzernamen existiert nicht in der Datenbank.', $output);
 
-        $userDB = $this->em->getRepository(User::class)->findOneBy(['username' => 'commandUsername']);
 
     }
 
