@@ -56,6 +56,7 @@ class DeleteUserCommand extends Command
         if($confirmation == 'y'){
             $this->em->remove($user);
             $this->em->flush();
+            $output->writeln('Der Benutzer wurde erfolgreich gelöscht');
         } else {
             $output->writeln('Es wird kein Benutzer gelöscht');
         }
