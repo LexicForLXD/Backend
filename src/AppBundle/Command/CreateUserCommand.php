@@ -100,10 +100,8 @@ class CreateUserCommand extends Command
             $output->writeln('Die Passwörter stimmen nicht überein.');
             $password = $helper->ask($input, $output, $questionPassword);
             $passwordAgain = $helper->ask($input, $output, $questionPasswordAgain);
-            if ($password === $passwordAgain)
+            if ($password != $passwordAgain)
             {
-                $user->setPassword($password);
-            }else {
                 $output->writeln('Die Passwörter stimmen nicht überein.');
                 $output->writeln('Bitte starten Sie den Command erneut.');
                 return;
@@ -114,5 +112,7 @@ class CreateUserCommand extends Command
 
         $this->em->persist($user);
         $this->em->flush();
+
+        $output->writeln('User erfolgreich erzeugt.');
     }
 }
