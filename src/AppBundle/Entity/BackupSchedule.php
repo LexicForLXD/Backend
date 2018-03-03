@@ -4,7 +4,9 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class BackupSchedule
@@ -27,6 +29,9 @@ class BackupSchedule
      * @var string
      *
      * @ORM\Column(type="string", unique=true, nullable=false)
+     * @Assert\NotNull
+     * @Assert\NotBlank()
+     * @Assert\Type("string")
      */
     protected $name;
 
@@ -34,6 +39,7 @@ class BackupSchedule
      * @var string | null
      *
      * @ORM\Column(type="string", nullable=true)
+     * @Assert\Type("string")
      */
     protected $description;
 
@@ -41,6 +47,11 @@ class BackupSchedule
      * @var int | null
      *
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Type("int")
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 59
+     * )
      */
     protected $minute;
 
@@ -48,6 +59,11 @@ class BackupSchedule
      * @var int | null
      *
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Type("int")
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 23
+     * )
      */
     protected $hour;
 
@@ -55,6 +71,11 @@ class BackupSchedule
      * @var int | null
      *
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Type("int")
+     * @Assert\Range(
+     *      min = 1,
+     *      max = 31
+     * )
      */
     protected $day;
 
@@ -62,6 +83,11 @@ class BackupSchedule
      * @var int | null
      *
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Type("int")
+     * @Assert\Range(
+     *      min = 1,
+     *      max = 12
+     * )
      */
     protected $month;
 
@@ -69,6 +95,11 @@ class BackupSchedule
      * @var int | null
      *
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Type("int")
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 7
+     * )
      */
     protected $weekday;
 
@@ -76,6 +107,7 @@ class BackupSchedule
      * @var string
      *
      * @ORM\Column(type="string")
+     * @Assert\Type("string")
      */
     protected $destination;
 
@@ -249,9 +281,9 @@ class BackupSchedule
     }
 
     /**
-     * @return Container
+     * @return PersistentCollection
      */
-    public function getContainers(): Container
+    public function getContainers(): PersistentCollection
     {
         return $this->containers;
     }
