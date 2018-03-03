@@ -2,7 +2,9 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Class BackupSchedule
@@ -79,8 +81,28 @@ class BackupSchedule
 
     /**
      * @var Container
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="backup_schedule")
+     * @ORM\JoinTable(
+     *  joinColumns={
+     *      @ORM\JoinColumn(name="backup_schedule_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     *  }
+     * )
+     *
+     * @JMS\Exclude()
      */
     protected $containers;
+
+    /**
+     * BackupSchedule constructor.
+     */
+    public function __construct()
+    {
+        $this->containers = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -235,10 +257,45 @@ class BackupSchedule
     }
 
     /**
-     * @param Container $containers
+     * @param Container $container
      */
-    public function setContainers(Container $containers): void
+    public function addContainer(Container $container)
     {
-        $this->containers = $containers;
+        if ($this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->add($container);
+        $container->addBackupSchedule($this);
+    }
+
+    /**
+     * @param Container $container
+     */
+    public function removeContainer(Container $container){
+        if (!$this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->removeElement($container);
+        $container->removeBackupSchedule($this);
+    }
+
+    /**
+     * @return array
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getContainerId(){
+        $ids[] = null;
+
+        if($this->containers->isEmpty()){
+            return $ids;
+        }
+
+        $this->containers->first();
+        do{
+            $ids[] = $this->containers->current()->getId();
+        }while($this->containers->next());
+
+        return $ids;
     }
 }
