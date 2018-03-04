@@ -44,64 +44,12 @@ class BackupSchedule
     protected $description;
 
     /**
-     * @var int | null
+     * @var string
      *
-     * @ORM\Column(type="integer", nullable=true)
-     * @Assert\Type("int")
-     * @Assert\Range(
-     *      min = 0,
-     *      max = 59
-     * )
+     * @ORM\Column(type="string")
+     * @Assert\Choice({"daily", "weekly", "monthly"})
      */
-    protected $minute;
-
-    /**
-     * @var int | null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @Assert\Type("int")
-     * @Assert\Range(
-     *      min = 0,
-     *      max = 23
-     * )
-     */
-    protected $hour;
-
-    /**
-     * @var int | null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @Assert\Type("int")
-     * @Assert\Range(
-     *      min = 1,
-     *      max = 31
-     * )
-     */
-    protected $day;
-
-    /**
-     * @var int | null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @Assert\Type("int")
-     * @Assert\Range(
-     *      min = 1,
-     *      max = 12
-     * )
-     */
-    protected $month;
-
-    /**
-     * @var int | null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @Assert\Type("int")
-     * @Assert\Range(
-     *      min = 0,
-     *      max = 7
-     * )
-     */
-    protected $weekday;
+    protected $executionTime;
 
     /**
      * @var string
