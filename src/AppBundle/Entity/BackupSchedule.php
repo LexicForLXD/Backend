@@ -129,11 +129,20 @@ class BackupSchedule
     protected $containers;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Backup", mappedBy="backupSchedule")
+     * @JMS\Exclude()
+     */
+    protected $backups;
+
+    /**
      * BackupSchedule constructor.
      */
     public function __construct()
     {
         $this->containers = new ArrayCollection();
+        $this->backups = new ArrayCollection();
     }
 
     /**
@@ -329,5 +338,29 @@ class BackupSchedule
         }while($this->containers->next());
 
         return $ids;
+    }
+
+    /**
+     * Adds a successful Backup to the BackupSchedule.
+     * @param Backup $backup
+     */
+    public function addBackup(Backup $backup){
+        if ($this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->add($backup);
+        $backup->setBackupSchedule($this);
+    }
+
+    /**
+     * Removes a successful Backup from the BackupSchedule.
+     * @param Backup $backup
+     */
+    public function removeBackup(Backup $backup){
+        if (!$this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->removeElement($backup);
+        $backup->setBackupSchedule(null);
     }
 }
