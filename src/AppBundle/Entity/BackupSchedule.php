@@ -120,7 +120,7 @@ class BackupSchedule
     /**
      * @param string $name
      */
-    public function setName(string $name): void
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -136,89 +136,25 @@ class BackupSchedule
     /**
      * @param null|string $description
      */
-    public function setDescription(?string $description): void
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
 
     /**
-     * @return int|null
+     * @return string
      */
-    public function getMinute(): ?int
+    public function getExecutionTime(): string
     {
-        return $this->minute;
+        return $this->executionTime;
     }
 
     /**
-     * @param int|null $minute
+     * @param string $executionTime
      */
-    public function setMinute(?int $minute): void
+    public function setExecutionTime($executionTime): void
     {
-        $this->minute = $minute;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getHour(): ?int
-    {
-        return $this->hour;
-    }
-
-    /**
-     * @param int|null $hour
-     */
-    public function setHour(?int $hour): void
-    {
-        $this->hour = $hour;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getDay(): ?int
-    {
-        return $this->day;
-    }
-
-    /**
-     * @param int|null $day
-     */
-    public function setDay(?int $day): void
-    {
-        $this->day = $day;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getMonth(): ?int
-    {
-        return $this->month;
-    }
-
-    /**
-     * @param int|null $month
-     */
-    public function setMonth(?int $month): void
-    {
-        $this->month = $month;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getWeekday(): ?int
-    {
-        return $this->weekday;
-    }
-
-    /**
-     * @param int|null $weekday
-     */
-    public function setWeekday(?int $weekday): void
-    {
-        $this->weekday = $weekday;
+        $this->executionTime = $executionTime;
     }
 
     /**
@@ -232,7 +168,7 @@ class BackupSchedule
     /**
      * @param string $destination
      */
-    public function setDestination(string $destination): void
+    public function setDestination($destination): void
     {
         $this->destination = $destination;
     }
