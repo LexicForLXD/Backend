@@ -48,6 +48,7 @@ class BackupSchedule
      *
      * @ORM\Column(type="string")
      * @Assert\Choice({"daily", "weekly", "monthly"})
+     * @Assert\Type("string")
      */
     protected $executionTime;
 
@@ -58,6 +59,19 @@ class BackupSchedule
      * @Assert\Type("string")
      */
     protected $destination;
+
+    /**
+     * whether to do a full or incremental backup
+     *
+     *
+     * @var string
+     *
+     * @ORM\Column(type="string")
+     * @Assert\Type("string")
+     * @Assert\Choice({"full", "incremental"})
+     */
+    protected $type;
+
 
     /**
      * @var Container
@@ -173,6 +187,29 @@ class BackupSchedule
         $this->destination = $destination;
     }
 
+
+    /**
+     * Get whether to do a full or incremental backup
+     *
+     * @return  string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set whether to do a full or incremental backup
+     *
+     * @param  string  $type  whether to do a full or incremental backup
+     *
+     * @return  self
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
     /**
      * @return PersistentCollection
      */
@@ -247,4 +284,34 @@ class BackupSchedule
         $this->backups->removeElement($backup);
         $backup->setBackupSchedule(null);
     }
+
+
+    /**
+     * Returns the Commands which will be written in a shell script.
+     *
+     * @return Array
+     */
+    public function getShellCommands()
+    {
+        $comandTexts = array();
+
+        foreach ($containers as $container) {
+            $comandTexts[] = '
+                #!/bin/sh \n
+                \n
+                # Backup for Container ' . $container->getName() . '\n
+                \n
+                r=$(($(od -An -N1 -i /dev/random))) \n
+                lxc snapshot ' . $container->getName() . '/"$r" \n
+                f=$(lxc publish ' . $container->getName() . '/"$r") \n
+                fingerprint=${f##*: } \n
+                # Hier wird duplicity befehl aufgerufen
+                lxc delete test2/"$r" \n
+                lxc image delete "$fingerprint"\n
+            ';
+        }
+
+        return $commandTexts;
+    }
+
 }
