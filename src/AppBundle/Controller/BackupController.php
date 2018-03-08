@@ -100,11 +100,11 @@ class BackupController extends Controller
      * @Route("/backups", name="create_backup_webhook", methods={"POST"})
      *
      * @param Request $request
+     * @param EntityManagerInterface $em
      * @return Response
      * @throws ForbiddenException
      * @throws WrongInputException
      * @throws WrongInputExceptionArray
-     *
      * @OAS\Post(path="/backups?path={path}&token={token}",
      * tags={"backups"},
      * @OAS\Parameter(
