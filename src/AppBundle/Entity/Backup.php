@@ -5,17 +5,21 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as JMS;
+use Swagger\Annotations as OAS;
 
 /**
  * Class Backup
  * @package AppBundle\Entity
  *
  * @ORM\Entity
+ *
+ * @OAS\Schema(schema="backup", type="object")
  */
 class Backup
 {
     /**
      * @var int
+     * @OAS\Property(example="1")
      *
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -25,15 +29,17 @@ class Backup
 
     /**
      * @var string
+     * @OAS\Property(example="2017-10-03T00:12:00+01:00")
      *
      * @ORM\Column(type="date", nullable=false)
      * @Assert\NotNull
      * @Assert\Date()
      */
-    protected $lastExecuted;
+    protected $executionTime;
 
     /**
      * @var string
+     * @OAS\Property(example="/backups/46876a46467645as6d3763.tar.gz")
      *
      * @Assert\NotNull
      * @Assert\NotBlank()
