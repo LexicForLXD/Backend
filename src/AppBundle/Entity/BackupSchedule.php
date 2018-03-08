@@ -103,6 +103,7 @@ class BackupSchedule
      */
     public function __construct()
     {
+        $this->token = bin2hex(random_bytes(10));
         $this->containers = new ArrayCollection();
         $this->backups = new ArrayCollection();
     }
