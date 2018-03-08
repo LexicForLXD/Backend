@@ -28,14 +28,13 @@ class Backup
     protected $id;
 
     /**
-     * @var string
+     * @var \DateTime
      * @OAS\Property(example="2017-10-03T00:12:00+01:00")
      *
      * @ORM\Column(type="date", nullable=false)
      * @Assert\NotNull
-     * @Assert\Date()
      */
-    protected $executionTime;
+    protected $timestamp;
 
     /**
      * @var string
@@ -62,22 +61,6 @@ class Backup
     public function getId(): int
     {
         return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLastExecuted(): string
-    {
-        return $this->lastExecuted;
-    }
-
-    /**
-     * @param string $lastExecuted
-     */
-    public function setLastExecuted($lastExecuted): void
-    {
-        $this->lastExecuted = $lastExecuted;
     }
 
     /**
@@ -110,5 +93,18 @@ class Backup
     public function setBackupSchedule(BackupSchedule $backupSchedule): void
     {
         $this->backupSchedule = $backupSchedule;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getTimestamp(): \DateTime
+    {
+        return $this->timestamp;
+    }
+
+    public function setTimestamp(): void
+    {
+        $this->timestamp = new \DateTime("now");
     }
 }
