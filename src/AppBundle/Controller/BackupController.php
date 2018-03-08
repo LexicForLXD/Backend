@@ -8,6 +8,7 @@ use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\ForbiddenException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
+use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Swagger\Annotations as OAS;
@@ -101,6 +102,8 @@ class BackupController extends Controller
      * @param Request $request
      * @return Response
      * @throws ForbiddenException
+     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      *
      * @OAS\Post(path="/backups?path={path}&token={token}",
      * tags={"backups"},
@@ -142,22 +145,17 @@ class BackupController extends Controller
      *  @OAS\JsonContent(ref="#/components/schemas/backup"),
      * ),
      * )
-     * @throws WrongInputException
-     * @throws WrongInputExceptionArray
      */
-    public function backupCreationWebhook(Request $request){
+    public function backupCreationWebhook(Request $request, EntityManagerInterface $em){
         $token = $request->query->get('token');
 
-        $backupSchedules = $this->getDoctrine()->getRepository(BackupSchedule::class)->findBy(["token" => $token]);
+        $backupSchedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->findOneBy(["token" => $token]);
 
-        if (!$backupSchedules) {
+        if (!$backupSchedule) {
             throw new ForbiddenException(
                 'Invalid backup token'
             );
         }
-
-        //Token is unique, there can be only one result
-        $backupSchedule = $backupSchedules[0];
 
         //Validate path
         if (!$request->query->has('path')){
@@ -176,8 +174,6 @@ class BackupController extends Controller
         if ($errorArray = $this->validation($backup)) {
             throw new WrongInputExceptionArray($errorArray);
         }
-
-        $em = $this->getDoctrine()->getManager();
 
         $em->persist($backup);
         $em->flush();
