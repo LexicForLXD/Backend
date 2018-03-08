@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputExceptionArray;
+use AppBundle\Service\SSH\HostSSH;
 
 
 class BackupScheduleController extends Controller
@@ -74,10 +75,8 @@ class BackupScheduleController extends Controller
      *  ),
      * )
      */
-    public function createBackupScheduleSingleContainerAction(Request $request, int $containerId, EntityManagerInterface $em)
+    public function createBackupScheduleSingleContainerAction(Request $request, int $containerId, EntityManagerInterface $em, HostSSH $sshApi)
     {
-        $fs = new Filesystem();
-
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
@@ -86,9 +85,8 @@ class BackupScheduleController extends Controller
             );
         }
 
-        $filename = $container->getName() . mt_rand() . '.sh';
 
-        $backupschedule  = new BackupSchedule();
+        $backupschedule = new BackupSchedule();
         $backupschedule->setName($request->get('name'));
         $backupschedule->setDescription($request->get('description'));
         $backupschedule->setExecutionTime($request->get('executionTime'));
@@ -104,13 +102,10 @@ class BackupScheduleController extends Controller
 
         $commandText = $backupschedule->getShellCommands();
 
+        $sshApi->sendAnacronFile($container, $commandText, $backupschedule->getExecutionTime());
+        $sshApi->makeFileExecuteable($container, $backupschedule->getExecutionTime());
 
-        try {
-            $fs->dumpFile('/tmp/'.$filename, $commandText[0]);
-            return new JsonResponse(["message" => "Datei erstellt"]);
-        } catch (IOExceptionInterface $e) {
-            return new JsonResponse(["error" => "An error occurred while creating your file at " . $e->getPath()]);
-        }
+
     }
 
 
