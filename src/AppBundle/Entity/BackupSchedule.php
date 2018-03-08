@@ -72,6 +72,18 @@ class BackupSchedule
      */
     protected $type;
 
+    /**
+     * token used for authorization of the backup script on the Host
+     * also used to find the association between backup and the backup schedule
+     *
+     * @var string
+     *
+     * @ORM\Column(type="string", unique=true)
+     *
+     * @Assert\Type("string")
+     *
+     */
+    protected $token;
 
     /**
      * @var Container
@@ -315,4 +327,19 @@ class BackupSchedule
         return $commandTexts;
     }
 
+    /**
+     * @return string
+     */
+    public function getToken(): string
+    {
+        return $this->token;
+    }
+
+    /**
+     * @param string $token
+     */
+    public function setToken(string $token): void
+    {
+        $this->token = $token;
+    }
 }
