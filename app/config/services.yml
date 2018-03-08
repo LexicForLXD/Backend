@@ -115,3 +115,8 @@ services:
             class: AppBundle\EventListener\WrongInputExceptionArrayListener
             tags:
                 - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+    forbidden_exception.listener:
+            class: AppBundle\EventListener\ForbiddenExceptionListener
+            tags:
+                - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
