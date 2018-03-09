@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Entity\BackupDestination;
+
 
 /**
  * Class BackupSchedule
@@ -53,10 +55,11 @@ class BackupSchedule
     protected $executionTime;
 
     /**
-     * @var string
+     * @var BackupDestination
      *
-     * @ORM\Column(type="string")
-     * @Assert\Type("string")
+     * @ManyToOne(targetEntity="BackupDestination", inversedBy="backupSchedules")
+     * @JoinColumn(name="destination_id", referencedColumnName="id")
+     * @Assert\NotNull
      */
     protected $destination;
 
@@ -111,7 +114,7 @@ class BackupSchedule
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId() : int
     {
         return $this->id;
     }
@@ -119,7 +122,7 @@ class BackupSchedule
     /**
      * @param int $id
      */
-    public function setId(int $id): void
+    public function setId(int $id) : void
     {
         $this->id = $id;
     }
@@ -127,7 +130,7 @@ class BackupSchedule
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName() : string
     {
         return $this->name;
     }
@@ -135,7 +138,7 @@ class BackupSchedule
     /**
      * @param string $name
      */
-    public function setName($name): void
+    public function setName($name) : void
     {
         $this->name = $name;
     }
@@ -143,7 +146,7 @@ class BackupSchedule
     /**
      * @return null|string
      */
-    public function getDescription(): ?string
+    public function getDescription() : ? string
     {
         return $this->description;
     }
@@ -151,7 +154,7 @@ class BackupSchedule
     /**
      * @param null|string $description
      */
-    public function setDescription($description): void
+    public function setDescription($description) : void
     {
         $this->description = $description;
     }
@@ -159,7 +162,7 @@ class BackupSchedule
     /**
      * @return string
      */
-    public function getExecutionTime(): string
+    public function getExecutionTime() : string
     {
         return $this->executionTime;
     }
@@ -167,23 +170,23 @@ class BackupSchedule
     /**
      * @param string $executionTime
      */
-    public function setExecutionTime($executionTime): void
+    public function setExecutionTime($executionTime) : void
     {
         $this->executionTime = $executionTime;
     }
 
     /**
-     * @return string
+     * @return BackupDestination
      */
-    public function getDestination(): string
+    public function getDestination() : BackupDestination
     {
         return $this->destination;
     }
 
     /**
-     * @param string $destination
+     * @param BackupDestination $destination
      */
-    public function setDestination($destination): void
+    public function setDestination($destination) : void
     {
         $this->destination = $destination;
     }
@@ -214,7 +217,7 @@ class BackupSchedule
     /**
      * @return PersistentCollection
      */
-    public function getContainers(): PersistentCollection
+    public function getContainers() : PersistentCollection
     {
         return $this->containers;
     }
@@ -234,7 +237,8 @@ class BackupSchedule
     /**
      * @param Container $container
      */
-    public function removeContainer(Container $container){
+    public function removeContainer(Container $container)
+    {
         if (!$this->containers->contains($container)) {
             return;
         }
@@ -247,17 +251,18 @@ class BackupSchedule
      *
      * @JMS\VirtualProperty()
      */
-    public function getContainerId(){
+    public function getContainerId()
+    {
         $ids[] = null;
 
-        if($this->containers->isEmpty()){
+        if ($this->containers->isEmpty()) {
             return $ids;
         }
 
         $this->containers->first();
-        do{
+        do {
             $ids[] = $this->containers->current()->getId();
-        }while($this->containers->next());
+        } while ($this->containers->next());
 
         return $ids;
     }
@@ -266,7 +271,8 @@ class BackupSchedule
      * Adds a successful Backup to the BackupSchedule.
      * @param Backup $backup
      */
-    public function addBackup(Backup $backup){
+    public function addBackup(Backup $backup)
+    {
         if ($this->backups->contains($backup)) {
             return;
         }
@@ -278,7 +284,8 @@ class BackupSchedule
      * Removes a successful Backup from the BackupSchedule.
      * @param Backup $backup
      */
-    public function removeBackup(Backup $backup){
+    public function removeBackup(Backup $backup)
+    {
         if (!$this->backups->contains($backup)) {
             return;
         }
@@ -306,8 +313,9 @@ class BackupSchedule
                 lxc snapshot ' . $container->getName() . '/"$r" \n
                 f=$(lxc publish ' . $container->getName() . '/"$r") \n
                 fingerprint=${f##*: } \n
-                # Hier wird duplicity befehl aufgerufen
-                lxc delete test2/"$r" \n
+                # Hier wird duplicity befehl aufgerufen \n
+                duplicity /var/snap/lxd/common/lxd/images/"$fingerprint" ' . $destination->getDestinationText . $container->getName() . ' \n
+                lxc delete ' . $container->getName() . '/"$r" \n
                 lxc image delete "$fingerprint"\n
             ';
         }
