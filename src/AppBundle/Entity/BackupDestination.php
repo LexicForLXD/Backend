@@ -320,6 +320,9 @@ class BackupDestination
      */
     public function getDestinationText()
     {
+        if ($this->username) {
+            return $this->protocol . '://' . $this->username . '@' . $this->hostname . '/' . $this->path . '/';
+        }
         return $this->protocol . '://' . $this->hostname . '/' . $this->path . '/';
     }
 }
