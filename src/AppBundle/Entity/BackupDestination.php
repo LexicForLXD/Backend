@@ -86,7 +86,7 @@ class BackupDestination
     /**
      * Undocumented variable
      *
-     * @OneToMany(targetEntity="BackupSchedule", mappedBy="destination")
+     * @ORM\OneToMany(targetEntity="BackupSchedule", mappedBy="destination")
      */
     protected $backupSchedules;
 

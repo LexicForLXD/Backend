@@ -57,8 +57,8 @@ class BackupSchedule
     /**
      * @var BackupDestination
      *
-     * @ManyToOne(targetEntity="BackupDestination", inversedBy="backupSchedules")
-     * @JoinColumn(name="destination_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="BackupDestination", inversedBy="backupSchedules")
+     * @ORM\JoinColumn(name="destination_id", referencedColumnName="id")
      * @Assert\NotNull
      */
     protected $destination;
@@ -338,7 +338,7 @@ class BackupSchedule
     /**
      * @return string
      */
-    public function getToken(): string
+    public function getToken() : string
     {
         return $this->token;
     }
@@ -346,7 +346,7 @@ class BackupSchedule
     /**
      * @param string $token
      */
-    public function setToken(string $token): void
+    public function setToken(string $token) : void
     {
         $this->token = $token;
     }
