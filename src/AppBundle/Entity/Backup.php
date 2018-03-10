@@ -29,9 +29,9 @@ class Backup
 
     /**
      * @var \DateTime
-     * @OAS\Property(example="2017-10-03T00:12:00+01:00")
+     * @OAS\Property(example="2018-03-10T22:40:28+00:00")
      *
-     * @ORM\Column(type="date", nullable=false)
+     * @ORM\Column(type="datetime", nullable=false)
      * @Assert\NotNull
      */
     protected $timestamp;
