@@ -326,7 +326,7 @@ class BackupSchedule
                 f=$(lxc publish ' . $container->getName() . '/"$r") \n
                 fingerprint=${f##*: } \n
                 # Hier wird duplicity befehl aufgerufen \n
-                duplicity /var/snap/lxd/common/lxd/images/"$fingerprint" ' . $destination->getDestinationText . $container->getName() . ' \n
+                duplicity /var/snap/lxd/common/lxd/images/"$fingerprint" ' . $this->destination->getDestinationText() . $container->getName() . ' \n
                 lxc delete ' . $container->getName() . '/"$r" \n
                 lxc image delete "$fingerprint"\n
             ';
