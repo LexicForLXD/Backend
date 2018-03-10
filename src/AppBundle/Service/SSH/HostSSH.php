@@ -68,13 +68,13 @@ class HostSSH
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
-        $filepath = "/etc/" . $executionTime;
+        $filepath = "/etc/" . $executionTime . "/";
 
         $session = new Session($configuration, $authentication);
 
         $exec = $session->getSftp();
 
-        return $exec->write($filepath . $container->getName() . 'sh', $fileContent);
+        return $exec->write($filepath . $container->getName(), $fileContent);
     }
 
 
