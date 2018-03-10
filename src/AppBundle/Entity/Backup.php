@@ -40,6 +40,7 @@ class Backup
      * @var string
      * @OAS\Property(example="/backups/46876a46467645as6d3763.tar.gz")
      *
+     * @ORM\Column(type="string", nullable=false)
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
