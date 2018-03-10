@@ -21,9 +21,6 @@ security:
             pattern: ^/oauth/v2/token
             security: false
 
-        doc:                                   # Everyone can access the access documentation URL.
-            pattern: ^/doc
-            security: false
         api:
             pattern: ^/                              # All URLs are protected
             fos_oauth: true                            # OAuth2 protected resource
