@@ -226,6 +226,64 @@ class BackupControllerTest extends WebTestCase
     }
 
     /**
+     * Negative test for deleteBackupEntry() - no Backup for id
+     * @throws \Exception
+     */
+    public function testDeleteBackupEntryNoBackupFound()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/backups/99999',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals('{"error":{"code":404,"message":"No Backup for id 99999 found"}}', $client->getResponse()->getContent());
+    }
+
+    /**
+     * Positive test for deleteBackupEntry()
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
+     */
+    public function testDeleteBackupEntry()
+    {
+        $backup = new Backup();
+
+        $backup->setTimestamp();
+        $backup->setFilePath("/test/1234.test");
+
+        $this->em->persist($backup);
+        $this->em->flush();
+
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/backups/'.$backup->getId(),
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode());
+        $this->assertEquals('', $client->getResponse()->getContent());
+
+        $backup = $this->em->getRepository(Backup::class)->find($backup->getId());
+        $this->assertNull($backup);
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function tearDown()
