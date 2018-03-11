@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as JMS;
@@ -48,13 +49,36 @@ class Backup
     protected $filePath;
 
     /**
-     * @var BackupSchedule
+     * @var ArrayCollection
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\BackupSchedule")
      * @ORM\JoinColumn(name="backup_schedule_id", referencedColumnName="id")
      * @JMS\Exclude()
      */
     protected $backupSchedule;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="backups")
+     * @ORM\JoinTable(
+     *  joinColumns={
+     *      @ORM\JoinColumn(name="backup_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     *  }
+     * )
+     */
+    protected $containers;
+
+    /**
+     * Backup constructor.
+     */
+    public function __construct()
+    {
+        $this->containers = new ArrayCollection();
+    }
 
     /**
      * @return int

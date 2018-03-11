@@ -123,6 +123,14 @@ class Container
     protected $backupSchedules;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Backup", mappedBy="containers")
+     * @JMS\Exclude()
+     */
+    protected $backups;
+
+    /**
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Image", inversedBy="containers")
      * @var Image
      */
@@ -133,6 +141,7 @@ class Container
         $this->profiles = new ArrayCollection();
         $this->statuses = new ArrayCollection();
         $this->backupSchedules = new ArrayCollection();
+        $this->backups = new ArrayCollection();
     }
 
     /**
