@@ -160,7 +160,7 @@ class BackupControllerTest extends WebTestCase
 
         $client->request(
             'GET',
-            '/profiles/'.$backup->getId(),
+            '/backups/'.$backup->getId(),
             array(),
             array(),
             array(
@@ -171,9 +171,7 @@ class BackupControllerTest extends WebTestCase
 
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $jsonArray = json_decode($client->getResponse()->getContent());
-
-        $object = $jsonArray[0];
+        $object = json_decode($client->getResponse()->getContent());
 
         $this->assertEquals($backup->getId(), $object->id);
         $this->assertEquals(date_format($backup->getTimestamp(), DATE_ISO8601), date_format(new \DateTime($object->timestamp), DATE_ISO8601));
@@ -213,14 +211,14 @@ class BackupControllerTest extends WebTestCase
         );
 
         $this->assertEquals(201, $client->getResponse()->getStatusCode());
-        $jsonArray = json_decode($client->getResponse()->getContent());
-
-        $object = $jsonArray[0];
+        $object = json_decode($client->getResponse()->getContent());
 
         $backup = $this->em->getRepository(Backup::class)->find($object->id);
 
         $this->assertEquals("my/test/path", $backup->getFilePath());
-        $this->assertEquals($backupSchedule, $backup->getBackupSchedule());
+        //TODO Add check for BackupSchedule association
+
+        $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
 
         $this->em->remove($backup);
         $this->em->remove($backupSchedule);
