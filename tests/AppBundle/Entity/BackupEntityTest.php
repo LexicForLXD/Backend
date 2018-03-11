@@ -37,7 +37,6 @@ class BackupEntityTest extends WebTestCase
         $backup = new Backup();
 
         $backup->setTimestamp();
-        $backup->setFilePath("/backups/46876a46467645as6d3763.tar.gz");
 
         $this->em->persist($backup);
         $this->em->flush();
@@ -45,28 +44,10 @@ class BackupEntityTest extends WebTestCase
         $backupFromDB = $this->em->getRepository(Backup::class)->find($backup->getId());
 
         $this->assertEquals($backup->getTimestamp(), $backupFromDB->getTimestamp());
-        $this->assertEquals($backup->getFilePath(), $backupFromDB->getFilePath());
         $this->assertEquals($backup->getId(), $backupFromDB->getId());
 
         $this->em->remove($backupFromDB);
         $this->em->flush();
-    }
-
-    /**
-     * Check if all setters allow wrong values to allow validation
-     * @throws \Exception
-     */
-    public function testWrongAttributes()
-    {
-        $exception = false;
-        try {
-            $backup = new Backup();
-            $backup->setFilePath(0);
-        }catch (Exception $e){
-            $exception = true;
-        }
-
-        $this->assertTrue(!$exception); // Should be false = no exception triggered
     }
 
     /**

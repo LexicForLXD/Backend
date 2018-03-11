@@ -83,7 +83,6 @@ class BackupControllerTest extends WebTestCase
         $backup = new Backup();
 
         $backup->setTimestamp();
-        $backup->setFilePath("/test/1234.test");
 
         $this->em->persist($backup);
         $this->em->flush();
@@ -109,7 +108,6 @@ class BackupControllerTest extends WebTestCase
 
         $this->assertEquals($backup->getId(), $object->id);
         $this->assertEquals(date_format($backup->getTimestamp(), DATE_ISO8601), date_format(new \DateTime($object->timestamp), DATE_ISO8601));
-        $this->assertEquals($backup->getFilePath(), $object->filePath);
 
         $backup = $this->em->getRepository(Backup::class)->find($backup->getId());
         $this->em->remove($backup);
@@ -151,7 +149,6 @@ class BackupControllerTest extends WebTestCase
         $backup = new Backup();
 
         $backup->setTimestamp();
-        $backup->setFilePath("/test/1234.test");
 
         $this->em->persist($backup);
         $this->em->flush();
@@ -175,55 +172,54 @@ class BackupControllerTest extends WebTestCase
 
         $this->assertEquals($backup->getId(), $object->id);
         $this->assertEquals(date_format($backup->getTimestamp(), DATE_ISO8601), date_format(new \DateTime($object->timestamp), DATE_ISO8601));
-        $this->assertEquals($backup->getFilePath(), $object->filePath);
 
         $backup = $this->em->getRepository(Backup::class)->find($backup->getId());
         $this->em->remove($backup);
         $this->em->flush();
     }
 
-    /**
-     * Positive test for backupCreationWebhook()
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Exception
-     */
-    public function testBackupCreationWebhook()
-    {
-        $backupSchedule = new BackupSchedule();
-        $backupSchedule->setExecutionTime("daily");
-        $backupSchedule->setName("TestBackupPlan");
-        $backupSchedule->setType("full");
-        $backupSchedule->setDestination("test://test");
-        $backupSchedule->setToken("13sa4d6as5d6asd312");
-
-        $this->em->persist($backupSchedule);
-        $this->em->flush();
-
-        $client = static::createClient();
-
-        //No OAuth2 authentication required
-        $client->request(
-            'POST',
-            '/backups?path=my/test/path&token='.$backupSchedule->getToken(),
-            array(),
-            array(),
-            array()
-        );
-
-        $this->assertEquals(201, $client->getResponse()->getStatusCode());
-        $object = json_decode($client->getResponse()->getContent());
-
-        $backup = $this->em->getRepository(Backup::class)->find($object->id);
-
-        $this->assertEquals("my/test/path", $backup->getFilePath());
-        //TODO Add check for BackupSchedule association
-
-        $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
-
-        $this->em->remove($backup);
-        $this->em->remove($backupSchedule);
-        $this->em->flush();
-    }
+//    /**
+//     * Positive test for backupCreationWebhook()
+//     * @throws \Doctrine\ORM\ORMException
+//     * @throws \Exception
+//     */
+//    public function testBackupCreationWebhook()
+//    {
+//        $backupSchedule = new BackupSchedule();
+//        $backupSchedule->setExecutionTime("daily");
+//        $backupSchedule->setName("TestBackupPlan");
+//        $backupSchedule->setType("full");
+//        $backupSchedule->setDestination("test://test");
+//        $backupSchedule->setToken("13sa4d6as5d6asd312");
+//
+//        $this->em->persist($backupSchedule);
+//        $this->em->flush();
+//
+//        $client = static::createClient();
+//
+//        //No OAuth2 authentication required
+//        $client->request(
+//            'POST',
+//            '/backups?path=my/test/path&token='.$backupSchedule->getToken(),
+//            array(),
+//            array(),
+//            array()
+//        );
+//
+//        $this->assertEquals(201, $client->getResponse()->getStatusCode());
+//        $object = json_decode($client->getResponse()->getContent());
+//
+//        $backup = $this->em->getRepository(Backup::class)->find($object->id);
+//
+//        $this->assertEquals("my/test/path", $backup->getFilePath());
+//        //TODO Add check for BackupSchedule association
+//
+//        $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
+//
+//        $this->em->remove($backup);
+//        $this->em->remove($backupSchedule);
+//        $this->em->flush();
+//    }
 
     /**
      * Negative test for deleteBackupEntry() - no Backup for id
@@ -258,7 +254,6 @@ class BackupControllerTest extends WebTestCase
         $backup = new Backup();
 
         $backup->setTimestamp();
-        $backup->setFilePath("/test/1234.test");
 
         $this->em->persist($backup);
         $this->em->flush();
