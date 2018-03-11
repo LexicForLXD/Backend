@@ -388,6 +388,28 @@ class Container
     }
 
     /**
+     * @param Backup $backup
+     */
+    public function addBackup(Backup $backup){
+        if ($this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->add($backup);
+        $backup->addContainer($this);
+    }
+
+    /**
+     * @param Backup $backup
+     */
+    public function removeBackup(Backup $backup){
+        if (!$this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->removeElement($backup);
+        $backup->removeContainer($this);
+    }
+
+    /**
      * @return int
      *
      * @OAS\Property(property="host_id", example="1")
