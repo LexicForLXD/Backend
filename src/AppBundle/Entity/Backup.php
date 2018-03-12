@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as JMS;
@@ -37,17 +38,6 @@ class Backup
     protected $timestamp;
 
     /**
-     * @var string
-     * @OAS\Property(example="/backups/46876a46467645as6d3763.tar.gz")
-     *
-     * @ORM\Column(type="string", nullable=false)
-     * @Assert\NotNull
-     * @Assert\NotBlank()
-     * @Assert\Type("string")
-     */
-    protected $filePath;
-
-    /**
      * @var BackupSchedule
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\BackupSchedule")
@@ -57,27 +47,35 @@ class Backup
     protected $backupSchedule;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="backups")
+     * @ORM\JoinTable(
+     *  joinColumns={
+     *      @ORM\JoinColumn(name="backup_id", referencedColumnName="id")
+     *  },
+     *  inverseJoinColumns={
+     *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
+     *  }
+     * )
+     * @JMS\Exclude()
+     */
+    protected $containers;
+
+    /**
+     * Backup constructor.
+     */
+    public function __construct()
+    {
+        $this->containers = new ArrayCollection();
+    }
+
+    /**
      * @return int
      */
     public function getId(): int
     {
         return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFilePath(): string
-    {
-        return $this->filePath;
-    }
-
-    /**
-     * @param string $filePath
-     */
-    public function setFilePath($filePath): void
-    {
-        $this->filePath = $filePath;
     }
 
     /**
@@ -107,5 +105,50 @@ class Backup
     public function setTimestamp(): void
     {
         $this->timestamp = new \DateTime("now");
+    }
+
+    /**
+     * @param Container $container
+     */
+    public function addContainer(Container $container)
+    {
+        if ($this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->add($container);
+        $container->addBackup($this);
+    }
+
+    /**
+     * @param Container $container
+     */
+    public function removeContainer(Container $container){
+        if (!$this->containers->contains($container)) {
+            return;
+        }
+        $this->containers->removeElement($container);
+        $container->removeBackup($this);
+    }
+
+    /**
+     * @return array
+     *
+     * @OAS\Property(property="containerId", example="[1]")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getContainerId(){
+        $ids[] = null;
+
+        if($this->containers->isEmpty()){
+            return $ids;
+        }
+
+        $this->containers->first();
+        do{
+            $ids[] = $this->containers->current()->getId();
+        }while($this->containers->next());
+
+        return $ids;
     }
 }

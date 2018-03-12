@@ -123,6 +123,14 @@ class Container
     protected $backupSchedules;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Backup", mappedBy="containers")
+     * @JMS\Exclude()
+     */
+    protected $backups;
+
+    /**
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Image", inversedBy="containers")
      * @var Image
      */
@@ -133,6 +141,7 @@ class Container
         $this->profiles = new ArrayCollection();
         $this->statuses = new ArrayCollection();
         $this->backupSchedules = new ArrayCollection();
+        $this->backups = new ArrayCollection();
     }
 
     /**
@@ -376,6 +385,28 @@ class Container
         }
         $this->backupSchedules->removeElement($backupSchedule);
         $backupSchedule->removeContainer($this);
+    }
+
+    /**
+     * @param Backup $backup
+     */
+    public function addBackup(Backup $backup){
+        if ($this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->add($backup);
+        $backup->addContainer($this);
+    }
+
+    /**
+     * @param Backup $backup
+     */
+    public function removeBackup(Backup $backup){
+        if (!$this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->removeElement($backup);
+        $backup->removeContainer($this);
     }
 
     /**
