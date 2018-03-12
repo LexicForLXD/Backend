@@ -115,12 +115,20 @@ class Container
     protected $profiles;
 
     /**
-     * @var BackupSchedule
+     * @var ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\BackupSchedule", mappedBy="containers")
      * @JMS\Exclude()
      */
     protected $backupSchedules;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Backup", mappedBy="containers")
+     * @JMS\Exclude()
+     */
+    protected $backups;
 
     /**
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Image", inversedBy="containers")
@@ -133,6 +141,7 @@ class Container
         $this->profiles = new ArrayCollection();
         $this->statuses = new ArrayCollection();
         $this->backupSchedules = new ArrayCollection();
+        $this->backups = new ArrayCollection();
     }
 
     /**
@@ -379,6 +388,28 @@ class Container
     }
 
     /**
+     * @param Backup $backup
+     */
+    public function addBackup(Backup $backup){
+        if ($this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->add($backup);
+        $backup->addContainer($this);
+    }
+
+    /**
+     * @param Backup $backup
+     */
+    public function removeBackup(Backup $backup){
+        if (!$this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->removeElement($backup);
+        $backup->removeContainer($this);
+    }
+
+    /**
      * @return int
      *
      * @OAS\Property(property="host_id", example="1")
@@ -413,6 +444,24 @@ class Container
 
         return $ids;
     }
+
+    /**
+     * @return PersistentCollection
+     */
+    public function getBackupSchedules(): PersistentCollection
+    {
+        return $this->backupSchedules;
+    }
+
+    /**
+     * @return PersistentCollection
+     */
+    public function getBackups(): PersistentCollection
+    {
+        return $this->backups;
+    }
+
+
 
     /** @see \Serializable::serialize() */
     // public function serialize()

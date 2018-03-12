@@ -66,6 +66,18 @@ class BackupController extends Controller
      *
      * @OAS\Get(path="/backups/{id}",
      *     tags={"backups"},
+     *     @OAS\Parameter(
+     *      description="Id of the Backup",
+     *      name="id",
+     *      in="path",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="id",
+     *              type="int",
+     *          ),
+     *      ),
+     *      ),
      *      @OAS\Response(
      *          response=200,
      *          description="Single Backup with the provided id",
@@ -95,30 +107,17 @@ class BackupController extends Controller
     }
 
     /**
-     * Webhook to create a new Backup object
+     * Webhook to create a new Backup object based on a Backup Schedule
      *
-     * @Route("/backups", name="create_backup_webhook", methods={"POST"})
+     * @Route("/backups", name="create_backup_with_schedule_webhook", methods={"POST"})
      *
      * @param Request $request
      * @param EntityManagerInterface $em
      * @return Response
      * @throws ForbiddenException
-     * @throws WrongInputException
      * @throws WrongInputExceptionArray
-     * @OAS\Post(path="/backups?path={path}&token={token}",
+     * @OAS\Post(path="/backups?token={token}",
      * tags={"backups"},
-     * @OAS\Parameter(
-     *      description="The path to the backup file created by duplicity",
-     *      name="path",
-     *      in="query",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="path",
-     *              type="string",
-     *          ),
-     *      ),
-     * ),
      * @OAS\Parameter(
      *      description="The authorization token set in the Backup Schedule",
      *      name="token",
@@ -132,7 +131,7 @@ class BackupController extends Controller
      *      ),
      * ),
      * @OAS\Response(
-     *  description="The provided parameters are invalid or the path is missing",
+     *  description="The provided parameters are invalid",
      *  response=400
      * ),
      * @OAS\Response(
@@ -157,18 +156,14 @@ class BackupController extends Controller
             );
         }
 
-        //Validate path
-        if (!$request->query->has('path')){
-            throw new WrongInputException(
-                'Backup file path is missing'
-            );
-        }
-
-        $path = $request->query->get('path');
-
         $backup = new Backup();
         $backup->setBackupSchedule($backupSchedule);
-        $backup->setFilePath($path);
+
+        //Add containers to Backup
+        foreach ($backupSchedule->getContainers() as $container){
+            $backup->addContainer($container);
+        }
+
         $backup->setTimestamp();
 
         if ($errorArray = $this->validation($backup)) {
@@ -181,6 +176,54 @@ class BackupController extends Controller
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($backup, 'json');
         return new Response($response, Response::HTTP_CREATED);
+    }
+
+    /**
+     * Delete an existing Backup
+     *
+     * @Route("/backups/{id}", name="delete_backup", methods={"DELETE"})
+     * @param $id
+     * @param EntityManagerInterface $em
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @throws ElementNotFoundException
+     *
+     * @OAS\Delete(path="/backups/{id}",
+     *     tags={"backups"},
+     *     @OAS\Parameter(
+     *      description="Id of the Backup",
+     *      name="id",
+     *      in="path",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="id",
+     *              type="int",
+     *          ),
+     *      ),
+     *      ),
+     *      @OAS\Response(
+     *          response=204,
+     *          description="Backup for the provided id deleted",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Backup for the id found",
+     *      ),
+     * )
+     */
+    public function deleteBackupEntry($id, EntityManagerInterface $em){
+        $backup = $this->getDoctrine()->getRepository(Backup::class)->find($id);
+
+        if (!$backup) {
+            throw new ElementNotFoundException(
+                'No Backup for id '.$id .' found'
+            );
+        }
+
+        $em->remove($backup);
+        $em->flush();
+
+        return $this->json([], 204);
     }
 
     private function validation($object)
