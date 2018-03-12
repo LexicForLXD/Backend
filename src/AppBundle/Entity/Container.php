@@ -115,7 +115,7 @@ class Container
     protected $profiles;
 
     /**
-     * @var BackupSchedule
+     * @var ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\BackupSchedule", mappedBy="containers")
      * @JMS\Exclude()
@@ -444,6 +444,24 @@ class Container
 
         return $ids;
     }
+
+    /**
+     * @return PersistentCollection
+     */
+    public function getBackupSchedules(): PersistentCollection
+    {
+        return $this->backupSchedules;
+    }
+
+    /**
+     * @return PersistentCollection
+     */
+    public function getBackups(): PersistentCollection
+    {
+        return $this->backups;
+    }
+
+
 
     /** @see \Serializable::serialize() */
     // public function serialize()
