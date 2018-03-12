@@ -21,9 +21,11 @@ security:
             pattern: ^/oauth/v2/token
             security: false
 
-        doc:                                   # Everyone can access the access documentation URL.
-            pattern: ^/doc
+        backup_webhook:
+            pattern: ^/backups
             security: false
+            methods: POST
+
         api:
             pattern: ^/                              # All URLs are protected
             fos_oauth: true                            # OAuth2 protected resource
