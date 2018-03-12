@@ -107,30 +107,17 @@ class BackupController extends Controller
     }
 
     /**
-     * Webhook to create a new Backup object
+     * Webhook to create a new Backup object based on a Backup Schedule
      *
-     * @Route("/backups", name="create_backup_webhook", methods={"POST"})
+     * @Route("/backups", name="create_backup_with_schedule_webhook", methods={"POST"})
      *
      * @param Request $request
      * @param EntityManagerInterface $em
      * @return Response
      * @throws ForbiddenException
-     * @throws WrongInputException
      * @throws WrongInputExceptionArray
-     * @OAS\Post(path="/backups?path={path}&token={token}",
+     * @OAS\Post(path="/backups?token={token}",
      * tags={"backups"},
-     * @OAS\Parameter(
-     *      description="The path to the backup file created by duplicity",
-     *      name="path",
-     *      in="query",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="path",
-     *              type="string",
-     *          ),
-     *      ),
-     * ),
      * @OAS\Parameter(
      *      description="The authorization token set in the Backup Schedule",
      *      name="token",
@@ -144,7 +131,7 @@ class BackupController extends Controller
      *      ),
      * ),
      * @OAS\Response(
-     *  description="The provided parameters are invalid or the path is missing",
+     *  description="The provided parameters are invalid",
      *  response=400
      * ),
      * @OAS\Response(
@@ -169,18 +156,14 @@ class BackupController extends Controller
             );
         }
 
-        //Validate path
-        if (!$request->query->has('path')){
-            throw new WrongInputException(
-                'Backup file path is missing'
-            );
-        }
-
-        $path = $request->query->get('path');
-
         $backup = new Backup();
         $backup->setBackupSchedule($backupSchedule);
-        $backup->setFilePath($path);
+
+        //Add containers to Backup
+        foreach ($backupSchedule->getContainers() as $container){
+            $backup->addContainer($container);
+        }
+
         $backup->setTimestamp();
 
         if ($errorArray = $this->validation($backup)) {

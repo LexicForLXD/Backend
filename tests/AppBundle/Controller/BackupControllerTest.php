@@ -3,6 +3,8 @@ namespace Tests\AppBundle\Controller;
 
 use AppBundle\Entity\Backup;
 use AppBundle\Entity\BackupSchedule;
+use AppBundle\Entity\Container;
+use AppBundle\Entity\Host;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class BackupControllerTest extends WebTestCase
@@ -178,48 +180,67 @@ class BackupControllerTest extends WebTestCase
         $this->em->flush();
     }
 
-//    /**
-//     * Positive test for backupCreationWebhook()
-//     * @throws \Doctrine\ORM\ORMException
-//     * @throws \Exception
-//     */
-//    public function testBackupCreationWebhook()
-//    {
-//        $backupSchedule = new BackupSchedule();
-//        $backupSchedule->setExecutionTime("daily");
-//        $backupSchedule->setName("TestBackupPlan");
-//        $backupSchedule->setType("full");
-//        $backupSchedule->setDestination("test://test");
-//        $backupSchedule->setToken("13sa4d6as5d6asd312");
-//
-//        $this->em->persist($backupSchedule);
-//        $this->em->flush();
-//
-//        $client = static::createClient();
-//
-//        //No OAuth2 authentication required
-//        $client->request(
-//            'POST',
-//            '/backups?path=my/test/path&token='.$backupSchedule->getToken(),
-//            array(),
-//            array(),
-//            array()
-//        );
-//
-//        $this->assertEquals(201, $client->getResponse()->getStatusCode());
-//        $object = json_decode($client->getResponse()->getContent());
-//
-//        $backup = $this->em->getRepository(Backup::class)->find($object->id);
-//
-//        $this->assertEquals("my/test/path", $backup->getFilePath());
-//        //TODO Add check for BackupSchedule association
-//
-//        $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
-//
-//        $this->em->remove($backup);
-//        $this->em->remove($backupSchedule);
-//        $this->em->flush();
-//    }
+    /**
+     * Positive test for backupCreationWebhook()
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Exception
+     */
+    public function testBackupCreationWebhook()
+    {
+        $host = new Host();
+        $host->setName("Test-Host1111".mt_rand());
+        $host->setDomainName("test.".mt_rand().".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $container = new Container();
+        $container->setName("testContainerBackupWebhook".mt_rand());
+        $container->setHost($host);
+        $container->setIpv4("192.168.178.20");
+        $container->setState('stopped');
+
+        $backupSchedule = new BackupSchedule();
+        $backupSchedule->setExecutionTime("daily");
+        $backupSchedule->setName("TestBackupPlan".mt_rand());
+        $backupSchedule->setType("full");
+        $backupSchedule->setDestination("test://test");
+        $backupSchedule->setToken("13sa4d6as6asd312asdasd");
+        $backupSchedule->addContainer($container);
+
+        $this->em->persist($host);
+        $this->em->persist($container);
+        $this->em->persist($backupSchedule);
+        $this->em->flush();
+
+        $client = static::createClient();
+
+        //No OAuth2 authentication required
+        $client->request(
+            'POST',
+            '/backups?token='.$backupSchedule->getToken(),
+            array(),
+            array(),
+            array()
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode());
+        $object = json_decode($client->getResponse()->getContent());
+
+        $this->assertContains('containerId', $client->getResponse()->getContent());
+        $this->assertContains('timestamp', $client->getResponse()->getContent());
+        $this->assertContains('id', $client->getResponse()->getContent());
+
+        $backup = $this->em->getRepository(Backup::class)->find($object->id);
+        $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
+        $container = $this->em->getRepository(Container::class)->find($container->getId());
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+
+        $this->em->remove($backup);
+        $this->em->remove($backupSchedule);
+        $this->em->remove($container);
+        $this->em->remove($host);
+        $this->em->flush();
+    }
 
     /**
      * Negative test for deleteBackupEntry() - no Backup for id
