@@ -83,6 +83,9 @@ class BackupDestinationEntityTest extends WebTestCase
         $destFromDB = $this->em->getRepository(BackupDestination::class)->find($destination->getId());
         $scheduleFromDB = $this->em->getRepository(BackupSchedule::class)->find($schedule->getId());
 
+        $this->assertNotNull($destFromDB);
+        $this->assertNotNull($scheduleFromDB);
+
         $this->assertEquals($destFromDB, $scheduleFromDB->getDestination());
 
         $this->em->remove($destFromDB);

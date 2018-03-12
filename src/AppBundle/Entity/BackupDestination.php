@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Entity\BackupSchedule;
 
 /**
  * Class BackupDestination
@@ -87,6 +88,7 @@ class BackupDestination
      * Undocumented variable
      *
      * @ORM\OneToMany(targetEntity="BackupSchedule", mappedBy="destination")
+     * @JMS\Exclude()
      */
     protected $backupSchedules;
 
@@ -221,8 +223,10 @@ class BackupDestination
 
     /**
      * Get undocumented variable
+     *
+     * @return PersistentCollection
      */
-    public function getBackupSchedules()
+    public function getBackupSchedules() : PersistentCollection
     {
         return $this->backupSchedules;
     }
@@ -230,13 +234,11 @@ class BackupDestination
     /**
      * Set undocumented variable
      *
-     * @return  self
+     * @param mixed $backupSchedules
      */
     public function setBackupSchedules($backupSchedules)
     {
         $this->backupSchedules = $backupSchedules;
-
-        return $this;
     }
 
 
