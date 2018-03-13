@@ -12,6 +12,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Entity\BackupSchedule;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputExceptionArray;
@@ -99,8 +100,9 @@ class BackupScheduleController extends Controller
         $em->persist($backupschedule);
         $em->flush();
 
+        $webhookUrl = $this->generateUrl('create_backup_with_schedule_webhook', array('token' => $backupschedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL);
 
-        $commandText = $backupschedule->getShellCommands();
+        $commandText = $backupschedule->getShellCommands($webhookUrl);
 
         $sshApi->sendAnacronFile($container, $commandText, $backupschedule->getExecutionTime());
         $sshApi->makeFileExecuteable($container, $backupschedule->getExecutionTime());

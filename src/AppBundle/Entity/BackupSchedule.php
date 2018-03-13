@@ -8,7 +8,6 @@ use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Entity\BackupDestination;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
 /**
@@ -124,12 +123,11 @@ class BackupSchedule
     /**
      * BackupSchedule constructor.
      */
-    public function __construct(UrlGeneratorInterface $urlGen)
+    public function __construct()
     {
         $this->token = bin2hex(random_bytes(10));
         $this->containers = new ArrayCollection();
         $this->backups = new ArrayCollection();
-        $this->urlGen = $urlGen;
     }
 
     /**
@@ -318,9 +316,10 @@ class BackupSchedule
     /**
      * Returns the Commands which will be written in a shell script.
      *
+     * @param string $webhookUrl
      * @return string
      */
-    public function getShellCommands()
+    public function getShellCommands($webhookUrl)
     {
         $commandTexts = '#!/bin/sh \n \n';
 
@@ -362,7 +361,7 @@ class BackupSchedule
             '# Backup via duplicity \n
             duplicity ' . $this->type . ' / tmp / ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n \n
             # Make api call to webhook
-            curl -X POST ' . $urlGen->generate('create_backup_with_schedule_webhook') . '?token=' . $this->token . ' \n
+            curl -X POST ' . $webhookUrl . ' \n
         \n\n';
 
         return $commandTexts;
