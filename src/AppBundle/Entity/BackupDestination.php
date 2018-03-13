@@ -66,6 +66,16 @@ class BackupDestination
     protected $username;
 
     /**
+     * password for authentification
+     *
+     * @ORM\Column(type="string", nullable=true)
+     * @Assert\Type("string")
+     * @var string
+     */
+    protected $password;
+
+
+    /**
      * hostname of backup destination
      *
      * @ORM\Column(type="string", nullable=true)
@@ -326,5 +336,29 @@ class BackupDestination
             return $this->protocol . '://' . $this->username . '@' . $this->hostname . '/' . $this->path . '/';
         }
         return $this->protocol . '://' . $this->hostname . '/' . $this->path . '/';
+    }
+
+    /**
+     * Get password for authentification
+     *
+     * @return  string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * Set password for authentification
+     *
+     * @param  string  $password  password for authentification
+     *
+     * @return  self
+     */
+    public function setPassword(string $password)
+    {
+        $this->password = $password;
+
+        return $this;
     }
 }
