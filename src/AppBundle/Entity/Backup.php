@@ -168,7 +168,7 @@ class Backup
      * @JMS\VirtualProperty()
      */
     public function getDestinationId(){
-        if(!$this->destination){
+        if($this->destination){
             return $this->destination->getId();
         }
         return null;
