@@ -262,25 +262,25 @@ class BackupDestination
     /**
      * @param BackupSchedule $backupSchedule
      */
-    public function addBackupSchedule(Container $backupSchedule)
+    public function addBackupSchedule(BackupSchedule $backupSchedule)
     {
         if ($this->backupSchedules->contains($backupSchedule)) {
             return;
         }
         $this->backupSchedules->add($backupSchedule);
-        $backupSchedule->addBackupSchedule($this);
+        $backupSchedule->setDestination($this);
     }
 
     /**
      * @param BackupSchedule $backupSchedule
      */
-    public function removeBackupSchedule(Container $backupSchedule)
+    public function removeBackupSchedule(BackupSchedule $backupSchedule)
     {
         if (!$this->backupSchedules->contains($backupSchedule)) {
             return;
         }
         $this->backupSchedules->removeElement($backupSchedule);
-        $backupSchedule->removeBackupSchedule($this);
+        $backupSchedule->setDestination(null);
     }
 
     /**
