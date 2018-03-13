@@ -313,10 +313,10 @@ class BackupSchedule
      */
     public function getShellCommands()
     {
-        $comandTexts = array();
+        $commandTexts = array();
 
-        foreach ($containers as $container) {
-            $comandTexts[] = '
+        foreach ($this->containers as $container) {
+            $commandTexts[] = '
                 #!/bin/sh \n
                 \n
                 # Backup for Container ' . $container->getName() . '\n
