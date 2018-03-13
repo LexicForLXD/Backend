@@ -153,11 +153,7 @@ class Backup
      */
     public function setDestination($destination): void
     {
-        if($this->destination !== $destination){
-            $this->destination = $destination;
-            $destination->addBackup($this);
-        }
-
+        $this->destination = $destination;
     }
 
     /**

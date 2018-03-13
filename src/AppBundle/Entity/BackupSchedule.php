@@ -200,11 +200,7 @@ class BackupSchedule
      */
     public function setDestination($destination): void
     {
-        if($this->destination !== $destination){
-            $this->destination = $destination;
-            $destination->addBackupSchedule($this);
-        }
-
+        $this->destination = $destination;
     }
 
     /**

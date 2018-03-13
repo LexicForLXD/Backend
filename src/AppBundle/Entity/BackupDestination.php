@@ -95,7 +95,7 @@ class BackupDestination
 
 
     /**
-     * Undocumented variable
+     * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="BackupSchedule", mappedBy="destination")
      * @JMS\Exclude()
@@ -103,7 +103,7 @@ class BackupDestination
     protected $backupSchedules;
 
     /**
-     * @var PersistentCollection
+     * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Backup", mappedBy="destination")
      * @JMS\Exclude()
