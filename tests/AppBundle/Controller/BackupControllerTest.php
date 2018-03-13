@@ -241,11 +241,13 @@ class BackupControllerTest extends WebTestCase
 
         $backup = $this->em->getRepository(Backup::class)->find($object->id);
         $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
+        $backupDestination = $this->em->getRepository(BackupDestination::class)->find($backupDestination->getId());
         $container = $this->em->getRepository(Container::class)->find($container->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
 
         $this->em->remove($backup);
         $this->em->remove($backupSchedule);
+        $this->em->remove($backupDestination);
         $this->em->remove($container);
         $this->em->remove($host);
         $this->em->flush();
