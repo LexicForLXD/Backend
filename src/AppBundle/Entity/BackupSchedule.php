@@ -8,6 +8,7 @@ use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Entity\BackupDestination;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
 /**
@@ -114,13 +115,21 @@ class BackupSchedule
     protected $backups;
 
     /**
+     * url generator
+     *
+     * @var UrlGeneratorInterface
+     */
+    protected $urlGen;
+
+    /**
      * BackupSchedule constructor.
      */
-    public function __construct()
+    public function __construct(UrlGeneratorInterface $urlGen)
     {
         $this->token = bin2hex(random_bytes(10));
         $this->containers = new ArrayCollection();
         $this->backups = new ArrayCollection();
+        $this->urlGen = $urlGen;
     }
 
     /**
@@ -320,6 +329,7 @@ class BackupSchedule
             $commandTexts = $commandTexts . '
                 # Backup for Container ' . $container->getName() . ' to ' . $this->destination->getName() . '\n
                 \n
+                DIRECTORY = /tmp/' . $this->name . '/ \n
                 # Just generating a random number \n
                 r=$(($(od -An -N1 -i /dev/random))) \n
                 \n
@@ -330,11 +340,14 @@ class BackupSchedule
                 f=$(lxc publish ' . $container->getName() . '/"$r") \n
                 fingerprint=${f##*: } \n
                 \n
-                # Make dir for backups in /tmp \n
-                mkdir /tmp/' . $this->name . ' \n
+                # Make dir for backups in /tmp if it not exists \n
+                if [ -d "$DIRECTORY" ]; then \n
+                    rm -Rf "$DIRECTORY" \n
+                fi \n
+                mkdir "$DIRECTORY" \n
                 \n
                 # Export the image \n
-                lxc image export "$fingerprint" /tmp/' . $this->name . '/' . $container->getName() . ' \n
+                lxc image export "$fingerprint" "$DIRECTORY"' . $container->getName() . ' \n
                 \n
 
                 # Delete the snapshot \n
@@ -347,7 +360,10 @@ class BackupSchedule
 
         $commandTexts = $commandTexts .
             '# Backup via duplicity \n
-            duplicity ' . $this->type . ' / tmp / ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n\n';
+            duplicity ' . $this->type . ' / tmp / ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n \n
+            # Make api call to webhook
+            curl -X POST ' . $urlGen->generate('create_backup_with_schedule_webhook') . '?token=' . $this->token . ' \n
+        \n\n';
 
         return $commandTexts;
     }
