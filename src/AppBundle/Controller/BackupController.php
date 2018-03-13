@@ -164,6 +164,7 @@ class BackupController extends Controller
             $backup->addContainer($container);
         }
 
+        $backup->setDestination($backupSchedule->getDestination());
         $backup->setTimestamp();
 
         if ($errorArray = $this->validation($backup)) {
