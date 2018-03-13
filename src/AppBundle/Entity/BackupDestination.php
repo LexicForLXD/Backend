@@ -95,18 +95,25 @@ class BackupDestination
 
 
     /**
-     * Undocumented variable
+     * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="BackupSchedule", mappedBy="destination")
      * @JMS\Exclude()
      */
     protected $backupSchedules;
 
-
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Backup", mappedBy="destination")
+     * @JMS\Exclude()
+     */
+    protected $backups;
 
     public function __constructor()
     {
         $this->backupSchedules = new ArrayCollection();
+        $this->backups = new ArrayCollection();
     }
 
 
@@ -255,25 +262,49 @@ class BackupDestination
     /**
      * @param BackupSchedule $backupSchedule
      */
-    public function addBackupSchedule(Container $backupSchedule)
+    public function addBackupSchedule(BackupSchedule $backupSchedule)
     {
         if ($this->backupSchedules->contains($backupSchedule)) {
             return;
         }
         $this->backupSchedules->add($backupSchedule);
-        $backupSchedule->addBackupSchedule($this);
+        $backupSchedule->setDestination($this);
     }
 
     /**
      * @param BackupSchedule $backupSchedule
      */
-    public function removeBackupSchedule(Container $backupSchedule)
+    public function removeBackupSchedule(BackupSchedule $backupSchedule)
     {
         if (!$this->backupSchedules->contains($backupSchedule)) {
             return;
         }
         $this->backupSchedules->removeElement($backupSchedule);
-        $backupSchedule->removeBackupSchedule($this);
+        $backupSchedule->setDestination(null);
+    }
+
+    /**
+     * @param Backup $backup
+     */
+    public function addBackup(Backup $backup)
+    {
+        if ($this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->add($backup);
+        $backup->setDestination($this);
+    }
+
+    /**
+     * @param Backup $backup
+     */
+    public function removeBackup(Backup $backup)
+    {
+        if (!$this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->removeElement($backup);
+        $backup->setDestination(null);
     }
 
     /**

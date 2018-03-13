@@ -197,7 +197,7 @@ class BackupSchedule
     /**
      * @return BackupDestination
      */
-    public function getDestination() : BackupDestination
+    public function getDestination(): BackupDestination
     {
         return $this->destination;
     }
@@ -205,11 +205,10 @@ class BackupSchedule
     /**
      * @param BackupDestination $destination
      */
-    public function setDestination($destination) : void
+    public function setDestination($destination): void
     {
         $this->destination = $destination;
     }
-
 
     /**
      * Get whether to do a full or incremental backup
