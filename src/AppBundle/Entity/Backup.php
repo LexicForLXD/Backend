@@ -161,6 +161,20 @@ class Backup
     }
 
     /**
+     * @return int
+     *
+     * @OAS\Property(property="destinationId", example="1")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getDestinationId(){
+        if(!$this->destination){
+            return $this->destination->getId();
+        }
+        return null;
+    }
+
+    /**
      * @return array
      *
      * @OAS\Property(property="containerId", example="[1]")
