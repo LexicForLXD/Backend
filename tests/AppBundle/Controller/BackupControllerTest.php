@@ -6,6 +6,7 @@ use AppBundle\Entity\BackupSchedule;
 use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Entity\BackupDestination;
 
 class BackupControllerTest extends WebTestCase
 {
@@ -46,8 +47,7 @@ class BackupControllerTest extends WebTestCase
         static::$kernel->boot();
         $this->em = static::$kernel->getContainer()
             ->get('doctrine')
-            ->getManager()
-        ;
+            ->getManager();
 
     }
 
@@ -159,7 +159,7 @@ class BackupControllerTest extends WebTestCase
 
         $client->request(
             'GET',
-            '/backups/'.$backup->getId(),
+            '/backups/' . $backup->getId(),
             array(),
             array(),
             array(
@@ -188,28 +188,37 @@ class BackupControllerTest extends WebTestCase
     public function testBackupCreationWebhook()
     {
         $host = new Host();
-        $host->setName("Test-Host1111".mt_rand());
-        $host->setDomainName("test.".mt_rand().".de");
+        $host->setName("Test-Host1111" . mt_rand());
+        $host->setDomainName("test." . mt_rand() . ".de");
         $host->setPort(8443);
         $host->setSettings("settings");
 
         $container = new Container();
-        $container->setName("testContainerBackupWebhook".mt_rand());
+        $container->setName("testContainerBackupWebhook" . mt_rand());
         $container->setHost($host);
         $container->setIpv4("192.168.178.20");
         $container->setState('stopped');
 
+        $backupDestination = new BackupDestination();
+        $backupDestination->setName("testBackupDestWebhook" . mt_rand());
+        $backupDestination->setDescription("Desc");
+        $backupDestination->setHostname("test.local");
+        $backupDestination->setProtocol("scp");
+        $backupDestination->setPath("/var/backup");
+        $backupDestination->setUsername("backupuser");
+
         $backupSchedule = new BackupSchedule();
         $backupSchedule->setExecutionTime("daily");
-        $backupSchedule->setName("TestBackupPlan".mt_rand());
+        $backupSchedule->setName("TestBackupPlan" . mt_rand());
         $backupSchedule->setType("full");
-        $backupSchedule->setDestination("test://test");
+        $backupSchedule->setDestination($backupDestination);
         $backupSchedule->setToken("13sa4d6as6asd312asdasd");
         $backupSchedule->addContainer($container);
 
         $this->em->persist($host);
         $this->em->persist($container);
         $this->em->persist($backupSchedule);
+        $this->em->persist($backupDestination);
         $this->em->flush();
 
         $client = static::createClient();
@@ -217,7 +226,7 @@ class BackupControllerTest extends WebTestCase
         //No OAuth2 authentication required
         $client->request(
             'POST',
-            '/backups?token='.$backupSchedule->getToken(),
+            '/backups?token=' . $backupSchedule->getToken(),
             array(),
             array(),
             array()
@@ -232,11 +241,13 @@ class BackupControllerTest extends WebTestCase
 
         $backup = $this->em->getRepository(Backup::class)->find($object->id);
         $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
+        $backupDestination = $this->em->getRepository(BackupDestination::class)->find($backupDestination->getId());
         $container = $this->em->getRepository(Container::class)->find($container->getId());
         $host = $this->em->getRepository(Host::class)->find($host->getId());
 
         $this->em->remove($backup);
         $this->em->remove($backupSchedule);
+        $this->em->remove($backupDestination);
         $this->em->remove($container);
         $this->em->remove($host);
         $this->em->flush();
@@ -283,7 +294,7 @@ class BackupControllerTest extends WebTestCase
 
         $client->request(
             'DELETE',
-            '/backups/'.$backup->getId(),
+            '/backups/' . $backup->getId(),
             array(),
             array(),
             array(
