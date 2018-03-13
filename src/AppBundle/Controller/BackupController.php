@@ -8,6 +8,7 @@ use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\ForbiddenException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
+use AppBundle\Service\SSH\HostSSH;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -241,4 +242,47 @@ class BackupController extends Controller
         }
         return false;
     }
+
+    /**
+     * @Route("/backups/{backupId}/restores/containers/{containerId}", name="restore_backup_single_container", methods={"POST"})
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     */
+    public function restoreBackupForSingleContainer($backupId, $containerId, EntityManagerInterface $entityManager, HostSSH $hostSSH)
+    {
+        $backup = $this->getDoctrine()->getRepository(Backup::class)->find($backupId);
+
+        if (!$backup) {
+            throw new ElementNotFoundException(
+                'No Backup for id ' . $backupId . ' found'
+            );
+        }
+
+        $containers = $backup->getContainers();
+        $container = null;
+        foreach ($containers as $containerCheck) {
+            if ($containerCheck->getId() == $containerId) {
+                $container = $containerCheck;
+                break;
+            }
+        }
+
+        if (!$container) {
+            throw new WrongInputException(
+                "The Backup doesn't contain the Container with the id " . $containerId
+            );
+        }
+
+        //Check if a BackupSchedule is set, for no it's a manual backup
+        if(!$backup->getBackupSchedule()){
+            //TODO Manual Backup restore
+        }else{
+            //Backup Schedule Backup
+            $destination = $backup->getDestination();
+            $backupSchedule = $backup->getBackupSchedule();
+            //Calling restore command with SSH
+            $hostSSH->restoreBackupForTimestampInTmp($backup->getTimestamp(), $destination, $backupSchedule->getName(), $container->getHost());
+        }
+    }
+
 }
