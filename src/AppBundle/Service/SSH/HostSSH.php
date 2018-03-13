@@ -2,6 +2,7 @@
 
 namespace AppBundle\Service\SSH;
 
+use AppBundle\Entity\BackupDestination;
 use AppBundle\Entity\Host;
 use AppBundle\Exception\WrongInputException;
 use Ssh\Authentication\PublicKeyFile;
@@ -100,5 +101,36 @@ class HostSSH
         $exec = $session->getExec();
 
         return $exec->run('chmod +x ' . $fileName);
+    }
+
+    /**
+     * @param \DateTime $timestamp
+     * @param BackupDestination $backupDestination
+     * @param string $destinationPath
+     * @param Host $host
+     *
+     * @return bool
+     */
+    public function restoreBackupForTimestampInTmp(\DateTime $timestamp, BackupDestination $backupDestination, string $destinationPath, Host $host) : bool
+    {
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
+        $configuration = new Configuration($hostname);
+        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
+
+        $session = new Session($configuration, $authentication);
+
+        $exec = $session->getExec();
+
+        $remoteBackupPath = $backupDestination->getDestinationText().$destinationPath;
+
+        $duplicityCommand = 'duplicity restore '.$remoteBackupPath.' --time '.date_format($timestamp, DATE_ISO8601).' /tmp/'.$destinationPath;
+
+        $result = $exec->run($duplicityCommand);
+
+        if(!$result){
+            return true;
+        }
+
+        return false;
     }
 }
