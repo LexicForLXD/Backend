@@ -319,15 +319,22 @@ class BackupSchedule
             $commandTexts[] = '
                 #!/bin/sh \n
                 \n
-                # Backup for Container ' . $container->getName() . '\n
+                # Backup for Container ' . $container->getName() . ' to ' . $this->destination->getName() . '\n
                 \n
-                r=$(($(od -An -N1 -i /dev/random))) \n
-                lxc snapshot ' . $container->getName() . '/"$r" \n
+                # Just generating a random number \n
+                r=$(($(od -An -N1 -i /dev/random))) \n \n
+                # Generating a snapshot of the container to build the image from \n
+                lxc snapshot ' . $container->getName() . '/"$r" \n \n
+                # Build the image to be exported \n
                 f=$(lxc publish ' . $container->getName() . '/"$r") \n
-                fingerprint=${f##*: } \n
-                # Hier wird duplicity befehl aufgerufen \n
-                duplicity /var/snap/lxd/common/lxd/images/"$fingerprint" ' . $this->destination->getDestinationText() . $container->getName() . ' \n
-                lxc delete ' . $container->getName() . '/"$r" \n
+                fingerprint=${f##*: } \n \n
+                # Export the image \n
+                lxc image export "$fingerprint" /tmp/' . $container->getName() . ' \n \n
+                # Backup via duplicity \n
+                duplicity ' . $this->type . ' /tmp/' . $container->getName() . ' ' . $this->destination->getDestinationText() . $container->getName() . ' \n \n
+                # Delete the snapshot \n
+                lxc delete ' . $container->getName() . '/"$r" \n \n
+                # Delete the image \n
                 lxc image delete "$fingerprint"\n
             ';
         }
