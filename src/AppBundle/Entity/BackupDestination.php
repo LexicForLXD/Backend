@@ -102,11 +102,18 @@ class BackupDestination
      */
     protected $backupSchedules;
 
-
+    /**
+     * @var PersistentCollection
+     *
+     * @ORM\OneToMany(targetEntity="Backup", mappedBy="destination")
+     * @JMS\Exclude()
+     */
+    protected $backups;
 
     public function __constructor()
     {
         $this->backupSchedules = new ArrayCollection();
+        $this->backups = new ArrayCollection();
     }
 
 
@@ -274,6 +281,30 @@ class BackupDestination
         }
         $this->backupSchedules->removeElement($backupSchedule);
         $backupSchedule->removeBackupSchedule($this);
+    }
+
+    /**
+     * @param Backup $backup
+     */
+    public function addBackup(Backup $backup)
+    {
+        if ($this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->add($backup);
+        $backup->setDestination($this);
+    }
+
+    /**
+     * @param Backup $backup
+     */
+    public function removeBackup(Backup $backup)
+    {
+        if (!$this->backups->contains($backup)) {
+            return;
+        }
+        $this->backups->removeElement($backup);
+        $backup->setDestination(null);
     }
 
     /**
