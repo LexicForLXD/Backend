@@ -83,7 +83,7 @@ jobs:
         - php bin/console doctrine:fixtures:load -n --env=test
       script: SYMFONY_PHPUNIT_VERSION=6.4 ./vendor/bin/simple-phpunit
     - stage: docs
-      if: branch = feature/github-pages
+      if: branch = master
       language: php
       php: '7.2'
       services:
@@ -111,8 +111,8 @@ jobs:
         github-token: $GITHUB_TOKEN
         keep-history: true
         local-dir: ./openapi.json
-    - stage: release
-      if: branch = master
-    - stage: deploy
-      if: branch = master
+    # - stage: release
+    #   if: branch = master
+    # - stage: deploy
+    #   if: branch = master
 
