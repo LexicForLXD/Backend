@@ -104,7 +104,8 @@ jobs:
         - cp app/config/parameters.yml.travis app/config/parameters.yml
         - php bin/console doctrine:schema:update --force --env=test
         - php bin/console doctrine:fixtures:load -n --env=test
-      script: ./vendor/bin/swagger -e vendor -o openapi
+        - mkdir openapi
+      script: ./vendor/bin/swagger -e vendor -o openapi/openapi.json
       deploy:
         provider: pages
         skip-cleanup: true
