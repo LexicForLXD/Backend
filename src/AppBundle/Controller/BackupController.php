@@ -282,6 +282,19 @@ class BackupController extends Controller
             $backupSchedule = $backup->getBackupSchedule();
             //Calling restore command with SSH
             $hostSSH->restoreBackupForTimestampInTmp($backup->getTimestamp(), $destination, $backupSchedule->getName(), $container->getName(), $container->getHost());
+            //TODO Error response
+
+            //Restoring image from tarball
+            $hostSSH->createLXCImageFromTarball($backupSchedule->getName(), $container->getName(), $container->getHost());
+            //TODO Error response
+
+            //Create Container for the restored Image
+            $container = $hostSSH->restoreContainerFromImage($container->getHost(), $container->getName());
+            //TODO Error response
+
+            $serializer = $this->get('jms_serializer');
+            $response = $serializer->serialize($container, 'json');
+            return new Response($response, Response::HTTP_CREATED);
         }
     }
 
