@@ -83,7 +83,7 @@ jobs:
         - php bin/console doctrine:fixtures:load -n --env=test
       script: SYMFONY_PHPUNIT_VERSION=6.4 ./vendor/bin/simple-phpunit
     - stage: docs
-      if: branch = master
+      if: branch = master AND type != pull_request
       language: php
       php: '7.2'
       services:
