@@ -104,13 +104,13 @@ jobs:
         - cp app/config/parameters.yml.travis app/config/parameters.yml
         - php bin/console doctrine:schema:update --force --env=test
         - php bin/console doctrine:fixtures:load -n --env=test
-      script: ./vendor/bin/swagger -e vendor
+      script: ./vendor/bin/swagger -e vendor -o openapi
       deploy:
         provider: pages
         skip-cleanup: true
         github-token: $GITHUB_TOKEN
         keep-history: true
-        local-dir: ./openapi.json
+        local-dir: openapi
     # - stage: release
     #   if: branch = master
     # - stage: deploy
