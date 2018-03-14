@@ -121,8 +121,9 @@ class HostSSH
 
         $remoteBackupPath = $backupDestination->getDestinationText().$destinationPath;
 
-        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($timestamp, DATE_ISO8601).' /tmp/'.$destinationPath;
+        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($timestamp, DATE_ISO8601).' /tmp/restore'.$destinationPath;
 
+        $exec->run('rm -rf /tmp/restore'.$destinationPath);
         $result = $exec->run($duplicityCommand);
     }
 }
