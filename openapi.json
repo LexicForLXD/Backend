@@ -1,0 +1,2467 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Lexic API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/backups": {
+            "get": {
+                "tags": [
+                    "backups"
+                ],
+                "summary": "Get all successful Backups",
+                "responses": {
+                    "200": {
+                        "description": "List of all successful Backups",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/backup"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Backups found"
+                    }
+                }
+            }
+        },
+        "/backups/{id}": {
+            "get": {
+                "tags": [
+                    "backups"
+                ],
+                "summary": "Get single Backup by it's id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the Backup",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "description": "Get single Backup by it's id",
+                                    "type": "int"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Single Backup with the provided id",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/backup"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Backup for the id found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "backups"
+                ],
+                "summary": "Delete an existing Backup",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the Backup",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "description": "Delete an existing Backup",
+                                    "type": "int"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Backup for the provided id deleted"
+                    },
+                    "404": {
+                        "description": "No Backup for the id found"
+                    }
+                }
+            }
+        },
+        "/backups?token={token}": {
+            "post": {
+                "tags": [
+                    "backups"
+                ],
+                "summary": "Webhook to create a new Backup object based on a Backup Schedule",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "The authorization token set in the Backup Schedule",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "token": {
+                                    "description": "Webhook to create a new Backup object based on a Backup Schedule",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "The provided parameters are invalid"
+                    },
+                    "403": {
+                        "description": "The backup token is invalid"
+                    },
+                    "201": {
+                        "description": "The new Backup object was created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/backup"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/containers/{containerId}/backups/schedules": {
+            "post": {
+                "tags": [
+                    "backups"
+                ],
+                "parameters": [
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "Which container should be used",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "bodyCreateSchedule",
+                        "in": "body",
+                        "description": "body for backupschedule for single container",
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "executionTime": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "destination": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Success message"
+                    },
+                    "400": {
+                        "description": "Nonvalid input data"
+                    },
+                    "404": {
+                        "description": "Container not found"
+                    }
+                }
+            }
+        },
+        "/containers": {
+            "get": {
+                "tags": [
+                    "containers"
+                ],
+                "summary": "Get all saved Containers",
+                "responses": {
+                    "200": {
+                        "description": "List of all containers",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/container"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No containers found"
+                    }
+                }
+            }
+        },
+        "/hosts/{hostId}/containers?fresh={fresh}": {
+            "get": {
+                "tags": [
+                    "containers"
+                ],
+                "summary": "Get all Containers from one host",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "fresh",
+                        "in": "query",
+                        "description": "true = force collect new data and return them, false = return cached data from the database",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of containers from one host",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/container"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/{hostId}/containers": {
+            "post": {
+                "tags": [
+                    "containers"
+                ],
+                "summary": "Create a new Container on a specific Host",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Gibt die Art an, wie der Container erstellt wird. (image, migration, copy, none) Default ist none",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "bodyFingerprint",
+                        "in": "body",
+                        "description": "Parameters for the new Container with fingerprint",
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "architecture": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "profiles": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "array"
+                                },
+                                "ephemeral": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "bool"
+                                },
+                                "config": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "devices": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "fingerprint": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "bodyAlias",
+                        "in": "body",
+                        "description": "Parameters for the new Container with alias",
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "architecture": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "profiles": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "array"
+                                },
+                                "ephemeral": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "bool"
+                                },
+                                "config": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "devices": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "alias": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "bodyMigration",
+                        "in": "body",
+                        "description": "Parameters for the new Container with migration",
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "architecture": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "profiles": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "array"
+                                },
+                                "ephemeral": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "bool"
+                                },
+                                "config": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "devices": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "oldContainerId": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "int"
+                                },
+                                "containerOnly": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "bool"
+                                },
+                                "live": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "bool"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "bodyCopy",
+                        "in": "body",
+                        "description": "Parameters for copying a Container",
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "architecture": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "profiles": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "array"
+                                },
+                                "ephemeral": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "bool"
+                                },
+                                "config": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "devices": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "string"
+                                },
+                                "oldContainerId": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "int"
+                                },
+                                "containerOnly": {
+                                    "description": "Create a new Container on a specific Host",
+                                    "type": "bool"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host the container should be created on",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "The Container was successfully created"
+                    },
+                    "404": {
+                        "description": "The Host was not found"
+                    },
+                    "400": {
+                        "description": "The input was wrong"
+                    }
+                }
+            }
+        },
+        "/containers/{containerId}": {
+            "get": {
+                "tags": [
+                    "containers"
+                ],
+                "summary": "Get a Container by containerID",
+                "parameters": [
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "ID of the Container",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the informationen of a single Container",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/container"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "containers"
+                ],
+                "parameters": [
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "ID of the Container",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "bodyName",
+                        "in": "body",
+                        "description": "Body f\u00fcr die Namensaenderung eines Containers.",
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "bodyProps",
+                        "in": "body",
+                        "description": "Body f\u00fcr die Aenderung eines Containers.",
+                        "schema": {
+                            "properties": {
+                                "architecture": {
+                                    "type": "string"
+                                },
+                                "config": {
+                                    "type": "string"
+                                },
+                                "devices": {
+                                    "type": "string"
+                                },
+                                "ephemeral": {
+                                    "type": "bool"
+                                },
+                                "profiles": {
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the informationen of a single Container",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/container"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Returns an 400 error if the new is already chosen."
+                    }
+                }
+            }
+        },
+        "/containers/{containerId}/state": {
+            "get": {
+                "tags": [
+                    "containerStates"
+                ],
+                "summary": "Get the current state of the Container by ContainerID",
+                "parameters": [
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "ID von Container",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Aktueller Status des Contianers"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "containerStates"
+                ],
+                "summary": "Start, stop or restart a Contaner by ContainerID",
+                "parameters": [
+                    {
+                        "name": "actionData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "action": {
+                                    "description": "Start, stop or restart a Contaner by ContainerID",
+                                    "type": "string"
+                                },
+                                "timeout": {
+                                    "description": "Start, stop or restart a Contaner by ContainerID",
+                                    "type": "integer"
+                                },
+                                "force": {
+                                    "description": "Start, stop or restart a Contaner by ContainerID",
+                                    "type": "boolean"
+                                },
+                                "stateful": {
+                                    "description": "Start, stop or restart a Contaner by ContainerID",
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "ID von Container",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Erfolgsmeldung f\u00fcr Container Status Update."
+                    }
+                }
+            }
+        },
+        "/hosts": {
+            "get": {
+                "tags": [
+                    "hosts"
+                ],
+                "summary": "Get a list of all saved Hosts",
+                "responses": {
+                    "200": {
+                        "description": "Zeigt eine Liste aller Hosts an",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/host"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Images found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "hosts"
+                ],
+                "summary": "Create a new Host",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for new Host",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "ipv4": {
+                                    "description": "Create a new Host",
+                                    "type": "string"
+                                },
+                                "ipv6": {
+                                    "description": "Create a new Host",
+                                    "type": "string"
+                                },
+                                "domainName": {
+                                    "description": "Create a new Host",
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "description": "Create a new Host",
+                                    "type": "string"
+                                },
+                                "mac": {
+                                    "description": "Create a new Host",
+                                    "type": "string"
+                                },
+                                "settings": {
+                                    "description": "Create a new Host",
+                                    "type": "string"
+                                },
+                                "port": {
+                                    "description": "Create a new Host",
+                                    "type": "integer"
+                                },
+                                "password": {
+                                    "description": "Create a new Host",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "gibt den neu gespeicherten Host zur\u00fcck",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/host"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/{hostId}": {
+            "get": {
+                "tags": [
+                    "hosts"
+                ],
+                "summary": "Get a Host by hostID",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID von anzuzeigendem Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "gibt einen Host zur\u00fcck",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/host"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "hosts"
+                ],
+                "summary": "Update a Host by hostID",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID von anzuzeigendem Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "ipv4": {
+                                    "description": "Update a Host by hostID",
+                                    "type": "string"
+                                },
+                                "ipv6": {
+                                    "description": "Update a Host by hostID",
+                                    "type": "string"
+                                },
+                                "domainName": {
+                                    "description": "Update a Host by hostID",
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "description": "Update a Host by hostID",
+                                    "type": "string"
+                                },
+                                "mac": {
+                                    "description": "Update a Host by hostID",
+                                    "type": "string"
+                                },
+                                "settings": {
+                                    "description": "Update a Host by hostID",
+                                    "type": "string"
+                                },
+                                "port": {
+                                    "description": "Update a Host by hostID",
+                                    "type": "integer"
+                                },
+                                "password": {
+                                    "description": "Update a Host by hostID",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "gibt den neu gespeicherten Host zur\u00fcck",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/host"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "hosts"
+                ],
+                "summary": "Delete a Host by hostID",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID von anzuzeigendem Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "l\u00f6scht einen Host"
+                    }
+                }
+            }
+        },
+        "/hosts/{hostId}/authorization": {
+            "post": {
+                "tags": [
+                    "hosts"
+                ],
+                "summary": "Authorize the Backend to Access the Hosts LXD API",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID von anzuzeigendem Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "password of lxd host",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "password": {
+                                    "description": "Authorize the Backend to Access the Hosts LXD API",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "erfolgsmeldung dass Host erfolgreich authorisiert"
+                    },
+                    "400": {
+                        "description": "liefert den Fehler zur\u00fcck."
+                    }
+                }
+            }
+        },
+        "/images/{imageId}/aliases": {
+            "post": {
+                "tags": [
+                    "image-alias"
+                ],
+                "summary": "Create an ImageAlias for an existing Image",
+                "parameters": [
+                    {
+                        "name": "imageId",
+                        "in": "path",
+                        "description": "ID of the Image",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for the new ImageAlias",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Create an ImageAlias for an existing Image",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Create an ImageAlias for an existing Image",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "404": {
+                        "description": "No Image for the provided ImageId found"
+                    },
+                    "400": {
+                        "description": "ImageAlias creation is only supported for Images where the creation process is finished or LXD-Error"
+                    },
+                    "201": {
+                        "description": "ImageAlias successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/image"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/images/aliases/{aliasId}": {
+            "delete": {
+                "tags": [
+                    "image-alias"
+                ],
+                "summary": "Delete a single ImageAlias by its id",
+                "parameters": [
+                    {
+                        "name": "aliasId",
+                        "in": "path",
+                        "description": "ID of the ImageAlias",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The ImageAlias was successfully deleted"
+                    },
+                    "400": {
+                        "description": "Deleting of the ImageAlias for an Image which is in the creation process is not possible or a LXD Error"
+                    },
+                    "404": {
+                        "description": "No ImageAlias for the provided id found"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "image-alias"
+                ],
+                "summary": "Change the description or name of an ImageAlias",
+                "parameters": [
+                    {
+                        "name": "aliasId",
+                        "in": "path",
+                        "description": "ID of the ImageAlias",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for the ImageAlias",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Change the description or name of an ImageAlias",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Change the description or name of an ImageAlias",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "404": {
+                        "description": "No ImageAlias for the provided id found"
+                    },
+                    "400": {
+                        "description": "Editing of the ImageAlias for an Image which is in the creation process is not possible or LXD-Error"
+                    },
+                    "200": {
+                        "description": "ImageAlias successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/imageAlias"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/images": {
+            "get": {
+                "tags": [
+                    "images"
+                ],
+                "summary": "Get all Images",
+                "responses": {
+                    "200": {
+                        "description": "List of all Images",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/image"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Images found"
+                    }
+                }
+            }
+        },
+        "/hosts/{hostId}/images": {
+            "get": {
+                "tags": [
+                    "images"
+                ],
+                "summary": "Get all Images on a specific Host",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of all Images for a specified Host",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/image"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Images on the Host found"
+                    }
+                }
+            }
+        },
+        "/hosts/{hostId}/images/remote": {
+            "post": {
+                "tags": [
+                    "images"
+                ],
+                "summary": "Create a new Remote-Image on a specific Host",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Same body as the LXD Request body for source image case",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "The placeholder image - some elements will be added after the image was async created - finished will then change to true - if the creation fails, finished stays false and an error attribute displays the error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/image"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Host for the provided id found"
+                    },
+                    "400": {
+                        "description": "Validation failed or there is a LXD Error"
+                    }
+                }
+            }
+        },
+        "/hosts/{hostId}/images/container": {
+            "post": {
+                "tags": [
+                    "images"
+                ],
+                "summary": "Create an Image from a stopped Container",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Same body as the LXD Request body to create an Image from stopped Container",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "The placeholder image - some elements will be added after the image was async created - finished will then change to true - if the creation fails, finished stays false and an error attribute displays the error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/image"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Host for the provided id found"
+                    },
+                    "400": {
+                        "description": "Validation failed or there is a LXD Error"
+                    }
+                }
+            }
+        },
+        "/images/{imageId}": {
+            "get": {
+                "tags": [
+                    "images"
+                ],
+                "summary": "Get a single Image",
+                "parameters": [
+                    {
+                        "name": "imageId",
+                        "in": "path",
+                        "description": "ID of the Image",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image with the specified ImageId",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/image"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Images with the ImageId found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "images"
+                ],
+                "summary": "Update an Image by its id",
+                "parameters": [
+                    {
+                        "name": "imageId",
+                        "in": "path",
+                        "description": "ID of the Image",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Same body as the LXD Request body to update an Image via Put",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "The updated Image",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/image"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Image for the provided id found"
+                    },
+                    "400": {
+                        "description": "Image update on LXD Api failed, the error message is 'Couldn't update Image - {LXD-Error}'"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "images"
+                ],
+                "summary": "Delete a single Image",
+                "parameters": [
+                    {
+                        "name": "imageId",
+                        "in": "path",
+                        "description": "ID of the Image",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Image with the specified ImageId successfully deleted"
+                    },
+                    "404": {
+                        "description": "No Image with the ImageId found"
+                    },
+                    "400": {
+                        "description": "There was an error deleting the Image, the error contains the message 'Couldn't delete alias - {LXD-Error}' or 'Couldn't delete image - {LXD-Error}'"
+                    }
+                }
+            }
+        },
+        "/monitoring/logs/containers/{containerId}": {
+            "get": {
+                "tags": [
+                    "container-monitoring"
+                ],
+                "summary": "List all available Logfiles for a Container",
+                "parameters": [
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "ID of the Container",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of all available logfiles for the Container as an array under the attribute logs"
+                    },
+                    "404": {
+                        "description": "No Container for the id found"
+                    },
+                    "400": {
+                        "description": "Returns an LXD Error 'LXD-Error - {LXD-Response}' "
+                    }
+                }
+            }
+        },
+        "/monitoring/logs/containers/{containerId}/{logfile}": {
+            "get": {
+                "tags": [
+                    "container-monitoring"
+                ],
+                "summary": "Get the content of a single Logfile",
+                "parameters": [
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "ID of the Container",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "logfile",
+                        "in": "path",
+                        "description": "Filename of the Logfile, including type",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the File content as text/plain"
+                    },
+                    "404": {
+                        "description": "No Container for the id found"
+                    },
+                    "400": {
+                        "description": "Returns an LXD Error 'LXD-Error - {LXD-Response}' "
+                    }
+                }
+            }
+        },
+        "/monitoring/logs/hosts/{hostId}?logpath={logpath}": {
+            "get": {
+                "tags": [
+                    "host-monitoring"
+                ],
+                "summary": "Get the content of a single Logfile",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "logpath",
+                        "in": "path",
+                        "description": "Path of the logfile on the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the File content as text/plain"
+                    },
+                    "404": {
+                        "description": "No Host for the id found"
+                    },
+                    "400": {
+                        "description": "Error getting the logfile"
+                    }
+                }
+            }
+        },
+        "/monitoring/checks/containers/{containerId}": {
+            "get": {
+                "tags": [
+                    "container-monitoring"
+                ],
+                "summary": "Get all ContainerStatus Nagios configurations for a Container",
+                "parameters": [
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "ID of the Container",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the ContainerStatus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/containerStatus"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Container for the id found or no StatusCheck for Container found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "container-monitoring"
+                ],
+                "summary": "Create ContainerStatus Nagios configuration",
+                "parameters": [
+                    {
+                        "name": "containerId",
+                        "in": "path",
+                        "description": "ID of the Container",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "nagiosEnabled": {
+                                    "description": "Create ContainerStatus Nagios configuration",
+                                    "type": "boolean",
+                                    "example": true
+                                },
+                                "nagiosName": {
+                                    "description": "Create ContainerStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "ContainerWebServer1"
+                                },
+                                "nagiosUrl": {
+                                    "description": "Create ContainerStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "https://nagios.example.com/pnp4nagios/"
+                                },
+                                "checkName": {
+                                    "description": "Create ContainerStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "check_http"
+                                },
+                                "sourceNumber": {
+                                    "description": "Create ContainerStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": 0
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Returns the ContainerStatus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/containerStatus"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Container for the id found"
+                    }
+                }
+            }
+        },
+        "/monitoring/checks/{checkId}/containers": {
+            "put": {
+                "tags": [
+                    "container-monitoring"
+                ],
+                "summary": "Edit ContainerStatus Nagios configuration",
+                "parameters": [
+                    {
+                        "name": "checkId",
+                        "in": "path",
+                        "description": "ID of the ContainerStatus",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "nagiosEnabled": {
+                                    "description": "Edit ContainerStatus Nagios configuration",
+                                    "type": "boolean",
+                                    "example": true
+                                },
+                                "nagiosName": {
+                                    "description": "Edit ContainerStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "ContainerWebServer1"
+                                },
+                                "nagiosUrl": {
+                                    "description": "Edit ContainerStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "https://nagios.example.com/pnp4nagios/"
+                                },
+                                "checkName": {
+                                    "description": "Edit ContainerStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "check_http"
+                                },
+                                "sourceNumber": {
+                                    "description": "Edit ContainerStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": 0
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the ContainerStatus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/containerStatus"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No ContainerStatus for the id found"
+                    },
+                    "400": {
+                        "description": "Validation for new ContainerStatus object failed, wrong input"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "container-monitoring"
+                ],
+                "summary": "Delete ContainerStatus Nagios configuration",
+                "parameters": [
+                    {
+                        "name": "checkId",
+                        "in": "path",
+                        "description": "ID of the ContainerStatus",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "ContainerStatus deleted"
+                    },
+                    "404": {
+                        "description": "No ContainerStatus for the provided id found"
+                    }
+                }
+            }
+        },
+        "/monitoring/checks/{checkId}/containers/graph?timerange={timerange}": {
+            "get": {
+                "tags": [
+                    "container-monitoring"
+                ],
+                "summary": "Receive a Nagios stats graph by ContainerStatus",
+                "parameters": [
+                    {
+                        "name": "checkId",
+                        "in": "path",
+                        "description": "ID of the ContainerStatus",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "timerange",
+                        "in": "path",
+                        "description": "Define a custom timerange for the output graph, examples : -1day or -3weeks or -1year or yesterday",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the Nagios stats graph as png with mime-type image/png"
+                    },
+                    "404": {
+                        "description": "No ContainerStatus with ID found - returns json error with mime-type application/json"
+                    },
+                    "400": {
+                        "description": "Error getting the Nagios graph image - returns json error with mime-type application/json"
+                    }
+                }
+            }
+        },
+        "/monitoring/checks/hosts/{hostId}": {
+            "get": {
+                "tags": [
+                    "host-monitoring"
+                ],
+                "summary": "Get all HostStatus Nagios configurations for a Host",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the HostStatuses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hostStatus"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Host for the id found or no HostStatus configuration for Host found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "host-monitoring"
+                ],
+                "summary": "Create HostStatus Nagios configuration",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "nagiosEnabled": {
+                                    "description": "Create HostStatus Nagios configuration",
+                                    "type": "boolean",
+                                    "example": true
+                                },
+                                "nagiosName": {
+                                    "description": "Create HostStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "LXC-Host1"
+                                },
+                                "nagiosUrl": {
+                                    "description": "Create HostStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "https://nagios.example.com/pnp4nagios/"
+                                },
+                                "checkName": {
+                                    "description": "Create HostStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "check_http"
+                                },
+                                "sourceNumber": {
+                                    "description": "Create HostStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": 0
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Returns the HostStatus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hostStatus"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No Host for the id found"
+                    }
+                }
+            }
+        },
+        "/monitoring/checks/{checkId}/hosts/graph?timerange={timerange}": {
+            "get": {
+                "tags": [
+                    "host-monitoring"
+                ],
+                "summary": "Receive a Nagios stats graph by HostStatus",
+                "parameters": [
+                    {
+                        "name": "checkId",
+                        "in": "path",
+                        "description": "ID of the HostStatus",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "timerange",
+                        "in": "path",
+                        "description": "Define a custom timerange for the output graph, examples : -1day or -3weeks or -1year or yesterday",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the Nagios stats graph as png with mime-type image/png"
+                    },
+                    "404": {
+                        "description": "No HostStatus with ID found - returns json error with mime-type application/json"
+                    },
+                    "400": {
+                        "description": "Error getting the Nagios graph image - returns json error with mime-type application/json"
+                    }
+                }
+            }
+        },
+        "/monitoring/checks/{checkId}/hosts": {
+            "put": {
+                "tags": [
+                    "host-monitoring"
+                ],
+                "summary": "Edit HostStatus Nagios configuration",
+                "parameters": [
+                    {
+                        "name": "checkId",
+                        "in": "path",
+                        "description": "ID of the HostStatus",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "nagiosEnabled": {
+                                    "description": "Edit HostStatus Nagios configuration",
+                                    "type": "boolean",
+                                    "example": true
+                                },
+                                "nagiosName": {
+                                    "description": "Edit HostStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "LXC-Host1"
+                                },
+                                "nagiosUrl": {
+                                    "description": "Edit HostStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "https://nagios.example.com/pnp4nagios/"
+                                },
+                                "checkName": {
+                                    "description": "Edit HostStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": "check_http"
+                                },
+                                "sourceNumber": {
+                                    "description": "Edit HostStatus Nagios configuration",
+                                    "type": "string",
+                                    "example": 0
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the HostStatus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/hostStatus"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No HostStatus for the id found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "host-monitoring"
+                ],
+                "summary": "Delete HostStatus Nagios configuration",
+                "parameters": [
+                    {
+                        "name": "checkId",
+                        "in": "path",
+                        "description": "ID of the HostStatus",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "HostStatus deleted"
+                    },
+                    "404": {
+                        "description": "No HostStatus for the provided id found"
+                    }
+                }
+            }
+        },
+        "/profiles": {
+            "get": {
+                "tags": [
+                    "profiles"
+                ],
+                "summary": "Get all LXC-Profiles",
+                "responses": {
+                    "200": {
+                        "description": "List of all LXC-Profiles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/profile"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No LXC-Profiles found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "profiles"
+                ],
+                "summary": "Create a LXC-Profile",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for the new LXC-Profile",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Create a LXC-Profile",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Create a LXC-Profile",
+                                    "type": "string"
+                                },
+                                "config": {
+                                    "description": "Create a LXC-Profile",
+                                    "type": "string"
+                                },
+                                "devices": {
+                                    "description": "Create a LXC-Profile",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "The provided values for the LXC-Profile are not valid"
+                    },
+                    "201": {
+                        "description": "The LXC-Profile was successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/profile"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{profileId}": {
+            "get": {
+                "tags": [
+                    "profiles"
+                ],
+                "summary": "Get a single LXC-Profile by its id",
+                "parameters": [
+                    {
+                        "name": "profileId",
+                        "in": "path",
+                        "description": "ID of the LXC-Profile",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detailed information about a specific LXC-Profile",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/profile"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No LXC-Profile for the provided id found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "profiles"
+                ],
+                "summary": "Edit a existing LXC-Profile",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters which should be used to update the LXC-Profile",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Edit a existing LXC-Profile",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Edit a existing LXC-Profile",
+                                    "type": "string"
+                                },
+                                "config": {
+                                    "description": "Edit a existing LXC-Profile",
+                                    "type": "string"
+                                },
+                                "devices": {
+                                    "description": "Edit a existing LXC-Profile",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "profileId",
+                        "in": "path",
+                        "description": "ID of the LXC-Profile",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "404": {
+                        "description": "No LXC-Profile for the provided id found"
+                    },
+                    "400": {
+                        "description": "The provided values for the LXC-Profile are not valid or the LXD Api call failed"
+                    },
+                    "201": {
+                        "description": "The LXC-Profile was successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/profile"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "profiles"
+                ],
+                "summary": "Delete a existing LXC-Profile",
+                "parameters": [
+                    {
+                        "name": "profileId",
+                        "in": "path",
+                        "description": "ID of the LXC-Profile",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The LXC-Profile was successfully deleted"
+                    },
+                    "400": {
+                        "description": "The LXC-Profile couldn't be deleted, because it is used by at least one Container or the LXD Api call failed"
+                    },
+                    "404": {
+                        "description": "No LXC-Profile for the provided id found"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Shows all users",
+                "responses": {
+                    "200": {
+                        "description": "List of all users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No users found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Updates existing User",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID von upzudatendem User",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for updated User",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "firstName": {
+                                    "description": "Updates existing User",
+                                    "type": "string"
+                                },
+                                "lastName": {
+                                    "description": "Updates existing User",
+                                    "type": "string"
+                                },
+                                "username": {
+                                    "description": "Updates existing User",
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "description": "Updates existing User",
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "description": "Updates existing User",
+                                    "type": "string"
+                                },
+                                "roles": {
+                                    "description": "Updates existing User",
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "gibt den neu gespeicherten User zur\u00fcck",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Stores a new User",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for new User",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "firstName": {
+                                    "description": "Stores a new User",
+                                    "type": "string"
+                                },
+                                "lastName": {
+                                    "description": "Stores a new User",
+                                    "type": "string"
+                                },
+                                "username": {
+                                    "description": "Stores a new User",
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "description": "Stores a new User",
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "description": "Stores a new User",
+                                    "type": "string"
+                                },
+                                "roles": {
+                                    "description": "Stores a new User",
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "gibt den neu gespeicherten User zur\u00fcck",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{userId}": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Shows single user",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID of the User",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Single user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete a existing User",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID von zu l\u00f6schendem User",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "l\u00f6scht einen User"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "backup": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2018-03-10T22:40:28+00:00"
+                    },
+                    "destinationId": {
+                        "example": "1"
+                    },
+                    "containerId": {
+                        "example": "[1]"
+                    }
+                },
+                "type": "object"
+            },
+            "container": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "14"
+                    },
+                    "ipv4": {
+                        "type": "string",
+                        "example": "192.168.178.20"
+                    },
+                    "ipv6": {
+                        "type": "string",
+                        "example": "fe80::20"
+                    },
+                    "domainName": {
+                        "type": "string",
+                        "example": "container14.localnet.com"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "WebServer1"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "TODO Settings"
+                    },
+                    "host": {
+                        "$ref": "#/components/schemas/host"
+                    },
+                    "host_id": {
+                        "example": "1"
+                    },
+                    "profile_id": {
+                        "example": "[1]"
+                    }
+                },
+                "type": "object"
+            },
+            "containerStatus": {
+                "properties": {
+                    "id": {
+                        "example": "4"
+                    },
+                    "nagiosEnabled": {
+                        "type": "boolean",
+                        "example": "true"
+                    },
+                    "nagiosName": {
+                        "type": "string",
+                        "example": "ContainerWebServer1"
+                    },
+                    "checkName": {
+                        "type": "string",
+                        "example": "check_http"
+                    },
+                    "sourceNumber": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "nagiosUrl": {
+                        "type": "string",
+                        "example": "https://nagios.example.com/pnp4nagios/"
+                    }
+                },
+                "type": "object"
+            },
+            "host": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "2"
+                    },
+                    "ipv4": {
+                        "type": "string",
+                        "example": "192.168.178.5"
+                    },
+                    "ipv6": {
+                        "type": "string",
+                        "example": "fe80::5"
+                    },
+                    "domainName": {
+                        "type": "string",
+                        "example": "host2.localnet.com"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "host2"
+                    },
+                    "mac": {
+                        "type": "string",
+                        "example": "82-75-93-4D-B8-6F"
+                    },
+                    "port": {
+                        "type": "integer",
+                        "example": "22"
+                    },
+                    "settings": {
+                        "type": "string",
+                        "example": "TODO Settings"
+                    },
+                    "authenticated": {
+                        "type": "boolean",
+                        "example": "true"
+                    },
+                    "container_id": {
+                        "example": "[1]"
+                    }
+                },
+                "type": "object"
+            },
+            "hostStatus": {
+                "properties": {
+                    "id": {
+                        "example": "4"
+                    },
+                    "nagiosEnabled": {
+                        "type": "boolean",
+                        "example": "true"
+                    },
+                    "nagiosName": {
+                        "type": "string",
+                        "example": "LXC-Host1"
+                    },
+                    "checkName": {
+                        "type": "string",
+                        "example": "check_http"
+                    },
+                    "sourceNumber": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "nagiosUrl": {
+                        "type": "string",
+                        "example": "https://nagios.example.com/pnp4nagios/"
+                    }
+                },
+                "type": "object"
+            },
+            "image": {
+                "properties": {
+                    "id": {
+                        "example": "3"
+                    },
+                    "fingerprint": {
+                        "example": "a49d26ce5808075f5175bf31f5cb90561f5023dcd408da8ac5e834096d46b2d8"
+                    },
+                    "aliases": {
+                        "$ref": "#/components/schemas/imageAlias"
+                    },
+                    "architecture": {
+                        "example": "x86_64"
+                    },
+                    "size": {
+                        "example": "1602345"
+                    },
+                    "public": {
+                        "type": "boolean",
+                        "example": "true"
+                    },
+                    "filename": {
+                        "type": "string",
+                        "example": "imageFilename"
+                    },
+                    "properties": {
+                        "type": "array",
+                        "example": "{json-Object}"
+                    },
+                    "finished": {
+                        "type": "boolean",
+                        "example": "true"
+                    },
+                    "hostId": {
+                        "example": "1"
+                    },
+                    "container_id": {
+                        "example": "[1]"
+                    }
+                },
+                "type": "object"
+            },
+            "imageAlias": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "3"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "my-alias"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "This is a description string"
+                    }
+                },
+                "type": "object"
+            },
+            "profile": {
+                "properties": {
+                    "id": {
+                        "example": "2"
+                    },
+                    "name": {
+                        "example": "my-profilename"
+                    },
+                    "description": {
+                        "example": "Some description string"
+                    },
+                    "config": {
+                        "example": "Config JSON Object"
+                    },
+                    "devices": {
+                        "example": "Devices JSON Object"
+                    },
+                    "hostId": {
+                        "example": "[1]"
+                    },
+                    "container_id": {
+                        "example": "[1]"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}
