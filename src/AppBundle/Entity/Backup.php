@@ -64,6 +64,15 @@ class Backup
     protected $containers;
 
     /**
+     * @var BackupDestination
+     *
+     * @ORM\ManyToOne(targetEntity="BackupDestination", inversedBy="backup")
+     * @ORM\JoinColumn(name="destination_id", referencedColumnName="id")
+     * @Assert\NotNull
+     */
+    protected $destination;
+
+    /**
      * Backup constructor.
      */
     public function __construct()
@@ -129,6 +138,36 @@ class Backup
         }
         $this->containers->removeElement($container);
         $container->removeBackup($this);
+    }
+
+    /**
+     * @return BackupDestination
+     */
+    public function getDestination(): BackupDestination
+    {
+        return $this->destination;
+    }
+
+    /**
+     * @param BackupDestination $destination
+     */
+    public function setDestination($destination): void
+    {
+        $this->destination = $destination;
+    }
+
+    /**
+     * @return int
+     *
+     * @OAS\Property(property="destinationId", example="1")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getDestinationId(){
+        if($this->destination){
+            return $this->destination->getId();
+        }
+        return null;
     }
 
     /**
