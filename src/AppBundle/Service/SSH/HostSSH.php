@@ -152,4 +152,18 @@ class HostSSH
         //Remove tarball after import
         $exec->run('rm -rf '.$pathToTarball);
     }
+
+    public function restoreContainerFromImage(Host $host, string $containerName)
+    {
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
+        $configuration = new Configuration($hostname);
+        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
+
+        $session = new Session($configuration, $authentication);
+
+        $exec = $session->getExec();
+        $exec->run('lxc init '.$containerName.' '.$containerName);
+
+        //TODO Create new Container object for the restored Container
+    }
 }
