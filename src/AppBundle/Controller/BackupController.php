@@ -281,7 +281,7 @@ class BackupController extends Controller
             $destination = $backup->getDestination();
             $backupSchedule = $backup->getBackupSchedule();
             //Calling restore command with SSH
-            $hostSSH->restoreBackupForTimestampInTmp($backup->getTimestamp(), $destination, $backupSchedule->getName(), $container->getHost());
+            $hostSSH->restoreBackupForTimestampInTmp($backup->getTimestamp(), $destination, $backupSchedule->getName(), $container->getName(), $container->getHost());
         }
     }
 
