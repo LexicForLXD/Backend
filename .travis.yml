@@ -83,7 +83,13 @@ jobs:
         - php bin/console doctrine:fixtures:load -n --env=test
       script: SYMFONY_PHPUNIT_VERSION=6.4 ./vendor/bin/simple-phpunit
     - stage: docs
-      if: branche = master
+      if: branch = master
+      script: ./vendor/bin/swagger -e vendor
+      deploy:
+        provides: pages
+        skip-cleanup: true
+        github-token: $GITHUB_TOKEN
+        keep-history: true
     - stage: release
       if: branch = master
     - stage: deploy
