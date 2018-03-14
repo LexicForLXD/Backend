@@ -106,10 +106,11 @@ jobs:
         - php bin/console doctrine:fixtures:load -n --env=test
       script: ./vendor/bin/swagger -e vendor
       deploy:
-        provides: pages
+        provider: pages
         skip-cleanup: true
         github-token: $GITHUB_TOKEN
         keep-history: true
+        local-dir: ./openapi.json
     - stage: release
       if: branch = master
     - stage: deploy
