@@ -40,9 +40,7 @@ jobs:
   include:
     - stage: tests
       language: php
-      php:
-        - '7.1'
-        - '7.2'
+      php: '7.1'
       services:
         - postgresql
         - redis-server
@@ -62,11 +60,32 @@ jobs:
         - php bin/console doctrine:schema:update --force --env=test
         - php bin/console doctrine:fixtures:load -n --env=test
       script: SYMFONY_PHPUNIT_VERSION=6.4 ./vendor/bin/simple-phpunit
-    - name: docs
+    - stage: tests
+      language: php
+      php: '7.2'
+      services:
+        - postgresql
+        - redis-server
+      before_install:
+        - sudo apt update
+        - sudo apt install libssh2-php
+        - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+        - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+        - echo $CERT_CRT >> client.crt
+        - echo echo $CERT_KEY >> client.key
+        - phpenv config-rm xdebug.ini
+      install:
+        - composer install --no-interaction
+      before_script:
+        - psql -c 'create database travis_lexic_test;' -U postgres
+        - cp app/config/parameters.yml.travis app/config/parameters.yml
+        - php bin/console doctrine:schema:update --force --env=test
+        - php bin/console doctrine:fixtures:load -n --env=test
+      script: SYMFONY_PHPUNIT_VERSION=6.4 ./vendor/bin/simple-phpunit
+    - stage: docs
       if: branche = master
-
-    - name: release
+    - stage: release
       if: branch = master
-    - name: deploy
+    - stage: deploy
       if: branch = master
 
