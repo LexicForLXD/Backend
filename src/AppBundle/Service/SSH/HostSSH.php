@@ -108,10 +108,8 @@ class HostSSH
      * @param BackupDestination $backupDestination
      * @param string $destinationPath
      * @param Host $host
-     *
-     * @return bool
      */
-    public function restoreBackupForTimestampInTmp(\DateTime $timestamp, BackupDestination $backupDestination, string $destinationPath, Host $host) : bool
+    public function restoreBackupForTimestampInTmp(\DateTime $timestamp, BackupDestination $backupDestination, string $destinationPath, Host $host)
     {
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
@@ -123,14 +121,8 @@ class HostSSH
 
         $remoteBackupPath = $backupDestination->getDestinationText().$destinationPath;
 
-        $duplicityCommand = 'duplicity restore '.$remoteBackupPath.' --time '.date_format($timestamp, DATE_ISO8601).' /tmp/'.$destinationPath;
+        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($timestamp, DATE_ISO8601).' /tmp/'.$destinationPath;
 
         $result = $exec->run($duplicityCommand);
-
-        if(!$result){
-            return true;
-        }
-
-        return false;
     }
 }
