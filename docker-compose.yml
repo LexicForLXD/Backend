@@ -1,15 +1,14 @@
 version: '2'
 services:
   web:
-    image: "git.janrtr.de:4567/syp-lxc/backend"
+    build: .
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - "/path/to/cert/client.crt:/srv/lexic/client.crt"
-      - "/path/to/cert/client.key:/srv/lexic/client.key"
-      - "/path/to/servercert/server.key:/etc/nginx/server.key"
-      - "/path/to/servercert/server.key:/etc/nginx/server.key"
+      - "/home/jan/Schreibtisch/Desktop/cert/client.crt:/srv/lexic/client.crt"
+      - "/home/jan/Schreibtisch/Desktop/cert/client.key:/srv/lexic/client.key"
+      - ".:/www/symfony"
   postgres:
     image: "postgres:9.6.7-alpine"
     ports:

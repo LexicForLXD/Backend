@@ -83,4 +83,31 @@ class RestoreService
 
         return $result;
     }
+
+    /**
+     * @param string $tarballFolder
+     * @param string $containerName
+     * @param Host $host
+     * @return string
+     */
+    public function createLXCImageFromTarball(string $tarballFolder, string $containerName,Host $host) : string
+    {
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
+        $configuration = new Configuration($hostname);
+        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
+
+        $session = new Session($configuration, $authentication);
+
+        $exec = $session->getExec();
+
+        $pathToTarball = '/tmp/restore'.$tarballFolder.'/'.$containerName.'.tar.gz';
+
+        $lxcCommand = 'lxc image import '.$pathToTarball.' --alias '.$containerName;
+
+        $importResult = $exec->run($lxcCommand);
+        //Remove tarball after import
+        $exec->run('rm -rf '.$pathToTarball);
+
+        return $importResult;
+    }
 }
