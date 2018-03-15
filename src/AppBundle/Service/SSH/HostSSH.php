@@ -156,7 +156,12 @@ class HostSSH
         return $importResult;
     }
 
-    public function restoreContainerFromImage(Host $host, string $containerName)
+    /**
+     * @param Host $host
+     * @param string $containerName
+     * @return string
+     */
+    public function restoreContainerFromImage(Host $host, string $containerName) : string
     {
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
@@ -165,8 +170,6 @@ class HostSSH
         $session = new Session($configuration, $authentication);
 
         $exec = $session->getExec();
-        $exec->run('lxc init '.$containerName.' '.$containerName);
-
-        //TODO Create new Container object for the restored Container
+        return $exec->run('lxc init '.$containerName.' '.$containerName);
     }
 }
