@@ -26,7 +26,8 @@ class RestoreController extends Controller
      *
      * @Route("/restores/backups/{backupID}", name="restore_all_files_in_backup", methods={"GET"})
      * @param $backupID
-     * @param RestoreService $restoreAPI
+     * @param RestoreService $restoreService
+     * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
      */
@@ -44,6 +45,10 @@ class RestoreController extends Controller
         if(strpos($result, 'Error') !== false){
             throw new WrongInputException($result);
         }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($result, 'json');
+        return new Response($response, Response::HTTP_OK);
     }
 
     /**

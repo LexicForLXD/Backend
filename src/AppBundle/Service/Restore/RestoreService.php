@@ -48,10 +48,27 @@ class RestoreService
             return substr($result, strpos($result, 'Error'));
         }
 
+        //Second query with grep
+        $result = shell_exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ISO8601).' '.$remoteBackupPath.' | grep .tar.gz');
+
         //Create array with filenames from result - try to find all files ending with .tar.gz
+        $numberOfTarballs = substr_count($result, '.tar.gz');
 
-        //TODO File parsing
+        $tarballs = array();
+        for($i=0; $i<$numberOfTarballs; $i++){
+            //Find .tar.gz
+            $end = strpos($result, '.tar.gz');
+            //Find space before tarball name
+            $start = strrpos($result, ' ', $end-strlen($result));
 
+            $name = substr($result, $start, $end-$start+7);
+            $tarballs[] = $name;
+
+            //Remove found tarball name from string
+            $result = str_replace($name, ' ', $result);
+        }
+
+        return $tarballs;
     }
 
     /**
