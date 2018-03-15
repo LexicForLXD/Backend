@@ -9,7 +9,7 @@ SYP-LXC Backend
 
 # Installation from Source
 
-### Resolve dependencies and set parameters  
+### Resolve dependencies and set parameters
 
 ```
 composer install
@@ -40,3 +40,5 @@ php bin/console app:create-user
 ```php
 ./vendor/bin/swagger -e vendor
 ```
+### Hosted swagger docs
+[here](https://lexicforlxd.github.io/Backend/?url=https://raw.githubusercontent.com/LexicForLXD/Backend/gh-pages/openapi.json)
