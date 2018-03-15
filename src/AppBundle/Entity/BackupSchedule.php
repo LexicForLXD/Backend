@@ -9,6 +9,7 @@ use JMS\Serializer\Annotation as JMS;
 use Swagger\Annotations as OAS;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Entity\BackupDestination;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
