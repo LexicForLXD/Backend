@@ -139,24 +139,30 @@
                 }
             }
         },
-        "/containers/{containerId}/backups/schedules": {
+        "/backups/schedules": {
+            "get": {
+                "tags": [
+                    "backups"
+                ],
+                "summary": "List all BackupSchedules",
+                "responses": {
+                    "200": {
+                        "description": "All schedules"
+                    },
+                    "404": {
+                        "description": "Schedules not found"
+                    }
+                }
+            },
             "post": {
                 "tags": [
                     "backups"
                 ],
                 "parameters": [
                     {
-                        "name": "containerId",
-                        "in": "path",
-                        "description": "Which container should be used",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
                         "name": "bodyCreateSchedule",
                         "in": "body",
-                        "description": "body for backupschedule for single container",
+                        "description": "body for backupschedule",
                         "schema": {
                             "properties": {
                                 "name": {
@@ -173,6 +179,9 @@
                                 },
                                 "destination": {
                                     "type": "string"
+                                },
+                                "containers": {
+                                    "type": "array"
                                 }
                             }
                         }
@@ -180,13 +189,123 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Success message"
+                        "description": "Created BackupSchedule"
                     },
                     "400": {
                         "description": "Nonvalid input data"
                     },
                     "404": {
                         "description": "Container not found"
+                    }
+                }
+            }
+        },
+        "/backups/schedules/{scheduleId}": {
+            "get": {
+                "tags": [
+                    "backups"
+                ],
+                "summary": "Show a Single Backup Schedule",
+                "parameters": [
+                    {
+                        "name": "scheduleId",
+                        "in": "path",
+                        "description": "Which schedule should be shown",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "one schedule"
+                    },
+                    "404": {
+                        "description": "Schedule not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "backups"
+                ],
+                "summary": "Update a BackupSchedule on the Host.",
+                "parameters": [
+                    {
+                        "name": "scheduleId",
+                        "in": "path",
+                        "description": "Which schedule should be updated",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "bodyCreateSchedule",
+                        "in": "body",
+                        "description": "body for backupschedule",
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Update a BackupSchedule on the Host.",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Update a BackupSchedule on the Host.",
+                                    "type": "string"
+                                },
+                                "executionTime": {
+                                    "description": "Update a BackupSchedule on the Host.",
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "description": "Update a BackupSchedule on the Host.",
+                                    "type": "string"
+                                },
+                                "destination": {
+                                    "description": "Update a BackupSchedule on the Host.",
+                                    "type": "string"
+                                },
+                                "containers": {
+                                    "description": "Update a BackupSchedule on the Host.",
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated BackupSchedule"
+                    },
+                    "400": {
+                        "description": "Nonvalid input data"
+                    },
+                    "404": {
+                        "description": "Container or Schedule not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "backups"
+                ],
+                "summary": "Delete an existing BackupSchedule",
+                "parameters": [
+                    {
+                        "name": "scheduleId",
+                        "in": "path",
+                        "description": "Which schedule should be deleted",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Success message"
+                    },
+                    "404": {
+                        "description": "Schedule not found"
                     }
                 }
             }
@@ -2235,6 +2354,33 @@
                     },
                     "containerId": {
                         "example": "[1]"
+                    }
+                },
+                "type": "object"
+            },
+            "backupSchedule": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "14"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Schedule1"
+                    },
+                    "description": {
+                        "description": "| null",
+                        "type": "string",
+                        "example": "Schedule1 des"
+                    },
+                    "executionTime": {
+                        "type": "string",
+                        "example": "daily"
+                    },
+                    "type": {
+                        "description": "whether to do a full or incremental backup",
+                        "type": "string",
+                        "example": "full"
                     }
                 },
                 "type": "object"
