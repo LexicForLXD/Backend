@@ -54,7 +54,7 @@ class BackupScheduleController extends Controller
      *          ),
      *          @OAS\Property(
      *              proterty="containers",
-     *              type="array"
+     *              type="array",
      *          ),
      *      ),
      *  ),
@@ -188,7 +188,7 @@ class BackupScheduleController extends Controller
      *          ),
      *          @OAS\Property(
      *              proterty="containers",
-     *              type="array"
+     *              type="array",
      *          ),
      *      ),
      *  ),

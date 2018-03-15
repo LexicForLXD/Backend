@@ -15,6 +15,7 @@ use AppBundle\Entity\BackupDestination;
  * @package AppBundle\Entity
  *
  * @ORM\Entity
+ * @OAS\Schema(schema="backupSchedule", type="object")
  */
 class BackupSchedule
 {
@@ -24,6 +25,7 @@ class BackupSchedule
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @OAS\Property(example="14")
      */
     protected $id;
 
@@ -34,6 +36,7 @@ class BackupSchedule
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
+     * @OAS\Property(example="Schedule1")
      */
     protected $name;
 
@@ -42,6 +45,7 @@ class BackupSchedule
      *
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
+     * @OAS\Property(example="Schedule1 des")
      */
     protected $description;
 
@@ -51,6 +55,7 @@ class BackupSchedule
      * @ORM\Column(type="string")
      * @Assert\Choice({"daily", "weekly", "monthly"})
      * @Assert\Type("string")
+     * @OAS\Property(example="daily")
      */
     protected $executionTime;
 
@@ -72,6 +77,7 @@ class BackupSchedule
      * @ORM\Column(type="string")
      * @Assert\Type("string")
      * @Assert\Choice({"full", "incremental"})
+     * @OAS\Property(example="full")
      */
     protected $type;
 
@@ -84,6 +90,7 @@ class BackupSchedule
      * @ORM\Column(type="string", unique=true)
      *
      * @Assert\Type("string")
+     * @JMS\Exclude()
      *
      */
     protected $token;
@@ -113,12 +120,6 @@ class BackupSchedule
      */
     protected $backups;
 
-    /**
-     * url generator
-     *
-     * @var UrlGeneratorInterface
-     */
-    protected $urlGen;
 
     /**
      * BackupSchedule constructor.
