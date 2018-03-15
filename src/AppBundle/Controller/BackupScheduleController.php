@@ -53,7 +53,7 @@ class BackupScheduleController extends Controller
      *              type="string",
      *          ),
      *          @OAS\Property(
-     *              proterty="containers",
+     *              property="containers",
      *              type="array",
      *          ),
      *      ),
@@ -122,6 +122,14 @@ class BackupScheduleController extends Controller
      *          type="integer"
      *      ),
      *  ),
+     *  @OAS\Response(
+     *      description="Success message",
+     *      response=204
+     *  ),
+     *  @OAS\Response(
+     *      description="Schedule not found",
+     *      response=404
+     *  ),
      * )
      *
      * @param integer $scheduleId
@@ -187,7 +195,7 @@ class BackupScheduleController extends Controller
      *              type="string",
      *          ),
      *          @OAS\Property(
-     *              proterty="containers",
+     *              property="containers",
      *              type="array",
      *          ),
      *      ),
