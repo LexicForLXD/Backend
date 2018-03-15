@@ -197,7 +197,7 @@ class BackupSchedule
     /**
      * @return BackupDestination
      */
-    public function getDestination(): BackupDestination
+    public function getDestination() : BackupDestination
     {
         return $this->destination;
     }
@@ -205,7 +205,7 @@ class BackupSchedule
     /**
      * @param BackupDestination $destination
      */
-    public function setDestination($destination): void
+    public function setDestination($destination) : void
     {
         $this->destination = $destination;
     }
@@ -238,6 +238,17 @@ class BackupSchedule
     public function getContainers() : PersistentCollection
     {
         return $this->containers;
+    }
+
+    /**
+     * set Containers
+     *
+     * @param PersitentCollection $containers
+     * @return void
+     */
+    public function setContainers($containers)
+    {
+        $this->containers = $containers;
     }
 
     /**
