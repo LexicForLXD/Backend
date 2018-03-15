@@ -110,4 +110,21 @@ class RestoreService
 
         return $importResult;
     }
+
+    /**
+     * @param Host $host
+     * @param string $containerName
+     * @return string
+     */
+    public function restoreContainerFromImage(Host $host, string $containerName) : string
+    {
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
+        $configuration = new Configuration($hostname);
+        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
+
+        $session = new Session($configuration, $authentication);
+
+        $exec = $session->getExec();
+        return $exec->run('lxc init '.$containerName.' '.$containerName);
+    }
 }
