@@ -133,8 +133,9 @@ class HostSSH
      * @param string $tarballFolder
      * @param string $containerName
      * @param Host $host
+     * @return string
      */
-    public function createLXCImageFromTarball(string $tarballFolder, string $containerName,Host $host)
+    public function createLXCImageFromTarball(string $tarballFolder, string $containerName,Host $host) : string
     {
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
@@ -148,9 +149,11 @@ class HostSSH
 
         $lxcCommand = 'lxc image import '.$pathToTarball.' --alias '.$containerName;
 
-        $exec->run($lxcCommand);
+        $importResult = $exec->run($lxcCommand);
         //Remove tarball after import
         $exec->run('rm -rf '.$pathToTarball);
+
+        return $importResult;
     }
 
     public function restoreContainerFromImage(Host $host, string $containerName)
