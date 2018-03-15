@@ -8,6 +8,7 @@ use AppBundle\Exception\WrongInputException;
 use Ssh\Authentication\PublicKeyFile;
 use Ssh\Configuration;
 use Ssh\Session;
+use AppBundle\Entity\BackupSchedule;
 
 class HostSSH
 {
@@ -58,48 +59,71 @@ class HostSSH
 
     /**
      * Sends the file to the respective anacron dir
-     * @param Container $container
-     * @param String $fileContent
+     * @param BackupSchedule $backupSchedule
+     * @param String $webhookUrl url which should be called in the bash script
      * @return null|string|string[]
      */
-    public function sendAnacronFile(Container $container, String $fileContent, String $executionTime)
+    public function sendAnacronFile(BackupSchedule $backupSchedule, String $webhookUrl)
     {
-        $host = $container->getHost();
+        $host->$backupSchedule->getContainers()[0]->getHost();
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
-        $filepath = "/etc/" . $executionTime . "/";
+        $fileName = "/etc/" . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
 
         $session = new Session($configuration, $authentication);
 
         $exec = $session->getSftp();
 
-        return $exec->write($filepath . $container->getName(), $fileContent);
+        return $exec->write($fileName, $backupSchedule->getShellCommands($webhookUrl));
     }
 
 
 
     /**
      * Make file executeable
-     * @param Host $host
-     * @param String $fileName absolute filename
+     * @param BackupSchedule $backupSchedule
      * @return null|string|string[]
      */
-    public function makeFileExecuteable(Container $container, String $executionTime)
+    public function makeFileExecuteable(BackupSchedule $backupSchedule)
     {
-        $host = $container->getHost();
-
-        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
+        $host->$backupSchedule->getContainers()[0]->getHost();
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
-        $fileName = "/etc/" . $executionTime . "/" . $container->getName();
+        $fileName = "/etc/" . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
 
         $session = new Session($configuration, $authentication);
 
         $exec = $session->getExec();
 
         return $exec->run('chmod +x ' . $fileName);
+    }
+
+    /**
+     * Delete the anacron file on Host
+     *
+     * @param BackupSchedule $backupSchedule
+     * @return boolean|string
+     */
+    public function deleteAnacronFile(BackupSchedule $backupSchedule)
+    {
+        $host->$backupSchedule->getContainers()[0]->getHost();
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
+        $configuration = new Configuration($hostname);
+        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
+
+        $filename = "/etc/" . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
+
+        $session = new Session($configuration, $authentication);
+
+        $exec = $session->getSftp();
+
+        if ($exec->exists($filename)) {
+            return $exec->unlink($filename);
+        }
+        return "File does not exist";
     }
 }

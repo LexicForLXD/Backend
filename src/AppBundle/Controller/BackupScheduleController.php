@@ -23,19 +23,12 @@ class BackupScheduleController extends Controller
 {
 
     /**
-     * @Route("/containers/{containerId}/backups/schedules", methods={"POST"})
+     * @Route("/backups/schedules", methods={"POST"})
      *
-     * @OAS\Post(path="/containers/{containerId}/backups/schedules", tags={"backups"},
+     * @OAS\Post(path="/backups/schedules", tags={"backups"},
+     *
      *  @OAS\Parameter(
-     *      description="Which container should be used",
-     *      in="path",
-     *      name="containerId",
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *  @OAS\Parameter(
-     *      description="body for backupschedule for single container",
+     *      description="body for backupschedule",
      *      in="body",
      *      name="bodyCreateSchedule",
      *      @OAS\Schema(
@@ -59,11 +52,15 @@ class BackupScheduleController extends Controller
      *              property="destination",
      *              type="string",
      *          ),
+     *          @OAS\Property(
+     *              property="containers",
+     *              type="array",
+     *          ),
      *      ),
      *  ),
      *
      *  @OAS\Response(
-     *      description="Success message",
+     *      description="Created BackupSchedule",
      *      response=201
      *  ),
      *  @OAS\Response(
@@ -76,38 +73,270 @@ class BackupScheduleController extends Controller
      *  ),
      * )
      */
-    public function createBackupScheduleSingleContainerAction(Request $request, int $containerId, EntityManagerInterface $em, HostSSH $sshApi)
+    public function createBackupScheduleAction(Request $request, EntityManagerInterface $em, HostSSH $sshApi)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
-        if (!$container) {
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findBy(["id" => $request->get('containers')]);
+
+        if (!$containers) {
             throw new ElementNotFoundException(
-                'No container found for id ' . $containerId
+                'No container found'
             );
         }
 
 
-        $backupschedule = new BackupSchedule();
-        $backupschedule->setName($request->get('name'));
-        $backupschedule->setDescription($request->get('description'));
-        $backupschedule->setExecutionTime($request->get('executionTime'));
-        $backupschedule->setDestination($request->get('destination'));
-        $backupschedule->setType($request->get('type'));
-        $backupschedule->addContainer($container);
+        $schedule = new BackupSchedule();
+        $schedule->setName($request->get('name'));
+        $schedule->setDescription($request->get('description'));
+        $schedule->setExecutionTime($request->get('executionTime'));
+        $schedule->setDestination($request->get('destination'));
+        $schedule->setType($request->get('type'));
+        $schedule->setContainers($containers);
 
         $this->validation($container);
 
-        $em->persist($backupschedule);
+        $em->persist($schedule);
         $em->flush();
 
-        $webhookUrl = $this->generateUrl('create_backup_with_schedule_webhook', array('token' => $backupschedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL);
+        $webhookUrl = $this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL);
 
-        $commandText = $backupschedule->getShellCommands($webhookUrl);
+        $sshApi->sendAnacronFile($schedule, $webhookUrl);
+        $sshApi->makeFileExecuteable($schedule);
 
-        $sshApi->sendAnacronFile($container, $commandText, $backupschedule->getExecutionTime());
-        $sshApi->makeFileExecuteable($container, $backupschedule->getExecutionTime());
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($schedule, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * Delete an existing BackupSchedule
+     *
+     * @Route("/backups/schedules/{scheduleId}", methods={"DELETE"})
+     *
+     * @OAS\Delete(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     *  @OAS\Parameter(
+     *      description="Which schedule should be deleted",
+     *      in="path",
+     *      name="scheduleId",
+     *      @OAS\Schema(
+     *          type="integer"
+     *      ),
+     *  ),
+     *  @OAS\Response(
+     *      description="Success message",
+     *      response=204
+     *  ),
+     *  @OAS\Response(
+     *      description="Schedule not found",
+     *      response=404
+     *  ),
+     * )
+     *
+     * @param integer $scheduleId
+     * @param EntityManagerInterface $em
+     * @param HostSSH $sshApi
+     * @return JsonResponse
+     */
+    public function deleteBackupScheduleAction(int $scheduleId, EntityManagerInterface $em, HostSSH $sshApi)
+    {
+        $schedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($scheduleId);
+
+        if (!$schedule) {
+            throw new ElementNotFoundException(
+                'No backupschedule found for id ' . $scheduleId
+            );
+        }
+
+        $sshApi->deleteAnacronFile($schedule);
+
+        $em->remove($schedule);
+        $em->flush();
+
+        return JsonResponse(["message" => "successful deleted", 204]);
+    }
+
+    /**
+     * Update a BackupSchedule on the Host.
+     *
+     * @Route("/backups/schedules/{scheduleId}", methods={"PUT"})
+     *
+     * @OAS\Put(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     *  @OAS\Parameter(
+     *      description="Which schedule should be updated",
+     *      in="path",
+     *      name="scheduleId",
+     *      @OAS\Schema(
+     *          type="integer"
+     *      ),
+     *  ),
+     *  @OAS\Parameter(
+     *      description="body for backupschedule",
+     *      in="body",
+     *      name="bodyCreateSchedule",
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="name",
+     *              type="string",
+     *          ),
+     *          @OAS\Property(
+     *              property="description",
+     *              type="string",
+     *          ),
+     *          @OAS\Property(
+     *              property="executionTime",
+     *              type="string",
+     *          ),
+     *          @OAS\Property(
+     *              property="type",
+     *              type="string",
+     *          ),
+     *          @OAS\Property(
+     *              property="destination",
+     *              type="string",
+     *          ),
+     *          @OAS\Property(
+     *              property="containers",
+     *              type="array",
+     *          ),
+     *      ),
+     *  ),
+     *
+     *  @OAS\Response(
+     *      description="Updated BackupSchedule",
+     *      response=200
+     *  ),
+     *  @OAS\Response(
+     *      description="Nonvalid input data",
+     *      response=400
+     *  ),
+     *  @OAS\Response(
+     *      description="Container or Schedule not found",
+     *      response=404
+     *  ),
+     * )
+     *
+     *
+     * @param Request $request
+     * @param integer $scheduleId
+     * @param EntityManagerInterface $em
+     * @param HostSSH $sshApi
+     * @return JsonResponse
+     */
+    public function updateBackupScheduleAction(Request $request, int $scheduleId, EntityManagerInterface $em, HostSSH $sshApi)
+    {
+        $schedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($scheduleId);
+
+        if (!$schedule) {
+            throw new ElementNotFoundException(
+                'No backupschedule found for id ' . $scheduleId
+            );
+        }
+
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findBy(["id" => $request->get('containers')]);
+
+        if (!$containers) {
+            throw new ElementNotFoundException(
+                'No container found'
+            );
+        }
+
+        $sshApi->deleteAnacronFile($schedule);
+
+        $schedule->setName($request->get('name'));
+        $schedule->setDescription($request->get('description'));
+        $schedule->setExecutionTime($request->get('executionTime'));
+        $schedule->setDestination($request->get('destination'));
+        $schedule->setType($request->get('type'));
+        $schedule->setContainers($containers);
+
+        $this->validation($container);
+
+        $em->flush($schedule);
 
 
+        $webhookUrl = $this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL);
+
+        $sshApi->sendAnacronFile($schedule, $webhookUrl);
+        $sshApi->makeFileExecuteable($schedule);
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($schedule, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * Show a Single Backup Schedule
+     *
+     * @Route("/backups/schedules/{scheduleId}", methods={"GET"})
+     *
+     * @OAS\Get(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     *  @OAS\Parameter(
+     *      description="Which schedule should be shown",
+     *      in="path",
+     *      name="scheduleId",
+     *      @OAS\Schema(
+     *          type="integer"
+     *      ),
+     *  ),
+     *  @OAS\Response(
+     *      description="one schedule",
+     *      response=200
+     *  ),
+     *  @OAS\Response(
+     *      description="Schedule not found",
+     *      response=404
+     *  ),
+     * )
+     *
+     * @param integer $scheduleId
+     * @return void
+     */
+    public function showBackupScheduleAction(int $scheduleId)
+    {
+        $schedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($scheduleId);
+
+        if (!$schedule) {
+            throw new ElementNotFoundException(
+                'No backupschedule found for id ' . $scheduleId
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($schedule, 'json');
+        return new Response($response);
+    }
+
+    /**
+     * List all BackupSchedules
+     *
+     * @Route("/backups/schedules", methods={"GET"})
+     *
+     * @OAS\Get(path="/backups/schedules", tags={"backups"},
+     *  @OAS\Response(
+     *      description="All schedules",
+     *      response=200
+     *  ),
+     *  @OAS\Response(
+     *      description="Schedules not found",
+     *      response=404
+     *  ),
+     * )
+     *
+     * @return void
+     */
+    public function indexBackupScheduleAction()
+    {
+        $schedules = $this->getDoctrine()->getRepository(BackupSchedule::class)->findAll();
+
+        if (!$schedules) {
+            throw new ElementNotFoundException(
+                'No backupschedules found'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($schedules, 'json');
+        return new Response($response);
     }
 
 
