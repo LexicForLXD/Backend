@@ -369,7 +369,7 @@ class BackupSchedule
 
         $commandTexts = $commandTexts .
             '# Backup via duplicity \n
-            duplicity ' . $this->type . ' / tmp / ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n \n
+            duplicity ' . $this->type . ' --no-encryption /tmp/ ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n \n
             # Make api call to webhook
             curl -X POST ' . $webhookUrl . ' \n
         \n\n';
