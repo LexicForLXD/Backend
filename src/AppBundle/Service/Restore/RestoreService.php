@@ -85,12 +85,12 @@ class RestoreService
     }
 
     /**
-     * @param string $tarballFolder
-     * @param string $containerName
      * @param Host $host
+     * @param string $containerName
+     * @param Backup $backup
      * @return string
      */
-    public function createLXCImageFromTarball(string $tarballFolder, string $containerName,Host $host) : string
+    public function createLXCImageFromTarball(Host $host, string $containerName, Backup $backup) : string
     {
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
@@ -100,7 +100,7 @@ class RestoreService
 
         $exec = $session->getExec();
 
-        $pathToTarball = '/tmp/restore'.$tarballFolder.'/'.$containerName.'.tar.gz';
+        $pathToTarball = '/tmp/restore'.$backup->getBackupSchedule()->getName().'/'.$containerName.'.tar.gz';
 
         $lxcCommand = 'lxc image import '.$pathToTarball.' --alias '.$containerName;
 
