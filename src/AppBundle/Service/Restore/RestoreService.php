@@ -3,6 +3,7 @@
 namespace AppBundle\Service\Restore;
 
 use AppBundle\Entity\Backup;
+use AppBundle\Entity\Host;
 use AppBundle\Exception\WrongInputException;
 
 class RestoreService
@@ -51,5 +52,35 @@ class RestoreService
 
         //TODO File parsing
 
+    }
+
+    /**
+     * @param Host $host
+     * @param string $containerName
+     * @param string $tarball
+     * @param Backup $backup
+     * @return string
+     */
+    public function restoreBackupForTimestampInTmp(Host $host, string $containerName, string $tarball, Backup $backup)
+    {
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
+        $configuration = new Configuration($hostname);
+        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
+
+        $session = new Session($configuration, $authentication);
+
+        $exec = $session->getExec();
+
+        $backupDestination = $backup->getDestination();
+
+        $remoteBackupPath = $backupDestination->getDestinationText().$backup->getBackupSchedule()->getName();
+
+        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($backup->getTimestamp(), DATE_ISO8601).' --file-to-restore '.$tarball.' /tmp/restore'.$backup->getBackupSchedule()->getName().'/'.$containerName.'.tar.gz';
+
+        $exec->run('rm -rf /tmp/restore'.$backup->getBackupSchedule()->getName());
+        $exec->run('mkdir /tmp/restore'.$backup->getBackupSchedule()->getName());
+        $result = $exec->run($duplicityCommand);
+
+        return $result;
     }
 }

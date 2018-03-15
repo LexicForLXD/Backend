@@ -104,32 +104,6 @@ class HostSSH
     }
 
     /**
-     * @param \DateTime $timestamp
-     * @param BackupDestination $backupDestination
-     * @param string $destinationPath
-     * @param string $containerName
-     * @param Host $host
-     */
-    public function restoreBackupForTimestampInTmp(\DateTime $timestamp, BackupDestination $backupDestination, string $destinationPath, string $containerName, Host $host)
-    {
-        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
-        $configuration = new Configuration($hostname);
-        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
-
-        $session = new Session($configuration, $authentication);
-
-        $exec = $session->getExec();
-
-        $remoteBackupPath = $backupDestination->getDestinationText().$destinationPath;
-
-        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($timestamp, DATE_ISO8601).' --file-to-restore '.$containerName.'.tar.gz /tmp/restore'.$destinationPath.'/'.$containerName.'.tar.gz';
-
-        $exec->run('rm -rf /tmp/restore'.$destinationPath);
-        $exec->run('mkdir /tmp/restore'.$destinationPath);
-        $result = $exec->run($duplicityCommand);
-    }
-
-    /**
      * @param string $tarballFolder
      * @param string $containerName
      * @param Host $host
