@@ -4,15 +4,9 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Backup;
 use AppBundle\Entity\BackupSchedule;
-use AppBundle\Entity\Image;
-use AppBundle\Entity\ImageAlias;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\ForbiddenException;
-use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
-use AppBundle\Service\LxdApi\ImageAliasApi;
-use AppBundle\Service\LxdApi\ImageApi;
-use AppBundle\Service\SSH\HostSSH;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -246,93 +240,4 @@ class BackupController extends Controller
         }
         return false;
     }
-
-    /**
-     * @Route("/backups/{backupId}/restores/containers/{containerId}", name="restore_backup_single_container", methods={"POST"})
-     * @throws ElementNotFoundException
-     * @throws WrongInputException
-     * @throws \Httpful\Exception\ConnectionErrorException
-     */
-    public function restoreBackupForSingleContainer($backupId, $containerId, EntityManagerInterface $entityManager, HostSSH $hostSSH, ImageApi $imageApi, ImageAliasApi $imageAliasApi)
-    {
-        $backup = $this->getDoctrine()->getRepository(Backup::class)->find($backupId);
-
-        if (!$backup) {
-            throw new ElementNotFoundException(
-                'No Backup for id ' . $backupId . ' found'
-            );
-        }
-
-        $containers = $backup->getContainers();
-        $container = null;
-        foreach ($containers as $containerCheck) {
-            if ($containerCheck->getId() == $containerId) {
-                $container = $containerCheck;
-                break;
-            }
-        }
-
-        if (!$container) {
-            throw new WrongInputException(
-                "The Backup doesn't contain the Container with the id " . $containerId
-            );
-        }
-
-        //Check if a BackupSchedule is set, for no it's a manual backup
-        if(!$backup->getBackupSchedule()){
-            //TODO Manual Backup restore
-        }else{
-            //Backup Schedule Backup
-            $destination = $backup->getDestination();
-            $backupSchedule = $backup->getBackupSchedule();
-            $host = $container->getHost();
-            //Calling restore command with SSH
-            $hostSSH->restoreBackupForTimestampInTmp($backup->getTimestamp(), $destination, $backupSchedule->getName(), $container->getName(), $host);
-            //TODO Error response
-
-            //Restoring image from tarball
-            $result = $hostSSH->createLXCImageFromTarball($backupSchedule->getName(), $container->getName(), $host);
-            if(strpos($result, 'error') !== false){
-                $image = new Image();
-                //Get fingerprint
-                $fingerprint = str_replace('Image imported with fingerprint: ', '', $result);
-                $image->setFingerprint($fingerprint);
-
-                $result = $imageApi->getImageByFingerprint($container->getHost() ,$fingerprint);
-
-                $image->setFilename($result->body->metadata->architecture);
-                $image->setProperties($result->body->metadata->properties);
-                $image->setPublic($result->body->metadata->public);
-                $image->setHost($host);
-                $image->setArchitecture($result->body->metadata->architecture);
-                $image->setSize($result->body->metadata->size);
-                $image->setFinished(true);
-
-                $entityManager->persist($image);
-
-                $imageAlias = new ImageAlias();
-                $imageAlias->setName($container->getName());
-                $imageAlias->setDescription('Restored Image for Container '.$container->getName().' from Backup - '.date_format($backup->getTimestamp(), DATE_ISO8601));
-
-                $imageAlias->setImage($image);
-                $image->addAlias($imageAlias);
-
-                $entityManager->persist($image);
-                $entityManager->persist($imageAlias);
-
-                $entityManager->flush();
-            }else{
-                throw new WrongInputException("Couldn't import LXC Image from tarball - LXC Error : ".$result);
-            }
-
-            //Create Container for the restored Image
-            $container = $hostSSH->restoreContainerFromImage($host, $container->getName());
-            //TODO Error response
-
-            $serializer = $this->get('jms_serializer');
-            $response = $serializer->serialize($container, 'json');
-            return new Response($response, Response::HTTP_CREATED);
-        }
-    }
-
 }
