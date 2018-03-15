@@ -6,8 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
+use Swagger\Annotations as OAS;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Entity\BackupDestination;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
@@ -15,6 +17,9 @@ use AppBundle\Entity\BackupDestination;
  * @package AppBundle\Entity
  *
  * @ORM\Entity
+ * @OAS\Schema(schema="backupSchedule", type="object")
+ * @UniqueEntity("name")
+ * @UniqueEntity("token")
  */
 class BackupSchedule
 {
@@ -24,6 +29,7 @@ class BackupSchedule
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @OAS\Property(example="14")
      */
     protected $id;
 
@@ -34,6 +40,7 @@ class BackupSchedule
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
+     * @OAS\Property(example="Schedule1")
      */
     protected $name;
 
@@ -42,6 +49,7 @@ class BackupSchedule
      *
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
+     * @OAS\Property(example="Schedule1 des")
      */
     protected $description;
 
@@ -51,6 +59,7 @@ class BackupSchedule
      * @ORM\Column(type="string")
      * @Assert\Choice({"daily", "weekly", "monthly"})
      * @Assert\Type("string")
+     * @OAS\Property(example="daily")
      */
     protected $executionTime;
 
@@ -72,6 +81,7 @@ class BackupSchedule
      * @ORM\Column(type="string")
      * @Assert\Type("string")
      * @Assert\Choice({"full", "incremental"})
+     * @OAS\Property(example="full")
      */
     protected $type;
 
@@ -84,6 +94,7 @@ class BackupSchedule
      * @ORM\Column(type="string", unique=true)
      *
      * @Assert\Type("string")
+     * @JMS\Exclude()
      *
      */
     protected $token;
@@ -113,12 +124,6 @@ class BackupSchedule
      */
     protected $backups;
 
-    /**
-     * url generator
-     *
-     * @var UrlGeneratorInterface
-     */
-    protected $urlGen;
 
     /**
      * BackupSchedule constructor.
@@ -197,7 +202,7 @@ class BackupSchedule
     /**
      * @return BackupDestination
      */
-    public function getDestination(): BackupDestination
+    public function getDestination() : BackupDestination
     {
         return $this->destination;
     }
@@ -205,7 +210,7 @@ class BackupSchedule
     /**
      * @param BackupDestination $destination
      */
-    public function setDestination($destination): void
+    public function setDestination($destination) : void
     {
         $this->destination = $destination;
     }
@@ -238,6 +243,17 @@ class BackupSchedule
     public function getContainers() : PersistentCollection
     {
         return $this->containers;
+    }
+
+    /**
+     * set Containers
+     *
+     * @param PersitentCollection $containers
+     * @return void
+     */
+    public function setContainers($containers)
+    {
+        $this->containers = $containers;
     }
 
     /**
@@ -358,7 +374,7 @@ class BackupSchedule
 
         $commandTexts = $commandTexts .
             '# Backup via duplicity \n
-            duplicity ' . $this->type . ' / tmp / ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n \n
+            duplicity ' . $this->type . ' --no-encryption /tmp/ ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n \n
             # Make api call to webhook
             curl -X POST ' . $webhookUrl . ' \n
         \n\n';
