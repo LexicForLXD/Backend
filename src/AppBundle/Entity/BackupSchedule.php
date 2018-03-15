@@ -100,6 +100,15 @@ class BackupSchedule
     protected $token;
 
     /**
+     * webhook to generate a backup
+     *
+     * @var string
+     * @ORM\Column(type="string", unique=true)
+     * @Assert\Type("string")
+     */
+    protected $webhookUrl;
+
+    /**
      * @var Container
      *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="backup_schedule")
@@ -331,10 +340,9 @@ class BackupSchedule
     /**
      * Returns the Commands which will be written in a shell script.
      *
-     * @param string $webhookUrl
      * @return string
      */
-    public function getShellCommands($webhookUrl)
+    public function getShellCommands()
     {
         $commandTexts = '#!/bin/sh \n \n';
 
@@ -376,7 +384,7 @@ class BackupSchedule
             '# Backup via duplicity \n
             duplicity ' . $this->type . ' --no-encryption /tmp/ ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n \n
             # Make api call to webhook
-            curl -X POST ' . $webhookUrl . ' \n
+            curl -X POST ' . $this->webhookUrl . ' \n
         \n\n';
 
         return $commandTexts;
@@ -397,5 +405,29 @@ class BackupSchedule
     public function setToken(string $token) : void
     {
         $this->token = $token;
+    }
+
+    /**
+     * Get webhook to generate a backup
+     *
+     * @return  string
+     */
+    public function getWebhookUrl()
+    {
+        return $this->webhookUrl;
+    }
+
+    /**
+     * Set webhook to generate a backup
+     *
+     * @param  string  $webhookUrl  webhook to generate a backup
+     *
+     * @return  self
+     */
+    public function setWebhookUrl($webhookUrl)
+    {
+        $this->webhookUrl = $webhookUrl;
+
+        return $this;
     }
 }
