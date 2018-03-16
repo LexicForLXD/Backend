@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputExceptionArray;
-use AppBundle\Service\SSH\HostSSH;
+use AppBundle\Service\SSH\ScheduleSSH;
 
 
 class BackupScheduleController extends Controller
@@ -73,7 +73,7 @@ class BackupScheduleController extends Controller
      *  ),
      * )
      */
-    public function createBackupScheduleAction(Request $request, EntityManagerInterface $em, HostSSH $sshApi)
+    public function createBackupScheduleAction(Request $request, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
 
         $containers = $this->getDoctrine()->getRepository(Container::class)->findBy(["id" => $request->get('containers')]);
@@ -92,15 +92,16 @@ class BackupScheduleController extends Controller
         $schedule->setDestination($request->get('destination'));
         $schedule->setType($request->get('type'));
         $schedule->setContainers($containers);
+        $schedule->setWebhookUrl($this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL));
 
         $this->validation($container);
 
         $em->persist($schedule);
         $em->flush();
 
-        $webhookUrl = $this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL);
 
-        $sshApi->sendAnacronFile($schedule, $webhookUrl);
+
+        $sshApi->sendAnacronFile($schedule);
         $sshApi->makeFileExecuteable($schedule);
 
         $serializer = $this->get('jms_serializer');
@@ -134,10 +135,10 @@ class BackupScheduleController extends Controller
      *
      * @param integer $scheduleId
      * @param EntityManagerInterface $em
-     * @param HostSSH $sshApi
+     * @param ScheduleSSH $sshApi
      * @return JsonResponse
      */
-    public function deleteBackupScheduleAction(int $scheduleId, EntityManagerInterface $em, HostSSH $sshApi)
+    public function deleteBackupScheduleAction(int $scheduleId, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
         $schedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($scheduleId);
 
@@ -219,10 +220,10 @@ class BackupScheduleController extends Controller
      * @param Request $request
      * @param integer $scheduleId
      * @param EntityManagerInterface $em
-     * @param HostSSH $sshApi
+     * @param ScheduleSSH $sshApi
      * @return JsonResponse
      */
-    public function updateBackupScheduleAction(Request $request, int $scheduleId, EntityManagerInterface $em, HostSSH $sshApi)
+    public function updateBackupScheduleAction(Request $request, int $scheduleId, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
         $schedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($scheduleId);
 
@@ -249,14 +250,12 @@ class BackupScheduleController extends Controller
         $schedule->setType($request->get('type'));
         $schedule->setContainers($containers);
 
+
         $this->validation($container);
 
         $em->flush($schedule);
 
-
-        $webhookUrl = $this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL);
-
-        $sshApi->sendAnacronFile($schedule, $webhookUrl);
+        $sshApi->sendAnacronFile($schedule);
         $sshApi->makeFileExecuteable($schedule);
 
         $serializer = $this->get('jms_serializer');

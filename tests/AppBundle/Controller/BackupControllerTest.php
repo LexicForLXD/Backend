@@ -212,7 +212,7 @@ class BackupControllerTest extends WebTestCase
         $backupSchedule->setName("TestBackupPlan" . mt_rand());
         $backupSchedule->setType("full");
         $backupSchedule->setDestination($backupDestination);
-        $backupSchedule->setToken("13sa4d6as6asd312asdasd");
+        $backupSchedule->setWebhookUrl("testWebhookUrl");
         $backupSchedule->addContainer($container);
 
         $this->em->persist($host);

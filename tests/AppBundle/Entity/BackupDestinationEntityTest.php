@@ -75,6 +75,7 @@ class BackupDestinationEntityTest extends WebTestCase
         $schedule->setExecutionTime('daily');
         $schedule->setType('full');
         $schedule->setDestination($destination);
+        $schedule->setWebhookUrl("testwebhook");
 
         $this->em->persist($schedule);
 
