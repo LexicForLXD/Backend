@@ -60,6 +60,14 @@ services:
             $ssh_user: '%ssh_user%'
             $ssh_passphrase: '%ssh_passphrase%'
 
+    AppBundle\Service\Restore\:
+            resource: '../../src/AppBundle/Service/Restore'
+            arguments:
+                $ssh_location: '%ssh_location%'
+                $ssh_key_location: '%ssh_key_location%'
+                $ssh_user: '%ssh_user%'
+                $ssh_passphrase: '%ssh_passphrase%'
+
     AppBundle\Service\Profile\:
         resource: '../../src/AppBundle/Service/Profile'
         public: true

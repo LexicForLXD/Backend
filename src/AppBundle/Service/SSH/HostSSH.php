@@ -2,6 +2,7 @@
 
 namespace AppBundle\Service\SSH;
 
+use AppBundle\Entity\BackupDestination;
 use AppBundle\Entity\Host;
 use AppBundle\Exception\WrongInputException;
 use Ssh\Authentication\PublicKeyFile;
