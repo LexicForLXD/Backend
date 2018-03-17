@@ -12,6 +12,7 @@ use Swagger\Annotations as OAS;
 
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
+use AppBundle\Exception\ElementNotFoundException;
 
 use AppBundle\Entity\BackupDestination;
 use AppBundle\Entity\Backup;
@@ -22,7 +23,7 @@ class BackupDestinationController extends Controller
     /**
      * List all backup destinations
      *
-     * @Route("/backupdestinations", name="backup_dest_index", methods="{GET"})
+     * @Route("/backupdestinations", name="backup_dest_index", methods={"GET"})
      *
      * @OAS\Get(path="/backupdestinations",
      *      tags={"backupdestinations"},
@@ -410,7 +411,7 @@ class BackupDestinationController extends Controller
         $em->remove($dest);
         $em->flush();
 
-        return JsonResponse(['message' => 'successful deleted'], 204);
+        return new JsonResponse(['message' => 'successful deleted'], 204);
     }
 
 
