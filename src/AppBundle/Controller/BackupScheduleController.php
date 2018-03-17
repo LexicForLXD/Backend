@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Entity\BackupSchedule;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -23,9 +24,9 @@ class BackupScheduleController extends Controller
 {
 
     /**
-     * @Route("/backups/schedules", methods={"POST"})
+     * @Route("/schedules", methods={"POST"})
      *
-     * @OAS\Post(path="/backups/schedules", tags={"backups"},
+     * @OAS\Post(path="/schedules", tags={"backups"},
      *
      *  @OAS\Parameter(
      *      description="body for backupschedule",
@@ -80,7 +81,7 @@ class BackupScheduleController extends Controller
 
         if (!$containers) {
             throw new ElementNotFoundException(
-                'No container found'
+                'No container found. You must specify at least one container to use a BackupSchedule.'
             );
         }
 
@@ -94,7 +95,7 @@ class BackupScheduleController extends Controller
         $schedule->setContainers($containers);
         $schedule->setWebhookUrl($this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL));
 
-        $this->validation($container);
+        $this->validation($schedule);
 
         $em->persist($schedule);
         $em->flush();
@@ -112,9 +113,9 @@ class BackupScheduleController extends Controller
     /**
      * Delete an existing BackupSchedule
      *
-     * @Route("/backups/schedules/{scheduleId}", methods={"DELETE"})
+     * @Route("/schedules/{scheduleId}", methods={"DELETE"})
      *
-     * @OAS\Delete(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     * @OAS\Delete(path="/schedules/{scheduleId}", tags={"backups"},
      *  @OAS\Parameter(
      *      description="Which schedule should be deleted",
      *      in="path",
@@ -159,9 +160,9 @@ class BackupScheduleController extends Controller
     /**
      * Update a BackupSchedule on the Host.
      *
-     * @Route("/backups/schedules/{scheduleId}", methods={"PUT"})
+     * @Route("/schedules/{scheduleId}", methods={"PUT"})
      *
-     * @OAS\Put(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     * @OAS\Put(path="/schedules/{scheduleId}", tags={"backups"},
      *  @OAS\Parameter(
      *      description="Which schedule should be updated",
      *      in="path",
@@ -237,7 +238,7 @@ class BackupScheduleController extends Controller
 
         if (!$containers) {
             throw new ElementNotFoundException(
-                'No container found'
+                'No container found. You must specify at least one container to use a BackupSchedule.'
             );
         }
 
@@ -251,7 +252,7 @@ class BackupScheduleController extends Controller
         $schedule->setContainers($containers);
 
 
-        $this->validation($container);
+        $this->validation($schedule);
 
         $em->flush($schedule);
 
@@ -266,9 +267,9 @@ class BackupScheduleController extends Controller
     /**
      * Show a Single Backup Schedule
      *
-     * @Route("/backups/schedules/{scheduleId}", methods={"GET"})
+     * @Route("/schedules/{scheduleId}", methods={"GET"})
      *
-     * @OAS\Get(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     * @OAS\Get(path="/schedules/{scheduleId}", tags={"backups"},
      *  @OAS\Parameter(
      *      description="Which schedule should be shown",
      *      in="path",
@@ -308,9 +309,9 @@ class BackupScheduleController extends Controller
     /**
      * List all BackupSchedules
      *
-     * @Route("/backups/schedules", methods={"GET"})
+     * @Route("/schedules", methods={"GET"})
      *
-     * @OAS\Get(path="/backups/schedules", tags={"backups"},
+     * @OAS\Get(path="/schedules", tags={"backups"},
      *  @OAS\Response(
      *      description="All schedules",
      *      response=200
