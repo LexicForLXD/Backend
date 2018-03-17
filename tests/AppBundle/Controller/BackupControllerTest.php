@@ -226,7 +226,7 @@ class BackupControllerTest extends WebTestCase
         //No OAuth2 authentication required
         $client->request(
             'POST',
-            '/backups?token=' . $backupSchedule->getToken(),
+            'webhooks/backups?token=' . $backupSchedule->getToken(),
             array(),
             array(),
             array()
