@@ -133,12 +133,8 @@ class BackupScheduleControllerTest extends WebTestCase
 
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-
-        $object = json_decode($client->getResponse()->getContent());
-
         $this->assertContains($schedule->getName(), $client->getResponse()->getContent());
 
-        // $this->assertEquals($schedule->getId(), $object->id);
 
         $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($schedule->getId());
         $backupDestination = $this->em->getRepository(BackupDestination::class)->find($backupDestination->getId());
@@ -237,12 +233,7 @@ class BackupScheduleControllerTest extends WebTestCase
 
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-
-        $object = json_decode($client->getResponse()->getContent());
-
         $this->assertContains($schedule->getName(), $client->getResponse()->getContent());
-
-        // $this->assertEquals($schedule->getId(), $object->id);
 
         $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($schedule->getId());
         $backupDestination = $this->em->getRepository(BackupDestination::class)->find($backupDestination->getId());
