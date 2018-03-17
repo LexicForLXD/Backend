@@ -11,12 +11,16 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use AppBundle\Entity\BackupSchedule;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use AppBundle\Entity\BackupSchedule;
+use AppBundle\Entity\Container;
+use AppBundle\Entity\BackupDestination;
+
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputExceptionArray;
+
 use AppBundle\Service\SSH\ScheduleSSH;
 
 
@@ -24,6 +28,8 @@ class BackupScheduleController extends Controller
 {
 
     /**
+     * Create a new backup schedule.
+     *
      * @Route("/schedules", methods={"POST"})
      *
      * @OAS\Post(path="/schedules", tags={"backups"},
@@ -73,6 +79,13 @@ class BackupScheduleController extends Controller
      *      response=404
      *  ),
      * )
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param ScheduleSSH $sshApi
+     * @return Response
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
      */
     public function createBackupScheduleAction(Request $request, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -85,12 +98,20 @@ class BackupScheduleController extends Controller
             );
         }
 
+        $destination = $this->getDoctrine()->getRepository(BackupDestination::class)->find($request->get('destination'));
+
+        if (!$destination) {
+            throw new ElementNotFoundException(
+                'No backup destination found for ID .' . $request->get('destination') . '. You can create a backup destination with another endpoint.'
+            );
+        }
+
 
         $schedule = new BackupSchedule();
         $schedule->setName($request->get('name'));
         $schedule->setDescription($request->get('description'));
         $schedule->setExecutionTime($request->get('executionTime'));
-        $schedule->setDestination($request->get('destination'));
+        $schedule->setDestination($destination);
         $schedule->setType($request->get('type'));
         $schedule->setContainers($containers);
         $schedule->setWebhookUrl($this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL));
@@ -138,6 +159,7 @@ class BackupScheduleController extends Controller
      * @param EntityManagerInterface $em
      * @param ScheduleSSH $sshApi
      * @return JsonResponse
+     * @throws ElementNotFoundException
      */
     public function deleteBackupScheduleAction(int $scheduleId, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -223,6 +245,8 @@ class BackupScheduleController extends Controller
      * @param EntityManagerInterface $em
      * @param ScheduleSSH $sshApi
      * @return JsonResponse
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
      */
     public function updateBackupScheduleAction(Request $request, int $scheduleId, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -289,7 +313,8 @@ class BackupScheduleController extends Controller
      * )
      *
      * @param integer $scheduleId
-     * @return void
+     * @return Response
+     * @throws ElementNotFoundException
      */
     public function showBackupScheduleAction(int $scheduleId)
     {
@@ -322,7 +347,8 @@ class BackupScheduleController extends Controller
      *  ),
      * )
      *
-     * @return void
+     * @return Response
+     * @throws ElementNotFoundException
      */
     public function indexBackupScheduleAction()
     {
@@ -342,6 +368,7 @@ class BackupScheduleController extends Controller
 
     /**
      * Validates a BackupSchedule Object and returns array with errors.
+     *
      * @param BackupSchedule $object
      * @return array|bool
      */
