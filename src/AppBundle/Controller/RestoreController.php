@@ -2,7 +2,6 @@
 
 namespace AppBundle\Controller;
 
-
 use AppBundle\Entity\Backup;
 use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
@@ -18,11 +17,40 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Swagger\Annotations as OAS;
 
 class RestoreController extends Controller
 {
     /**
      * Get all files in a duplicity backup
+     *
+     * @OAS\Get(path="/restores/backups/{id}",
+     *     tags={"backup-restore"},
+     *     @OAS\Parameter(
+     *      description="ID of the Backup",
+     *      name="id",
+     *      in="path",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="id",
+     *              type="int",
+     *          ),
+     *      ),
+     *      ),
+     *      @OAS\Response(
+     *          response=200,
+     *          description="Array of all Container backup tarballs included in the specified duplicity Backup",
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No Backup for the id found",
+     *      ),
+     *      @OAS\Response(
+     *          response=400,
+     *          description="Error getting the list of files from the duplicity backup",
+     *      ),
+     * )
      *
      * @Route("/restores/backups/{backupID}", name="restore_all_files_in_backup", methods={"GET"})
      * @param $backupID
@@ -53,6 +81,61 @@ class RestoreController extends Controller
 
     /**
      * Restore Backups created via BackupSchedule
+     *
+     * @OAS\Post(path="/restores/backups/{id}",
+     * tags={"backup-restore"},
+     * @OAS\Parameter(
+     *      description="ID of the Backup",
+     *      name="id",
+     *      in="path",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="id",
+     *              type="int",
+     *          ),
+     *      ),
+     * ),
+     * @OAS\Parameter(
+     *      description="Body for the Backup restore",
+     *      in="body",
+     *      name="bodyRestoreBackup",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="tarball",
+     *              example="TestContainer.tar.gz",
+     *              description="You can receive a list of all available tarballs in the Backup via the get endpoint",
+     *              type="string",
+     *          ),
+     *          @OAS\Property(
+     *              property="containerName",
+     *              example="My-Restored-Container",
+     *              description="Name of the new Container, which gets created based on the restored Image",
+     *              type="string",
+     *          ),
+     *          @OAS\Property(
+     *              property="hostID",
+     *              example="2",
+     *              description="ID of the Host, where the new Container should be created",
+     *              type="int",
+     *          ),
+     *      ),
+     *  ),
+     * @OAS\Response(
+     *  description="One of the body parameters is missing or an error occurred in the image restore process or in the Container creation",
+     *  response=400
+     * ),
+     * @OAS\Response(
+     *  description="No Backup for the ID found or no Host for the ID found",
+     *  response=404
+     * ),
+     * @OAS\Response(
+     *  description="The new Container was successfully created",
+     *  response=201,
+     *  @OAS\JsonContent(ref="#/components/schemas/container"),
+     * ),
+     * )
      *
      * @Route("/restores/backups/{backupID}", name="create_container_from_backup", methods={"POST"})
      * @param $backupID
