@@ -57,7 +57,7 @@ class BackupDestination
      * @ORM\Column(type="string")
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     * @Assert\Choice({"scp", "ftp", "file", "imap", "imaps", "rsync", "sftp", "cf+http", "http", "https", "s3", "s3+http", "u1", "u1+http", "tahoe", "webdav", "webdavs", "gdocs"})
+     * @Assert\Choice(choices={"scp", "ftp", "file", "imap", "imaps", "rsync", "sftp", "cf+http", "http", "https", "s3", "s3+http", "u1", "u1+http", "tahoe", "webdav", "webdavs", "gdocs"}, strict="true")
      * @OAS\Property(example="scp")
      * @var string
      */
