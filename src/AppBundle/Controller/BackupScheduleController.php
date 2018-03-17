@@ -10,12 +10,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use AppBundle\Entity\BackupSchedule;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use AppBundle\Entity\BackupSchedule;
+use AppBundle\Entity\Container;
+use AppBundle\Entity\BackupDestination;
+
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputExceptionArray;
+
 use AppBundle\Service\SSH\ScheduleSSH;
 
 
@@ -23,9 +28,11 @@ class BackupScheduleController extends Controller
 {
 
     /**
-     * @Route("/backups/schedules", methods={"POST"})
+     * Create a new backup schedule.
      *
-     * @OAS\Post(path="/backups/schedules", tags={"backups"},
+     * @Route("/schedules", methods={"POST"})
+     *
+     * @OAS\Post(path="/schedules", tags={"backups"},
      *
      *  @OAS\Parameter(
      *      description="body for backupschedule",
@@ -72,6 +79,13 @@ class BackupScheduleController extends Controller
      *      response=404
      *  ),
      * )
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param ScheduleSSH $sshApi
+     * @return Response
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
      */
     public function createBackupScheduleAction(Request $request, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -80,7 +94,15 @@ class BackupScheduleController extends Controller
 
         if (!$containers) {
             throw new ElementNotFoundException(
-                'No container found'
+                'No container found. You must specify at least one container to use a BackupSchedule.'
+            );
+        }
+
+        $destination = $this->getDoctrine()->getRepository(BackupDestination::class)->find($request->get('destination'));
+
+        if (!$destination) {
+            throw new ElementNotFoundException(
+                'No backup destination found for ID .' . $request->get('destination') . '. You can create a backup destination with another endpoint.'
             );
         }
 
@@ -89,12 +111,12 @@ class BackupScheduleController extends Controller
         $schedule->setName($request->get('name'));
         $schedule->setDescription($request->get('description'));
         $schedule->setExecutionTime($request->get('executionTime'));
-        $schedule->setDestination($request->get('destination'));
+        $schedule->setDestination($destination);
         $schedule->setType($request->get('type'));
         $schedule->setContainers($containers);
         $schedule->setWebhookUrl($this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL));
 
-        $this->validation($container);
+        $this->validation($schedule);
 
         $em->persist($schedule);
         $em->flush();
@@ -112,9 +134,9 @@ class BackupScheduleController extends Controller
     /**
      * Delete an existing BackupSchedule
      *
-     * @Route("/backups/schedules/{scheduleId}", methods={"DELETE"})
+     * @Route("/schedules/{scheduleId}", methods={"DELETE"})
      *
-     * @OAS\Delete(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     * @OAS\Delete(path="/schedules/{scheduleId}", tags={"backups"},
      *  @OAS\Parameter(
      *      description="Which schedule should be deleted",
      *      in="path",
@@ -137,6 +159,7 @@ class BackupScheduleController extends Controller
      * @param EntityManagerInterface $em
      * @param ScheduleSSH $sshApi
      * @return JsonResponse
+     * @throws ElementNotFoundException
      */
     public function deleteBackupScheduleAction(int $scheduleId, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -159,9 +182,9 @@ class BackupScheduleController extends Controller
     /**
      * Update a BackupSchedule on the Host.
      *
-     * @Route("/backups/schedules/{scheduleId}", methods={"PUT"})
+     * @Route("/schedules/{scheduleId}", methods={"PUT"})
      *
-     * @OAS\Put(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     * @OAS\Put(path="/schedules/{scheduleId}", tags={"backups"},
      *  @OAS\Parameter(
      *      description="Which schedule should be updated",
      *      in="path",
@@ -222,6 +245,8 @@ class BackupScheduleController extends Controller
      * @param EntityManagerInterface $em
      * @param ScheduleSSH $sshApi
      * @return JsonResponse
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
      */
     public function updateBackupScheduleAction(Request $request, int $scheduleId, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -237,7 +262,7 @@ class BackupScheduleController extends Controller
 
         if (!$containers) {
             throw new ElementNotFoundException(
-                'No container found'
+                'No container found. You must specify at least one container to use a BackupSchedule.'
             );
         }
 
@@ -251,7 +276,7 @@ class BackupScheduleController extends Controller
         $schedule->setContainers($containers);
 
 
-        $this->validation($container);
+        $this->validation($schedule);
 
         $em->flush($schedule);
 
@@ -266,9 +291,9 @@ class BackupScheduleController extends Controller
     /**
      * Show a Single Backup Schedule
      *
-     * @Route("/backups/schedules/{scheduleId}", methods={"GET"})
+     * @Route("/schedules/{scheduleId}", methods={"GET"})
      *
-     * @OAS\Get(path="/backups/schedules/{scheduleId}", tags={"backups"},
+     * @OAS\Get(path="/schedules/{scheduleId}", tags={"backups"},
      *  @OAS\Parameter(
      *      description="Which schedule should be shown",
      *      in="path",
@@ -288,7 +313,8 @@ class BackupScheduleController extends Controller
      * )
      *
      * @param integer $scheduleId
-     * @return void
+     * @return Response
+     * @throws ElementNotFoundException
      */
     public function showBackupScheduleAction(int $scheduleId)
     {
@@ -308,9 +334,9 @@ class BackupScheduleController extends Controller
     /**
      * List all BackupSchedules
      *
-     * @Route("/backups/schedules", methods={"GET"})
+     * @Route("/schedules", methods={"GET"})
      *
-     * @OAS\Get(path="/backups/schedules", tags={"backups"},
+     * @OAS\Get(path="/schedules", tags={"backups"},
      *  @OAS\Response(
      *      description="All schedules",
      *      response=200
@@ -321,7 +347,8 @@ class BackupScheduleController extends Controller
      *  ),
      * )
      *
-     * @return void
+     * @return Response
+     * @throws ElementNotFoundException
      */
     public function indexBackupScheduleAction()
     {
@@ -341,6 +368,7 @@ class BackupScheduleController extends Controller
 
     /**
      * Validates a BackupSchedule Object and returns array with errors.
+     *
      * @param BackupSchedule $object
      * @return array|bool
      */
