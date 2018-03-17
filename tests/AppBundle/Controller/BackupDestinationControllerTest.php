@@ -104,7 +104,7 @@ class BackupDestinationControllerTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertContains($dest->getName(), $client->getResponse()->getContent());
 
-        $host = $this->em->getRepository(BackupDestination::class)->find($dest->getId());
+        $dest = $this->em->getRepository(BackupDestination::class)->find($dest->getId());
         $this->em->remove($dest);
         $this->em->flush();
     }
@@ -222,8 +222,6 @@ class BackupDestinationControllerTest extends WebTestCase
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
-
-        $json = json_decode($client->getResponse()->getContent());
 
         $this->assertContains("protocol", $client->getResponse()->getContent());
     }
