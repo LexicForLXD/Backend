@@ -139,7 +139,7 @@
                 }
             }
         },
-        "/backups/schedules": {
+        "/schedules": {
             "get": {
                 "tags": [
                     "backups"
@@ -158,6 +158,7 @@
                 "tags": [
                     "backups"
                 ],
+                "summary": "Create a new backup schedule.",
                 "parameters": [
                     {
                         "name": "bodyCreateSchedule",
@@ -166,21 +167,27 @@
                         "schema": {
                             "properties": {
                                 "name": {
+                                    "description": "Create a new backup schedule.",
                                     "type": "string"
                                 },
                                 "description": {
+                                    "description": "Create a new backup schedule.",
                                     "type": "string"
                                 },
                                 "executionTime": {
+                                    "description": "Create a new backup schedule.",
                                     "type": "string"
                                 },
                                 "type": {
+                                    "description": "Create a new backup schedule.",
                                     "type": "string"
                                 },
                                 "destination": {
+                                    "description": "Create a new backup schedule.",
                                     "type": "string"
                                 },
                                 "containers": {
+                                    "description": "Create a new backup schedule.",
                                     "type": "array"
                                 }
                             }
@@ -200,7 +207,7 @@
                 }
             }
         },
-        "/backups/schedules/{scheduleId}": {
+        "/schedules/{scheduleId}": {
             "get": {
                 "tags": [
                     "backups"
