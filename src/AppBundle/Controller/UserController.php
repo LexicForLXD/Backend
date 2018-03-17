@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Leon
@@ -18,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends Controller
 {
@@ -158,24 +160,22 @@ class UserController extends Controller
      * @param EntityManagerInterface $em
      * @return JsonResponse|Response
      */
-    public function storeAction(Request $request, EntityManagerInterface $em)
+    public function storeAction(Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
     {
-        $encoder = $this->container->get('security.password_encoder');
-
         $user = new User();
-        if($request->request->has("email")) {
+        if ($request->request->has("email")) {
             $user->setEmail($request->request->get('email'));
         }
-        if($request->request->has("firstName")) {
+        if ($request->request->has("firstName")) {
             $user->setFirstName($request->request->get('firstName'));
         }
-        if($request->request->has("lastName")) {
+        if ($request->request->has("lastName")) {
             $user->setLastName($request->request->get('lastName'));
         }
-        if($request->request->has("password")) {
+        if ($request->request->has("password")) {
             $user->setPassword($encoder->encodePassword($user, $request->request->get('password')));
         }
-        if($request->request->has("username")) {
+        if ($request->request->has("username")) {
             $user->setUsername($request->request->get('username'));
         }
 
@@ -259,7 +259,7 @@ class UserController extends Controller
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
      */
-    public function updateAction(Request $request, $userId, EntityManagerInterface $em)
+    public function updateAction(Request $request, $userId, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
     {
         $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
 
@@ -269,21 +269,19 @@ class UserController extends Controller
             );
         }
 
-        $encoder = $this->container->get('security.password_encoder');
-
-        if($request->request->has("email")) {
+        if ($request->request->has("email")) {
             $user->setEmail($request->request->get('email'));
         }
-        if($request->request->has("firstName")) {
+        if ($request->request->has("firstName")) {
             $user->setFirstName($request->request->get('firstName'));
         }
-        if($request->request->has("lastName")) {
+        if ($request->request->has("lastName")) {
             $user->setLastName($request->request->get('lastName'));
         }
-        if($request->request->has("password")) {
+        if ($request->request->has("password")) {
             $user->setPassword($encoder->encodePassword($user, $request->request->get('password')));
         }
-        if($request->request->has("username")) {
+        if ($request->request->has("username")) {
             $user->setUsername($request->request->get('username'));
         }
 
