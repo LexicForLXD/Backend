@@ -22,7 +22,7 @@ security:
             security: false
 
         backup_webhook:
-            pattern: ^/backups
+            pattern: ^/webhooks/backups
             security: false
             methods: POST
 
