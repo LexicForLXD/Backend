@@ -2142,6 +2142,106 @@
                 }
             }
         },
+        "/restores/backups/{id}": {
+            "get": {
+                "tags": [
+                    "backup-restore"
+                ],
+                "summary": "Get all files in a duplicity backup",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the Backup",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "description": "Get all files in a duplicity backup",
+                                    "type": "int"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of all Container backup tarballs included in the specified duplicity Backup"
+                    },
+                    "404": {
+                        "description": "No Backup for the id found"
+                    },
+                    "400": {
+                        "description": "Error getting the list of files from the duplicity backup"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "backup-restore"
+                ],
+                "summary": "Restore Backups created via BackupSchedule",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the Backup",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "description": "Restore Backups created via BackupSchedule",
+                                    "type": "int"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "bodyRestoreBackup",
+                        "in": "body",
+                        "description": "Body for the Backup restore",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "tarball": {
+                                    "description": "You can receive a list of all available tarballs in the Backup via the get endpoint",
+                                    "type": "string",
+                                    "example": "TestContainer.tar.gz"
+                                },
+                                "containerName": {
+                                    "description": "Name of the new Container, which gets created based on the restored Image",
+                                    "type": "string",
+                                    "example": "My-Restored-Container"
+                                },
+                                "hostID": {
+                                    "description": "ID of the Host, where the new Container should be created",
+                                    "type": "int",
+                                    "example": "2"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "One of the body parameters is missing or an error occurred in the image restore process or in the Container creation"
+                    },
+                    "404": {
+                        "description": "No Backup for the ID found or no Host for the ID found"
+                    },
+                    "201": {
+                        "description": "The new Container was successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/container"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "tags": [
