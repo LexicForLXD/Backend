@@ -139,6 +139,276 @@
                 }
             }
         },
+        "/backupdestinations": {
+            "get": {
+                "tags": [
+                    "backupdestinations"
+                ],
+                "summary": "List all backup destinations",
+                "responses": {
+                    "200": {
+                        "description": "Zeigt eine Liste aller backup destinations an",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/backupdest"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No backup destinations found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "backupdestinations"
+                ],
+                "summary": "Creates a new backup destination",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for new backup dest without username and password",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "hostname": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "protocol": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "path": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for new backup dest with username and password",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "hostname": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "protocol": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "path": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "username": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "description": "Creates a new backup destination",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "gibt die neu gespeicherte backup destination zur\u00fcck",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/backupdest"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "wrong input data with array what was wrong"
+                    }
+                }
+            }
+        },
+        "/backupdestinations/{destId}": {
+            "get": {
+                "tags": [
+                    "backupdestinations"
+                ],
+                "summary": "Show one backup destination",
+                "parameters": [
+                    {
+                        "name": "destId",
+                        "in": "path",
+                        "description": "ID von anzuzeigender backup destination",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "gibt eine backup destination zur\u00fcck",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/backupdest"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No backup destination found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "backupdestinations"
+                ],
+                "summary": "Update a single backup destination",
+                "parameters": [
+                    {
+                        "name": "bodyWithoutUser",
+                        "in": "body",
+                        "description": "Parameters for update backup dest without username and password",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "hostname": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "protocol": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "path": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for update backup dest with username and password",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "hostname": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "protocol": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "path": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "username": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "description": "Update a single backup destination",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "gibt die bearbeitete backup destination zur\u00fcck",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/backupdest"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "wrong input data with array what was wrong"
+                    },
+                    "404": {
+                        "description": "No backup destination found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "backupdestinations"
+                ],
+                "summary": "Delete one backup destination",
+                "parameters": [
+                    {
+                        "name": "destId",
+                        "in": "path",
+                        "description": "ID der zu l\u00f6schenden backup destination",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "success message"
+                    },
+                    "404": {
+                        "description": "No backup destination found"
+                    },
+                    "400": {
+                        "description": "Backup destination is associated with a backup schedule"
+                    }
+                }
+            }
+        },
         "/schedules": {
             "get": {
                 "tags": [
@@ -2461,6 +2731,50 @@
                     },
                     "containerId": {
                         "example": "[1]"
+                    }
+                },
+                "type": "object"
+            },
+            "backupdest": {
+                "properties": {
+                    "id": {
+                        "description": "id",
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "DestName"
+                    },
+                    "description": {
+                        "description": "| null",
+                        "type": "string",
+                        "example": "DestDesc"
+                    },
+                    "protocol": {
+                        "description": "which protocol should be used",
+                        "type": "string",
+                        "example": "scp"
+                    },
+                    "username": {
+                        "description": "username for authentification",
+                        "type": "string",
+                        "example": "backup"
+                    },
+                    "password": {
+                        "description": "password for authentification",
+                        "type": "string",
+                        "example": "secret"
+                    },
+                    "hostname": {
+                        "description": "hostname of backup destination",
+                        "type": "string",
+                        "example": "192.168.1.2"
+                    },
+                    "path": {
+                        "description": "path to backups",
+                        "type": "string",
+                        "example": "/path/to/backups"
                     }
                 },
                 "type": "object"
