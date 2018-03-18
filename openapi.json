@@ -97,7 +97,7 @@
                 }
             }
         },
-        "/backups?token={token}": {
+        "webhooks/backups?token={token}": {
             "post": {
                 "tags": [
                     "backups"
