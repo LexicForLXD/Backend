@@ -391,6 +391,11 @@ class BackupDestinationController extends Controller
      *      response=404,
      *      description="No backup destination found",
      *  ),
+     *
+     *  @OAS\Response(
+     *      response=400,
+     *      description="Backup destination is associated with a backup schedule",
+     *  ),
      * )
      *
      * @param integer $destId
@@ -408,10 +413,14 @@ class BackupDestinationController extends Controller
             );
         }
 
+        if ($dest->getBackupSchedules()) {
+            throw new WrongInputException('Please first remove this backup destination from the backup schedule.');
+        }
+
         $em->remove($dest);
         $em->flush();
 
-        return new JsonResponse(['message' => 'successful deleted'], 204);
+        return new JsonResponse([], 204);
     }
 
 
