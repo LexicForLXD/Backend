@@ -413,7 +413,7 @@ class BackupDestinationController extends Controller
             );
         }
 
-        if ($dest->getBackupSchedules()) {
+        if (!$dest->getBackupSchedules()->isEmpty()) {
             throw new WrongInputException('Please first remove this backup destination from the backup schedule.');
         }
 
