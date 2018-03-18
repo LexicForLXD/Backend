@@ -108,14 +108,14 @@ class BackupController extends Controller
     /**
      * Webhook to create a new Backup object based on a Backup Schedule
      *
-     * @Route("/backups", name="create_backup_with_schedule_webhook", methods={"POST"})
+     * @Route("/webhooks/backups", name="create_backup_with_schedule_webhook", methods={"POST"})
      *
      * @param Request $request
      * @param EntityManagerInterface $em
      * @return Response
      * @throws ForbiddenException
      * @throws WrongInputExceptionArray
-     * @OAS\Post(path="/backups?token={token}",
+     * @OAS\Post(path="webhooks/backups?token={token}",
      * tags={"backups"},
      * @OAS\Parameter(
      *      description="The authorization token set in the Backup Schedule",
