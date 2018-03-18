@@ -7,13 +7,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use AppBundle\Entity\BackupSchedule;
+use Swagger\Annotations as OAS;
 
 /**
  * Class BackupDestination
  * @package AppBundle\Entity
  *
  * @ORM\Entity
+ * @OAS\Schema(schema="backupdest", type="object")
+ * @UniqueEntity("name")
  */
 class BackupDestination
 {
@@ -23,6 +27,7 @@ class BackupDestination
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @OAS\Property(example="1")
      * @var integer
      */
     protected $id;
@@ -31,9 +36,9 @@ class BackupDestination
      * @var string
      *
      * @ORM\Column(type="string", unique=true, nullable=false)
-     * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
+     * @OAS\Property(example="DestName")
      */
     protected $name;
 
@@ -42,6 +47,7 @@ class BackupDestination
      *
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
+     * @OAS\Property(example="DestDesc")
      */
     protected $description;
 
@@ -49,9 +55,10 @@ class BackupDestination
      * which protocol should be used
      *
      * @ORM\Column(type="string")
-     * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
+     * @Assert\Choice(choices={"scp", "ftp", "file", "imap", "imaps", "rsync", "sftp", "cf+http", "http", "https", "s3", "s3+http", "u1", "u1+http", "tahoe", "webdav", "webdavs", "gdocs"}, strict="true")
+     * @OAS\Property(example="scp")
      * @var string
      */
     protected $protocol;
@@ -61,6 +68,7 @@ class BackupDestination
      *
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
+     * @OAS\Property(example="backup")
      * @var string
      */
     protected $username;
@@ -70,6 +78,7 @@ class BackupDestination
      *
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
+     * @OAS\Property(example="secret")
      * @var string
      */
     protected $password;
@@ -78,7 +87,9 @@ class BackupDestination
     /**
      * hostname of backup destination
      *
+     * @Assert\Type("string")
      * @ORM\Column(type="string", nullable=true)
+     * @OAS\Property(example="192.168.1.2")
      * @var string
      */
     protected $hostname;
@@ -88,6 +99,9 @@ class BackupDestination
      * path to backups
      *
      * @ORM\Column(type="string")
+     * @Assert\Type("string")
+     * @Assert\NotNull()
+     * @OAS\Property(example="/path/to/backups")
      * @var string
      */
     protected $path;
