@@ -11,6 +11,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
 use AppBundle\Exception\ElementNotFoundException;
+use AppBundle\Exception\WrongInputExceptionArray;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
@@ -179,10 +180,7 @@ class UserController extends Controller
             $user->setUsername($request->request->get('username'));
         }
 
-
-        if ($errorArray = $this->validation($user)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
-        }
+        $this->validation($user);
 
         $em->persist($user);
         $em->flush();
@@ -286,9 +284,7 @@ class UserController extends Controller
         }
 
 
-        if ($errorArray = $this->validation($user)) {
-            return new JsonResponse(['errors' => $errorArray], 400);
-        }
+        $this->validation($user);
 
         $em->flush($user);
 
@@ -340,5 +336,29 @@ class UserController extends Controller
         $em->flush();
 
         return $this->json([], 204);
+    }
+
+
+    /**
+     * Validates a User Object and returns array with errors.
+     *
+     * @param User $object
+     * @return array|bool
+     */
+    private function validation(User $object)
+    {
+        $validator = $this->get('validator');
+        $errors = $validator->validate($object);
+
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            throw new WrongInputExceptionArray($errorArray);
+            return $errorArray;
+
+        }
+        return false;
     }
 }
