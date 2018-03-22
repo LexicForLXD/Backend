@@ -11,6 +11,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Host;
 use AppBundle\Exception\ElementNotFoundException;
+use Httpful\Exception\ConnectionErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,9 +75,13 @@ class HostController extends Controller
      * @param HostApi $api
      * @return Response
      *
+     * @throws WrongInputExceptionArray
+     * @throws \Httpful\Exception\ConnectionErrorException
+     *
+     *
      * @OAS\POST(path="/hosts",
      *  tags={"hosts"},
-     *  @OAS\Response(
+     * @OAS\Response(
      *     response=201,
      *     description="gibt den neu gespeicherten Host zurück",
      *     @OAS\JsonContent(ref="#/components/schemas/host"),
@@ -85,7 +90,7 @@ class HostController extends Controller
      *     ),
      *  ),
      *
-     *  @OAS\Parameter(
+     * @OAS\Parameter(
      *      description="Parameters for new Host",
      *      name="body",
      *      in="body",
@@ -126,7 +131,6 @@ class HostController extends Controller
      *      ),
      * ),
      *)
-     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function storeAction(Request $request, EntityManagerInterface $em, HostApi $api)
     {
@@ -164,7 +168,7 @@ class HostController extends Controller
 
         try{
             $authenticated = $api->trusted($host);
-        } catch(\Httpful\Exception\ConnectionErrorException $e){
+        } catch(ConnectionErrorException $e){
             $authenticated = false;
         }
 
@@ -247,8 +251,9 @@ class HostController extends Controller
      * @param HostApi $api
      * @return Response
      *
+     * @throws ConnectionErrorException
      * @throws ElementNotFoundException
-     * @throws \Httpful\Exception\ConnectionErrorException
+     * @throws WrongInputExceptionArray
      *
      * @OAS\Put(path="/hosts/{hostId}",
      *  tags={"hosts"},
@@ -367,13 +372,16 @@ class HostController extends Controller
      * Delete a Host by hostID
      *
      * @Route("/hosts/{hostId}", name="hosts_delete", methods={"DELETE"})
-     * @param $hostId
+     * @param int $hostId
      * @param EntityManagerInterface $em
      * @return Response
      *
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     *
      * @OAS\Delete(path="/hosts/{hostId}",
      *  tags={"hosts"},
-     *  @OAS\Parameter(
+     * @OAS\Parameter(
      *     description="ID von anzuzeigendem Host",
      *     in="path",
      *     name="hostId",
@@ -383,12 +391,11 @@ class HostController extends Controller
      *     ),
      *  ),
      *
-     *  @OAS\Response(
+     * @OAS\Response(
      *     response=204,
      *     description="löscht einen Host"
      *  ),
      * )
-     * @throws ElementNotFoundException
      */
     public function deleteAction(int $hostId, EntityManagerInterface $em)
     {
@@ -423,9 +430,9 @@ class HostController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      *
+     * @throws ConnectionErrorException
      * @throws ElementNotFoundException
-     * @throws \Httpful\Exception\ConnectionErrorException
-     *
+     * @throws WrongInputException
      *
      * @OAS\Post(path="/hosts/{hostId}/authorization",
      *  tags={"hosts"},
@@ -460,7 +467,6 @@ class HostController extends Controller
      *      response = 400,
      *      description="liefert den Fehler zurück."
      * ))
-     *
      */
     public function authorizeAction(Request $request, $hostId, HostApi $api, EntityManagerInterface $em)
     {
@@ -488,7 +494,7 @@ class HostController extends Controller
             if($result->code != 201)
             {
                 $host->setAuthenticated(false);
-                throw new WrongInputExceptionArray($result->body);
+                throw new WrongInputException($result->body);
             } else {
                 $host->setAuthenticated(true);
             }
@@ -502,6 +508,7 @@ class HostController extends Controller
     /**
      * @param $object
      * @return array|bool
+     * @throws WrongInputExceptionArray
      */
     private function validation($object)
     {
@@ -514,7 +521,6 @@ class HostController extends Controller
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
             throw new WrongInputExceptionArray($errorArray);
-            return $errorArray;
         }
         return false;
     }
