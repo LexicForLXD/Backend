@@ -5,6 +5,9 @@ namespace AppBundle\Service\Restore;
 use AppBundle\Entity\Backup;
 use AppBundle\Entity\Host;
 use AppBundle\Exception\WrongInputException;
+use Ssh\Authentication\PublicKeyFile;
+use Ssh\Configuration;
+use Ssh\Session;
 
 class RestoreService
 {
