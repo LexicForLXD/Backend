@@ -37,7 +37,6 @@ class BackupSchedule
      * @var string
      *
      * @ORM\Column(type="string", unique=true, nullable=false)
-     * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
      * @OAS\Property(example="Schedule1")
@@ -57,7 +56,7 @@ class BackupSchedule
      * @var string
      *
      * @ORM\Column(type="string")
-     * @Assert\Choice({"daily", "weekly", "monthly"})
+     * @Assert\Choice({"daily", "weekly", "monthly"}, strict="true")
      * @Assert\Type("string")
      * @OAS\Property(example="daily")
      */
@@ -80,7 +79,7 @@ class BackupSchedule
      *
      * @ORM\Column(type="string")
      * @Assert\Type("string")
-     * @Assert\Choice({"full", "incremental"})
+     * @Assert\Choice({"full", "incremental"}, strict="true")
      * @OAS\Property(example="full")
      */
     protected $type;
