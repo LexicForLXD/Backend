@@ -32,10 +32,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
 
 
-use \Symfony\Component\VarDumper\VarDumper;
-
-
-
 
 class ContainerController extends Controller
 {
@@ -112,6 +108,7 @@ class ContainerController extends Controller
      * @param ContainerApi $api
      * @param EntityManagerInterface $em
      * @return Response
+     * @throws ElementNotFoundException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function listFromHostAction(Request $request, int $hostId, ContainerApi $api, EntityManagerInterface $em)
@@ -386,7 +383,7 @@ class ContainerController extends Controller
 
         $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
 
-
+        $this->checkProfiles($profiles, $request->get("profiles"));
 
         $profileNames = array();
 
@@ -606,6 +603,7 @@ class ContainerController extends Controller
      * @param ContainerApi $api
      * @param EntityManagerInterface $em
      * @return Object|Response
+     * @throws ElementNotFoundException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function showSingleAction(Request $request, int $containerId, ContainerApi $api, EntityManagerInterface $em)
@@ -662,7 +660,11 @@ class ContainerController extends Controller
      * @param int $containerId
      * @param EntityManagerInterface $em
      * @param ContainerApi $api
+     * @param ContainerStateApi $stateApi
      * @return JsonResponse
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi)
     {
@@ -705,7 +707,10 @@ class ContainerController extends Controller
      * @param EntityManagerInterface $em
      * @param ContainerApi $api
      * @param OperationApi $operationApi
+     * @return Response
+     * @throws ElementNotFoundException
      * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      * @throws \Httpful\Exception\ConnectionErrorException
      * @Route("/containers/{containerId}", name="containers_update", methods={"PUT"})
      *
@@ -814,6 +819,8 @@ class ContainerController extends Controller
                 $profileNames[] = $profile->getName();
             }
 
+            $this->checkProfiles($profiles, $request->get("profiles"));
+
             if (!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral")) {
                 throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
             }
@@ -857,6 +864,7 @@ class ContainerController extends Controller
      * Validates a Container Object and returns array with errors.
      * @param Container $object
      * @return array|bool
+     * @throws WrongInputExceptionArray
      */
     private function validation(Container $object)
     {
@@ -869,10 +877,38 @@ class ContainerController extends Controller
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
             throw new WrongInputExceptionArray($errorArray);
-            return $errorArray;
-
         }
         return false;
+    }
+
+
+    /**
+     * @param array $profiles
+     * @param array $profilesRequest
+     * @return bool
+     * @throws WrongInputExceptionArray
+     */
+    private function checkProfiles(Array $profiles, Array $profilesRequest)
+    {
+        if(count($profiles) == count($profilesRequest))
+        {
+            return true;
+        }
+
+        $profilesDB = array();
+
+        foreach ($profiles as $profile)
+        {
+            $profilesDB[] = $profile->getId();
+        }
+
+        $errors = array_diff($profilesRequest, $profilesDB);
+
+        $errorArray = array();
+        foreach ($errors as $error) {
+            $errorArray[] = 'The profile with the id ' . $error . ' is not present in our database.';
+        }
+        throw new WrongInputExceptionArray($errorArray);
     }
 
 }
