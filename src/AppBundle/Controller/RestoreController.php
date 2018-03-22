@@ -175,63 +175,62 @@ class RestoreController extends Controller
 
         //Restoring image from tarball
         $result = $restoreService->createLXCImageFromTarball($host ,$containerName, $backup);
-        if(strpos($result, 'error') !== false){
-            $image = new Image();
-            //Get fingerprint
-            $fingerprint = str_replace('Image imported with fingerprint: ', '', $result);
-            $image->setFingerprint($fingerprint);
 
-            $result = $imageApi->getImageByFingerprint($host ,$fingerprint);
-
-            $image->setFilename($result->body->metadata->architecture);
-            $image->setProperties($result->body->metadata->properties);
-            $image->setPublic($result->body->metadata->public);
-            $image->setHost($host);
-            $image->setArchitecture($result->body->metadata->architecture);
-            $image->setSize($result->body->metadata->size);
-            $image->setFinished(true);
-
-            $entityManager->persist($image);
-
-            $imageAlias = new ImageAlias();
-            $imageAlias->setName($containerName);
-            $imageAlias->setDescription('Restored Image for Container '.$containerName.' from Backup - '.date_format($backup->getTimestamp(), DATE_ISO8601));
-
-            $imageAlias->setImage($image);
-            $image->addAlias($imageAlias);
-
-            $entityManager->persist($image);
-            $entityManager->persist($imageAlias);
-
-            $entityManager->flush();
-        }else{
-            throw new WrongInputException("Couldn't import LXC Image from tarball - LXC Error : ".$result);
+        if (strpos($result, 'error') !== false) {
+            throw new WrongInputException("Couldn't import LXC Image from tarball - LXC Error : " . $result);
         }
+
+        $image = new Image();
+        //Get fingerprint
+        $fingerprint = str_replace('Image imported with fingerprint: ', '', $result);
+        $image->setFingerprint($fingerprint);
+
+        $result = $imageApi->getImageByFingerprint($host, $fingerprint);
+
+        $image->setFilename($result->body->metadata->architecture);
+        $image->setProperties($result->body->metadata->properties);
+        $image->setPublic($result->body->metadata->public);
+        $image->setHost($host);
+        $image->setArchitecture($result->body->metadata->architecture);
+        $image->setSize($result->body->metadata->size);
+        $image->setFinished(true);
+
+        $entityManager->persist($image);
+
+        $imageAlias = new ImageAlias();
+        $imageAlias->setName($containerName);
+        $imageAlias->setDescription('Restored Image for Container ' . $containerName . ' from Backup - ' . date_format($backup->getTimestamp(), DATE_ISO8601));
+
+        $imageAlias->setImage($image);
+        $image->addAlias($imageAlias);
+
+        $entityManager->persist($image);
+        $entityManager->persist($imageAlias);
+
+        $entityManager->flush();
 
         //Create Container for the restored Image
         $result = $restoreService->restoreContainerFromImage($host, $containerName);
-        if(strpos($result, 'error') !== false){
-
-            $result = $containerApi->show($host, $containerName);
-
-            $container = new Container();
-            $container->setName($containerName);
-            $container->setHost($host);
-            $container->setSettings($result->body->metadata);
-            $container->setState(strtolower($result->body->metadata->status));
-
-            $container->setImage($image);
-            $image->addContainer($container);
-
-            $entityManager->persist($container);
-            $entityManager->merge($image);
-
-            $entityManager->flush();
-
-        }else{
+        if (strpos($result, 'error') !== false) {
             $error = substr(strpos($result, 'error'), $result);
-            throw new WrongInputException("Couldn't create Container from the imported Image - LXC Error : ".$error);
+            throw new WrongInputException("Couldn't create Container from the imported Image - LXC Error : " . $error);
         }
+
+        $result = $containerApi->show($host, $containerName);
+
+        $container = new Container();
+        $container->setName($containerName);
+        $container->setHost($host);
+        $container->setSettings($result->body->metadata);
+        $container->setState(strtolower($result->body->metadata->status));
+
+        $container->setImage($image);
+        $image->addContainer($container);
+
+        $entityManager->persist($container);
+        $entityManager->merge($image);
+
+        $entityManager->flush();
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
