@@ -174,7 +174,7 @@ class RestoreController extends Controller
         $restoreService->restoreBackupForTimestampInTmp($host, $containerName, $tarball, $backup);
 
         //Restoring image from tarball
-        $result = $restoreService->createLXCImageFromTarball($host ,$backup, $containerName);
+        $result = $restoreService->createLXCImageFromTarball($host ,$containerName, $backup);
         if(strpos($result, 'error') !== false){
             $image = new Image();
             //Get fingerprint
