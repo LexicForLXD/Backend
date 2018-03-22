@@ -356,7 +356,7 @@ class BackupSchedule
                 r=$(($(od -An -N1 -i /dev/random))) 
                 
                 # Generating a snapshot of the container to build the image from 
-                lxc snapshot ' . $container->getName() . '/"$r" 
+                lxc snapshot ' . $container->getName() . ' "$r" 
                 
                 # Build the image to be exported 
                 f=$(lxc publish ' . $container->getName() . '/"$r") 
