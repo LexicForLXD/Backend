@@ -351,8 +351,8 @@ class BackupSchedule
             $commandTexts = $commandTexts . '
                 # Backup for Container ' . $container->getName() . ' to ' . $this->destination->getName() . '
                 
-                DIRECTORY = /tmp/' . $this->name . '/ 
-                CONTAINER = ' . $container->getName() . '
+                DIRECTORY=/tmp/' . $this->name . '/ 
+                CONTAINER=' . $container->getName() . '
                 
                 # Just generating a random number 
                 r=$(($(od -An -N1 -i /dev/random))) 
