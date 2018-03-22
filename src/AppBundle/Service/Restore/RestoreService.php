@@ -42,7 +42,7 @@ class RestoreService
 
         $remoteBackupPath = $backupDestination->getDestinationText().$backupSchedule->getName();
 
-        exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath, $result);
+        exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath.' 2>&1 &', $result);
 
         if(strpos($result, 'Error') !== false){
             return substr($result, strpos($result, 'Error'));
