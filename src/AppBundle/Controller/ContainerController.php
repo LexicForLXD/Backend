@@ -509,8 +509,22 @@ class ContainerController extends Controller
                 $container->setImage($oldContainer->getImage());
 
                 break;
+            case 'none':
+                $data = [
+                    "name" => $request->request->get("name"),
+                    "architecture" => $request->get("architecture", 'x86_64'),
+                    "profiles" => $profileNames,
+                    "ephemeral" => $request->get("ephemeral", false),
+                    "config" => $request->get("config"),
+                    "devices" => $request->get("devices"),
+                    "source" => [
+                        "type" => "none"
+                    ]
+                ];
+
+                break;
             default:
-                return new JsonResponse(["message" => "none"]);
+                throw new WrongInputException("The type was wrong. Either use image, migration, copy or none.");
         }
 
         $container->setHost($host);
