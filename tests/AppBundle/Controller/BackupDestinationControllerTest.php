@@ -145,7 +145,7 @@ class BackupDestinationControllerTest extends WebTestCase
         $this->assertEquals("desc", $dest->getDescription());
         $this->assertEquals("ftp", $dest->getProtocol());
         $this->assertEquals("host.local", $dest->getHostname());
-        $this->assertEquals("/path", $dest->getPath());
+        $this->assertEquals("path", $dest->getPath());
 
         $this->em->remove($dest);
         $this->em->flush();
@@ -277,7 +277,7 @@ class BackupDestinationControllerTest extends WebTestCase
         $this->assertEquals("desc", $dest->getDescription());
         $this->assertEquals("ftp", $dest->getProtocol());
         $this->assertEquals("host.local", $dest->getHostname());
-        $this->assertEquals("/path", $dest->getPath());
+        $this->assertEquals("path", $dest->getPath());
 
         $this->em->remove($dest);
         $this->em->flush();
@@ -390,7 +390,7 @@ class BackupDestinationControllerTest extends WebTestCase
         $this->assertEquals("desc1", $dest->getDescription());
         $this->assertEquals("scp", $dest->getProtocol());
         $this->assertEquals("host.local", $dest->getHostname());
-        $this->assertEquals("/path/again", $dest->getPath());
+        $this->assertEquals("path/again", $dest->getPath());
 
         $this->em->remove($dest);
         $this->em->flush();
