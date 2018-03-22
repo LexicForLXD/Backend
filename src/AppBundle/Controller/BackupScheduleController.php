@@ -7,12 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use AppBundle\Entity\BackupSchedule;
 use AppBundle\Entity\Container;
@@ -22,6 +19,7 @@ use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputExceptionArray;
 
 use AppBundle\Service\SSH\ScheduleSSH;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
 class BackupScheduleController extends Controller
@@ -85,7 +83,7 @@ class BackupScheduleController extends Controller
      * @param ScheduleSSH $sshApi
      * @return Response
      * @throws ElementNotFoundException
-     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
     public function createBackupScheduleAction(Request $request, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -114,7 +112,7 @@ class BackupScheduleController extends Controller
         $schedule->setDestination($destination);
         $schedule->setType($request->get('type'));
         $schedule->setContainers($containers);
-        $schedule->setWebhookUrl($this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGerneratorInterface::ABSOLUTE_URL));
+        $schedule->setWebhookUrl($this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGeneratorInterface::ABSOLUTE_URL));
 
         $this->validation($schedule);
 
