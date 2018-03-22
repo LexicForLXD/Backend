@@ -165,7 +165,7 @@ class BackupScheduleController extends Controller
 
         if (!$schedule) {
             throw new ElementNotFoundException(
-                'No backupschedule found for id ' . $scheduleId
+                'No backup schedule found for id ' . $scheduleId
             );
         }
 
@@ -174,7 +174,7 @@ class BackupScheduleController extends Controller
         $em->remove($schedule);
         $em->flush();
 
-        return JsonResponse(["message" => "successful deleted", 204]);
+        return new JsonResponse([], 204);
     }
 
     /**
@@ -242,9 +242,9 @@ class BackupScheduleController extends Controller
      * @param integer $scheduleId
      * @param EntityManagerInterface $em
      * @param ScheduleSSH $sshApi
-     * @return JsonResponse
+     * @return Response
      * @throws ElementNotFoundException
-     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
     public function updateBackupScheduleAction(Request $request, int $scheduleId, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -252,7 +252,7 @@ class BackupScheduleController extends Controller
 
         if (!$schedule) {
             throw new ElementNotFoundException(
-                'No backupschedule found for id ' . $scheduleId
+                'No backup schedule found for id ' . $scheduleId
             );
         }
 
@@ -320,7 +320,7 @@ class BackupScheduleController extends Controller
 
         if (!$schedule) {
             throw new ElementNotFoundException(
-                'No backupschedule found for id ' . $scheduleId
+                'No backup schedule found for id ' . $scheduleId
             );
         }
 
@@ -354,7 +354,7 @@ class BackupScheduleController extends Controller
 
         if (!$schedules) {
             throw new ElementNotFoundException(
-                'No backupschedules found'
+                'No backup schedules found'
             );
         }
 
@@ -369,6 +369,7 @@ class BackupScheduleController extends Controller
      *
      * @param BackupSchedule $object
      * @return array|bool
+     * @throws WrongInputExceptionArray
      */
     private function validation(BackupSchedule $object)
     {
@@ -381,7 +382,6 @@ class BackupScheduleController extends Controller
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
             throw new WrongInputExceptionArray($errorArray);
-            return $errorArray;
 
         }
         return false;
