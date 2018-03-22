@@ -183,6 +183,9 @@ class RestoreController extends Controller
         $image = new Image();
         //Get fingerprint
         $fingerprint = str_replace('Image imported with fingerprint: ', '', $result);
+        //Remove line break \n at the end of the string
+        $fingerprint = preg_replace( "/\r|\n/", "", $fingerprint );
+
         $image->setFingerprint($fingerprint);
 
         $result = $imageApi->getImageByFingerprint($host, $fingerprint);
