@@ -370,6 +370,7 @@ class ContainerController extends Controller
      */
     public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi, HostApi $hostApi, OperationApi $operationApi)
     {
+        $type = $request->query->get('type');
 
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -379,18 +380,19 @@ class ContainerController extends Controller
             );
         }
 
-        $type = $request->query->get('type');
+        if($request->request->has('profiles'))
+        {
+            $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
 
-        $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
+            $this->checkProfiles($profiles, $request->get("profiles"));
 
-        $this->checkProfiles($profiles, $request->get("profiles"));
+            $profileNames = array();
 
-        $profileNames = array();
-
-
-        foreach ($profiles as $profile) {
-            $profileNames[] = $profile->getName();
+            foreach ($profiles as $profile) {
+                $profileNames[] = $profile->getName();
+            }
         }
+
 
         $container = new Container();
 
