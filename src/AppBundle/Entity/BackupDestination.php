@@ -364,6 +364,16 @@ class BackupDestination
      */
     public function setPath($path)
     {
+        if(substr($path, 0, 1) == '/')
+        {
+            $path = substr_replace($path, '',0,1);
+        }
+
+        if(substr($path, -1) == '/')
+        {
+            $path = substr_replace($path, '',-1);
+        }
+
         $this->path = $path;
 
         return $this;
@@ -373,7 +383,7 @@ class BackupDestination
     /**
      * Get text for duplicity command
      *
-     * @return void
+     * @return string
      */
     public function getDestinationText()
     {
