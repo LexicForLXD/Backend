@@ -349,43 +349,48 @@ class BackupSchedule
 
         foreach ($this->containers as $container) {
             $commandTexts = $commandTexts . '
-                # Backup for Container ' . $container->getName() . ' to ' . $this->destination->getName() . '\n
-                \n
-                DIRECTORY = /tmp/' . $this->name . '/ \n
-                # Just generating a random number \n
-                r=$(($(od -An -N1 -i /dev/random))) \n
-                \n
-                # Generating a snapshot of the container to build the image from \n
-                lxc snapshot ' . $container->getName() . '/"$r" \n
-                \n
-                # Build the image to be exported \n
-                f=$(lxc publish ' . $container->getName() . '/"$r") \n
-                fingerprint=${f##*: } \n
-                \n
-                # Make dir for backups in /tmp if it not exists \n
-                if [ -d "$DIRECTORY" ]; then \n
-                    rm -Rf "$DIRECTORY" \n
-                fi \n
-                mkdir "$DIRECTORY" \n
-                \n
-                # Export the image \n
-                lxc image export "$fingerprint" "$DIRECTORY"' . $container->getName() . ' \n
-                \n
+                # Backup for Container ' . $container->getName() . ' to ' . $this->destination->getName() . '
+                
+                DIRECTORY = /tmp/' . $this->name . '/ 
+                # Just generating a random number 
+                r=$(($(od -An -N1 -i /dev/random))) 
+                
+                # Generating a snapshot of the container to build the image from 
+                lxc snapshot ' . $container->getName() . '/"$r" 
+                
+                # Build the image to be exported 
+                f=$(lxc publish ' . $container->getName() . '/"$r") 
+                fingerprint=${f##*: } 
+                
+                # Make dir for backups in /tmp if it not exists 
+                if [ -d "$DIRECTORY" ]; then 
+                    rm -Rf "$DIRECTORY" 
+                fi 
+                mkdir "$DIRECTORY" 
+                
+                # Export the image 
+                lxc image export "$fingerprint" "$DIRECTORY"' . $container->getName() . ' 
+                
 
-                # Delete the snapshot \n
-                lxc delete ' . $container->getName() . '/"$r" \n
-                \n
-                # Delete the image \n
-                lxc image delete "$fingerprint"\n \n \n
+                # Delete the snapshot 
+                lxc delete ' . $container->getName() . '/"$r" 
+                
+                # Delete the image 
+                lxc image delete "$fingerprint"
+                
+                
             ';
         }
 
         $commandTexts = $commandTexts .
-            '# Backup via duplicity \n
-            duplicity ' . $this->type . ' --no-encryption /tmp/ ' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' \n \n
+            '# Backup via duplicity 
+            duplicity ' . $this->type . ' --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . ' 
+            
+            
             # Make api call to webhook
-            curl -X POST ' . $this->webhookUrl . ' \n
-        \n\n';
+            curl -X -k POST ' . $this->webhookUrl . '
+            
+        ';
 
         return $commandTexts;
     }
