@@ -95,7 +95,7 @@ class RestoreService
 
         $remoteBackupPath = $backupDestination->getDestinationText().$backup->getBackupSchedule()->getName();
 
-        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($backup->getTimestamp(), DATE_ISO8601).' --file-to-restore '.$tarball.' /tmp/restore'.$backup->getBackupSchedule()->getName().'/'.$containerName.'.tar.gz';
+        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($backup->getTimestamp(), DATE_ATOM).' --file-to-restore '.$tarball.' /tmp/restore'.$backup->getBackupSchedule()->getName().'/'.$containerName.'.tar.gz';
 
         $exec->run('rm -rf /tmp/restore'.$backup->getBackupSchedule()->getName());
         $exec->run('mkdir /tmp/restore'.$backup->getBackupSchedule()->getName());
