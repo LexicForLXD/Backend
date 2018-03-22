@@ -362,6 +362,7 @@ class ContainerController extends Controller
      * @param OperationApi $operationApi
      * @return Response
      * @throws ElementNotFoundException
+     * @throws WrongInputException
      * @throws WrongInputExceptionArray
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
