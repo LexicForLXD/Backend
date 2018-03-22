@@ -494,7 +494,7 @@ class HostController extends Controller
             if($result->code != 201)
             {
                 $host->setAuthenticated(false);
-                throw new WrongInputException($result->body);
+                throw new WrongInputException($result->body->error);
             } else {
                 $host->setAuthenticated(true);
             }
