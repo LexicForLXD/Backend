@@ -407,6 +407,13 @@ class ContainerController extends Controller
                     "source" => []
                 ];
 
+                if(!$request->request->has("fingerprint") && !$request->request->has("alias"))
+                {
+                    throw new WrongInputException(
+                        'You have to pass either a fingerprint or an alias for the image.'
+                    );
+                }
+
                 if ($request->request->has("fingerprint")) {
                     $image = $this->getDoctrine()->getRepository(Image::class)->findOneBy(["fingerprint" => $request->get("fingerprint")]);
 
@@ -416,12 +423,7 @@ class ContainerController extends Controller
                         );
                     }
 
-                    $container->setImage($image);
 
-                    $data["source"] = [
-                        "type" => "image",
-                        "fingerprint" => $image->getFingerPrint()
-                    ];
                 }
 
                 if ($request->request->has("alias")) {
@@ -434,12 +436,23 @@ class ContainerController extends Controller
                     }
 
                     $image = $imageAlias->getImage();
-                    $container->setImage($image);
-                    $data["source"] = [
-                        "type" => "image",
-                        "fingerprint" => $image->getFingerPrint()
-                    ];
+
                 }
+
+
+                if($host !== $image->getHost())
+                {
+                    throw new WrongInputException(
+                        'The image you selected is not available on the selected host.'
+                    );
+                }
+
+                $container->setImage($image);
+
+                $data["source"] = [
+                    "type" => "image",
+                    "fingerprint" => $image->getFingerPrint()
+                ];
 
                 break;
             case 'migration':
