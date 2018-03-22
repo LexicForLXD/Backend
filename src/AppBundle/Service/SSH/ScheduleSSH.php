@@ -43,7 +43,7 @@ class ScheduleSSH
      */
     public function sendAnacronFile(BackupSchedule $backupSchedule)
     {
-        $host->$backupSchedule->getContainers()[0]->getHost();
+        $host = $backupSchedule->getContainers()[0]->getHost();
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
@@ -66,7 +66,7 @@ class ScheduleSSH
      */
     public function makeFileExecuteable(BackupSchedule $backupSchedule)
     {
-        $host->$backupSchedule->getContainers()[0]->getHost();
+        $host = $backupSchedule->getContainers()[0]->getHost();
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
@@ -88,7 +88,7 @@ class ScheduleSSH
      */
     public function deleteAnacronFile(BackupSchedule $backupSchedule)
     {
-        $host->$backupSchedule->getContainers()[0]->getHost();
+        $host = $backupSchedule->getContainers()[0]->getHost();
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
