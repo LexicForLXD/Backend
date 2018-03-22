@@ -2,9 +2,9 @@
 
 ## Start Docker environment
 
-- Login to the Docker registry by using the command <code>docker login git.janrtr.de:4567</code>
-
 - Update the path to the LXD-certificate "/path/to/cert/" with your local path in docker-compose.yml
+
+- Update the path to the SSH Key "/path/to/ssh/" with your local path in docker-compose.yml
 
 - Optional (remove not required cert volume links)
 
@@ -34,6 +34,22 @@ docker-compose exec web php bin/console app:create-user
 - Execute shell commands in the Web Container
 ```
 docker-compose exec web <command>
+```
+
+## Required steps for Duplicity Backup
+##### This steps are required to work with BackupDestinations using SSH Key Authentication
+
+- Add these to links to the docker-compose file (under volumes)
+```
+- "/path/to/backupSSH/ssh:/root/.ssh/id_rsa"
+- "/path/to/backupSSH/ssh.pub:/root/.ssh/id_rsa.pub"
+```
+- Replace "path/to/backupSSH" with local filepath to the SSH Key
+- The private key must have permissions 600 and the public key 644
+
+- Add BackupDestinations to known hosts (accept with yes)
+```
+docker-compose exec web ssh myuser@myDestination
 ```
 
 ## Access to Containers
