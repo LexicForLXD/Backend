@@ -70,6 +70,7 @@ class HostApi extends HttpHelper
      *
      * @param Host $host
      * @return string
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function getCertificate(Host $host)
     {
