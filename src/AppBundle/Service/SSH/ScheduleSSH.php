@@ -48,7 +48,7 @@ class ScheduleSSH
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
-        $fileName = "/etc/" . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
+        $fileName = "/etc/cron." . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
 
         $session = new Session($configuration, $authentication);
 
@@ -71,7 +71,7 @@ class ScheduleSSH
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
-        $fileName = "/etc/" . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
+        $fileName = "/etc/cron." . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
 
         $session = new Session($configuration, $authentication);
 
@@ -93,7 +93,7 @@ class ScheduleSSH
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
-        $filename = "/etc/" . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
+        $filename = "/etc/cron." . $backupSchedule->getExecutionTime() . "/" . $backupSchedule->getName();
 
         $session = new Session($configuration, $authentication);
 
