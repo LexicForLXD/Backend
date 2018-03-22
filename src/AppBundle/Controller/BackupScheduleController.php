@@ -244,7 +244,7 @@ class BackupScheduleController extends Controller
      * @param ScheduleSSH $sshApi
      * @return JsonResponse
      * @throws ElementNotFoundException
-     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
     public function updateBackupScheduleAction(Request $request, int $scheduleId, EntityManagerInterface $em, ScheduleSSH $sshApi)
     {
@@ -252,7 +252,7 @@ class BackupScheduleController extends Controller
 
         if (!$schedule) {
             throw new ElementNotFoundException(
-                'No backupschedule found for id ' . $scheduleId
+                'No backup schedule found for id ' . $scheduleId
             );
         }
 
