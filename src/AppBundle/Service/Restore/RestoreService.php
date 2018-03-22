@@ -42,14 +42,14 @@ class RestoreService
 
         $remoteBackupPath = $backupDestination->getDestinationText().$backupSchedule->getName();
 
-        $result = shell_exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath);
+        exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath, $result);
 
         if(strpos($result, 'Error') !== false){
             return substr($result, strpos($result, 'Error'));
         }
 
         //Second query with grep
-        $result = shell_exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath.' | grep .tar.gz');
+        exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath.' | grep .tar.gz', $result);
 
         //Create array with filenames from result - try to find all files ending with .tar.gz
         $numberOfTarballs = substr_count($result, '.tar.gz');
