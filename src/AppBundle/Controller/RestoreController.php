@@ -70,7 +70,7 @@ class RestoreController extends Controller
 
         $result = $restoreService->getFilesInBackupForTimestamp($backup);
 
-        if(strpos($result, 'Error') !== false){
+        if(is_array($result) == false){
             throw new WrongInputException($result);
         }
 
