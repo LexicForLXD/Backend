@@ -100,7 +100,7 @@ class BackupScheduleController extends Controller
 
         if (!$destination) {
             throw new ElementNotFoundException(
-                'No backup destination found for ID .' . $request->get('destination') . '. You can create a backup destination with another endpoint.'
+                'No backup destination found for ID ' . $request->get('destination') . '. You can create a backup destination with another endpoint.'
             );
         }
 
