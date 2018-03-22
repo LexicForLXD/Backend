@@ -352,14 +352,16 @@ class BackupSchedule
                 # Backup for Container ' . $container->getName() . ' to ' . $this->destination->getName() . '
                 
                 DIRECTORY = /tmp/' . $this->name . '/ 
+                CONTAINER = ' . $container->getName() . '
+                
                 # Just generating a random number 
                 r=$(($(od -An -N1 -i /dev/random))) 
                 
                 # Generating a snapshot of the container to build the image from 
-                lxc snapshot ' . $container->getName() . ' "$r" 
+                lxc snapshot "$CONTAINER" "$r" 
                 
                 # Build the image to be exported 
-                f=$(lxc publish ' . $container->getName() . '/"$r") 
+                f=$(lxc publish "$CONTAINER"/"$r") 
                 fingerprint=${f##*: } 
                 
                 # Make dir for backups in /tmp if it not exists 
@@ -369,11 +371,11 @@ class BackupSchedule
                 mkdir "$DIRECTORY" 
                 
                 # Export the image 
-                lxc image export "$fingerprint" "$DIRECTORY"' . $container->getName() . ' 
+                lxc image export "$fingerprint" "$DIRECTORY""$CONTAINER" 
                 
 
                 # Delete the snapshot 
-                lxc delete ' . $container->getName() . '/"$r" 
+                lxc delete "$CONTAINER"/"$r" 
                 
                 # Delete the image 
                 lxc image delete "$fingerprint"
