@@ -386,11 +386,7 @@ class ContainerController extends Controller
 
         $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
 
-        if (!$profiles) {
-            throw new WrongInputException(
-                'No profile found for id(s) ' . $request->get("profiles")
-            );
-        }
+
 
         $profileNames = array();
 
