@@ -69,6 +69,7 @@ class Backup
      * @ORM\ManyToOne(targetEntity="BackupDestination", inversedBy="backup")
      * @ORM\JoinColumn(name="destination_id", referencedColumnName="id")
      * @Assert\NotNull
+     * @JMS\Exclude()
      */
     protected $destination;
 
