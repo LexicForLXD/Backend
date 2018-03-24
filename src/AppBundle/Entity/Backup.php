@@ -200,4 +200,16 @@ class Backup
     {
         return $this->containers;
     }
+
+    /**
+     * @OAS\Property(property="backupScheduleId", example="2")
+     * @JMS\VirtualProperty()
+     * @return int|null
+     */
+    public function getBackupScheduleId(){
+        if($this->backupSchedule){
+            return $this->backupSchedule->getId();
+        }
+        return null;
+    }
 }
