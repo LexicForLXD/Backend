@@ -2731,6 +2731,9 @@
                     },
                     "containerId": {
                         "example": "[1]"
+                    },
+                    "backupScheduleId": {
+                        "example": "2"
                     }
                 },
                 "type": "object"
