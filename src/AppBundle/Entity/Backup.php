@@ -69,6 +69,7 @@ class Backup
      * @ORM\ManyToOne(targetEntity="BackupDestination", inversedBy="backup")
      * @ORM\JoinColumn(name="destination_id", referencedColumnName="id")
      * @Assert\NotNull
+     * @JMS\Exclude()
      */
     protected $destination;
 
@@ -198,5 +199,17 @@ class Backup
     public function getContainers(): PersistentCollection
     {
         return $this->containers;
+    }
+
+    /**
+     * @OAS\Property(property="backupScheduleId", example="2")
+     * @JMS\VirtualProperty()
+     * @return int|null
+     */
+    public function getBackupScheduleId(){
+        if($this->backupSchedule){
+            return $this->backupSchedule->getId();
+        }
+        return null;
     }
 }
