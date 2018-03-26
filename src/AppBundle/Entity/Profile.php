@@ -252,10 +252,8 @@ class Profile
      * @JMS\VirtualProperty()
      */
     public function getHostId(){
-        $ids[] = null;
-
         if($this->hosts->isEmpty()){
-            return $ids;
+            return null;
         }
 
         $this->hosts->first();
@@ -274,10 +272,8 @@ class Profile
      * @JMS\VirtualProperty()
      */
     public function getContainerId(){
-        $ids[] = null;
-
         if($this->containers->isEmpty()){
-            return $ids;
+            return null;
         }
 
         $this->containers->first();

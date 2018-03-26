@@ -30,6 +30,8 @@ class ProfileEntityTest extends WebTestCase
     /**
      * Check all getter for minimal allowed attributes in Entity - only notNull attributes set
      * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
      */
     public function testGetterMinimalAttributesSet()
     {
@@ -46,8 +48,8 @@ class ProfileEntityTest extends WebTestCase
         $this->assertEquals(null, $profileFromDB->getDescription());
         $this->assertEquals(null, $profileFromDB->getConfig());
         $this->assertEquals(null, $profileFromDB->getDevices());
-        $this->assertEquals([ 0 => null], $profileFromDB->getContainerId());
-        $this->assertEquals([ 0 => null], $profileFromDB->getHostId());
+        $this->assertEquals(null, $profileFromDB->getContainerId());
+        $this->assertEquals(null, $profileFromDB->getHostId());
 
         $this->em->remove($profileFromDB);
         $this->em->flush();
