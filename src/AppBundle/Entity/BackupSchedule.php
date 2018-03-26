@@ -37,7 +37,6 @@ class BackupSchedule
      * @var string
      *
      * @ORM\Column(type="string", unique=true, nullable=false)
-     * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
      * @OAS\Property(example="Schedule1")
@@ -57,7 +56,7 @@ class BackupSchedule
      * @var string
      *
      * @ORM\Column(type="string")
-     * @Assert\Choice({"daily", "weekly", "monthly"})
+     * @Assert\Choice({"daily", "weekly", "monthly"}, strict="true")
      * @Assert\Type("string")
      * @OAS\Property(example="daily")
      */
@@ -80,7 +79,7 @@ class BackupSchedule
      *
      * @ORM\Column(type="string")
      * @Assert\Type("string")
-     * @Assert\Choice({"full", "incremental"})
+     * @Assert\Choice({"full", "incremental"}, strict="true")
      * @OAS\Property(example="full")
      */
     protected $type;
@@ -296,10 +295,8 @@ class BackupSchedule
      */
     public function getContainerId()
     {
-        $ids[] = null;
-
         if ($this->containers->isEmpty()) {
-            return $ids;
+            return null;
         }
 
         $this->containers->first();
@@ -344,7 +341,9 @@ class BackupSchedule
      */
     public function getShellCommands()
     {
-        $commandTexts = '#!/bin/sh \n \n';
+        $commandTexts = '#!/bin/sh
+
+        ';
 
 
         foreach ($this->containers as $container) {
@@ -391,6 +390,7 @@ class BackupSchedule
 
             # Make api call to webhook
             curl -X POST -k ' . $this->webhookUrl . '
+
 
         ';
 

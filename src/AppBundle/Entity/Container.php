@@ -417,9 +417,7 @@ class Container
      * @JMS\VirtualProperty()
      */
     public function getHostId(){
-        $id = $this->host->getId();
-
-        return $id;
+        return $this->host->getId();
     }
 
 
@@ -431,10 +429,8 @@ class Container
      * @JMS\VirtualProperty()
      */
     public function getProfileId(){
-        $ids[] = null;
-
         if($this->profiles->isEmpty()){
-            return $ids;
+            return null;
         }
 
         $this->profiles->first();
@@ -460,32 +456,4 @@ class Container
     {
         return $this->backups;
     }
-
-
-
-    /** @see \Serializable::serialize() */
-    // public function serialize()
-    // {
-    //     return serialize(array(
-    //         $this->id,
-    //         $this->name,
-    //         $this->ipv4,
-    //         $this->ipv6,
-    //         $this->settings,
-    //         $this->host
-    //     ));
-    // }
-
-    // /** @see \Serializable::unserialize() */
-    // public function unserialize($serialized)
-    // {
-    //     list (
-    //         $this->id,
-    //         $this->name,
-    //         $this->ipv4,
-    //         $this->ipv6,
-    //         $this->settings,
-    //         $this->host
-    //         ) = unserialize($serialized);
-    // }
 }

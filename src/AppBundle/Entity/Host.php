@@ -563,10 +563,8 @@ class Host
      * @JMS\VirtualProperty()
      */
     public function getContainerId(){
-        $ids[] = null;
-
         if($this->containers->isEmpty()){
-            return $ids;
+            return null;
         }
 
         $this->containers->first();
@@ -576,36 +574,4 @@ class Host
 
         return $ids;
     }
-
-
-
-    /** @see \Serializable::serialize() */
-    // public function serialize()
-    // {
-    //     return serialize(array(
-    //         $this->id,
-    //         $this->name,
-    //         $this->ipv4,
-    //         $this->ipv6,
-    //         $this->domainName,
-    //         $this->mac,
-    //         $this->port,
-    //         $this->settings
-    //     ));
-    // }
-
-    // /** @see \Serializable::unserialize() */
-    // public function unserialize($serialized)
-    // {
-    //     list (
-    //         $this->id,
-    //         $this->name,
-    //         $this->ipv4,
-    //         $this->ipv6,
-    //         $this->domainName,
-    //         $this->mac,
-    //         $this->port,
-    //         $this->settings
-    //         ) = unserialize($serialized);
-    // }
 }
