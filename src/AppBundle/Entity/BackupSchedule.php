@@ -389,7 +389,8 @@ class BackupSchedule
 
 
             # Make api call to webhook
-            curl -X -k POST ' . $this->webhookUrl . '
+            curl -X POST -k ' . $this->webhookUrl . '
+
 
         ';
 
