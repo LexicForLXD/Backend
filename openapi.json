@@ -2711,6 +2711,26 @@
                     }
                 }
             }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Gets current authenticated user.",
+                "responses": {
+                    "200": {
+                        "description": "current authenticated user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
