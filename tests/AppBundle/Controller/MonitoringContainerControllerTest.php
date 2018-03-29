@@ -87,6 +87,9 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container->setHost($host);
         $container->setIpv4("192.168.178.120");
         $container->setState('stopped');
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->setArchitecture('x86_64');
 
         $this->em->persist($host);
         $this->em->persist($container);
@@ -132,6 +135,9 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container->setHost($host);
         $container->setIpv4("192.168.178.10");
         $container->setState('stopped');
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->setArchitecture('x86_64');
 
         $containerStatus = new ContainerStatus();
         $containerStatus->setNagiosEnabled(true);
@@ -224,6 +230,9 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container->setHost($host);
         $container->setIpv4("192.168.178.10");
         $container->setState('stopped');
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->setArchitecture('x86_64');
 
         $this->em->persist($host);
         $this->em->persist($container);
@@ -276,6 +285,9 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container->setHost($host);
         $container->setIpv4("192.168.178.11");
         $container->setState('stopped');
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->setArchitecture('x86_64');
 
         $this->em->persist($host);
         $this->em->persist($container);
@@ -365,6 +377,9 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container->setHost($host);
         $container->setIpv4("192.168.178.10");
         $container->setState('stopped');
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->setArchitecture('x86_64');
 
         $containerStatus = new ContainerStatus();
         $containerStatus->setNagiosEnabled(true);
@@ -429,6 +444,9 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container->setHost($host);
         $container->setIpv4("192.168.178.10");
         $container->setState('stopped');
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->setArchitecture('x86_64');
 
         $containerStatus = new ContainerStatus();
         $containerStatus->setNagiosEnabled(true);
@@ -523,6 +541,9 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container->setHost($host);
         $container->setIpv4("192.168.178.11");
         $container->setState('stopped');
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->setArchitecture('x86_64');
 
         $containerStatus = new ContainerStatus();
         $containerStatus->setNagiosEnabled(true);
