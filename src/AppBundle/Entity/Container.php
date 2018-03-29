@@ -105,6 +105,7 @@ class Container
      * @var
      * @ORM\Column(type="json")
      * @Assert\Type(type="array")
+     * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $config;
 
@@ -112,6 +113,7 @@ class Container
      * @var
      * @ORM\Column(type="json", nullable=true)
      * @Assert\Type(type="array")
+     * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $expandedConfig;
 
@@ -119,6 +121,7 @@ class Container
      * @var
      * @ORM\Column(type="json")
      * @Assert\Type(type="array")
+     * @OAS\Property(example="{'root': {'path': '/'}}")
      */
     protected $devices;
 
@@ -126,13 +129,15 @@ class Container
      * @var
      * @ORM\Column(type="json", nullable=true)
      * @Assert\Type(type="array")
+     * @OAS\Property(example="{'root': {'path': '/'}}")
      */
     protected $expandedDevices;
 
     /**
      * @var
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="object")
+     * @Assert\Type(type="array")
+     * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $network;
 
