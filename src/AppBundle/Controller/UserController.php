@@ -340,6 +340,33 @@ class UserController extends Controller
 
 
     /**
+     * Gets current authenticated user.
+     *
+     * @Route("/user", name="user_current", methods={"GET"})
+     *
+     * @OAS\Get(path="/user",
+     *  tags={"users"},
+     *  @OAS\Response(
+     *      response=200,
+     *      description="current authenticated user",
+     *      @OAS\JsonContent(ref="#/components/schemas/user"),
+     *  ),
+     *
+     * )
+     *
+     * @return Response
+     */
+    public function currentUserAction()
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($user, 'json');
+        return new Response($response);
+    }
+
+
+    /**
      * Validates a User Object and returns array with errors.
      *
      * @param User $object

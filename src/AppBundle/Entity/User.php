@@ -9,6 +9,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
@@ -45,11 +46,13 @@ class User implements AdvancedUserInterface, \Serializable
 
     /**
      * @ORM\Column(type="string")
+     * @JMS\Exclude()
      */
     protected $password;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
+     *
      */
     protected $email;
 
