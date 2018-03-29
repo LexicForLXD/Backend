@@ -32,7 +32,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
 
 
-
 class ContainerController extends Controller
 {
     /**
@@ -380,13 +379,14 @@ class ContainerController extends Controller
             );
         }
 
+        $profileNames = array();
+
         if($request->request->has('profiles'))
         {
             $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
 
             $this->checkProfiles($profiles, $request->get("profiles"));
 
-            $profileNames = array();
 
             foreach ($profiles as $profile) {
                 $profileNames[] = $profile->getName();
@@ -408,6 +408,8 @@ class ContainerController extends Controller
                     "devices" => $request->get("devices"),
                     "source" => []
                 ];
+
+                $container->setArchitecture($request->get("architecture"));
 
                 if(!$request->request->has("fingerprint") && !$request->request->has("alias"))
                 {
@@ -496,6 +498,7 @@ class ContainerController extends Controller
                 ];
 
                 $container->setImage($oldContainer->getImage());
+                $container->setArchitecture($request->get('architecture'));
 
 
                 break;
@@ -536,6 +539,7 @@ class ContainerController extends Controller
                         "type" => "none"
                     ]
                 ];
+                $container->setArchitecture($request->get('architecture'));
 
                 break;
             default:
@@ -543,6 +547,8 @@ class ContainerController extends Controller
         }
 
         $container->setHost($host);
+        $container->setConfig($request->get("config"));
+        $container->setDevices($request->get("devices"));
 
         if ($request->request->has("name")) {
             $container->setName($request->get("name"));
@@ -557,13 +563,16 @@ class ContainerController extends Controller
         $this->validation($container);
 
 
-
         $em->persist($container);
         $em->flush();
 
-        foreach ($profiles as $profile) {
-            $profileManagerApi->enableProfileForContainer($profile, $container);
+        if($request->request->has('profiles'))
+        {
+            foreach ($profiles as $profile) {
+                $profileManagerApi->enableProfileForContainer($profile, $container);
+            }
         }
+
 
         $result = $api->create($host, $data);
 
@@ -681,7 +690,7 @@ class ContainerController extends Controller
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function deleteAction(int $containerId, EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi)
+    public function deleteAction($containerId, EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
         $profiles = $container->getProfiles();
@@ -796,7 +805,7 @@ class ContainerController extends Controller
      *  ),
      * )
      */
-    public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ContainerApi $api, OperationApi $operationApi)
+    public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ContainerApi $api, OperationApi $operationApi, ProfileManagerApi $profileManagerApi)
     {
         $dispatcher = $this->get('sb_event_queue');
 
@@ -828,13 +837,20 @@ class ContainerController extends Controller
 
 
         } else {
-            $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
             $profileNames = array();
-            foreach ($profiles as $profile) {
-                $profileNames[] = $profile->getName();
+
+            if($request->request->has('profiles'))
+            {
+                $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
+                foreach ($profiles as $profile) {
+                    $profileNames[] = $profile->getName();
+                    $profileManagerApi->enableProfileForContainer($profile, $container);
+                }
+                $this->checkProfiles($profiles, $request->get("profiles"));
             }
 
-            $this->checkProfiles($profiles, $request->get("profiles"));
+
+
 
             if (!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral")) {
                 throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
@@ -850,6 +866,10 @@ class ContainerController extends Controller
 
             $result = $api->update($container->getHost(), $container, $data);
 
+            $container->setArchitekture($request->get("architecture"));
+            $container->setConfig($request->get("config"));
+            $container->setDevices($request->get("devices"));
+            $container->setEphemeral($request->get("ephemeral"));
 
 
         }
