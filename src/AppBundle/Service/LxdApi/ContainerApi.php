@@ -27,11 +27,12 @@ class ContainerApi extends HttpHelper
      *
      * @param Host $host
      * @return object
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function list(Host $host)
     {
         $uri = $this->buildUri($host, $this->getEndpoint());
-        return Request::get($uri)->send();
+        return Request::get($uri)->timeoutIn(3)->send();
     }
 
     /**
@@ -39,11 +40,12 @@ class ContainerApi extends HttpHelper
      *
      * @param Host $host
      * @return object
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function remove(Host $host, $containerName)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
-        return Request::delete($uri)->send();
+        return Request::delete($uri)->timeoutIn(3)->send();
     }
 
 
@@ -58,7 +60,7 @@ class ContainerApi extends HttpHelper
     public function show(Host $host, $containerName)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
-        return Request::get($uri)->send();
+        return Request::get($uri)->timeoutIn(3)->send();
     }
 
     /**
@@ -72,7 +74,7 @@ class ContainerApi extends HttpHelper
     public function create(Host $host, $data)
     {
         $uri = $this->buildUri($host, $this->getEndpoint());
-        return Request::post($uri, $data)->send();
+        return Request::post($uri, $data)->timeoutIn(3)->send();
     }
 
     /**
@@ -87,7 +89,7 @@ class ContainerApi extends HttpHelper
     public function update(Host $host, Container $container, $data)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$container->getName());
-        return Request::put($uri, $data)->send();
+        return Request::put($uri, $data)->timeoutIn(3)->send();
     }
 
     /**
@@ -102,7 +104,7 @@ class ContainerApi extends HttpHelper
     public function migrate(Host $host, Container $container, $data)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$container->getName());
-        return Request::post($uri, $data)->send();
+        return Request::post($uri, $data)->timeoutIn(3)->send();
     }
 
     /**
