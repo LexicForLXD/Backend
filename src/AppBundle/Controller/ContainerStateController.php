@@ -152,7 +152,7 @@ class ContainerStateController extends Controller
      *  ),
      * )
      */
-    public function showCurrentStateAction(int $containerId, ContainerStateApi $api)
+    public function showCurrentStateAction(int $containerId, ContainerStateApi $api, EntityManagerInterface $em)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneById($containerId);
 
@@ -163,6 +163,10 @@ class ContainerStateController extends Controller
         }
 
         $result = $api->actual($container->getHost(), $container);
+
+        $container->setNetwork($result->body->metadata->network);
+
+        $em->flush($container);
 
 
         return new JsonResponse([
