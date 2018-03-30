@@ -66,7 +66,7 @@ class ContainerListener
 
         $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
         $container->setState('created');
-        $this->getContainerData($container);
+        $container = $this->getContainerData($container);
 
 
         $this->em->flush($container);
@@ -191,7 +191,7 @@ class ContainerListener
             $this->sshApi->makeFileExecuteable($schedule);
         }
 
-        $this->getContainerData($container);
+        $container = $this->getContainerData($container);
 
         $container->setSettings($operationsResponse->body);
 
@@ -205,6 +205,7 @@ class ContainerListener
      * Receives data from lxd and saves it to db
      *
      * @param Container $container
+     * @return Container
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     private function getContainerData($container)
@@ -216,7 +217,7 @@ class ContainerListener
         $container->setExpandedDevices($containerResponse->body->metadata->expanded_devices);
         $container->setCreatedAt($containerResponse->body->metadata->created_at);
 
-
+        return $container;
     }
 
 }
