@@ -227,7 +227,7 @@ class RestoreController extends Controller
 
         $container->setExpandedConfig($result->body->metadata->expanded_config);
         $container->setExpandedDevices($result->body->metadata->expanded_devices);
-        $container->setArchitecture($result->body->architecture);
+        $container->setArchitecture($result->body->metadata->architecture);
         $container->setCreatedAt(\DateTime::createFromFormat(DATE_ATOM, $result->body->metadata->created_at));
         $container->setState(strtolower($result->body->metadata->status));
 
