@@ -58,7 +58,7 @@ class ContainerListener
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
+            $container->setError($operationsResponse->body->metadata->err);
             $this->em->persist($container);
             $this->em->flush($container);
             return;
@@ -94,7 +94,7 @@ class ContainerListener
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-STATE-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
+            $container->setError($operationsResponse->body->metadata->err);
             $this->em->persist($container);
             $this->em->flush($container);
             return;
@@ -177,7 +177,8 @@ class ContainerListener
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-CONTAINER-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
+            $container->setError($operationsResponse->body->metadata->err);
+
             $this->em->flush($container);
             return;
         }
@@ -217,6 +218,7 @@ class ContainerListener
         $container->setExpandedConfig($containerResponse->body->metadata->expanded_config);
         $container->setExpandedDevices($containerResponse->body->metadata->expanded_devices);
         $container->setCreatedAt($containerResponse->body->metadata->created_at);
+        $container->setState(strtolower($containerResponse->body->metadata->status));
 
         return $container;
     }

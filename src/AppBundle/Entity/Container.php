@@ -102,7 +102,7 @@ class Container
     protected $architecture;
 
     /**
-     * @var
+     * @var array
      * @ORM\Column(type="json")
      * @Assert\Type(type="array")
      * @OAS\Property(example="{'limits.cpu': '2'}")
@@ -110,7 +110,7 @@ class Container
     protected $config;
 
     /**
-     * @var
+     * @var array
      * @ORM\Column(type="json", nullable=true)
      * @Assert\Type(type="array")
      * @OAS\Property(example="{'limits.cpu': '2'}")
@@ -118,7 +118,7 @@ class Container
     protected $expandedConfig;
 
     /**
-     * @var
+     * @var array
      * @ORM\Column(type="json")
      * @Assert\Type(type="array")
      * @OAS\Property(example="{'root': {'path': '/'}}")
@@ -126,7 +126,7 @@ class Container
     protected $devices;
 
     /**
-     * @var
+     * @var array
      * @ORM\Column(type="json", nullable=true)
      * @Assert\Type(type="array")
      * @OAS\Property(example="{'root': {'path': '/'}}")
@@ -146,6 +146,13 @@ class Container
      * @ORM\Column(type="datetime", nullable=true)
      */
     protected $createdAt;
+
+    /**
+     * @var mixed
+     * @ORM\Column(type="string", nullable=true)
+     *
+     */
+    protected $error;
 
     /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
@@ -458,6 +465,22 @@ class Container
     public function setCreatedAt($createdAt): void
     {
         $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param mixed $error
+     */
+    public function setError($error): void
+    {
+        $this->error = $error;
     }
 
 
