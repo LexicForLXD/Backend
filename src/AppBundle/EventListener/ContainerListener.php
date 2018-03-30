@@ -13,6 +13,7 @@ use AppBundle\Entity\Container;
 use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Event\ContainerStateEvent;
+use AppBundle\Event\ContainerUpdateEvent;
 use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\OperationApi;
