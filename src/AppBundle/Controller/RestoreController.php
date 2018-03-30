@@ -224,7 +224,10 @@ class RestoreController extends Controller
         $container = new Container();
         $container->setName($containerName);
         $container->setHost($host);
-        $container->setSettings($result->body->metadata);
+
+        $container->setExpandedConfig($result->body->metadata->expanded_config);
+        $container->setExpandedDevices($result->body->metadata->expanded_devices);
+        $container->setCreatedAt($result->body->metadata->created_at);
         $container->setState(strtolower($result->body->metadata->status));
 
         $container->setImage($image);
