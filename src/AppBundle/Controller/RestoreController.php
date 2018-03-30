@@ -225,6 +225,8 @@ class RestoreController extends Controller
         $container->setName($containerName);
         $container->setHost($host);
 
+        $container->setConfig($result->body->metadata->config);
+        $container->setDevices($result->body->metadata->config);
         $container->setExpandedConfig($result->body->metadata->expanded_config);
         $container->setExpandedDevices($result->body->metadata->expanded_devices);
         $container->setArchitecture($result->body->metadata->architecture);
