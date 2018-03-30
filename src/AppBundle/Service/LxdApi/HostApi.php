@@ -62,7 +62,7 @@ class HostApi extends HttpHelper
     public function authenticate(Host $host, $data)
     {
         $uri = $this->buildUri($host, 'certificates');
-        return Request::post($uri, $data)->send();
+        return Request::post($uri, $data)->timeoutIn(10)->send();
     }
 
     /**

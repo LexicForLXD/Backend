@@ -32,7 +32,7 @@ class ContainerApi extends HttpHelper
     public function list(Host $host)
     {
         $uri = $this->buildUri($host, $this->getEndpoint());
-        return Request::get($uri)->timeoutIn(3)->send();
+        return Request::get($uri)->timeoutIn(10)->send();
     }
 
     /**
@@ -45,7 +45,7 @@ class ContainerApi extends HttpHelper
     public function remove(Host $host, $containerName)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
-        return Request::delete($uri)->timeoutIn(3)->send();
+        return Request::delete($uri)->timeoutIn(10)->send();
     }
 
 
@@ -60,7 +60,7 @@ class ContainerApi extends HttpHelper
     public function show(Host $host, $containerName)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
-        return Request::get($uri)->timeoutIn(3)->send();
+        return Request::get($uri)->timeoutIn(10)->send();
     }
 
     /**
@@ -74,7 +74,7 @@ class ContainerApi extends HttpHelper
     public function create(Host $host, $data)
     {
         $uri = $this->buildUri($host, $this->getEndpoint());
-        return Request::post($uri, $data)->timeoutIn(3)->send();
+        return Request::post($uri, $data)->timeoutIn(10)->send();
     }
 
     /**
@@ -89,7 +89,7 @@ class ContainerApi extends HttpHelper
     public function update(Host $host, Container $container, $data)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$container->getName());
-        return Request::put($uri, $data)->timeoutIn(3)->send();
+        return Request::put($uri, $data)->timeoutIn(10)->send();
     }
 
     /**
@@ -104,7 +104,7 @@ class ContainerApi extends HttpHelper
     public function migrate(Host $host, Container $container, $data)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$container->getName());
-        return Request::post($uri, $data)->timeoutIn(3)->send();
+        return Request::post($uri, $data)->timeoutIn(10)->send();
     }
 
     /**
