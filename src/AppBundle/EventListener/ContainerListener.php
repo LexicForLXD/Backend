@@ -223,7 +223,7 @@ class ContainerListener
 
         $container->setExpandedConfig($containerResponse->body->metadata->expanded_config);
         $container->setExpandedDevices($containerResponse->body->metadata->expanded_devices);
-        $container->setCreatedAt($containerResponse->body->metadata->created_at);
+        $container->setCreatedAt(\DateTime::createFromFormat(DATE_ATOM, $containerResponse->body->metadata->created_at));
         $container->setState(strtolower($containerResponse->body->metadata->status));
 
         $this->em->flush($container);

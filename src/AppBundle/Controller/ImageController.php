@@ -107,133 +107,18 @@ class ImageController extends Controller
     }
 
     /**
-     * Create a new Remote-Image on a specific Host
+     * Create a new Image
+     * @Route("/hosts/{hostId}/images", name="create_image", methods={"POST"})
      *
-     *
-     * @Route("/hosts/{hostId}/images/remote", name="create_remote_image_on_host", methods={"POST"})
-     *
-     * @OAS\Post(path="/hosts/{hostId}/images/remote",
-     *     tags={"images"},
-     *     @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *        @OAS\Schema(
-     *          type="integer"
-     *        ),
-     *     ),
-     *     @OAS\Parameter(
-     *      description="Same body as the LXD Request body for source image case",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      ),
-     *      @OAS\Response(
-     *          response=202,
-     *          description="The placeholder image - some elements will be added after the image was async created - finished will then change to true - if the creation fails, finished stays false and an error attribute displays the error",
-     *          @OAS\JsonContent(ref="#/components/schemas/image"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *     @OAS\Response(
-     *          response=404,
-     *          description="No Host for the provided id found",
-     *      ),
-     *      @OAS\Response(
-     *          response=400,
-     *          description="Validation failed or there is a LXD Error",
-     *      ),
-     * )
-     *
-     * @param $hostId
+     * @param int $hostId
      * @param Request $request
      * @param ImageApi $api
-     * @param OperationsRelayApi $relayApi
      * @return Response
-     *
      * @throws ConnectionErrorException
      * @throws ElementNotFoundException
-     * @throws WrongInputExceptionArray
      * @throws WrongInputException
-     */
-    public function createNewRemoteSourceImageOnHost($hostId, Request $request, ImageApi $api, OperationsRelayApi $relayApi){
-        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
-
-        if (!$host) {
-            throw new ElementNotFoundException(
-                'No Host for '.$hostId.' found'
-            );
-        }
-
-        $image = new Image();
-        $image->setHost($host);
-
-        if($request->request->has('filename')) {
-            $image->setFilename($request->request->get('filename'));
-        }
-        if($request->request->has('public')) {
-            $image->setPublic($request->request->get('public'));
-        }
-        if($request->request->has('properties')) {
-            $image->setProperties($request->request->get('properties'));
-        }
-
-        if ($errorArray = $this->validation($image)) {
-            throw new WrongInputExceptionArray($errorArray);
-        }
-
-        $em = $this->getDoctrine()->getManager();
-        //Create aliases
-        if($request->request->has('aliases')) {
-            $aliasArray = $request->request->get('aliases');
-
-            for($i=0; $i<sizeof($aliasArray); $i++){
-                $alias = new ImageAlias();
-                $alias->setName($aliasArray[$i]['name']);
-                $alias->setDescription($aliasArray[$i]['description']);
-                if ($errorArray = $this->validation($alias)) {
-                    throw new WrongInputExceptionArray($errorArray);
-                }
-                $em->persist($alias);
-                $image->addAlias($alias);
-            }
-        }
-
-        $result = $api->createImage($host, $request->getContent());
-
-        if ($result->code != 202) {
-            throw new WrongInputException($result->body->error);
-        }
-        if ($result->body->metadata->status_code == 400) {
-            throw new WrongInputException($result->body->error);
-        }
-
-        $image->setFinished(false);
-
-        $em->persist($image);
-        $em->flush();
-
-        $dispatcher = $this->get('sb_event_queue');
-
-        $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
-
-        $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($image, 'json');
-        return new Response($response, Response::HTTP_ACCEPTED);
-    }
-
-    /**
-     * Create an Image from a stopped Container
-     * @Route("/hosts/{hostId}/images/container", name="create_image_from_contaniner_on_host", methods={"POST"})
-     *
-     * @throws ElementNotFoundException
-     * @throws ConnectionErrorException
      * @throws WrongInputExceptionArray
-     * @throws WrongInputException
-     *
-     * @OAS\Post(path="/hosts/{hostId}/images/container",
+     * @OAS\Post(path="/hosts/{hostId}/images",
      *     tags={"images"},
      *     @OAS\Parameter(
      *      description="ID of the Host",
@@ -245,7 +130,7 @@ class ImageController extends Controller
      *        ),
      *     ),
      *     @OAS\Parameter(
-     *      description="Same body as the LXD Request body to create an Image from stopped Container",
+     *      description="Same body as the LXD Request body to create an Image from stopped Container or LXD Request body for source image case",
      *      name="body",
      *      in="body",
      *      required=true,
@@ -268,7 +153,7 @@ class ImageController extends Controller
      *      ),
      * )
      */
-    public function createImageFromSourceContainer(int $hostId, Request $request, ImageApi $api){
+    public function createImage(int $hostId, Request $request, ImageApi $api){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
@@ -277,70 +162,136 @@ class ImageController extends Controller
             );
         }
 
-        //Check if container exists on host
-        if($request->request->has('source')){
-            $source = $request->request->get('source');
-        }
-        $container = $this->getDoctrine()->getRepository(Container::class)->findBy(['name' => $source['name'], 'host' => $host]);
-        if (!$container) {
-            throw new ElementNotFoundException(
-                'No Container for name '.$source['name'].' with host '.$host->getId().' found'
-            );
+        if(!$request->request->has('source')){
+            throw new WrongInputException("Missing source object in json");
         }
 
-        $image = new Image();
-        $image->setHost($host);
+        $source = $request->request->get('source');
 
-        if($request->request->has('filename')) {
-            $image->setFilename($request->request->get('filename'));
-        }
-        if($request->request->has('public')) {
-            $image->setPublic($request->request->get('public'));
-        }
-        if($request->request->has('properties')) {
-            $image->setProperties($request->request->get('properties'));
-        }
+        switch ($source['type']){
+            case "container":
+                //Check if container exists on host
+                $container = $this->getDoctrine()->getRepository(Container::class)->findBy(['name' => $source['name'], 'host' => $host]);
+                if (!$container) {
+                    throw new ElementNotFoundException(
+                        'No Container for name '.$source['name'].' with host '.$host->getId().' found'
+                    );
+                }
 
-        if ($errorArray = $this->validation($image)) {
-            throw new WrongInputExceptionArray($errorArray);
-        }
+                $image = new Image();
+                $image->setHost($host);
 
-        $em = $this->getDoctrine()->getManager();
-        //Create aliases
-        if($request->request->has('aliases')) {
-            $aliasArray = $request->request->get('aliases');
+                if($request->request->has('filename')) {
+                    $image->setFilename($request->request->get('filename'));
+                }
+                if($request->request->has('public')) {
+                    $image->setPublic($request->request->get('public'));
+                }
+                if($request->request->has('properties')) {
+                    $image->setProperties($request->request->get('properties'));
+                }
 
-            for($i=0; $i<sizeof($aliasArray); $i++){
-                $alias = new ImageAlias();
-                $alias->setName($aliasArray[$i]['name']);
-                $alias->setDescription($aliasArray[$i]['description']);
-                if ($errorArray = $this->validation($alias)) {
+                if ($errorArray = $this->validation($image)) {
                     throw new WrongInputExceptionArray($errorArray);
                 }
-                $em->persist($alias);
-                $image->addAlias($alias);
-            }
+
+                $em = $this->getDoctrine()->getManager();
+                //Create aliases
+                if($request->request->has('aliases')) {
+                    $aliasArray = $request->request->get('aliases');
+
+                    for($i=0; $i<sizeof($aliasArray); $i++){
+                        $alias = new ImageAlias();
+                        $alias->setName($aliasArray[$i]['name']);
+                        $alias->setDescription($aliasArray[$i]['description']);
+                        if ($errorArray = $this->validation($alias)) {
+                            throw new WrongInputExceptionArray($errorArray);
+                        }
+                        $em->persist($alias);
+                        $image->addAlias($alias);
+                    }
+                }
+
+                $result = $api->createImage($host, $request->getContent());
+
+                if ($result->code != 202) {
+                    throw new WrongInputException($result->body->error);
+                }
+                if ($result->body->metadata->status_code == 400) {
+                    throw new WrongInputException($result->body->error);
+                }
+
+                $image->setFinished(false);
+                $em->persist($image);
+                $em->flush();
+
+                $dispatcher = $this->get('sb_event_queue');
+                $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
+
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($image, 'json');
+                return new Response($response, Response::HTTP_ACCEPTED);
+
+            case "image":
+                $image = new Image();
+                $image->setHost($host);
+
+                if($request->request->has('filename')) {
+                    $image->setFilename($request->request->get('filename'));
+                }
+                if($request->request->has('public')) {
+                    $image->setPublic($request->request->get('public'));
+                }
+                if($request->request->has('properties')) {
+                    $image->setProperties($request->request->get('properties'));
+                }
+
+                if ($errorArray = $this->validation($image)) {
+                    throw new WrongInputExceptionArray($errorArray);
+                }
+
+                $em = $this->getDoctrine()->getManager();
+                //Create aliases
+                if($request->request->has('aliases')) {
+                    $aliasArray = $request->request->get('aliases');
+
+                    for($i=0; $i<sizeof($aliasArray); $i++){
+                        $alias = new ImageAlias();
+                        $alias->setName($aliasArray[$i]['name']);
+                        $alias->setDescription($aliasArray[$i]['description']);
+                        if ($errorArray = $this->validation($alias)) {
+                            throw new WrongInputExceptionArray($errorArray);
+                        }
+                        $em->persist($alias);
+                        $image->addAlias($alias);
+                    }
+                }
+
+                $result = $api->createImage($host, $request->getContent());
+
+                if ($result->code != 202) {
+                    throw new WrongInputException($result->body->error);
+                }
+                if ($result->body->metadata->status_code == 400) {
+                    throw new WrongInputException($result->body->error);
+                }
+
+                $image->setFinished(false);
+
+                $em->persist($image);
+                $em->flush();
+
+                $dispatcher = $this->get('sb_event_queue');
+
+                $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
+
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($image, 'json');
+                return new Response($response, Response::HTTP_ACCEPTED);
+
+            default:
+                throw new WrongInputException("Please use source image or container body");
         }
-
-        $result = $api->createImage($host, $request->getContent());
-
-        if ($result->code != 202) {
-            throw new WrongInputException($result->body->error);
-        }
-        if ($result->body->metadata->status_code == 400) {
-            throw new WrongInputException($result->body->error);
-        }
-
-        $image->setFinished(false);
-        $em->persist($image);
-        $em->flush();
-
-        $dispatcher = $this->get('sb_event_queue');
-        $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
-
-        $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($image, 'json');
-        return new Response($response, Response::HTTP_ACCEPTED);
     }
 
     /**
