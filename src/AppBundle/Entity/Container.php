@@ -95,7 +95,7 @@ class Container
 
     /**
      * @var string
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      * @Assert\Type(type="string")
      * @OAS\Property(example="x86_64")
      */
@@ -366,7 +366,7 @@ class Container
     /**
      * @param string $architecture
      */
-    public function setArchitecture(string $architecture): void
+    public function setArchitecture($architecture)
     {
         $this->architecture = $architecture;
     }
