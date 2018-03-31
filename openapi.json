@@ -1458,14 +1458,12 @@
                         "description": "No Images on the Host found"
                     }
                 }
-            }
-        },
-        "/hosts/{hostId}/images/remote": {
+            },
             "post": {
                 "tags": [
                     "images"
                 ],
-                "summary": "Create a new Remote-Image on a specific Host",
+                "summary": "Create a new Image",
                 "parameters": [
                     {
                         "name": "hostId",
@@ -1479,50 +1477,7 @@
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Same body as the LXD Request body for source image case",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "202": {
-                        "description": "The placeholder image - some elements will be added after the image was async created - finished will then change to true - if the creation fails, finished stays false and an error attribute displays the error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/image"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No Host for the provided id found"
-                    },
-                    "400": {
-                        "description": "Validation failed or there is a LXD Error"
-                    }
-                }
-            }
-        },
-        "/hosts/{hostId}/images/container": {
-            "post": {
-                "tags": [
-                    "images"
-                ],
-                "summary": "Create an Image from a stopped Container",
-                "parameters": [
-                    {
-                        "name": "hostId",
-                        "in": "path",
-                        "description": "ID of the Host",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "Same body as the LXD Request body to create an Image from stopped Container",
+                        "description": "Same body as the LXD Request body to create an Image from stopped Container or LXD Request body for source image case",
                         "required": true
                     }
                 ],
