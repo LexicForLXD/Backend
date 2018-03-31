@@ -2855,6 +2855,30 @@
                         "type": "string",
                         "example": "TODO Settings"
                     },
+                    "architecture": {
+                        "type": "string",
+                        "example": "x86_64"
+                    },
+                    "config": {
+                        "type": "array",
+                        "example": "{'limits.cpu': '2'}"
+                    },
+                    "expandedConfig": {
+                        "type": "array",
+                        "example": "{'limits.cpu': '2'}"
+                    },
+                    "devices": {
+                        "type": "array",
+                        "example": "{'root': {'path': '/'}}"
+                    },
+                    "expandedDevices": {
+                        "type": "array",
+                        "example": "{'root': {'path': '/'}}"
+                    },
+                    "network": {
+                        "description": "@ORM\\Column(type=\"json\", nullable=true)",
+                        "example": "{'limits.cpu': '2'}"
+                    },
                     "host": {
                         "$ref": "#/components/schemas/host"
                     },
