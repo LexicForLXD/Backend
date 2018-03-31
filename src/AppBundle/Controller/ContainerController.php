@@ -582,11 +582,13 @@ class ContainerController extends Controller
 
 
         if ($result->code != 202) {
-            throw new WrongInputExceptionArray($result->body);
+            throw new WrongInputException($result->raw_body);
         }
         if ($result->body->metadata->status_code == 400) {
-            throw new WrongInputExceptionArray($result->body);
+            throw new WrongInputException($result->raw_body);
         }
+
+
 
         $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
 
