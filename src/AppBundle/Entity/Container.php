@@ -92,6 +92,68 @@ class Container
      */
     protected $state;
 
+
+    /**
+     * @var string
+     * @ORM\Column(type="text")
+     * @Assert\Type(type="string")
+     * @OAS\Property(example="x86_64")
+     */
+    protected $architecture;
+
+    /**
+     * @var array
+     * @ORM\Column(type="json")
+     * @Assert\Type(type="array")
+     * @OAS\Property(example="{'limits.cpu': '2'}")
+     */
+    protected $config;
+
+    /**
+     * @var array
+     * @ORM\Column(type="json", nullable=true)
+     * @Assert\Type(type="array")
+     * @OAS\Property(example="{'limits.cpu': '2'}")
+     */
+    protected $expandedConfig;
+
+    /**
+     * @var array
+     * @ORM\Column(type="json")
+     * @Assert\Type(type="array")
+     * @OAS\Property(example="{'root': {'path': '/'}}")
+     */
+    protected $devices;
+
+    /**
+     * @var array
+     * @ORM\Column(type="json", nullable=true)
+     * @Assert\Type(type="array")
+     * @OAS\Property(example="{'root': {'path': '/'}}")
+     */
+    protected $expandedDevices;
+
+    /**
+     * @var
+     * @ORM\Column(type="json", nullable=true)
+     * @Assert\Type(type="array")
+     * @OAS\Property(example="{'limits.cpu': '2'}")
+     */
+    protected $network;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $createdAt;
+
+    /**
+     * @var mixed
+     * @ORM\Column(type="string", nullable=true)
+     *
+     */
+    protected $error;
+
     /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
@@ -292,6 +354,136 @@ class Container
     {
         $this->state = $state;
     }
+
+    /**
+     * @return string
+     */
+    public function getArchitecture(): string
+    {
+        return $this->architecture;
+    }
+
+    /**
+     * @param string $architecture
+     */
+    public function setArchitecture(string $architecture): void
+    {
+        $this->architecture = $architecture;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param mixed $config
+     */
+    public function setConfig($config): void
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpandedConfig()
+    {
+        return $this->expandedConfig;
+    }
+
+    /**
+     * @param mixed $expandedConfig
+     */
+    public function setExpandedConfig($expandedConfig): void
+    {
+        $this->expandedConfig = $expandedConfig;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDevices()
+    {
+        return $this->devices;
+    }
+
+    /**
+     * @param mixed $devices
+     */
+    public function setDevices($devices): void
+    {
+        $this->devices = $devices;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpandedDevices()
+    {
+        return $this->expandedDevices;
+    }
+
+    /**
+     * @param mixed $expandedDevices
+     */
+    public function setExpandedDevices($expandedDevices): void
+    {
+        $this->expandedDevices = $expandedDevices;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNetwork()
+    {
+        return $this->network;
+    }
+
+    /**
+     * @param mixed $network
+     */
+    public function setNetwork($network): void
+    {
+        $this->network = $network;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     */
+    public function setCreatedAt($createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param mixed $error
+     */
+    public function setError($error): void
+    {
+        $this->error = $error;
+    }
+
+
 
     /**
      * @return Image

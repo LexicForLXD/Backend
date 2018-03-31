@@ -41,6 +41,9 @@ class ContainerEntityTest extends WebTestCase
         $container->setName("Container_ContainerEntityTest");
         $container->setSettings("Settings");
         $container->setState("testing");
+        $container->setArchitecture("x86_64");
+        $container->setConfig([]);
+        $container->setDevices([]);
 
 
         $this->em->persist($container);
@@ -54,6 +57,7 @@ class ContainerEntityTest extends WebTestCase
         $this->assertEquals("fe::1", $containerFromDb->getIpv6());
         $this->assertEquals("Settings", $containerFromDb->getSettings());
         $this->assertEquals("testing", $containerFromDb->getState());
+        $this->assertEquals("x86_64", $containerFromDb->getArchitecture());
 
         $this->em->remove($containerFromDb);
         $this->em->flush();
@@ -67,6 +71,10 @@ class ContainerEntityTest extends WebTestCase
         $container->setIpv4("123.123.123.123");
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
+        $container->setArchitecture("x86_64");
+        $container->setConfig([]);
+        $container->setDevices([]);
+
         $this->em->persist($container);
 
         $profile = new Profile();
@@ -99,6 +107,10 @@ class ContainerEntityTest extends WebTestCase
         $container->setIpv4("123.123.123.123");
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
+        $container->setArchitecture("x86_64");
+        $container->setConfig([]);
+        $container->setDevices([]);
+
         $this->em->persist($container);
 
         $host = new Host();
@@ -128,6 +140,10 @@ class ContainerEntityTest extends WebTestCase
         $container->setIpv4("123.123.123.123");
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
+        $container->setArchitecture("x86_64");
+        $container->setConfig([]);
+        $container->setDevices([]);
+
         $this->em->persist($container);
 
 

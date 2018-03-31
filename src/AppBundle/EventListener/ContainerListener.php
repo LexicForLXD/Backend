@@ -13,6 +13,7 @@ use AppBundle\Entity\Container;
 use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Event\ContainerStateEvent;
+use AppBundle\Event\ContainerUpdateEvent;
 use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\OperationApi;
@@ -57,7 +58,7 @@ class ContainerListener
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
+            $container->setError($operationsResponse->body->metadata->err);
             $this->em->persist($container);
             $this->em->flush($container);
             return;
@@ -65,10 +66,10 @@ class ContainerListener
 
 
         $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-
         $container->setState('created');
+        $container = $this->getContainerData($container);
 
-        $this->em->persist($container);
+
         $this->em->flush($container);
 
         echo "FINISH-CREATION : ContainerId " . $event->getContainerId() . "\n";
@@ -93,7 +94,7 @@ class ContainerListener
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-STATE-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
+            $container->setError($operationsResponse->body->metadata->err);
             $this->em->persist($container);
             $this->em->flush($container);
             return;
@@ -105,8 +106,8 @@ class ContainerListener
 
 
         $container->setState(strtolower($result->body->metadata->status));
+        $container->setNetwork($result->body->metadata->network);
 
-        $this->em->persist($container);
         $this->em->flush($container);
 
         echo "FINISH-STATE-UPDATE : ContainerId " . $event->getContainerId() . "\n";
@@ -139,12 +140,12 @@ class ContainerListener
 
         foreach ($container->getBackupSchedules() as $schedule) {
             echo "REMOVE-CONTAINER-FROM-BACKUPSCHEDULE \n";
-            $sshApi->deleteAnacronFile($schedule);
+            $this->sshApi->deleteAnacronFile($schedule);
 
             $schedule->removeContainer($container);
 
-            $sshApi->sendAnacronFile($schedule);
-            $sshApi->makeFileExecuteable($schedule);
+            $this->sshApi->sendAnacronFile($schedule);
+            $this->sshApi->makeFileExecuteable($schedule);
         }
 
         foreach ($container->getProfiles() as $profile) {
@@ -176,7 +177,8 @@ class ContainerListener
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-CONTAINER-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setState($operationsResponse->body->metadata->err);
+            $container->setError($operationsResponse->body->metadata->err);
+
             $this->em->flush($container);
             return;
         }
@@ -185,17 +187,40 @@ class ContainerListener
 
         echo "UPDATING-BACKUPSCHEDULE... \n";
         foreach ($container->getBackupSchedules() as $schedule) {
-            $sshApi->deleteAnacronFile($schedule);
+            $this->sshApi->deleteAnacronFile($schedule);
 
-            $sshApi->sendAnacronFile($schedule);
-            $sshApi->makeFileExecuteable($schedule);
+            $this->sshApi->sendAnacronFile($schedule);
+            $this->sshApi->makeFileExecuteable($schedule);
         }
+
+        $container = $this->getContainerData($container);
 
         $container->setSettings($operationsResponse->body);
 
         $this->em->flush($container);
 
         echo "FINISH-CONTAINER-UPDATE : ContainerId " . $event->getContainerId() . "\n";
+    }
+
+
+    /**
+     * Receives data from lxd and saves it to db
+     *
+     * @param Container $container
+     * @return Container
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    private function getContainerData($container)
+    {
+        $containerResponse = $this->api->show($container->getHost(), $container);
+
+
+        $container->setExpandedConfig($containerResponse->body->metadata->expanded_config);
+        $container->setExpandedDevices($containerResponse->body->metadata->expanded_devices);
+        $container->setCreatedAt(\DateTime::createFromFormat(DATE_ATOM, $containerResponse->body->metadata->created_at));
+        $container->setState(strtolower($containerResponse->body->metadata->status));
+
+        return $container;
     }
 
 }
