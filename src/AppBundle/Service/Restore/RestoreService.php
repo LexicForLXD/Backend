@@ -71,9 +71,9 @@ class RestoreService
             //Find .tar.gz
             $end = strpos($result, '.tar.gz');
             //Find space before tarball name
-            $start = strrpos($result, ' ', $end-strlen($result));
+            $start = strrpos($result, ' ', $end-strlen($result))+1;
 
-            $name = substr($result, $start+1, $end-$start+6);
+            $name = substr($result, $start, $end-$start+7);
             $tarballs[] = $name;
 
             //Remove found tarball name from string
