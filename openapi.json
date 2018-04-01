@@ -2374,7 +2374,7 @@
                 }
             }
         },
-        "/restores/backups/{id}": {
+        "/restores/backups/{id}?host={hostID}": {
             "get": {
                 "tags": [
                     "backup-restore"
@@ -2394,6 +2394,20 @@
                                 }
                             }
                         }
+                    },
+                    {
+                        "name": "hostID",
+                        "in": "query",
+                        "description": "ID of the Host, where the Duplicity command should be executed on. Could be any host which is allowed to access the Backups backupDestination",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "hostID": {
+                                    "description": "Get all files in a duplicity backup",
+                                    "type": "int"
+                                }
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -2401,13 +2415,15 @@
                         "description": "Array of all Container backup tarballs included in the specified duplicity Backup"
                     },
                     "404": {
-                        "description": "No Backup for the id found"
+                        "description": "No Backup for the id found or no Host for the ID found"
                     },
                     "400": {
                         "description": "Error getting the list of files from the duplicity backup"
                     }
                 }
-            },
+            }
+        },
+        "/restores/backups/{id}": {
             "post": {
                 "tags": [
                     "backup-restore"
