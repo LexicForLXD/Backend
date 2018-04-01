@@ -36,23 +36,32 @@ class RestoreService
 
     /**
      * @param Backup $backup
+     * @param Host $host
      * @return string | array
      */
-    public function getFilesInBackupForTimestamp(Backup $backup)
+    public function getFilesInBackupForTimestamp(Backup $backup, Host $host)
     {
         $backupDestination = $backup->getDestination();
         $backupSchedule = $backup->getBackupSchedule();
 
         $remoteBackupPath = $backupDestination->getDestinationText().$backupSchedule->getName();
 
-        exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath.' 2>&1 &', $result);
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
+        $configuration = new Configuration($hostname);
+        $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
+
+        $session = new Session($configuration, $authentication);
+
+        $exec = $session->getExec();
+
+        $result = $exec->run('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath.' 2>&1 &');
 
         if(strpos($result, 'Error') !== false){
             return substr($result, strpos($result, 'Error'));
         }
 
         //Second query with grep
-        exec('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath.' | grep .tar.gz', $result);
+        $result = $exec->run('duplicity list-current-files --time '.date_format($backup->getTimestamp(), DATE_ATOM).' '.$remoteBackupPath.' | grep .tar.gz');
 
         //Create array with filenames from result - try to find all files ending with .tar.gz
         $numberOfTarballs = substr_count($result, '.tar.gz');
@@ -62,7 +71,7 @@ class RestoreService
             //Find .tar.gz
             $end = strpos($result, '.tar.gz');
             //Find space before tarball name
-            $start = strrpos($result, ' ', $end-strlen($result));
+            $start = strrpos($result, ' ', $end-strlen($result))+1;
 
             $name = substr($result, $start, $end-$start+7);
             $tarballs[] = $name;
