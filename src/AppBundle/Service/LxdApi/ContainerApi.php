@@ -57,7 +57,7 @@ class ContainerApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function show(Host $host, $containerName)
+    public function show(Host $host, string $containerName)
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$containerName);
         return Request::get($uri)->timeoutIn(10)->send();

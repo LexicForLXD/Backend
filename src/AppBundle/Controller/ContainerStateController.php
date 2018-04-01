@@ -165,6 +165,7 @@ class ContainerStateController extends Controller
         $result = $api->actual($container->getHost(), $container);
 
         $container->setNetwork($result->body->metadata->network);
+        $container->setState(mb_strtolower($result->body->metadata->status));
 
         $em->flush($container);
 

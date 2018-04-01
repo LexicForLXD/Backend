@@ -52,25 +52,27 @@ class ContainerListener
         echo "START-CREATION : ContainerId " . $event->getContainerId() . " \n";
 
         echo "CREATING CONTAINER... \n";
-
         $operationsResponse = $this->api->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
 
         if ($operationsResponse->body->metadata->status_code != 200) {
             echo "FAILED-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
             $container->setError($operationsResponse->body->metadata->err);
-            $this->em->persist($container);
             $this->em->flush($container);
             return;
         }
 
-
         $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
         $container->setState('created');
-        $container = $this->getContainerData($container);
 
-
+        $containerResponse = $this->api->show($container->getHost(), $container->getName());
+        $container->setExpandedConfig($containerResponse->body->metadata->expanded_config);
+        $container->setExpandedDevices($containerResponse->body->metadata->expanded_devices);
+        $container->setCreatedAt(new \DateTime($containerResponse->body->metadata->created_at));
+        $container->setState(strtolower($containerResponse->body->metadata->status));
+        $container->setArchitecture($containerResponse->body->metadata->architecture);
         $this->em->flush($container);
+
 
         echo "FINISH-CREATION : ContainerId " . $event->getContainerId() . "\n";
     }
@@ -95,7 +97,6 @@ class ContainerListener
             echo "FAILED-STATE-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
             $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
             $container->setError($operationsResponse->body->metadata->err);
-            $this->em->persist($container);
             $this->em->flush($container);
             return;
         }
@@ -193,7 +194,12 @@ class ContainerListener
             $this->sshApi->makeFileExecuteable($schedule);
         }
 
-        $container = $this->getContainerData($container);
+        $containerResponse = $this->api->show($container->getHost(), $container->getName());
+        $container->setExpandedConfig($containerResponse->body->metadata->expanded_config);
+        $container->setExpandedDevices($containerResponse->body->metadata->expanded_devices);
+        $container->setCreatedAt(new \DateTime($containerResponse->body->metadata->created_at));
+        $container->setState(strtolower($containerResponse->body->metadata->status));
+        $container->setArchitecture($containerResponse->body->metadata->architecture);
 
         $container->setSettings($operationsResponse->body);
 
@@ -220,6 +226,7 @@ class ContainerListener
         $container->setCreatedAt(\DateTime::createFromFormat(DATE_ATOM, $containerResponse->body->metadata->created_at));
         $container->setState(strtolower($containerResponse->body->metadata->status));
 
+        $this->em->flush($container);
         return $container;
     }
 
