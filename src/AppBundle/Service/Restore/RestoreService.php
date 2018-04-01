@@ -73,7 +73,7 @@ class RestoreService
             //Find space before tarball name
             $start = strrpos($result, ' ', $end-strlen($result));
 
-            $name = substr($result, $start, $end-$start+7);
+            $name = substr($result, $start+1, $end-$start+7);
             $tarballs[] = $name;
 
             //Remove found tarball name from string
