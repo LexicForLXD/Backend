@@ -24,7 +24,7 @@ class RestoreController extends Controller
     /**
      * Get all files in a duplicity backup
      *
-     * @OAS\Get(path="/restores/backups/{id}",
+     * @OAS\Get(path="/restores/backups/{id}?host={hostID}",
      *     tags={"backup-restore"},
      *     @OAS\Parameter(
      *      description="ID of the Backup",
@@ -38,13 +38,25 @@ class RestoreController extends Controller
      *          ),
      *      ),
      *      ),
+     *     @OAS\Parameter(
+     *      description="ID of the Host, where the Duplicity command should be executed on. Could be any host which is allowed to access the Backups backupDestination",
+     *      name="hostID",
+     *      in="query",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="hostID",
+     *              type="int",
+     *          ),
+     *      ),
+     *      ),
      *      @OAS\Response(
      *          response=200,
      *          description="Array of all Container backup tarballs included in the specified duplicity Backup",
      *      ),
      *      @OAS\Response(
      *          response=404,
-     *          description="No Backup for the id found",
+     *          description="No Backup for the id found or no Host for the ID found",
      *      ),
      *      @OAS\Response(
      *          response=400,
@@ -55,11 +67,12 @@ class RestoreController extends Controller
      * @Route("/restores/backups/{backupID}", name="restore_all_files_in_backup", methods={"GET"})
      * @param $backupID
      * @param RestoreService $restoreService
+     * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
      */
-    public function listAllFilesInBackup($backupID, RestoreService $restoreService){
+    public function listAllFilesInBackup($backupID, RestoreService $restoreService, Request $request){
         $backup = $this->getDoctrine()->getRepository(Backup::class)->find($backupID);
 
         if (!$backup) {
@@ -68,7 +81,19 @@ class RestoreController extends Controller
             );
         }
 
-        $result = $restoreService->getFilesInBackupForTimestamp($backup);
+        if(!$request->query->has('host')){
+            throw new WrongInputException("Host query paramater is missing");
+        }
+
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($request->query->get('host'));
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No Host for id '.$request->query->get('host') .' found'
+            );
+        }
+
+        $result = $restoreService->getFilesInBackupForTimestamp($backup, $host);
 
         if(is_array($result) == false){
             throw new WrongInputException($result);
