@@ -39,13 +39,20 @@ class Backup
     protected $timestamp;
 
     /**
-     * @var BackupSchedule
+     * @var BackupSchedule | null
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\BackupSchedule")
      * @ORM\JoinColumn(name="backup_schedule_id", referencedColumnName="id")
      * @JMS\Exclude()
      */
     protected $backupSchedule;
+
+    /**
+     * @var string | null
+     *
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     */
+    protected $manualBackupName;
 
     /**
      * @var ArrayCollection
@@ -90,9 +97,9 @@ class Backup
     }
 
     /**
-     * @return BackupSchedule
+     * @return BackupSchedule | null
      */
-    public function getBackupSchedule(): BackupSchedule
+    public function getBackupSchedule(): ?BackupSchedule
     {
         return $this->backupSchedule;
     }
@@ -209,5 +216,21 @@ class Backup
             return $this->backupSchedule->getId();
         }
         return null;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getManualBackupName(): ?string
+    {
+        return $this->manualBackupName;
+    }
+
+    /**
+     * @param null|string $manualBackupName
+     */
+    public function setManualBackupName($manualBackupName): void
+    {
+        $this->manualBackupName = $manualBackupName;
     }
 }
