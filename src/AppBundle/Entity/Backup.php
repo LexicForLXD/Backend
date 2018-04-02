@@ -43,6 +43,7 @@ class Backup
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\BackupSchedule")
      * @ORM\JoinColumn(name="backup_schedule_id", referencedColumnName="id")
+     * @Assert\Type(type="integer")
      * @JMS\Exclude()
      */
     protected $backupSchedule;
@@ -51,6 +52,7 @@ class Backup
      * @var string | null
      *
      * @ORM\Column(type="string", unique=true, nullable=true)
+     * @Assert\Type(type="string")
      */
     protected $manualBackupName;
 
