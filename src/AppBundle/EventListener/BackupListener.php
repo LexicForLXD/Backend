@@ -14,7 +14,7 @@ use AppBundle\Event\ManualBackupEvent;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\LxdApi\SnapshotApi;
-use AppBundle\Service\Restore\BackupService;
+use AppBundle\Service\Backup\BackupService;
 use Doctrine\ORM\EntityManager;
 
 class BackupListener
@@ -36,6 +36,8 @@ class BackupListener
 
     /**
      * @param ManualBackupEvent $event
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function onManualBackup(ManualBackupEvent $event)
