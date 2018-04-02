@@ -3,7 +3,10 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Backup;
+use AppBundle\Entity\BackupDestination;
 use AppBundle\Entity\BackupSchedule;
+use AppBundle\Entity\Container;
+use AppBundle\Event\ManualBackupEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\ForbiddenException;
 use AppBundle\Exception\WrongInputExceptionArray;
@@ -224,6 +227,95 @@ class BackupController extends Controller
         $em->flush();
 
         return $this->json([], 204);
+    }
+
+
+    /**
+     * @Route("/backups", name="create_backup", methods={"POST"})
+     *
+     * @OAS\Post(path="/backups",
+     *  tags={"backups"},
+     *  @OAS\Parameter(
+     *      description="Create a manual backup of containers from the same host",
+     *      name="body",
+     *      in="body",
+     *      required=true,
+     *      @OAS\Schema(
+     *          @OAS\Property(
+     *              property="destination",
+     *              type="int",
+     *          ),
+     *          @OAS\Property(
+     *              property="containerIds",
+     *              type="array",
+     *          ),
+     *          @OAS\Property(
+     *              property="backupName",
+     *              type="string",
+     *          ),
+     *      ),
+     *  ),
+     *  @OAS\Response(
+     *      description="The provided parameters are invalid",
+     *      response=400
+     *  ),
+     *  @OAS\Response(
+     *      description="The backup token is invalid",
+     *      response=403
+     *  ),
+     *  @OAS\Response(
+     *      description="The new Backup object was created",
+     *      response=201,
+     *      @OAS\JsonContent(ref="#/components/schemas/backup"),
+     *  ),
+     * )
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @return Response
+     * @throws ElementNotFoundException
+     */
+    public function storeBackupAction(Request $request, EntityManagerInterface $em)
+    {
+        $destination = $this->getDoctrine()->getRepository(BackupDestination::class)->find($request->get("destination"));
+
+        if (!$destination) {
+            throw new ElementNotFoundException(
+                'No backup destination for id '.$request->get("destination") .' found'
+            );
+        }
+
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findBy(['id' => $request->get("containerIds")]);
+
+        if (!$containers) {
+            throw new ElementNotFoundException(
+                'No containers for id '.$request->get("containerIds") .' found'
+            );
+        }
+
+        $host = $containers[0].getHost();
+
+        $backup = new Backup();
+        $backup->setDestination($destination);
+        foreach ($containers as $container)
+        {
+            $backup->addContainer($container);
+        }
+        $backup->setManualBackupName($request->get("backupName"));
+        $backup->setTimestamp();
+
+        $this->validation($backup);
+
+        $em->persist($backup);
+        $em->flush();
+
+        $dispatcher = $this->get('sb_event_queue');
+        $dispatcher->on(ManualBackupEvent::class, date('Y-m-d H:i:s'), $host, $backup);
+
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($backup, 'json');
+        return new Response($response, Response::HTTP_CREATED);
     }
 
     private function validation($object)
