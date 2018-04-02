@@ -214,6 +214,9 @@ class RestoreController extends Controller
         $image->setFingerprint($fingerprint);
 
         $result = $imageApi->getImageByFingerprint($host, $fingerprint);
+        if($result->code != 200){
+            throw new WrongInputException("Couldn't find the Image with fingerprint ".$fingerprint." on the Host");
+        }
 
         $image->setFilename($result->body->metadata->architecture);
         $image->setProperties($result->body->metadata->properties);
@@ -245,6 +248,9 @@ class RestoreController extends Controller
         }
 
         $result = $containerApi->show($host, $containerName);
+        if($result->code != 200){
+            throw new WrongInputException("Couldn't find the Container with the name ".$containerName." on the Host");
+        }
 
         $container = new Container();
         $container->setName($containerName);
