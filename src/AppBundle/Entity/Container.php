@@ -26,7 +26,7 @@ use JMS\Serializer\Annotation as JMS;
  * @UniqueEntity("ipv6")
  * @UniqueEntity("domainName")
  * @UniqueEntity("name")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\ContainerRepository")
+ * @ORM\Entity
  *
  * @OAS\Schema(schema="container", type="object")
  */
