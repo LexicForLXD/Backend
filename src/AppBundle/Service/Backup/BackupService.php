@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Service\Restore;
+namespace AppBundle\Service\Backup;
 
 use AppBundle\Entity\Backup;
 use AppBundle\Entity\Container;
