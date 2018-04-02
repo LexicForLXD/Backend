@@ -43,11 +43,7 @@ class RestoreService
     {
         $backupDestination = $backup->getDestination();
 
-        //Check if backupSchedule or manualBackupName is set
-        $backupName = $backup->getManualBackupName();
-        if($backup->getBackupSchedule() != null){
-            $backupName = $backup->getBackupSchedule()->getName();
-        }
+        $backupName = $this->getBackupName($backup);
 
         if($backupName == null){
             return "Backup object is invalid, backupSchedule and manualBackupName is missing.";
@@ -111,10 +107,7 @@ class RestoreService
 
         $backupDestination = $backup->getDestination();
 
-        $backupName = $backup->getManualBackupName();
-        if($backup->getBackupSchedule() != null){
-            $backupName = $backup->getBackupSchedule()->getName();
-        }
+        $backupName = $this->getBackupName($backup);
 
         if($backupName == null){
             return "Error - Backup object is invalid, backupSchedule and manualBackupName is missing.";
@@ -147,7 +140,13 @@ class RestoreService
 
         $exec = $session->getExec();
 
-        $pathToTarball = '/tmp/restore'.$backup->getBackupSchedule()->getName().'/'.$containerName.'.tar.gz';
+        $backupName = $this->getBackupName($backup);
+
+        if($backupName == null){
+            return "Error - Backup object is invalid, backupSchedule and manualBackupName is missing.";
+        }
+
+        $pathToTarball = '/tmp/restore'.$backupName.'/'.$containerName.'.tar.gz';
 
         $lxcCommand = 'lxc image import '.$pathToTarball.' --alias '.$containerName;
 
@@ -173,5 +172,14 @@ class RestoreService
 
         $exec = $session->getExec();
         return $exec->run('lxc init '.$containerName.' '.$containerName);
+    }
+
+    private function getBackupName(Backup $backup){
+        //Check if backupSchedule or manualBackupName is set
+        $backupName = $backup->getManualBackupName();
+        if($backup->getBackupSchedule() != null){
+            $backupName = $backup->getBackupSchedule()->getName();
+        }
+        return $backupName;
     }
 }
