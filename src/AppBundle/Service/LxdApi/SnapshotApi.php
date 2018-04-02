@@ -19,7 +19,7 @@ class SnapshotApi extends HttpHelper
 
     protected function getEndpoint($urlParam = NULL)
     {
-        return 'containers/'.$urlParam.'/snapshots';
+        return 'containers/' . $urlParam . '/snapshots';
     }
 
 
@@ -70,6 +70,23 @@ class SnapshotApi extends HttpHelper
             "name" => $snapshotName,
             "stateful" => $stateful
         ])->timeoutIn(10)->send();
+    }
+
+
+    /**
+     * Deletes a snapshot
+     *
+     * @param Host $host
+     * @param Container $container
+     * @param string $snapshotName
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function delete(Host $host, Container $container, string $snapshotName)
+    {
+        $uri = $this->buildUri($host, $this->getEndpoint($container->getName()).$snapshotName);
+
+        return Request::delete($uri)->timeoutIn(10)->send();
     }
 
 
