@@ -12,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Class Host
@@ -19,6 +21,8 @@ use Symfony\Component\Security\Core\User\AdvancedUserInterface;
  * @ORM\Entity
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
+ * @UniqueEntity("email")
+ * @UniqueEntity("username")
  */
 class User implements AdvancedUserInterface, \Serializable
 {
@@ -31,16 +35,25 @@ class User implements AdvancedUserInterface, \Serializable
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\Type(type="string")
      */
     protected $firstName;
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\Type(type="string")
      */
     protected $lastName;
 
     /**
      * @ORM\Column(type="string", length=30, unique=true)
+     * @Assert\Type(type="string")
+     * @Assert\Length(
+     *     min=5,
+     *     max=30,
+     *     minMessage = "Your username must be at least {{ limit }} characters long",
+     *     maxMessage = "Your username cannot be longer than {{ limit }} characters"
+     * )
      */
     protected $username;
 
@@ -52,7 +65,13 @@ class User implements AdvancedUserInterface, \Serializable
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
-     *
+     * @Assert\Email()
+     * @Assert\Length(
+     *     min=5,
+     *     max=60,
+     *     minMessage = "Your email must be at least {{ limit }} characters long",
+     *     maxMessage = "Your email cannot be longer than {{ limit }} characters"
+     * )
      */
     protected $email;
 
@@ -127,7 +146,7 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * @return mixed
      */
-    public function getisActive()
+    public function getIsActive()
     {
         return $this->isActive;
     }

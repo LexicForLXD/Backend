@@ -11,6 +11,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
 use AppBundle\Exception\ElementNotFoundException;
+use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -254,8 +255,11 @@ class UserController extends Controller
      * @param Request $request
      * @param $userId
      * @param EntityManagerInterface $em
+     * @param UserPasswordEncoderInterface $encoder
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
     public function updateAction(Request $request, $userId, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
     {
@@ -266,23 +270,20 @@ class UserController extends Controller
                 'No User found'
             );
         }
+        $this->checkRequestFields($request, ["firstName", "lastName", "email", "username"]);
 
-        if ($request->request->has("email")) {
-            $user->setEmail($request->request->get('email'));
-        }
-        if ($request->request->has("firstName")) {
-            $user->setFirstName($request->request->get('firstName'));
-        }
-        if ($request->request->has("lastName")) {
-            $user->setLastName($request->request->get('lastName'));
-        }
+        $user->setEmail($request->request->get('email'));
+        $user->setFirstName($request->request->get('firstName'));
+        $user->setLastName($request->request->get('lastName'));
+        $user->setUsername($request->request->get('username'));
+
         if ($request->request->has("password")) {
             $user->setPassword($encoder->encodePassword($user, $request->request->get('password')));
         }
-        if ($request->request->has("username")) {
-            $user->setUsername($request->request->get('username'));
-        }
 
+        if ($request->request->has("isActive")) {
+            $user->setIsActive($request->get("isActive"));
+        }
 
         $this->validation($user);
 
@@ -363,6 +364,26 @@ class UserController extends Controller
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($user, 'json');
         return new Response($response);
+    }
+
+    /**
+     * Checks whether the given fields are in the request
+     *
+     * @param Request $request
+     * @param array $fieldNames
+     * @throws WrongInputException
+     * @return bool
+     */
+    private function checkRequestFields(Request $request, array $fieldNames)
+    {
+
+        foreach ($fieldNames as $fieldName) {
+            if (!$request->request->has($fieldName)) {
+                throw new WrongInputException("You have to include the " . $fieldName . " field.");
+            }
+        }
+
+        return true;
     }
 
 
