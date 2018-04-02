@@ -103,7 +103,7 @@ class Container
 
     /**
      * @var array
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="json", nullable=true)
      * @Assert\Type(type="array")
      * @OAS\Property(example="{'limits.cpu': '2'}")
      */
@@ -119,9 +119,10 @@ class Container
 
     /**
      * @var array
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="json", nullable=true)
      * @Assert\Type(type="array")
      * @OAS\Property(example="{'root': {'path': '/'}}")
+     * @Assert\NotBlank()
      */
     protected $devices;
 
@@ -157,8 +158,6 @@ class Container
     /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
-     *
-     * @OAS\Property(ref="#/components/schemas/host")
      *
      * @JMS\Exclude()
      */
@@ -307,8 +306,19 @@ class Container
         return $this->host;
     }
 
+
     /**
-     * @return ArrayCollection
+     * @return int | null
+     * @OAS\Property(property="hostId", example="1")
+     * @JMS\VirtualProperty()
+     */
+    public function getHostId()
+    {
+        return $this->host->getId();
+    }
+
+    /**
+     * @return PersistentCollection
      */
     public function getStatuses() :PersistentCollection
     {
@@ -601,16 +611,6 @@ class Container
         $backup->removeContainer($this);
     }
 
-    /**
-     * @return int
-     *
-     * @OAS\Property(property="host_id", example="1")
-     *
-     * @JMS\VirtualProperty()
-     */
-    public function getHostId(){
-        return $this->host->getId();
-    }
 
 
     /**
