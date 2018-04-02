@@ -54,10 +54,11 @@ class ContainerController extends Controller
      *          description="No containers found",
      *      ),
      * )
+     * @throws ElementNotFoundException
      */
     public function indexAction()
     {
-        $containers = $this->getDoctrine()->getRepository(Container::class)->findAllJoinedToHost();
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findAll();
 
         if (!$containers) {
             throw new ElementNotFoundException(
@@ -115,7 +116,7 @@ class ContainerController extends Controller
 
         $fresh = $request->query->get('fresh');
 
-        $containers = $this->getDoctrine()->getRepository(Container::class)->findAllByHostJoinedToHost($hostId);
+        $containers = $this->getDoctrine()->getRepository(Container::class)->findBy(['host' => $hostId]);
 
         if (!$containers) {
             throw new ElementNotFoundException(
@@ -636,7 +637,7 @@ class ContainerController extends Controller
     {
         $fresh = $request->query->get('fresh');
 
-        $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
             throw new ElementNotFoundException(
@@ -694,7 +695,7 @@ class ContainerController extends Controller
      */
     public function deleteAction($containerId, EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
         $profiles = $container->getProfiles();
 
 
@@ -811,7 +812,7 @@ class ContainerController extends Controller
     {
         $dispatcher = $this->get('sb_event_queue');
 
-        $container = $this->getDoctrine()->getRepository(Container::class)->findOneByIdJoinedToHost($containerId);
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
 
         if (!$container) {
