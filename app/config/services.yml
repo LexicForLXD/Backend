@@ -129,3 +129,8 @@ services:
             class: AppBundle\EventListener\ForbiddenExceptionListener
             tags:
                 - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+    runtime_exception.listener:
+            class: AppBundle\EventListener\RuntimeExceptionListener
+            tags:
+                - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
