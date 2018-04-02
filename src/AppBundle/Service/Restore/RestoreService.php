@@ -111,7 +111,16 @@ class RestoreService
 
         $backupDestination = $backup->getDestination();
 
-        $remoteBackupPath = $backupDestination->getDestinationText().$backup->getBackupSchedule()->getName();
+        $backupName = $backup->getManualBackupName();
+        if($backup->getBackupSchedule() != null){
+            $backupName = $backup->getBackupSchedule()->getName();
+        }
+
+        if($backupName == null){
+            return "Error - Backup object is invalid, backupSchedule and manualBackupName is missing.";
+        }
+
+        $remoteBackupPath = $backupDestination->getDestinationText().$backupName;
 
         $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($backup->getTimestamp(), DATE_ATOM).' --file-to-restore '.$tarball.' /tmp/restore'.$backup->getBackupSchedule()->getName().'/'.$containerName.'.tar.gz';
 
