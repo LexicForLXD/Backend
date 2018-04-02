@@ -2850,10 +2850,7 @@
                         "description": "@ORM\\Column(type=\"json\", nullable=true)",
                         "example": "{'limits.cpu': '2'}"
                     },
-                    "host": {
-                        "$ref": "#/components/schemas/host"
-                    },
-                    "host_id": {
+                    "hostId": {
                         "example": "1"
                     },
                     "profile_id": {
