@@ -8,10 +8,9 @@
 
 namespace AppBundle\Event;
 
-use AppBundle\Entity\BackupDestination;
+use AppBundle\Entity\Backup;
 use SymfonyBundles\EventQueueBundle\Event;
 use AppBundle\Entity\Host;
-use AppBundle\Entity\Container;
 
 
 class ManualBackupEvent extends Event
@@ -20,23 +19,20 @@ class ManualBackupEvent extends Event
 
     private $time;
     private $host;
-    private $container;
-    private $destination;
+    private $backup;
 
 
     /**
      * ImageCreationEvent constructor.
      * @param $time
      * @param Host $host
-     * @param Container $container
-     * @param BackupDestination $destination
+     * @param Backup $backup
      */
-    public function __construct($time, Host $host, Container $container, BackupDestination $destination)
+    public function __construct($time, Host $host, Backup $backup)
     {
         $this->time = $time;
         $this->host = $host;
-        $this->container = $container;
-        $this->destination = $destination;
+        $this->backup = $backup;
     }
 
     /**
@@ -56,18 +52,12 @@ class ManualBackupEvent extends Event
     }
 
     /**
-     * @return Container
+     * @return Backup
      */
-    public function getContainer()
+    public function getBackup()
     {
-        return $this->container;
+        return $this->backup;
     }
 
-    /**
-     * @return BackupDestination
-     */
-    public function getDestination()
-    {
-        return $this->destination;
-    }
+
 }
