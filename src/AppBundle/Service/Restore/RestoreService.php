@@ -117,8 +117,8 @@ class RestoreService
 
         $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($backup->getTimestamp(), DATE_ATOM).' --file-to-restore '.$tarball.' /tmp/restore'.$backupName.'/'.$containerName.'.tar.gz';
 
-        $exec->run('rm -rf /tmp/restore'.$backup->getBackupSchedule()->getName());
-        $exec->run('mkdir /tmp/restore'.$backup->getBackupSchedule()->getName());
+        $exec->run('rm -rf /tmp/restore'.$backupName);
+        $exec->run('mkdir /tmp/restore'.$backupName);
         $result = $exec->run($duplicityCommand);
 
         return $result;
