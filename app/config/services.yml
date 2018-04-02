@@ -134,3 +134,8 @@ services:
             class: AppBundle\EventListener\RuntimeExceptionListener
             tags:
                 - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+    manual_backup.listener:
+            class: AppBundle\EventListener\BackupListener
+            tags:
+                - { name: kernel.event_listener, event: lxd.container.manual.backup, method: onManualBackup }
