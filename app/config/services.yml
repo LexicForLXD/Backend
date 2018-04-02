@@ -137,5 +137,6 @@ services:
 
     manual_backup.listener:
             class: AppBundle\EventListener\BackupListener
+            arguments: [ "@doctrine.orm.entity_manager" ]
             tags:
                 - { name: kernel.event_listener, event: lxd.container.manual.backup, method: onManualBackup }
