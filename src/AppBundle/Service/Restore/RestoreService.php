@@ -42,9 +42,18 @@ class RestoreService
     public function getFilesInBackupForTimestamp(Backup $backup, Host $host)
     {
         $backupDestination = $backup->getDestination();
-        $backupSchedule = $backup->getBackupSchedule();
 
-        $remoteBackupPath = $backupDestination->getDestinationText().$backupSchedule->getName();
+        //Check if backupSchedule or manualBackupName is set
+        $backupName = $backup->getManualBackupName();
+        if($backup->getBackupSchedule() != null){
+            $backupName = $backup->getBackupSchedule()->getName();
+        }
+
+        if($backupName == null){
+            return "Backup object is invalid, backupSchedule and manualBackupName is missing.";
+        }
+
+        $remoteBackupPath = $backupDestination->getDestinationText().$backupName;
 
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
