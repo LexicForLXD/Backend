@@ -9,6 +9,7 @@ use AppBundle\Entity\Container;
 use AppBundle\Event\ManualBackupEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\ForbiddenException;
+use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -274,6 +275,7 @@ class BackupController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      * @throws ElementNotFoundException
+     * @throws WrongInputException
      */
     public function storeBackupAction(Request $request, EntityManagerInterface $em)
     {
@@ -294,6 +296,14 @@ class BackupController extends Controller
         }
 
         $host = $containers[0].getHost();
+
+        foreach ($containers as $container)
+        {
+            if($container->getHost() != $host)
+            {
+                throw new WrongInputException("The selected containers are not on the same host.");
+            }
+        }
 
         $backup = new Backup();
         $backup->setDestination($destination);
