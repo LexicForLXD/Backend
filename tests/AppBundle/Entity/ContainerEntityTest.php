@@ -35,9 +35,6 @@ class ContainerEntityTest extends WebTestCase
     public function testSetterAllWithoutAssociations()
     {
         $container = new Container();
-        $container->setIpv4("123.123.123.123");
-        $container->setIpv6("fe::1");
-        $container->setDomainName("host.local");
         $container->setName("Container_ContainerEntityTest");
         $container->setSettings("Settings");
         $container->setState("testing");
@@ -53,8 +50,6 @@ class ContainerEntityTest extends WebTestCase
         $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
 
         $this->assertEquals("Container_ContainerEntityTest", $containerFromDb->getName());
-        $this->assertEquals("123.123.123.123", $containerFromDb->getIpv4());
-        $this->assertEquals("fe::1", $containerFromDb->getIpv6());
         $this->assertEquals("Settings", $containerFromDb->getSettings());
         $this->assertEquals("testing", $containerFromDb->getState());
         $this->assertEquals("x86_64", $containerFromDb->getArchitecture());
@@ -68,7 +63,6 @@ class ContainerEntityTest extends WebTestCase
     public function testAddRemoveProfile()
     {
         $container = new Container();
-        $container->setIpv4("123.123.123.123");
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
         $container->setArchitecture("x86_64");
@@ -104,7 +98,6 @@ class ContainerEntityTest extends WebTestCase
     public function testSetGetHost()
     {
         $container = new Container();
-        $container->setIpv4("123.123.123.123");
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
         $container->setArchitecture("x86_64");
@@ -137,7 +130,6 @@ class ContainerEntityTest extends WebTestCase
     public function testSetGetImage()
     {
         $container = new Container();
-        $container->setIpv4("123.123.123.123");
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
         $container->setArchitecture("x86_64");
@@ -168,36 +160,7 @@ class ContainerEntityTest extends WebTestCase
         $this->em->flush();
     }
 
-    public function testHasUriTrue()
-    {
-        $container1 = new Container();
-        $container1->setIpv4("127.0.0.1");
 
-        $this->assertTrue($container1->hasUri());
-
-        $container2  = new Container();
-        $container2->setIpv6("fe::1");
-
-        $this->assertTrue($container2->hasUri());
-
-        $container3  = new Container();
-        $container3->setDomainName("container.local");
-
-        $this->assertTrue($container3->hasUri());
-
-        $container4 = new Container();
-        $container4->setIpv4("127.0.0.1");
-        $container4->setIpv6("fe::1");
-        $container4->setDomainName("container.local");
-
-        $this->assertTrue($container4->hasUri());
-    }
-
-    public function testHasUriFalse()
-    {
-        $container = new Container();
-        $this->assertTrue(!$container->hasUri());
-    }
 
 
     /**

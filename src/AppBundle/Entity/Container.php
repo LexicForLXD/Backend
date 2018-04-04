@@ -22,9 +22,6 @@ use JMS\Serializer\Annotation as JMS;
  * Class Container
  * @package AppBundle\Entity
  * @ORM\Table(name="containers")
- * @UniqueEntity("ipv4")
- * @UniqueEntity("ipv6")
- * @UniqueEntity("domainName")
  * @UniqueEntity("name")
  * @ORM\Entity
  *
@@ -503,21 +500,7 @@ class Container
 
 
 
-    /**
-     * Checks if the container has at least on URI
-     *
-     *
-     *
-     * @return boolean
-     */
-    public function hasUri(){
-        if($this->ipv4 || $this->ipv6 || $this->domainName)
-        {
-            return true;
-        } else {
-            return false;
-        }
-    }
+
 
     /**
      * @param Profile $profile
