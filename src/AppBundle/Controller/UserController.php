@@ -160,25 +160,22 @@ class UserController extends Controller
      *
      * @param Request $request
      * @param EntityManagerInterface $em
+     * @param UserPasswordEncoderInterface $encoder
      * @return JsonResponse|Response
+     * @throws WrongInputExceptionArray
      */
     public function storeAction(Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
     {
         $user = new User();
-        if ($request->request->has("email")) {
-            $user->setEmail($request->request->get('email'));
-        }
-        if ($request->request->has("firstName")) {
-            $user->setFirstName($request->request->get('firstName'));
-        }
-        if ($request->request->has("lastName")) {
-            $user->setLastName($request->request->get('lastName'));
-        }
-        if ($request->request->has("password")) {
+
+        $user->setEmail($request->request->get('email'));
+        $user->setFirstName($request->request->get('firstName'));
+        $user->setLastName($request->request->get('lastName'));
+        $user->setUsername($request->request->get('username'));
+
+        if($request->request->has('password'))
+        {
             $user->setPassword($encoder->encodePassword($user, $request->request->get('password')));
-        }
-        if ($request->request->has("username")) {
-            $user->setUsername($request->request->get('username'));
         }
 
         $this->validation($user);
@@ -392,6 +389,7 @@ class UserController extends Controller
      *
      * @param User $object
      * @return array|bool
+     * @throws WrongInputExceptionArray
      */
     private function validation(User $object)
     {
