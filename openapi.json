@@ -26,6 +26,50 @@
                         "description": "No Backups found"
                     }
                 }
+            },
+            "post": {
+                "tags": [
+                    "backups"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Create a manual backup of containers from the same host",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "destination": {
+                                    "type": "int"
+                                },
+                                "containerIds": {
+                                    "type": "array"
+                                },
+                                "backupName": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "The provided parameters are invalid"
+                    },
+                    "403": {
+                        "description": "The backup token is invalid"
+                    },
+                    "201": {
+                        "description": "The new Backup object was created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/backup"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/backups/{id}": {
@@ -2428,7 +2472,7 @@
                 "tags": [
                     "backup-restore"
                 ],
-                "summary": "Restore Backups created via BackupSchedule",
+                "summary": "Restore Backup",
                 "parameters": [
                     {
                         "name": "id",
@@ -2438,7 +2482,7 @@
                         "schema": {
                             "properties": {
                                 "id": {
-                                    "description": "Restore Backups created via BackupSchedule",
+                                    "description": "Restore Backup",
                                     "type": "int"
                                 }
                             }
