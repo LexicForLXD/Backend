@@ -3467,16 +3467,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v2.4.4",
+            "version": "v2.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "eddb97148ad779f27e670e1e3f19fb323aedafeb"
+                "reference": "7b604c89da162034bdf4bb66310f358d313dd16d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/eddb97148ad779f27e670e1e3f19fb323aedafeb",
-                "reference": "eddb97148ad779f27e670e1e3f19fb323aedafeb",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/7b604c89da162034bdf4bb66310f358d313dd16d",
+                "reference": "7b604c89da162034bdf4bb66310f358d313dd16d",
                 "shasum": ""
             },
             "require": {
@@ -3485,8 +3485,8 @@
             },
             "require-dev": {
                 "psr/container": "^1.0",
-                "symfony/debug": "~2.7",
-                "symfony/phpunit-bridge": "~3.3@dev"
+                "symfony/debug": "^2.7",
+                "symfony/phpunit-bridge": "^3.3"
             },
             "type": "library",
             "extra": {
@@ -3529,7 +3529,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2017-09-27T18:10:31+00:00"
+            "time": "2018-04-02T09:24:19+00:00"
         },
         {
             "name": "willdurand/jsonp-callback-validator",
@@ -3736,12 +3736,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "458931cf5763f57248a610a98575282d78285ed3"
+                "reference": "0867e66ca5bcd66d29e845aa46e97603a6af8a0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/458931cf5763f57248a610a98575282d78285ed3",
-                "reference": "458931cf5763f57248a610a98575282d78285ed3",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/0867e66ca5bcd66d29e845aa46e97603a6af8a0e",
+                "reference": "0867e66ca5bcd66d29e845aa46e97603a6af8a0e",
                 "shasum": ""
             },
             "require": {
@@ -3790,7 +3790,7 @@
                 "rest",
                 "service discovery"
             ],
-            "time": "2017-11-24T08:53:32+00:00"
+            "time": "2018-02-25T09:51:37+00:00"
         }
     ],
     "packages-dev": [
