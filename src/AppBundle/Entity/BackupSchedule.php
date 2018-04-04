@@ -56,6 +56,7 @@ class BackupSchedule
      * @var string
      *
      * @ORM\Column(type="string")
+     * @Assert\NotBlank()
      * @Assert\Choice({"daily", "weekly", "monthly"}, strict="true")
      * @Assert\Type("string")
      * @OAS\Property(example="daily")
@@ -67,7 +68,7 @@ class BackupSchedule
      *
      * @ORM\ManyToOne(targetEntity="BackupDestination", inversedBy="backupSchedules")
      * @ORM\JoinColumn(name="destination_id", referencedColumnName="id")
-     * @Assert\NotNull
+     * @Assert\NotBlank()
      */
     protected $destination;
 
@@ -78,6 +79,7 @@ class BackupSchedule
      * @var string
      *
      * @ORM\Column(type="string")
+     * @Assert\NotBlank()
      * @Assert\Type("string")
      * @Assert\Choice({"full", "incremental"}, strict="true")
      * @OAS\Property(example="full")
@@ -119,7 +121,7 @@ class BackupSchedule
      *      @ORM\JoinColumn(name="container_id", referencedColumnName="id")
      *  }
      * )
-     *
+     * @Assert\NotBlank()
      * @JMS\Exclude()
      */
     protected $containers;
