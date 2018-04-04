@@ -243,18 +243,11 @@ class BackupScheduleController extends Controller
                 'No backup schedule found for id ' . $scheduleId
             );
         }
+        $oldSchedule = $schedule;
 
         $containers = $this->getDoctrine()->getRepository(Container::class)->findBy(["id" => $request->get('containers')]);
 
-        if (!$containers) {
-            throw new ElementNotFoundException(
-                'No container found. You must specify at least one container to use a BackupSchedule.'
-            );
-        }
-
         $this->checkForSameHost($containers);
-
-        $sshApi->deleteAnacronFile($schedule);
 
         $schedule->setName($request->get('name'));
         $schedule->setDescription($request->get('description'));
@@ -263,11 +256,12 @@ class BackupScheduleController extends Controller
         $schedule->setType($request->get('type'));
         $schedule->setContainers($containers);
 
-
         $this->validation($schedule);
 
         $em->flush($schedule);
 
+
+        $sshApi->deleteAnacronFile($oldSchedule);
         $sshApi->sendAnacronFile($schedule);
         $sshApi->makeFileExecuteable($schedule);
 
