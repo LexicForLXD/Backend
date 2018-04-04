@@ -900,16 +900,16 @@
         },
         {
             "name": "doctrine/orm",
-            "version": "v2.6.0",
+            "version": "v2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "374e7ace49d864dad8cddbc55346447c8a6a2083"
+                "reference": "87ee409783a4a322b5597ebaae558661404055a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/374e7ace49d864dad8cddbc55346447c8a6a2083",
-                "reference": "374e7ace49d864dad8cddbc55346447c8a6a2083",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/87ee409783a4a322b5597ebaae558661404055a7",
+                "reference": "87ee409783a4a322b5597ebaae558661404055a7",
                 "shasum": ""
             },
             "require": {
@@ -978,7 +978,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2017-12-20T00:38:15+00:00"
+            "time": "2018-02-27T07:30:56+00:00"
         },
         {
             "name": "fig/link-util",
@@ -3736,12 +3736,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "458931cf5763f57248a610a98575282d78285ed3"
+                "reference": "0867e66ca5bcd66d29e845aa46e97603a6af8a0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/458931cf5763f57248a610a98575282d78285ed3",
-                "reference": "458931cf5763f57248a610a98575282d78285ed3",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/0867e66ca5bcd66d29e845aa46e97603a6af8a0e",
+                "reference": "0867e66ca5bcd66d29e845aa46e97603a6af8a0e",
                 "shasum": ""
             },
             "require": {
@@ -3790,7 +3790,7 @@
                 "rest",
                 "service discovery"
             ],
-            "time": "2017-11-24T08:53:32+00:00"
+            "time": "2018-02-25T09:51:37+00:00"
         }
     ],
     "packages-dev": [
