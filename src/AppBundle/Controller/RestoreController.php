@@ -105,7 +105,7 @@ class RestoreController extends Controller
     }
 
     /**
-     * Restore Backups created via BackupSchedule
+     * Restore Backup
      *
      * @OAS\Post(path="/restores/backups/{id}",
      * tags={"backup-restore"},

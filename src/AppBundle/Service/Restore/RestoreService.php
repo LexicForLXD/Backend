@@ -42,9 +42,14 @@ class RestoreService
     public function getFilesInBackupForTimestamp(Backup $backup, Host $host)
     {
         $backupDestination = $backup->getDestination();
-        $backupSchedule = $backup->getBackupSchedule();
 
-        $remoteBackupPath = $backupDestination->getDestinationText().$backupSchedule->getName();
+        $backupName = $this->getBackupName($backup);
+
+        if($backupName == null){
+            return "Backup object is invalid, backupSchedule and manualBackupName is missing.";
+        }
+
+        $remoteBackupPath = $backupDestination->getDestinationText().$backupName;
 
         $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
@@ -102,12 +107,18 @@ class RestoreService
 
         $backupDestination = $backup->getDestination();
 
-        $remoteBackupPath = $backupDestination->getDestinationText().$backup->getBackupSchedule()->getName();
+        $backupName = $this->getBackupName($backup);
 
-        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($backup->getTimestamp(), DATE_ATOM).' --file-to-restore '.$tarball.' /tmp/restore'.$backup->getBackupSchedule()->getName().'/'.$containerName.'.tar.gz';
+        if($backupName == null){
+            return "Error - Backup object is invalid, backupSchedule and manualBackupName is missing.";
+        }
 
-        $exec->run('rm -rf /tmp/restore'.$backup->getBackupSchedule()->getName());
-        $exec->run('mkdir /tmp/restore'.$backup->getBackupSchedule()->getName());
+        $remoteBackupPath = $backupDestination->getDestinationText().$backupName;
+
+        $duplicityCommand = 'duplicity restore --no-encryption '.$remoteBackupPath.' --time '.date_format($backup->getTimestamp(), DATE_ATOM).' --file-to-restore '.$tarball.' /tmp/restore'.$backupName.'/'.$containerName.'.tar.gz';
+
+        $exec->run('rm -rf /tmp/restore'.$backupName);
+        $exec->run('mkdir /tmp/restore'.$backupName);
         $result = $exec->run($duplicityCommand);
 
         return $result;
@@ -129,7 +140,13 @@ class RestoreService
 
         $exec = $session->getExec();
 
-        $pathToTarball = '/tmp/restore'.$backup->getBackupSchedule()->getName().'/'.$containerName.'.tar.gz';
+        $backupName = $this->getBackupName($backup);
+
+        if($backupName == null){
+            return "Error - Backup object is invalid, backupSchedule and manualBackupName is missing.";
+        }
+
+        $pathToTarball = '/tmp/restore'.$backupName.'/'.$containerName.'.tar.gz';
 
         $lxcCommand = 'lxc image import '.$pathToTarball.' --alias '.$containerName;
 
@@ -155,5 +172,14 @@ class RestoreService
 
         $exec = $session->getExec();
         return $exec->run('lxc init '.$containerName.' '.$containerName);
+    }
+
+    private function getBackupName(Backup $backup){
+        //Check if backupSchedule or manualBackupName is set
+        $backupName = $backup->getManualBackupName();
+        if($backup->getBackupSchedule() != null){
+            $backupName = $backup->getBackupSchedule()->getName();
+        }
+        return $backupName;
     }
 }
