@@ -43,36 +43,9 @@ class Container
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\Ip
-     * @Assert\Type(type="string")
-     * @OAS\Property(example="192.168.178.20")
-     * @var string
-     */
-    protected $ipv4;
-
-    /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\Ip(version = 6)
-     *
-     * @Assert\Type(type="string")
-     * @OAS\Property(example="fe80::20")
-     * @var string
-     */
-    protected $ipv6;
-
-    /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\Regex("/[.]/")
-     * @Assert\Type(type="string")
-     * @OAS\Property(example="container14.localnet.com")
-     * @var string
-     */
-    protected $domainName;
-
-    /**
      * @ORM\Column(type="text")
      * @Assert\Type(type="string")
+     * @Assert\NotBlank()
      * @OAS\Property(example="WebServer1")
      * @var string
      */
@@ -158,6 +131,7 @@ class Container
     /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+     * @Assert\NotBlank()
      *
      * @JMS\Exclude()
      */
