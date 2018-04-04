@@ -36,12 +36,14 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * @ORM\Column(type="string")
      * @Assert\Type(type="string")
+     * @Assert\NotBlank()
      */
     protected $firstName;
 
     /**
      * @ORM\Column(type="string")
      * @Assert\Type(type="string")
+     * @Assert\NotBlank()
      */
     protected $lastName;
 
@@ -54,18 +56,22 @@ class User implements AdvancedUserInterface, \Serializable
      *     minMessage = "Your username must be at least {{ limit }} characters long",
      *     maxMessage = "Your username cannot be longer than {{ limit }} characters"
      * )
+     * @Assert\NotBlank()
      */
     protected $username;
 
     /**
      * @ORM\Column(type="string")
      * @JMS\Exclude()
+     * @Assert\NotBlank()
+     *
      */
     protected $password;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
      * @Assert\Email()
+     * @Assert\NotBlank()
      * @Assert\Length(
      *     min=5,
      *     max=60,
@@ -97,6 +103,7 @@ class User implements AdvancedUserInterface, \Serializable
     public function __construct()
     {
         $this->isActive = true;
+        $this->roles = array();
     }
 
     public function getId()
