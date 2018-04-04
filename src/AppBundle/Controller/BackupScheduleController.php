@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Controller;
 
 
@@ -82,7 +83,6 @@ class BackupScheduleController extends Controller
      * @param EntityManagerInterface $em
      * @param ScheduleSSH $sshApi
      * @return Response
-     * @throws ElementNotFoundException
      * @throws WrongInputExceptionArray
      */
     public function createBackupScheduleAction(Request $request, EntityManagerInterface $em, ScheduleSSH $sshApi)
@@ -92,6 +92,7 @@ class BackupScheduleController extends Controller
 
         $destination = $this->getDoctrine()->getRepository(BackupDestination::class)->find($request->get('destination'));
 
+        $this->checkForSameHost($containers);
 
         $schedule = new BackupSchedule();
         $schedule->setName($request->get('name'));
@@ -106,7 +107,6 @@ class BackupScheduleController extends Controller
 
         $em->persist($schedule);
         $em->flush();
-
 
 
         $sshApi->sendAnacronFile($schedule);
@@ -252,6 +252,8 @@ class BackupScheduleController extends Controller
             );
         }
 
+        $this->checkForSameHost($containers);
+
         $sshApi->deleteAnacronFile($schedule);
 
         $schedule->setName($request->get('name'));
@@ -373,5 +375,25 @@ class BackupScheduleController extends Controller
 
         }
         return false;
+    }
+
+
+    /**
+     * Checks whether all containers are on the same host.
+     *
+     * @param $containers
+     * @return bool
+     * @throws WrongInputExceptionArray
+     */
+    private function checkForSameHost($containers)
+    {
+        $host = $containers[0]->getHost();
+
+        foreach ($containers as $container) {
+            if ($container->getHost() != $host) {
+                throw new WrongInputExceptionArray(["containers" => "The selected containers are not on the same host."]);
+            }
+        }
+        return true;
     }
 }
