@@ -12,14 +12,19 @@ use AppBundle\Entity\User;
 use AppBundle\Entity\Client;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class Fixtures extends Fixture
 {
+    private $encoder;
+    
+    public function __construct(UserPasswordEncoderInterface $encoder)
+    {
+        $this->encoder = $encoder;
+    }
+    
     public function load(ObjectManager $manager)
     {
-        $encoder = $this->container->get('security.password_encoder');
-
         $client = new Client();
         $client->setAllowedGrantTypes(['password']);
         $client->setSecret('4ok2x70rlfokc8g0wws8c8kwcokw80k44sg48goc0ok4w0so0k');
@@ -31,7 +36,7 @@ class Fixtures extends Fixture
         $user->setFirstName('Max');
         $user->setLastName('Mustermann');
         $user->setUsername('mmustermann');
-        $user->setPassword($encoder->encodePassword($user, 'password'));
+        $user->setPassword($this->encoder->encodePassword($user, 'password'));
         $user->setRoles(['ROLE_ADMIN']);
         $manager->persist($user);
 
