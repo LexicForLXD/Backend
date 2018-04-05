@@ -12,7 +12,6 @@ use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\ImageAliasApi;
 use AppBundle\Service\LxdApi\ImageApi;
-use AppBundle\Service\LxdApi\OperationsRelayApi;
 use Httpful\Exception\ConnectionErrorException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -363,7 +362,7 @@ class ImageController extends Controller
         $aliases = $image->getAliases();
         for($i = 0; $i < $aliases->count(); $i++){
             $result = $aliasApi->removeAliasByName($image->getHost(), $aliases->get($i)->getName());
-            if($result->code != 200){
+            if($result->code != 200 && $result->code != 404){
                 throw new WrongInputException("Couldn't delete alias - ".$result->body->error);
             }
             $imageAlias = $aliases->get($i);
@@ -374,7 +373,7 @@ class ImageController extends Controller
 
         $result = $api->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
 
-        if($result->body->metadata->status_code != 200){
+        if($result->body->metadata->status_code != 200 && $result->body->metadata->err != "not found"){
             throw new WrongInputException("Couldn't delete image - ".$result->body->metadata->err);
         }
 
