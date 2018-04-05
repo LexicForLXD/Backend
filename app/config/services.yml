@@ -176,3 +176,7 @@ services:
     SymfonyBundles\EventQueueBundle\Command\DispatchCommand:
             tags:
                 - { name: 'console.command', command: 'event:queue:dispatch' }
+    
+    Doctrine\ORM\EntityRepository:
+            alias: platform.user.repository
+         
