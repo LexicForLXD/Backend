@@ -39,7 +39,7 @@
         "zircote/swagger-php": "3.x-dev"
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^2.4",
+        "doctrine/doctrine-fixtures-bundle": "^3.0",
         "sensio/generator-bundle": "^3.0",
         "symfony/phpunit-bridge": "^4.0"
     },
