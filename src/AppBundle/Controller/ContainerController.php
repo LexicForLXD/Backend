@@ -696,8 +696,6 @@ class ContainerController extends Controller
     public function deleteAction($containerId, EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
-        $profiles = $container->getProfiles();
-
 
         if (!$container) {
             throw new ElementNotFoundException(

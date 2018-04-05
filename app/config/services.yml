@@ -148,3 +148,19 @@ services:
             arguments: [ "@doctrine.orm.entity_manager" ]
             tags:
                 - { name: kernel.event_listener, event: lxd.container.manual.backup, method: onManualBackup }
+
+    FOS\OAuthServerBundle\Model\AccessTokenManagerInterface:
+            alias: fos_oauth_server.access_token_manager.default
+            public: true
+
+    FOS\OAuthServerBundle\Model\AuthCodeManagerInterface:
+            alias: fos_oauth_server.auth_code_manager.default
+            public: true
+
+    FOS\OAuthServerBundle\Model\ClientManagerInterface:
+            alias: fos_oauth_server.client_manager.default
+            public: true
+
+    FOS\OAuthServerBundle\Model\RefreshTokenManagerInterface:
+            alias: fos_oauth_server.refresh_token_manager.default
+            public: true
