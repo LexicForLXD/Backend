@@ -384,9 +384,21 @@ class BackupSchedule
 
             ';
         }
+        if($this->type == "incremental")
+        {
+            $commandTexts = $commandTexts .
+                '# Backup via duplicity
+            duplicity --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . '
 
-        $commandTexts = $commandTexts .
-            '# Backup via duplicity
+
+            # Make api call to webhook
+            curl -X POST -k ' . $this->webhookUrl . '
+
+
+            ';
+        } else {
+            $commandTexts = $commandTexts .
+                '# Backup via duplicity
             duplicity ' . $this->type . ' --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . '
 
 
@@ -394,7 +406,8 @@ class BackupSchedule
             curl -X POST -k ' . $this->webhookUrl . '
 
 
-        ';
+            ';
+        }
 
         return $commandTexts;
     }
