@@ -268,6 +268,7 @@ class RestoreController extends Controller
         $container->setArchitecture($result->body->metadata->architecture);
         $container->setCreatedAt(\DateTime::createFromFormat(DATE_ATOM, $result->body->metadata->created_at));
         $container->setState(strtolower($result->body->metadata->status));
+        $container->setEphemeral(false);
 
         $container->setImage($image);
         $image->addContainer($container);
