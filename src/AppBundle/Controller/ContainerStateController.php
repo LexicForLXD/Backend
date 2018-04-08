@@ -117,12 +117,7 @@ class ContainerStateController extends Controller
                 break;
         }
 
-
-
-
-
         $dispatcher->on(ContainerStateEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
-
 
 
         //TODO mögliche Fehler abfangen
