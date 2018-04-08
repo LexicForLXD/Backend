@@ -2,25 +2,6 @@ FROM janrtr/docker-symfony-php7-composer:3.7
 
 RUN apk --no-cache add git php7-simplexml php7-ssh2
 
-#Duplicity - commands from https://hub.docker.com/r/wernight/duplicity/~/dockerfile/
-RUN set -x \
- && apk add --no-cache \
-        ca-certificates \
-        duplicity \
-        lftp \
-        openssh \
-        openssl \
-        py-crypto \
-        py-pip \
-        py-paramiko \
-        py-setuptools \
-        rsync \
- && update-ca-certificates \
- && pip install \
-      pydrive==1.3.1 \
-      fasteners==0.14.1 \
- && apk del --purge py-pip
-
 ADD /app /www/symfony/app
 
 #Add parameters.yml for Docker
