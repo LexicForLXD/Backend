@@ -2,6 +2,7 @@ SYP-LXC Backend
 ========================
 
 [![Build Status](https://travis-ci.org/LexicForLXD/Backend.svg?branch=master)](https://travis-ci.org/LexicForLXD/Backend)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FLexicForLXD%2FBackend.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FLexicForLXD%2FBackend?ref=badge_shield)
 
 [![coverage report](https://git.janrtr.de/syp-lxc/Backend/badges/master/coverage.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
 # Requirements
@@ -42,3 +43,7 @@ php bin/console app:create-user
 ```
 ### Hosted swagger docs
 [here](https://lexicforlxd.github.io/Backend/?url=https://raw.githubusercontent.com/LexicForLXD/Backend/gh-pages/openapi.json)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FLexicForLXD%2FBackend.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FLexicForLXD%2FBackend?ref=badge_large)
