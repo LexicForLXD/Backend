@@ -546,14 +546,12 @@ class ContainerController extends Controller
         $container->setHost($host);
         $container->setConfig($request->get("config"));
         $container->setDevices($request->get("devices"));
+        $container->setEphemeral($request->get("ephemeral"));
 
         if ($request->request->has("name")) {
             $container->setName($request->get("name"));
         }
         $container->setSettings($data);
-
-
-
 
         $container->setState('creating');
 
