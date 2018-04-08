@@ -36,22 +36,6 @@ docker-compose exec web php bin/console app:create-user
 docker-compose exec web <command>
 ```
 
-## Required steps for Duplicity Backup
-##### This steps are required to work with BackupDestinations using SSH Key Authentication
-
-- Add these to links to the docker-compose file (under volumes)
-```
-- "/path/to/backupSSH/ssh:/root/.ssh/id_rsa"
-- "/path/to/backupSSH/ssh.pub:/root/.ssh/id_rsa.pub"
-```
-- Replace "path/to/backupSSH" with local filepath to the SSH Key
-- The private key must have permissions 600 and the public key 644
-
-- Add BackupDestinations to known hosts (accept with yes)
-```
-docker-compose exec web ssh myuser@myDestination
-```
-
 ## Access to Containers
 - WebServer : localhost port 80
 - Postgres Database : localhost port 5432
