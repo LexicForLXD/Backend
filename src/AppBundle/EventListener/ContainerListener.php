@@ -93,13 +93,17 @@ class ContainerListener
 
         $operationsResponse = $this->stateApi->getOperationsLinkWithWait($event->getHost(), $event->getOperationId());
 
-        if ($operationsResponse->body->metadata->status_code != 200) {
-            echo "FAILED-STATE-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
-            $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
-            $container->setError($operationsResponse->body->metadata->err);
-            $this->em->flush($container);
-            return;
+        if($operationsResponse->code != 200)
+        {
+            if ($operationsResponse->body->metadata->status_code != 200) {
+                echo "FAILED-STATE-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
+                $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
+                $container->setError($operationsResponse->body->metadata->err);
+                $this->em->flush($container);
+                return;
+            }
         }
+
 
         $container = $this->em->getRepository(Container::class)->find($event->getContainerId());
 
