@@ -78,6 +78,7 @@ class ContainerStateController extends Controller
      */
     public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateApi $api)
     {
+        $dispatcher = $this->get('sb_event_queue');
         $container = $this->getDoctrine()->getRepository(Container::class)->findOneById($containerId);
 
         if (!$container) {
@@ -85,23 +86,6 @@ class ContainerStateController extends Controller
                 'No container found for id ' . $containerId
             );
         }
-
-
-        switch($request->get("action")){
-            case "start":
-                $container->setState("running");
-                break;
-            case "stop":
-                $container->setState("stopped");
-                break;
-            case "restart":
-                $container->setState("running");
-                break;
-            default:
-                throw new WrongInputException('please use one of the following actions: state, stop, restart');
-                break;
-        }
-
 
         $data = [
             "action" => $request->get("action"),
@@ -112,7 +96,30 @@ class ContainerStateController extends Controller
 
         $result = $api->update($container->getHost(), $container, $data);
 
-        $dispatcher = $this->get('sb_event_queue');
+        switch($request->get("action")){
+            case "start":
+                $container->setState("starting");
+                break;
+            case "stop":
+                if($container->getEphemeral())
+                {
+                    $em->remove($container);
+                    $em->flush();
+                    return new JsonResponse(['message' => 'container delete because ephemeral']);
+                }
+                $container->setState("stopping");
+                break;
+            case "restart":
+                $container->setState("restarting");
+                break;
+            default:
+                throw new WrongInputException('please use one of the following actions: state, stop, restart');
+                break;
+        }
+
+
+
+
 
         $dispatcher->on(ContainerStateEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
 
