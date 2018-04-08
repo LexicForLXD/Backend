@@ -2929,6 +2929,10 @@
                         "type": "string",
                         "example": "WebServer1"
                     },
+                    "ephemeral": {
+                        "type": "boolean",
+                        "example": "false"
+                    },
                     "state": {
                         "type": "string",
                         "example": "TODO Settings"
