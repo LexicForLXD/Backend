@@ -92,8 +92,6 @@ class BackupScheduleController extends Controller
 
         $destination = $this->getDoctrine()->getRepository(BackupDestination::class)->find($request->get('destination'));
 
-        $this->checkForSameHost($containers);
-
         $schedule = new BackupSchedule();
         $schedule->setName($request->get('name'));
         $schedule->setDescription($request->get('description'));
@@ -104,6 +102,8 @@ class BackupScheduleController extends Controller
         $schedule->setWebhookUrl($this->generateUrl('create_backup_with_schedule_webhook', array('token' => $schedule->getToken()), UrlGeneratorInterface::ABSOLUTE_URL));
 
         $this->validation($schedule);
+
+        $this->checkForSameHost($containers);
 
         $em->persist($schedule);
         $em->flush();
@@ -247,12 +247,12 @@ class BackupScheduleController extends Controller
         $containers = $this->getDoctrine()->getRepository(Container::class)->findBy(["id" => $request->get('containers')]);
 
         if (!$containers) {
-            throw new ElementNotFoundException(
-                'No container found. You must specify at least one container to use a BackupSchedule.'
-            );
+            throw new WrongInputExceptionArray([
+                'containers' => 'No container found. You must specify at least one container to use a BackupSchedule.'
+            ]);
         }
 
-        $this->checkForSameHost($containers);
+
 
         $sshApi->deleteAnacronFile($schedule);
 
@@ -265,6 +265,8 @@ class BackupScheduleController extends Controller
 
 
         $this->validation($schedule);
+
+        $this->checkForSameHost($containers);
 
         $em->flush($schedule);
 
