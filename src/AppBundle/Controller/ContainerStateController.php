@@ -2,6 +2,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Event\ContainerStateEvent;
+use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -32,6 +33,7 @@ class ContainerStateController extends Controller
      *
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
+     * @throws ElementNotFoundException
      * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
      *
      * @OAS\Put(path="/containers/{containerId}/state",
@@ -79,10 +81,10 @@ class ContainerStateController extends Controller
     public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateApi $api)
     {
         $dispatcher = $this->get('sb_event_queue');
-        $container = $this->getDoctrine()->getRepository(Container::class)->findOneById($containerId);
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No container found for id ' . $containerId
             );
         }
@@ -132,8 +134,12 @@ class ContainerStateController extends Controller
      * Get the current state of the Container by ContainerID
      *
      * @param int $containerId
+     * @param ContainerStateApi $api
+     * @param EntityManagerInterface $em
      * @return Response
      *
+     * @throws \Httpful\Exception\ConnectionErrorException
+     * @throws ElementNotFoundException
      * @Route("/containers/{containerId}/state", name="show_container_state", methods={"GET"})
      *
      * @OAS\Get(path="/containers/{containerId}/state",
@@ -156,10 +162,10 @@ class ContainerStateController extends Controller
      */
     public function showCurrentStateAction(int $containerId, ContainerStateApi $api, EntityManagerInterface $em)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->findOneById($containerId);
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
-            throw $this->createNotFoundException(
+            throw new ElementNotFoundException(
                 'No container found for id ' . $containerId
             );
         }
