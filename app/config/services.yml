@@ -164,3 +164,26 @@ services:
     FOS\OAuthServerBundle\Model\RefreshTokenManagerInterface:
             alias: fos_oauth_server.refresh_token_manager.default
             public: true
+            
+    SymfonyBundles\EventQueueBundle\Command\Daemon\StopCommand:
+            tags:
+                - { name: 'console.command', command: 'event:queue:daemon:stop' }
+                
+    SymfonyBundles\EventQueueBundle\Command\Daemon\StartCommand:
+            tags:
+                - { name: 'console.command', command: 'event:queue:daemon:start' }
+
+    SymfonyBundles\EventQueueBundle\Command\DispatchCommand:
+            tags:
+                - { name: 'console.command', command: 'event:queue:dispatch' }
+    
+    Doctrine\ORM\EntityRepository:
+            alias: platform.user.repository
+         
+    FOS\OAuthServerBundle\Command\CreateClientCommand:
+            tags:
+                - { name: 'console.command', command: 'fos:oauth-server:create-client' }
+                
+    FOS\OAuthServerBundle\Command\CleanCommand:
+            tags:
+                - { name: 'console.command', command: 'fos:oauth-server:clean' }
