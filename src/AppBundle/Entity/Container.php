@@ -86,7 +86,8 @@ class Container
 
     /**
      * @ORM\Column(type="boolean")
-     * @Assert\Type(type="boolean")
+     * @Assert\Type(type="bool")
+     * @Assert\NotNull()
      * @OAS\Property(example="false")
      * @var bool
      */
@@ -112,7 +113,6 @@ class Container
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="array")
      * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $config;
@@ -166,7 +166,7 @@ class Container
     /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
-     *
+     * @Assert\NotBlank()
      * @JMS\Exclude()
      */
     protected $host;
