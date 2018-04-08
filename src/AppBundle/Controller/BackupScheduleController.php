@@ -247,9 +247,9 @@ class BackupScheduleController extends Controller
         $containers = $this->getDoctrine()->getRepository(Container::class)->findBy(["id" => $request->get('containers')]);
 
         if (!$containers) {
-            throw new ElementNotFoundException(
-                'No container found. You must specify at least one container to use a BackupSchedule.'
-            );
+            throw new WrongInputExceptionArray([
+                'containers' => 'No container found. You must specify at least one container to use a BackupSchedule.'
+            ]);
         }
 
 
