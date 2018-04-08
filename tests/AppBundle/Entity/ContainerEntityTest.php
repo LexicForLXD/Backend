@@ -42,6 +42,7 @@ class ContainerEntityTest extends WebTestCase
         $container->setSettings("Settings");
         $container->setState("testing");
         $container->setArchitecture("x86_64");
+        $container->setEphemeral(false);
         $container->setConfig([]);
         $container->setDevices([]);
 
@@ -72,6 +73,7 @@ class ContainerEntityTest extends WebTestCase
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
         $container->setArchitecture("x86_64");
+        $container->setEphemeral(false);
         $container->setConfig([]);
         $container->setDevices([]);
 
@@ -108,6 +110,7 @@ class ContainerEntityTest extends WebTestCase
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
         $container->setArchitecture("x86_64");
+        $container->setEphemeral(false);
         $container->setConfig([]);
         $container->setDevices([]);
 
@@ -141,6 +144,7 @@ class ContainerEntityTest extends WebTestCase
         $container->setName("Container_ContainerEntityTest");
         $container->setState("testing");
         $container->setArchitecture("x86_64");
+        $container->setEphemeral(false);
         $container->setConfig([]);
         $container->setDevices([]);
 

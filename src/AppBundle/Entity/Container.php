@@ -85,6 +85,14 @@ class Container
     protected $settings;
 
     /**
+     * @ORM\Column(type="boolean")
+     * @Assert\Type(type="boolean")
+     * @OAS\Property(example="false")
+     * @var bool
+     */
+    protected $ephemeral;
+
+    /**
      * @ORM\Column(type="text", nullable=true)
      * @Assert\Type(type="string")
      * @OAS\Property(example="TODO Settings")
@@ -491,6 +499,22 @@ class Container
     public function setError($error): void
     {
         $this->error = $error;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEphemeral(): bool
+    {
+        return $this->ephemeral;
+    }
+
+    /**
+     * @param bool $ephemeral
+     */
+    public function setEphemeral($ephemeral): void
+    {
+        $this->ephemeral = $ephemeral;
     }
 
 
