@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class Network
  * @package AppBundle\Entity
+ * @ORM\Entity
  * @ORM\Table(name="lxdNetwork")
  */
 class Network
@@ -78,7 +79,7 @@ class Network
     protected $status;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy=lxdnetworks")
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="networks")
      * @ORM\JoinTable(
      *  joinColumns={
      *      @ORM\JoinColumn(name="lxdnetwork_id", referencedColumnName="id")
