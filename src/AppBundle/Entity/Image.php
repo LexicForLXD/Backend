@@ -211,7 +211,7 @@ class Image
     /**
      * @param Host $host
      */
-    public function setHost(Host $host)
+    public function setHost($host)
     {
         $this->host = $host;
     }

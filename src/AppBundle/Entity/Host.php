@@ -459,7 +459,7 @@ class Host
             return;
         }
         $this->images->add($image);
-        $image->addHost($this);
+        $image->setHost($this);
     }
 
     /**
@@ -471,7 +471,7 @@ class Host
             return;
         }
         $this->images->removeElement($image);
-        $image->removeHost($this);
+        $image->setHost(null);
     }
 
     /**
