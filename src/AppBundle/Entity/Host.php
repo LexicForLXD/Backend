@@ -144,6 +144,12 @@ class Host
      */
     protected $statuses;
 
+    /**
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Network", mappedBy="host")
+     * @JMS\Exclude()
+     */
+    protected $lxdNetworks;
+
 
     public function __construct()
     {
@@ -151,6 +157,7 @@ class Host
         $this->profiles = new ArrayCollection();
         $this->images = new ArrayCollection();
         $this->statuses = new ArrayCollection();
+        $this->lxdNetworks = new ArrayCollection();
     }
 
 
@@ -423,9 +430,30 @@ class Host
     }
 
     /**
-    * Adds a Image to the Host.
-    * @param Image $image
+    * @param Network $network
     */
+    public function addLXDNetwork(Network $network){
+        if ($this->lxdNetworks->contains($network)) {
+            return;
+        }
+        $this->lxdNetworks->add($network);
+        $network->setHost($this);
+    }
+
+    /**
+     * @param Network $network
+     */
+    public function removeLXDNetwork(Network $network){
+        if (!$this->lxdNetworks->contains($network)) {
+            return;
+        }
+        $this->lxdNetworks->removeElement($network);
+        $network->setHost(null);
+    }
+
+    /**
+     * @param Image $image
+     */
     public function addImage(Image $image){
         if ($this->images->contains($image)) {
             return;

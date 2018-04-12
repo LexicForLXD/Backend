@@ -146,7 +146,7 @@ class Container
      * @var
      * @ORM\Column(type="json", nullable=true)
      * @Assert\Type(type="array")
-     * @OAS\Property(example="{'limits.cpu': '2'}")
+     * @OAS\Property(example="{'limits.cpu': '2'}") //TODO Maybe not required with the new Network Entity
      */
     protected $network;
 
@@ -205,12 +205,19 @@ class Container
      */
     protected $image;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Network", mappedBy="containers")
+     * @JMS\Exclude()
+     */
+    protected $networks;
+
     public function __construct()
     {
         $this->profiles = new ArrayCollection();
         $this->statuses = new ArrayCollection();
         $this->backupSchedules = new ArrayCollection();
         $this->backups = new ArrayCollection();
+        $this->networks = new ArrayCollection();
     }
 
     /**
@@ -635,7 +642,27 @@ class Container
         $backup->removeContainer($this);
     }
 
+    /**
+     * @param Network $network
+     */
+    public function addNetwork(Network $network){
+        if ($this->networks->contains($network)) {
+            return;
+        }
+        $this->networks->add($network);
+        $this->networks->addContainer($this);
+    }
 
+    /**
+     * @param Network $network
+     */
+    public function removeNetwork(Network $network){
+        if (!$this->backups->contains($network)) {
+            return;
+        }
+        $this->networks->removeElement($network);
+        $network->removeContainer($this);
+    }
 
     /**
      * @return array
