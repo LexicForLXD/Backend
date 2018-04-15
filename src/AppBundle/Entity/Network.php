@@ -68,8 +68,6 @@ class Network
 
     /**
      * @ORM\Column(type="boolean")
-     * @Assert\NotNull()
-     * @Assert\Type(type="boolean")
      *
      * @OAS\Property(example=true)
      * @var boolean
@@ -198,9 +196,9 @@ class Network
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -214,9 +212,9 @@ class Network
     }
 
     /**
-     * @return bool
+     * @return bool | null
      */
-    public function isManaged(): bool
+    public function isManaged(): ?bool
     {
         return $this->managed;
     }
@@ -230,9 +228,9 @@ class Network
     }
 
     /**
-     * @return string
+     * @return string | null
      */
-    public function getStatus(): string
+    public function getStatus(): ?string
     {
         return $this->status;
     }
