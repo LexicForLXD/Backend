@@ -44,7 +44,7 @@ class NetworkController extends Controller
 
         if(!$network){
             throw new ElementNotFoundException(
-                'No Network for '.$networkID.' found'
+                'No Network for ID '.$networkID.' found'
             );
         }
 
@@ -88,7 +88,7 @@ class NetworkController extends Controller
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostID);
         if(!$host){
             throw new ElementNotFoundException(
-                'No Host for '.$hostID.' found'
+                'No Host for ID '.$hostID.' found'
             );
         }
 
@@ -119,8 +119,32 @@ class NetworkController extends Controller
         return new Response($response, Response::HTTP_CREATED);
     }
 
-    public function deleteNetwork(){
+    /**
+     * @Route("/networks/{networkID}", name="delete_network", methods={"DELETE"})
+     * @throws ElementNotFoundException
+     * @throws WrongInputException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function deleteNetwork($networkID, NetworkApi $networkApi){
+        $network = $this->getDoctrine()->getRepository(Network::class)->find($networkID);
 
+        if(!$network){
+            throw new ElementNotFoundException(
+                'No Network for ID '.$networkID.' found'
+            );
+        }
+
+        $result = $networkApi->deleteNetwork($network->getHost(), $network->getName());
+
+        if($result->code != 200 && $result->code != 404){
+            throw new WrongInputException("LXD Error - ".$result->body->error);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($network);
+        $em->flush();
+
+        return $this->json([], 204);
     }
 
     private function validation($object)

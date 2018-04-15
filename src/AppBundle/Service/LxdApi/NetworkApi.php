@@ -79,4 +79,17 @@ class NetworkApi extends HttpHelper
         $uri = $this->buildUri($host, $this->getEndpoint());
         return Request::get($uri."/".$networkName)->timeoutIn(10)->send();
     }
+
+    /**
+     * Delete single network by name
+     *
+     * @param Host $host
+     * @param $networkName
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function deleteNetwork(Host $host, $networkName){
+        $uri = $this->buildUri($host, $this->getEndpoint());
+        return Request::delete($uri."/".$networkName)->timeoutIn(10)->send();
+    }
 }
