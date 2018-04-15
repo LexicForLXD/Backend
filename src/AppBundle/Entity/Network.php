@@ -7,12 +7,15 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as JMS;
 use Doctrine\ORM\Mapping as ORM;
+use Swagger\Annotations as OAS;
 
 /**
  * Class Network
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="lxdNetwork")
+ *
+ * @OAS\Schema(schema="network", type="object")
  */
 class Network
 {
@@ -21,6 +24,7 @@ class Network
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
+     * @OAS\Property(example="2")
      * @var integer
      */
     protected $id;
@@ -30,6 +34,7 @@ class Network
      * @Assert\Type(type="string")
      * @Assert\NotNull()
      *
+     * @OAS\Property(example="lxd-network-1")
      * @var string
      */
     protected $name;
@@ -38,6 +43,7 @@ class Network
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type(type="string")
      *
+     * @OAS\Property(example="Some description string")
      * @var string
      */
     protected $description;
@@ -46,9 +52,7 @@ class Network
      * @ORM\Column(type="json")
      * @Assert\NotNull()
      * @Assert\Type(type="array")
-     * @Assert\Choice({"bridge"}, strict="true")
      *
-     * //TODO Add missing choices
      * @var array
      */
     protected $config;
@@ -56,7 +60,9 @@ class Network
     /**
      * @ORM\Column(type="string")
      * @Assert\Type(type="string")
+     * @Assert\Choice({"bridge"}, strict="true")
      *
+     * @OAS\Property(example="bridge")
      * @var string
      */
     protected $type;
@@ -66,6 +72,7 @@ class Network
      * @Assert\NotNull()
      * @Assert\Type(type="boolean")
      *
+     * @OAS\Property(example=true)
      * @var boolean
      */
     protected $managed;
@@ -74,6 +81,7 @@ class Network
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type(type="string")
      *
+     * @OAS\Property(example="Created")
      * @var string
      */
     protected $status;
@@ -82,6 +90,7 @@ class Network
      * @ORM\Column(type="array", nullable=true)
      * @Assert\Type(type="array")
      *
+     * @OAS\Property(example="Json array with locations")
      * @var array
      */
     protected $locations;
@@ -290,5 +299,25 @@ class Network
         }
         $this->containers->removeElement($container);
         $container->removeNetwork($this);
+    }
+
+    /**
+     * @return array
+     *
+     * @OAS\Property(property="containerId", example="[1]")
+     *
+     * @JMS\VirtualProperty()
+     */
+    public function getContainerId(){
+        if($this->containers->isEmpty()){
+            return null;
+        }
+
+        $this->containers->first();
+        do{
+            $ids[] = $this->containers->current()->getId();
+        }while($this->containers->next());
+
+        return $ids;
     }
 }
