@@ -60,7 +60,6 @@ class Network
     /**
      * @ORM\Column(type="string")
      * @Assert\Type(type="string")
-     * @Assert\Choice({"bridge"}, strict="true")
      *
      * @OAS\Property(example="bridge")
      * @var string
