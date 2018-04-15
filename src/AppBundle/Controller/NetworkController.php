@@ -105,6 +105,7 @@ class NetworkController extends Controller
         $network->setManaged($result->body->metadata->managed);
         $network->setStatus($result->body->metadata->status);
         $network->setLocations($result->body->metadata->locations);
+        $network->setType($result->body->metadata->type);
 
         $host->addLXDNetwork($network);
 
