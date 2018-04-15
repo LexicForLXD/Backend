@@ -79,6 +79,14 @@ class Network
     protected $status;
 
     /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Assert\Type(type="array")
+     *
+     * @var array
+     */
+    protected $locations;
+
+    /**
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Container", inversedBy="networks")
      * @ORM\JoinTable(
      *  joinColumns={
@@ -243,6 +251,22 @@ class Network
     public function setContainers(PersistentCollection $containers): void
     {
         $this->containers = $containers;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLocations(): ?array
+    {
+        return $this->locations;
+    }
+
+    /**
+     * @param array $locations
+     */
+    public function setLocations($locations): void
+    {
+        $this->locations = $locations;
     }
 
     /**
