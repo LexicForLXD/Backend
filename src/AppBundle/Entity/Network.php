@@ -160,7 +160,7 @@ class Network
     /**
      * @param string $name
      */
-    public function setName(string $name): void
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -176,7 +176,7 @@ class Network
     /**
      * @param string $description
      */
-    public function setDescription(string $description): void
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
@@ -192,7 +192,7 @@ class Network
     /**
      * @param array $config
      */
-    public function setConfig(array $config): void
+    public function setConfig($config): void
     {
         $this->config = $config;
     }
@@ -208,7 +208,7 @@ class Network
     /**
      * @param string $type
      */
-    public function setType(string $type): void
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -224,7 +224,7 @@ class Network
     /**
      * @param bool $managed
      */
-    public function setManaged(bool $managed): void
+    public function setManaged($managed): void
     {
         $this->managed = $managed;
     }
@@ -240,7 +240,7 @@ class Network
     /**
      * @param string $status
      */
-    public function setStatus(string $status): void
+    public function setStatus($status): void
     {
         $this->status = $status;
     }
