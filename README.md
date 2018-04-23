@@ -22,9 +22,9 @@ composer install
 php bin/console doctrine:schema:update --force
 ```
 
-### Test password grant client erzeugen
+### Password grant client erzeugen
 ```php
-php bin/console doctrine:fixtures:load
+php bin/console fos:oauth-server:create-client
 ```
 
 ### User erzeugen
