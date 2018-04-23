@@ -387,12 +387,7 @@ class ContainerController extends Controller
         {
             $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
 
-            $this->checkProfiles($profiles, $request->get("profiles"));
-
-
-            foreach ($profiles as $profile) {
-                $profileNames[] = $profile->getName();
-            }
+            $profileNames = $this->checkProfiles($profiles, $request->get("profiles"));
         }
 
 
@@ -415,18 +410,18 @@ class ContainerController extends Controller
 
                 if(!$request->request->has("fingerprint") && !$request->request->has("alias"))
                 {
-                    throw new WrongInputException(
-                        'You have to pass either a fingerprint or an alias for the image.'
-                    );
+                    throw new WrongInputExceptionArray([
+                        'image' => 'You have to pass either a fingerprint or an alias for the image.'
+                    ]);
                 }
 
                 if ($request->request->has("fingerprint")) {
                     $image = $this->getDoctrine()->getRepository(Image::class)->findOneBy(["fingerprint" => $request->get("fingerprint")]);
 
                     if (!$image) {
-                        throw new ElementNotFoundException(
-                            'No Image in our system found for fingerprint ' . $request->get("fingerprint")
-                        );
+                        throw new WrongInputExceptionArray([
+                            'fingerprint' => 'No Image in our system found for fingerprint ' . $request->get("fingerprint")
+                        ]);
                     }
 
 
@@ -436,9 +431,9 @@ class ContainerController extends Controller
                     $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findOneBy(["name" => $request->get("alias")]);
 
                     if (!$imageAlias) {
-                        throw new ElementNotFoundException(
-                            'No Image in our system found for alias ' . $request->get("alias")
-                        );
+                        throw new WrongInputExceptionArray([
+                            'alias' => 'No Image in our system found for alias ' . $request->get("alias")
+                        ]);
                     }
 
                     $image = $imageAlias->getImage();
@@ -448,9 +443,9 @@ class ContainerController extends Controller
 
                 if($host !== $image->getHost())
                 {
-                    throw new WrongInputException(
-                        'The image you selected is not available on the selected host.'
-                    );
+                    throw new WrongInputExceptionArray([
+                        'image' => 'The image you selected is not available on the selected host.'
+                    ]);
                 }
 
                 $container->setImage($image);
@@ -465,9 +460,9 @@ class ContainerController extends Controller
                 $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
 
                 if (!$oldContainer) {
-                    throw new ElementNotFoundException(
-                        'No Container found for containerId ' . $request->get("oldContainerId")
-                    );
+                    throw new WrongInputExceptionArray([
+                        'container' => 'No Container found for containerId ' . $request->get("oldContainerId")
+                    ]);
                 }
 
                 $data = [
@@ -508,9 +503,9 @@ class ContainerController extends Controller
                 $oldContainer = $this->getDoctrine()->getRepository(Container::class)->find($request->get("oldContainerId"));
 
                 if (!$oldContainer) {
-                    throw new ElementNotFoundException(
-                        'No Container found for containerId ' . $request->get("oldContainerId")
-                    );
+                    throw new WrongInputExceptionArray([
+                        'container' => 'No Container found for containerId ' . $request->get("oldContainerId")
+                    ]);
                 }
 
                 $data = [
@@ -545,7 +540,7 @@ class ContainerController extends Controller
 
                 break;
             default:
-                throw new WrongInputException("The type was wrong. Either use image, migration, copy or none.");
+                throw new WrongInputExceptionArray(['type' => "The type was wrong. Either use image, migration, copy or none."]);
         }
 
         $container->setHost($host);
@@ -731,10 +726,13 @@ class ContainerController extends Controller
      * @param EntityManagerInterface $em
      * @param ContainerApi $api
      * @param OperationApi $operationApi
+     * @param ProfileManagerApi $profileManagerApi
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws WrongInputExceptionArray
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      * @Route("/containers/{containerId}", name="containers_update", methods={"PUT"})
      *
@@ -826,13 +824,13 @@ class ContainerController extends Controller
                 $result = $api->migrate($container->getHost(), $container, $data);
 
                 if ($result->code == 409) {
-                    throw new WrongInputException("The name is already taken.");
+                    throw new WrongInputExceptionArray(["name" => "The name is already taken."]);
                 }
 
                 $container->setName($request->get("name"));
 
             } else {
-                throw new WrongInputException("The name is already taken.");
+                throw new WrongInputExceptionArray(["name" => "The new name is same as current name."]);
             }
 
 
@@ -852,7 +850,7 @@ class ContainerController extends Controller
 
 
 
-            if (!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral")) {
+            if (!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral") && !$request->request->has("profiles")) {
                 throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
             }
 
@@ -918,23 +916,22 @@ class ContainerController extends Controller
 
 
     /**
+     * Checks whether the transmitted profiles are in the DB
+     *
      * @param array $profiles
      * @param array $profilesRequest
-     * @return bool
+     * @return array
      * @throws WrongInputExceptionArray
      */
     private function checkProfiles(Array $profiles, Array $profilesRequest)
     {
-        if(count($profiles) == count($profilesRequest))
-        {
-            return true;
-        }
-
         $profilesDB = array();
+        $profileNames = array();
 
         foreach ($profiles as $profile)
         {
             $profilesDB[] = $profile->getId();
+            $profileNames[] = $profile->getName();
         }
 
         $errors = array_diff($profilesRequest, $profilesDB);
@@ -943,7 +940,12 @@ class ContainerController extends Controller
         foreach ($errors as $error) {
             $errorArray[] = 'The profile with the id ' . $error . ' is not present in our database.';
         }
-        throw new WrongInputExceptionArray($errorArray);
+        if(count($errorArray) > 0)
+        {
+            throw new WrongInputExceptionArray($errorArray);
+        }
+        return $profileNames;
+
     }
 
 }
