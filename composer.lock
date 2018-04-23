@@ -346,16 +346,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "v2.7.0",
+            "version": "v2.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "f76bf5ef631cec551a86c2291fc749534febebf1"
+                "reference": "11037b4352c008373561dc6fc836834eed80c3b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/f76bf5ef631cec551a86c2291fc749534febebf1",
-                "reference": "f76bf5ef631cec551a86c2291fc749534febebf1",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/11037b4352c008373561dc6fc836834eed80c3b5",
+                "reference": "11037b4352c008373561dc6fc836834eed80c3b5",
                 "shasum": ""
             },
             "require": {
@@ -417,7 +417,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2018-04-01T23:33:17+00:00"
+            "time": "2018-04-07T18:44:18+00:00"
         },
         {
             "name": "doctrine/doctrine-bundle",
@@ -1099,12 +1099,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
-                "reference": "37b3b9d8268d1bae8ff59ed2ad51493269512ca7"
+                "reference": "0f6f6bb3e46fed4794556c4a937a3f60691ebed3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/37b3b9d8268d1bae8ff59ed2ad51493269512ca7",
-                "reference": "37b3b9d8268d1bae8ff59ed2ad51493269512ca7",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/0f6f6bb3e46fed4794556c4a937a3f60691ebed3",
+                "reference": "0f6f6bb3e46fed4794556c4a937a3f60691ebed3",
                 "shasum": ""
             },
             "require": {
@@ -1175,7 +1175,7 @@
                 "oauth2",
                 "server"
             ],
-            "time": "2018-04-04T10:02:38+00:00"
+            "time": "2018-04-23T07:01:14+00:00"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -3809,12 +3809,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "0867e66ca5bcd66d29e845aa46e97603a6af8a0e"
+                "reference": "46ffb9e9a29e715bd857cf87046e244dddc0cb9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/0867e66ca5bcd66d29e845aa46e97603a6af8a0e",
-                "reference": "0867e66ca5bcd66d29e845aa46e97603a6af8a0e",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/46ffb9e9a29e715bd857cf87046e244dddc0cb9b",
+                "reference": "46ffb9e9a29e715bd857cf87046e244dddc0cb9b",
                 "shasum": ""
             },
             "require": {
@@ -3863,7 +3863,7 @@
                 "rest",
                 "service discovery"
             ],
-            "time": "2018-02-25T09:51:37+00:00"
+            "time": "2018-03-23T11:32:56+00:00"
         }
     ],
     "packages-dev": [
