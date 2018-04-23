@@ -103,7 +103,7 @@ class ContainerStateController extends Controller
                 $container->setState("starting");
                 break;
             case "stop":
-                if($container->getEphemeral())
+                if($container->isEphemeral())
                 {
                     $em->remove($container);
                     $em->flush();
