@@ -76,17 +76,15 @@ jobs:
         github-token: $GITHUB_TOKEN
         keep-history: true
         local-dir: openapi
-    - stage: release
-      if: branch = master AND type != pull_request
-      language: php
-      node_js: 7.1
-      script: echo "releasing"
-      deploy:
-        provider: script
-        skip-cleanup: true
-        script:
-          - nvm install lts/*
-          - npx semantic-release
+#    - stage: release
+#      if: branch = master AND type != pull_request
+#      language: node_js
+#      node_js: node
+#      script: echo "releasing"
+#      deploy:
+#        provider: script
+#        skip-cleanup: true
+#        script: npx semantic-release-github
     # - stage: deploy
     #   if: branch = master
 
