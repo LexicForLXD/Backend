@@ -22,9 +22,6 @@ use JMS\Serializer\Annotation as JMS;
  * Class Container
  * @package AppBundle\Entity
  * @ORM\Table(name="containers")
- * @UniqueEntity("ipv4")
- * @UniqueEntity("ipv6")
- * @UniqueEntity("domainName")
  * @UniqueEntity("name")
  * @ORM\Entity
  *
@@ -43,36 +40,9 @@ class Container
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\Ip
-     * @Assert\Type(type="string")
-     * @OAS\Property(example="192.168.178.20")
-     * @var string
-     */
-    protected $ipv4;
-
-    /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\Ip(version = 6)
-     *
-     * @Assert\Type(type="string")
-     * @OAS\Property(example="fe80::20")
-     * @var string
-     */
-    protected $ipv6;
-
-    /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\Regex("/[.]/")
-     * @Assert\Type(type="string")
-     * @OAS\Property(example="container14.localnet.com")
-     * @var string
-     */
-    protected $domainName;
-
-    /**
      * @ORM\Column(type="text")
      * @Assert\Type(type="string")
+     * @Assert\NotBlank()
      * @OAS\Property(example="WebServer1")
      * @var string
      */
@@ -560,21 +530,7 @@ class Container
 
 
 
-    /**
-     * Checks if the container has at least on URI
-     *
-     *
-     *
-     * @return boolean
-     */
-    public function hasUri(){
-        if($this->ipv4 || $this->ipv6 || $this->domainName)
-        {
-            return true;
-        } else {
-            return false;
-        }
-    }
+
 
     /**
      * @param Profile $profile

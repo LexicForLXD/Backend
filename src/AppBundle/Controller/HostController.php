@@ -136,27 +136,13 @@ class HostController extends Controller
     {
 
         $host = new Host();
-        if($request->request->has("ipv4")) {
-            $host->setIpv4($request->request->get('ipv4'));
-        }
-        if($request->request->has("ipv6")) {
-            $host->setIpv6($request->request->get('ipv6'));
-        }
-        if($request->request->has("domainName")) {
-            $host->setDomainName($request->request->get('domainName'));
-        }
-        if($request->request->has("mac")) {
-            $host->setMac($request->request->get('mac'));
-        }
-        if($request->request->has("name")) {
-            $host->setName($request->request->get('name'));
-        }
-        if($request->request->has("port")) {
-            $host->setPort($request->request->get('port'));
-        }
-        if($request->request->has("settings")) {
-            $host->setSettings($request->request->get('settings'));
-        }
+        $host->setIpv4($request->request->get('ipv4'));
+        $host->setIpv6($request->request->get('ipv6'));
+        $host->setDomainName($request->request->get('domainName'));
+        $host->setMac($request->request->get('mac'));
+        $host->setName($request->request->get('name'));
+        $host->setPort($request->request->get('port'));
+        $host->setSettings($request->request->get('settings'));
 
 
         $host->setAuthenticated(false);
@@ -166,14 +152,14 @@ class HostController extends Controller
         $em->persist($host);
         $em->flush();
 
-        try{
+        try {
             $authenticated = $api->trusted($host);
-        } catch(ConnectionErrorException $e){
+        } catch (ConnectionErrorException $e) {
             $authenticated = false;
         }
 
 
-        if($authenticated){
+        if ($authenticated) {
             $host->setAuthenticated(true);
         } elseif ($request->get('password')) {
             $data = [
@@ -184,7 +170,7 @@ class HostController extends Controller
 
             $result = $api->authenticate($host, $data);
 
-            if($result->code == 201) {
+            if ($result->code == 201) {
                 $host->setAuthenticated(true);
             }
 
@@ -338,10 +324,8 @@ class HostController extends Controller
         $host->setSettings($request->request->get('settings'));
 
 
-        if(!$host->isAuthenticated())
-        {
-            if($request->request->has("password"))
-            {
+        if (!$host->isAuthenticated()) {
+            if ($request->request->has("password")) {
                 $data = [
                     "type" => "client",
                     "name" => "LEXIC_",
@@ -350,12 +334,11 @@ class HostController extends Controller
 
                 $result = $api->authenticate($host, $data);
 
-                if($result->code == 201) {
+                if ($result->code == 201) {
                     $host->setAuthenticated(true);
                 }
             }
         }
-
 
 
         $this->validation($host);
@@ -407,7 +390,7 @@ class HostController extends Controller
             );
         }
 
-        if($host->hasAnything()) {
+        if ($host->hasAnything()) {
             throw new WrongInputException('Host has an association with one or more of the following: images, containers, profiles');
         }
 
@@ -478,11 +461,9 @@ class HostController extends Controller
             );
         }
 
-        if($api->trusted($host))
-        {
+        if ($api->trusted($host)) {
             $host->setAuthenticated(true);
-        } else
-        {
+        } else {
             $data = [
                 "type" => "client",
                 "name" => "LEXIC",
@@ -491,8 +472,7 @@ class HostController extends Controller
 
             $result = $api->authenticate($host, $data);
 
-            if($result->code != 201)
-            {
+            if ($result->code != 201) {
                 $host->setAuthenticated(false);
                 throw new WrongInputException($result->body->error);
             } else {
@@ -524,7 +504,6 @@ class HostController extends Controller
         }
         return false;
     }
-
 
 
 }
