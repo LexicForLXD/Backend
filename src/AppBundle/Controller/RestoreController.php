@@ -193,6 +193,11 @@ class RestoreController extends Controller
             );
         }
 
+        //Check if Container name is already in use
+        if($this->getDoctrine()->getRepository(Container::class)->findBy(['name' => $request->request->get('containerName')])){
+            throw new WrongInputException("The Container name needs to be unique, please select another name");
+        }
+
         $tarball = $request->request->get('tarball');
         $containerName  = $request->request->get('containerName');
 
@@ -263,6 +268,7 @@ class RestoreController extends Controller
         $container->setArchitecture($result->body->metadata->architecture);
         $container->setCreatedAt(\DateTime::createFromFormat(DATE_ATOM, $result->body->metadata->created_at));
         $container->setState(strtolower($result->body->metadata->status));
+        $container->setEphemeral(false);
 
         $container->setImage($image);
         $image->addContainer($container);

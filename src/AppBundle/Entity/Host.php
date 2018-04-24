@@ -5,6 +5,7 @@
  * Date: 06.11.2017
  * Time: 19:10
  */
+
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -63,7 +64,6 @@ class Host
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\Regex("/[.]/")
      *
      * @Assert\Type(type="string")
      * @OAS\Property(example="host2.localnet.com")
@@ -73,7 +73,7 @@ class Host
 
     /**
      * @ORM\Column(type="string", unique=true)
-     * @Assert\NotNull()
+     * @Assert\NotBlank()
      *
      * @Assert\Type(type="string")
      * @OAS\Property(example="host2")
@@ -94,6 +94,12 @@ class Host
      * @ORM\Column(type="integer", nullable=true)
      *
      * @Assert\Type(type="int")
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 65535,
+     *      minMessage = "The port number must be greater than {{ limit }}",
+     *      maxMessage = "The port number must be smaller than {{ limit }}"
+     * )
      * @OAS\Property(example="22")
      * @var integer
      */
@@ -157,7 +163,7 @@ class Host
     /**
      * @return int
      */
-    public function getId() : ?int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -165,7 +171,7 @@ class Host
     /**
      * @return string | null
      */
-    public function getIpv4() : ?string
+    public function getIpv4(): ?string
     {
         return $this->ipv4;
     }
@@ -173,7 +179,7 @@ class Host
     /**
      * @return string | null
      */
-    public function getIpv6() : ?string
+    public function getIpv6(): ?string
     {
         return $this->ipv6;
     }
@@ -181,7 +187,7 @@ class Host
     /**
      * @return string | null
      */
-    public function getDomainName() : ?string
+    public function getDomainName(): ?string
     {
         return $this->domainName;
     }
@@ -213,7 +219,7 @@ class Host
     /**
      * @return string
      */
-    public function getName() : ?string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -221,7 +227,7 @@ class Host
     /**
      * @param mixed $name
      */
-    public function setName( $name)
+    public function setName($name)
     {
         $this->name = $name;
     }
@@ -229,7 +235,7 @@ class Host
     /**
      * @return string
      */
-    public function getMac() : ?string
+    public function getMac(): ?string
     {
         return $this->mac;
     }
@@ -237,7 +243,7 @@ class Host
     /**
      * @param mixed $mac
      */
-    public function setMac( $mac)
+    public function setMac($mac)
     {
         $this->mac = $mac;
     }
@@ -245,7 +251,7 @@ class Host
     /**
      * @return string
      */
-    public function getSettings() : ?string
+    public function getSettings(): ?string
     {
         return $this->settings;
     }
@@ -261,7 +267,7 @@ class Host
     /**
      * @return int
      */
-    public function getPort() : ?int
+    public function getPort(): ?int
     {
         return $this->port;
     }
@@ -269,7 +275,7 @@ class Host
     /**
      * @param mixed $port
      */
-    public function setPort( $port)
+    public function setPort($port)
     {
         $this->port = $port;
     }
@@ -294,7 +300,7 @@ class Host
     /**
      * @return PersistentCollection
      */
-    public function getContainers() : PersistentCollection
+    public function getContainers(): PersistentCollection
     {
         return $this->containers;
     }
@@ -302,7 +308,7 @@ class Host
     /**
      * @param mixed $containers
      */
-    public function setContainers( $containers)
+    public function setContainers($containers)
     {
         $this->containers = $containers;
     }
@@ -310,7 +316,7 @@ class Host
     /**
      * @return PersistentCollection
      */
-    public function getProfiles() : PersistentCollection
+    public function getProfiles(): PersistentCollection
     {
         return $this->profiles;
     }
@@ -318,7 +324,7 @@ class Host
     /**
      * @param mixed $profiles
      */
-    public function setProfiles( $profiles)
+    public function setProfiles($profiles)
     {
         $this->profiles = $profiles;
     }
@@ -326,7 +332,7 @@ class Host
     /**
      * @return PersistentCollection
      */
-    public function getImages() : PersistentCollection
+    public function getImages(): PersistentCollection
     {
         return $this->images;
     }
@@ -334,7 +340,7 @@ class Host
     /**
      * @param mixed $images
      */
-    public function setImages( $images)
+    public function setImages($images)
     {
         $this->images = $images;
     }
@@ -342,8 +348,9 @@ class Host
     /**
      * @param HostStatus $hostStatus
      */
-    public function addStatus(HostStatus $hostStatus){
-        if(!$this->statuses->contains($hostStatus)){
+    public function addStatus(HostStatus $hostStatus)
+    {
+        if (!$this->statuses->contains($hostStatus)) {
             $hostStatus->setHost($this);
             $this->statuses->add($hostStatus);
         }
@@ -352,8 +359,9 @@ class Host
     /**
      * @param HostStatus $hostStatus
      */
-    public function removeStatus(HostStatus $hostStatus){
-        if(!$this->statuses->contains($hostStatus)){
+    public function removeStatus(HostStatus $hostStatus)
+    {
+        if (!$this->statuses->contains($hostStatus)) {
             $hostStatus->setHost(null);
             $this->statuses->remove($hostStatus);
         }
@@ -366,10 +374,9 @@ class Host
      *
      * @return boolean
      */
-    public function hasUri() : bool
+    public function hasUri(): bool
     {
-        if($this->ipv4 || $this->ipv6 || $this->domainName)
-        {
+        if ($this->ipv4 || $this->ipv6 || $this->domainName) {
             return true;
         } else {
             return false;
@@ -379,7 +386,8 @@ class Host
     /**
      * @param Profile $profile
      */
-    public function addProfile(Profile $profile){
+    public function addProfile(Profile $profile)
+    {
         if ($this->profiles->contains($profile)) {
             return;
         }
@@ -390,7 +398,8 @@ class Host
     /**
      * @param Profile $profile
      */
-    public function removeProfile(Profile $profile){
+    public function removeProfile(Profile $profile)
+    {
         if (!$this->profiles->contains($profile)) {
             return;
         }
@@ -402,7 +411,8 @@ class Host
      * Adds a container to the Host.
      * @param Container $container
      */
-    public function addContainer(Container $container){
+    public function addContainer(Container $container)
+    {
         if ($this->containers->contains($container)) {
             return;
         }
@@ -414,7 +424,8 @@ class Host
      * Removes a container from the Host.
      * @param Container $container
      */
-    public function removeContainer(Container $container){
+    public function removeContainer(Container $container)
+    {
         if (!$this->containers->contains($container)) {
             return;
         }
@@ -423,10 +434,11 @@ class Host
     }
 
     /**
-    * Adds a Image to the Host.
-    * @param Image $image
-    */
-    public function addImage(Image $image){
+     * Adds a Image to the Host.
+     * @param Image $image
+     */
+    public function addImage(Image $image)
+    {
         if ($this->images->contains($image)) {
             return;
         }
@@ -438,7 +450,8 @@ class Host
      * Removes a Image from the Host.
      * @param Image $image
      */
-    public function removeImage(Image $image){
+    public function removeImage(Image $image)
+    {
         if (!$this->images->contains($image)) {
             return;
         }
@@ -450,10 +463,11 @@ class Host
      * Checks whether the Host has any Containers
      * @return bool
      */
-    public function hasContainers() : bool {
-        if($this->containers->count() > 0){
+    public function hasContainers(): bool
+    {
+        if ($this->containers->count() > 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -462,10 +476,11 @@ class Host
      * Checks whether the Host has any Profiles
      * @return bool
      */
-    public function hasProfiles() : bool {
-        if($this->profiles->count() > 0){
+    public function hasProfiles(): bool
+    {
+        if ($this->profiles->count() > 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -474,10 +489,11 @@ class Host
      * Checks whether the Host has any Images
      * @return bool
      */
-    public function hasImages() : bool {
-        if($this->images->count() > 0){
+    public function hasImages(): bool
+    {
+        if ($this->images->count() > 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -486,10 +502,11 @@ class Host
      * Checks whether the Host has any images or profiles or containers
      * @return bool
      */
-    public function hasAnything() : bool {
-        if($this->hasImages() || $this->hasContainers() || $this->hasProfiles()){
+    public function hasAnything(): bool
+    {
+        if ($this->hasImages() || $this->hasContainers() || $this->hasProfiles()) {
             return true;
-        } else{
+        } else {
             return false;
         }
 
@@ -499,21 +516,22 @@ class Host
      * Deletes all associations
      * @return bool
      */
-    public function deleteAnything() : bool {
+    public function deleteAnything(): bool
+    {
 
-        if($this->hasProfiles()) {
+        if ($this->hasProfiles()) {
             foreach ($this->profiles as $profile) {
                 $this->removeProfile($profile);
             }
         }
 
-        if($this->hasContainers()) {
+        if ($this->hasContainers()) {
             foreach ($this->containers as $container) {
                 $this->removeContainer($container);
             }
         }
 
-        if($this->hasImages()) {
+        if ($this->hasImages()) {
             foreach ($this->images as $image) {
                 $this->removeImage($image);
             }
@@ -526,13 +544,13 @@ class Host
      * Returns the url for a host.
      * @return string
      */
-    public function getUri() : string
+    public function getUri(): string
     {
         $hostname = $this->getIpv4() ?: $this->getIpv6() ?: $this->getDomainName() ?: 'localhost';
 
         $port = $this->getPort() ?: '8443';
         $apiVersion = '1.0';
-        $url = 'https://'.$hostname.':'.$port.'/'.$apiVersion.'/';
+        $url = 'https://' . $hostname . ':' . $port . '/' . $apiVersion . '/';
 
         return $url;
     }
@@ -540,7 +558,7 @@ class Host
     /**
      * @return PersistentCollection
      */
-    public function getStatuses() : PersistentCollection
+    public function getStatuses(): PersistentCollection
     {
         return $this->statuses;
     }
@@ -548,11 +566,10 @@ class Host
     /**
      * @param mixed $statuses
      */
-    public function setStatuses( $statuses)
+    public function setStatuses($statuses)
     {
         $this->statuses = $statuses;
     }
-
 
 
     /**
@@ -562,15 +579,16 @@ class Host
      *
      * @JMS\VirtualProperty()
      */
-    public function getContainerId(){
-        if($this->containers->isEmpty()){
+    public function getContainerId()
+    {
+        if ($this->containers->isEmpty()) {
             return null;
         }
 
         $this->containers->first();
-        do{
+        do {
             $ids[] = $this->containers->current()->getId();
-        }while($this->containers->next());
+        } while ($this->containers->next());
 
         return $ids;
     }
