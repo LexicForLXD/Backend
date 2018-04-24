@@ -77,7 +77,7 @@ jobs:
         keep-history: true
         local-dir: openapi
     - stage: release
-       #if: branch = master AND type != pull_request
+      if: branch = master AND type != pull_request
       language: php
       node_js: 7.1
       script: echo "releasing"
