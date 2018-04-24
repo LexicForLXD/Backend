@@ -80,6 +80,7 @@ jobs:
        #if: branch = master AND type != pull_request
       language: php
       node_js: 7.1
+      script: echo "releasing"
       deploy:
         provider: script
         skip-cleanup: true
