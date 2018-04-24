@@ -346,16 +346,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "v2.7.0",
+            "version": "v2.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "f76bf5ef631cec551a86c2291fc749534febebf1"
+                "reference": "11037b4352c008373561dc6fc836834eed80c3b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/f76bf5ef631cec551a86c2291fc749534febebf1",
-                "reference": "f76bf5ef631cec551a86c2291fc749534febebf1",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/11037b4352c008373561dc6fc836834eed80c3b5",
+                "reference": "11037b4352c008373561dc6fc836834eed80c3b5",
                 "shasum": ""
             },
             "require": {
@@ -417,20 +417,20 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2018-04-01T23:33:17+00:00"
+            "time": "2018-04-07T18:44:18+00:00"
         },
         {
             "name": "doctrine/doctrine-bundle",
-            "version": "1.8.1",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/DoctrineBundle.git",
-                "reference": "eb6e4fb904a459be28872765ab6e2d246aac7c87"
+                "reference": "703fad32e4c8cbe609caf45a71a1d4266c830f0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/DoctrineBundle/zipball/eb6e4fb904a459be28872765ab6e2d246aac7c87",
-                "reference": "eb6e4fb904a459be28872765ab6e2d246aac7c87",
+                "url": "https://api.github.com/repos/doctrine/DoctrineBundle/zipball/703fad32e4c8cbe609caf45a71a1d4266c830f0f",
+                "reference": "703fad32e4c8cbe609caf45a71a1d4266c830f0f",
                 "shasum": ""
             },
             "require": {
@@ -441,13 +441,13 @@
                 "symfony/console": "~2.7|~3.0|~4.0",
                 "symfony/dependency-injection": "~2.7|~3.0|~4.0",
                 "symfony/doctrine-bridge": "~2.7|~3.0|~4.0",
-                "symfony/framework-bundle": "~2.7|~3.0|~4.0"
+                "symfony/framework-bundle": "^2.7.22|~3.0|~4.0"
             },
             "conflict": {
                 "symfony/http-foundation": "<2.6"
             },
             "require-dev": {
-                "doctrine/orm": "~2.3",
+                "doctrine/orm": "~2.4",
                 "phpunit/phpunit": "^4.8.36|^5.7|^6.4",
                 "satooshi/php-coveralls": "^1.0",
                 "symfony/phpunit-bridge": "~2.7|~3.0|~4.0",
@@ -502,7 +502,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2017-11-24T13:09:19+00:00"
+            "time": "2018-04-19T14:07:39+00:00"
         },
         {
             "name": "doctrine/doctrine-cache-bundle",
@@ -1099,12 +1099,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
-                "reference": "37b3b9d8268d1bae8ff59ed2ad51493269512ca7"
+                "reference": "d01b55749eaced40ee7e44162800c3c68c56a235"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/37b3b9d8268d1bae8ff59ed2ad51493269512ca7",
-                "reference": "37b3b9d8268d1bae8ff59ed2ad51493269512ca7",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/d01b55749eaced40ee7e44162800c3c68c56a235",
+                "reference": "d01b55749eaced40ee7e44162800c3c68c56a235",
                 "shasum": ""
             },
             "require": {
@@ -1175,7 +1175,7 @@
                 "oauth2",
                 "server"
             ],
-            "time": "2018-04-04T10:02:38+00:00"
+            "time": "2018-04-23T07:20:33+00:00"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -3386,16 +3386,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v3.4.7",
+            "version": "v3.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "eb07b0eab0bda8441fbf94d06ad1f9896e0552cc"
+                "reference": "5304a36c5efbb01af7efe2bb5b1953dbaeebc293"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/eb07b0eab0bda8441fbf94d06ad1f9896e0552cc",
-                "reference": "eb07b0eab0bda8441fbf94d06ad1f9896e0552cc",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/5304a36c5efbb01af7efe2bb5b1953dbaeebc293",
+                "reference": "5304a36c5efbb01af7efe2bb5b1953dbaeebc293",
                 "shasum": ""
             },
             "require": {
@@ -3536,7 +3536,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2018-04-03T05:50:03+00:00"
+            "time": "2018-04-06T15:20:04+00:00"
         },
         {
             "name": "twig/twig",
@@ -3809,12 +3809,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "0867e66ca5bcd66d29e845aa46e97603a6af8a0e"
+                "reference": "46ffb9e9a29e715bd857cf87046e244dddc0cb9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/0867e66ca5bcd66d29e845aa46e97603a6af8a0e",
-                "reference": "0867e66ca5bcd66d29e845aa46e97603a6af8a0e",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/46ffb9e9a29e715bd857cf87046e244dddc0cb9b",
+                "reference": "46ffb9e9a29e715bd857cf87046e244dddc0cb9b",
                 "shasum": ""
             },
             "require": {
@@ -3863,7 +3863,7 @@
                 "rest",
                 "service discovery"
             ],
-            "time": "2018-02-25T09:51:37+00:00"
+            "time": "2018-03-23T11:32:56+00:00"
         }
     ],
     "packages-dev": [

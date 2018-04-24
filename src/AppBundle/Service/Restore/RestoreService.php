@@ -148,7 +148,7 @@ class RestoreService
 
         $pathToTarball = '/tmp/restore'.$backupName.'/'.$containerName.'.tar.gz';
 
-        $lxcCommand = 'lxc image import '.$pathToTarball.' --alias '.$containerName;
+        $lxcCommand = '/snap/bin/lxc image import '.$pathToTarball.' --alias '.$containerName;
 
         $importResult = $exec->run($lxcCommand);
         //Remove tarball after import
@@ -171,7 +171,7 @@ class RestoreService
         $session = new Session($configuration, $authentication);
 
         $exec = $session->getExec();
-        return $exec->run('lxc init '.$containerName.' '.$containerName);
+        return $exec->run('/snap/bin/lxc init '.$containerName.' '.$containerName);
     }
 
     private function getBackupName(Backup $backup){
