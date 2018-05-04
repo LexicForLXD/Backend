@@ -87,17 +87,3 @@ jobs:
 #        script: npx semantic-release-github
     # - stage: deploy
     #   if: branch = master
-    - stage: docker
-      if: branch = master AND type != pull_request
-      services:
-        - docker
-      before_script:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      script: docker build -t lexicforlxd/backend
-      deploy:
-        provider: script
-        script: docker push lexicforlexd/backend
-        on:
-          branch: master
-
-
