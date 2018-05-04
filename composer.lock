@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "6b174d7a7ede69b8970f163ec17af088",
+    "content-hash": "4ee5216c80eeae45d7e584a6f37eb8c3",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1095,42 +1095,41 @@
         },
         {
             "name": "friendsofsymfony/oauth-server-bundle",
-            "version": "dev-master",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
-                "reference": "d01b55749eaced40ee7e44162800c3c68c56a235"
+                "reference": "5cc4c8555dedb5c7e737a35789bd429ccd9ad254"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/d01b55749eaced40ee7e44162800c3c68c56a235",
-                "reference": "d01b55749eaced40ee7e44162800c3c68c56a235",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/5cc4c8555dedb5c7e737a35789bd429ccd9ad254",
+                "reference": "5cc4c8555dedb5c7e737a35789bd429ccd9ad254",
                 "shasum": ""
             },
             "require": {
                 "friendsofsymfony/oauth2-php": "~1.1",
-                "php": "^7.1",
-                "symfony/dependency-injection": "~3.0|~4.0",
-                "symfony/framework-bundle": "~3.0|~4.0",
-                "symfony/security-bundle": "~3.0|~4.0"
+                "paragonie/random_compat": "^1|^2",
+                "php": "^5.5|^7.0",
+                "symfony/dependency-injection": "^2.8|~3.0|^4.0",
+                "symfony/framework-bundle": "~2.8|~3.0|^4.0",
+                "symfony/security-bundle": "~2.8|~3.0|^4.0"
             },
             "require-dev": {
                 "doctrine/doctrine-bundle": "~1.0",
                 "doctrine/mongodb-odm": "~1.0",
                 "doctrine/orm": "~2.2",
                 "phing/phing": "~2.4",
-                "php-mock/php-mock-phpunit": "~1.0|~2.0",
-                "phpstan/phpstan-phpunit": "~0.9",
-                "phpstan/phpstan-shim": "~0.9",
-                "phpunit/phpunit": "~5.0|~6.0",
-                "propel/propel1": "~1.6",
-                "symfony/class-loader": "~3.0|~4.0",
-                "symfony/console": "~3.0|~4.0",
-                "symfony/form": "~3.0|~4.0",
-                "symfony/phpunit-bridge": "~3.0|~4.0",
-                "symfony/templating": "~3.0|~4.0",
-                "symfony/yaml": "~3.0|~4.0",
-                "willdurand/propel-typehintable-behavior": "~1.0"
+                "php-mock/php-mock-phpunit": "^1.1",
+                "phpunit/phpunit": "~4.8|~5.0",
+                "propel/propel1": "^1.6.5",
+                "symfony/class-loader": "~2.8|~3.0|^4.0",
+                "symfony/console": "~2.8|~3.0|^4.0",
+                "symfony/form": "~2.8|~3.0|^4.0",
+                "symfony/phpunit-bridge": "~2.8|~3.0|^4.0",
+                "symfony/templating": "~2.8|~3.0|^4.0",
+                "symfony/yaml": "~2.8|~3.0|^4.0",
+                "willdurand/propel-typehintable-behavior": "^1.0.4"
             },
             "suggest": {
                 "doctrine/doctrine-bundle": "*",
@@ -1143,7 +1142,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0-dev"
+                    "dev-master": "1.5-dev"
                 }
             },
             "autoload": {
@@ -1175,7 +1174,7 @@
                 "oauth2",
                 "server"
             ],
-            "time": "2018-04-23T07:20:33+00:00"
+            "time": "2018-04-18T13:46:16+00:00"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -4109,7 +4108,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "friendsofsymfony/oauth-server-bundle": 20,
         "zircote/swagger-php": 20
     },
     "prefer-stable": false,

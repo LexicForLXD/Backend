@@ -149,21 +149,6 @@ services:
             tags:
                 - { name: kernel.event_listener, event: lxd.container.manual.backup, method: onManualBackup }
 
-    FOS\OAuthServerBundle\Model\AccessTokenManagerInterface:
-            alias: fos_oauth_server.access_token_manager.default
-            public: true
-
-    FOS\OAuthServerBundle\Model\AuthCodeManagerInterface:
-            alias: fos_oauth_server.auth_code_manager.default
-            public: true
-
-    FOS\OAuthServerBundle\Model\ClientManagerInterface:
-            alias: fos_oauth_server.client_manager.default
-            public: true
-
-    FOS\OAuthServerBundle\Model\RefreshTokenManagerInterface:
-            alias: fos_oauth_server.refresh_token_manager.default
-            public: true
             
     SymfonyBundles\EventQueueBundle\Command\Daemon\StopCommand:
             tags:
@@ -179,11 +164,3 @@ services:
     
     Doctrine\ORM\EntityRepository:
             alias: platform.user.repository
-         
-    FOS\OAuthServerBundle\Command\CreateClientCommand:
-            tags:
-                - { name: 'console.command', command: 'fos:oauth-server:create-client' }
-                
-    FOS\OAuthServerBundle\Command\CleanCommand:
-            tags:
-                - { name: 'console.command', command: 'fos:oauth-server:clean' }
