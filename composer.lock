@@ -1,11 +1,49 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ee5216c80eeae45d7e584a6f37eb8c3",
+    "content-hash": "2d8ec54ef0f6bdc801c43afd873286dd",
     "packages": [
+        {
+            "name": "cocur/background-process",
+            "version": "v0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cocur/background-process.git",
+                "reference": "9ae2902922f02ec5544d723756758eb7304c6869"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cocur/background-process/zipball/9ae2902922f02ec5544d723756758eb7304c6869",
+                "reference": "9ae2902922f02ec5544d723756758eb7304c6869",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8|~5.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cocur\\BackgroundProcess\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Start processes in the background that continue running when the PHP process exists.",
+            "keywords": [
+                "background",
+                "process",
+                "unix"
+            ],
+            "time": "2017-02-11T12:41:41+00:00"
+        },
         {
             "name": "composer/ca-bundle",
             "version": "1.1.1",
@@ -983,6 +1021,64 @@
             "time": "2018-02-27T07:30:56+00:00"
         },
         {
+            "name": "dstuecken/php7ify",
+            "version": "1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dstuecken/php7ify.git",
+                "reference": "323f5febd5e0c79cd7e365e504370c074be3f64e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dstuecken/php7ify/zipball/323f5febd5e0c79cd7e365e504370c074be3f64e",
+                "reference": "323f5febd5e0c79cd7e365e504370c074be3f64e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/",
+                    "src/Exceptions/"
+                ],
+                "files": [
+                    "src/Functions/preg_replace_callback_array.php",
+                    "src/Functions/error_clear_last.php",
+                    "src/Functions/intdiv.php"
+                ],
+                "psr-4": {
+                    "dstuecken\\Php7ify\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "dstuecken",
+                    "email": "dstuecken@i-doit.com"
+                }
+            ],
+            "description": "php7ify is a project that brings new php7 classes and exceptions to php 5.x.",
+            "keywords": [
+                "PHP7",
+                "error",
+                "errorexception",
+                "exceptions",
+                "php 7",
+                "php 7 exceptions",
+                "php 7.0",
+                "throwable"
+            ],
+            "time": "2015-12-14T15:55:01+00:00"
+        },
+        {
             "name": "egulias/email-validator",
             "version": "2.1.3",
             "source": {
@@ -1730,6 +1826,167 @@
                 "xml"
             ],
             "time": "2017-12-08T19:49:08+00:00"
+        },
+        {
+            "name": "mmucklo/grid-bundle",
+            "version": "4.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmucklo/DtcGridBundle.git",
+                "reference": "091323fd618a459a4d4397264bebbbaf06ea0b5c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmucklo/DtcGridBundle/zipball/091323fd618a459a4d4397264bebbbaf06ea0b5c",
+                "reference": "091323fd618a459a4d4397264bebbbaf06ea0b5c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0",
+                "sensio/framework-extra-bundle": "2.*|3.*|4.*|5.*",
+                "symfony/framework-bundle": "2.*|3.*|4.*",
+                "symfony/templating": "2.*|3.*|4.*",
+                "symfony/twig-bundle": "2.*|3.*|4.*",
+                "twig/twig": "^1.0||^2.0"
+            },
+            "require-dev": {
+                "doctrine/annotations": "<1.5",
+                "doctrine/cache": "<1.7",
+                "doctrine/collections": "<1.5",
+                "doctrine/common": "<2.8",
+                "doctrine/dbal": "<2.6",
+                "doctrine/instantiator": "<1.1",
+                "doctrine/mongodb-odm": "^1.1",
+                "doctrine/orm": "^2.4",
+                "friendsofphp/php-cs-fixer": "dev-master",
+                "phpunit/php-code-coverage": "^4.0",
+                "phpunit/phpunit": "^5.7.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Dtc\\GridBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "David Tee"
+                },
+                {
+                    "name": "Matthew J Mucklo",
+                    "email": "mmucklo@gmail.com"
+                }
+            ],
+            "description": "Datagrid for symfony2 or symfony3 or symfony4",
+            "keywords": [
+                "grid",
+                "jqgrid",
+                "table"
+            ],
+            "time": "2018-02-24T16:15:12+00:00"
+        },
+        {
+            "name": "mmucklo/queue-bundle",
+            "version": "4.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmucklo/DtcQueueBundle.git",
+                "reference": "8ffdf8eda8397eb5975a60479cdaf9494cf260bd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmucklo/DtcQueueBundle/zipball/8ffdf8eda8397eb5975a60479cdaf9494cf260bd",
+                "reference": "8ffdf8eda8397eb5975a60479cdaf9494cf260bd",
+                "shasum": ""
+            },
+            "require": {
+                "cocur/background-process": ">=0.7",
+                "dstuecken/php7ify": ">=1.1",
+                "mmucklo/grid-bundle": ">=4.0.6",
+                "php": ">=5.6",
+                "sensio/framework-extra-bundle": "2.*|3.*|4.*|5.*",
+                "symfony/framework-bundle": ">=2.7|>=3.3|4.*"
+            },
+            "require-dev": {
+                "beberlei/doctrineextensions": "^1.0",
+                "doctrine/annotations": "<1.5",
+                "doctrine/cache": "<1.7",
+                "doctrine/collections": "<1.5",
+                "doctrine/common": "<2.8",
+                "doctrine/dbal": "<2.6",
+                "doctrine/doctrine-bundle": ">=1.8.1",
+                "doctrine/instantiator": "<1.1",
+                "doctrine/mongodb-odm": "^1.2",
+                "doctrine/orm": "^2.4",
+                "friendsofphp/php-cs-fixer": "dev-master",
+                "pda/pheanstalk": "^3.1",
+                "php-amqplib/php-amqplib": "^2.6",
+                "phpunit/php-code-coverage": "^4.0",
+                "phpunit/phpunit": "^5.7.0",
+                "predis/predis": "^v1.1.1",
+                "snc/redis-bundle": "^2.0",
+                "symfony/proxy-manager-bridge": ">=2.7|>=3.3|4.*",
+                "symfony/templating": "2.*|3.*|4.*"
+            },
+            "suggest": {
+                "alcaeus/mongo-php-adapter": "If trying to use MongoDB ODM on PHP 7.0 or greater",
+                "beberlei/DoctrineExtensions": "Alternative for YEAR, MONTH, DAY, HOUR, MINUTE if using JobTiming trends",
+                "doctrine/mongodb-odm": "If using mongo db",
+                "doctrine/orm": "If using an RDBMS",
+                "ext-redis": "Alternative redis library",
+                "oro/doctrine-extensions": "For YEAR, MONTH, DAY, HOUR, MINUTE date functions if using JobTiming trends",
+                "pda/pheanstalk": "If using beanstalkd",
+                "php-amqplib/php-amqplib": "If using RabbitMQ",
+                "predis/predis": "If using redis",
+                "snc/redis-bundle": "If using redis"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Dtc\\QueueBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "David Tee"
+                },
+                {
+                    "name": "Matthew J. Mucklo",
+                    "email": "mmucklo@gmail.com"
+                }
+            ],
+            "description": "Symfony2/3/4 Queue Bundle (for background jobs) supporting Mongo (Doctrine ODM), Mysql (and any Doctrine ORM), RabbitMQ, Beanstalkd, Redis, and ... {write your own}",
+            "keywords": [
+                "beanstalk",
+                "beanstalkd",
+                "doctrine",
+                "message queue",
+                "mongo",
+                "mongodb",
+                "mysql",
+                "odm",
+                "orm",
+                "queue",
+                "rabbit_mq",
+                "rabbitmq",
+                "redis",
+                "symfony"
+            ],
+            "time": "2018-02-11T00:27:47+00:00"
         },
         {
             "name": "monolog/monolog",
