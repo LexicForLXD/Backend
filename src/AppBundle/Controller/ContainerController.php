@@ -2,7 +2,6 @@
 namespace AppBundle\Controller;
 
 
-use AppBundle\Event\ContainerCreationEvent;
 use AppBundle\Event\ContainerDeleteEvent;
 use AppBundle\Event\ContainerUpdateEvent;
 use AppBundle\Exception\ElementNotFoundException;
@@ -15,6 +14,7 @@ use AppBundle\Service\LxdApi\HostApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\ContainerApi;
 
+use AppBundle\Worker\ContainerWorker;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -369,7 +369,7 @@ class ContainerController extends Controller
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi, HostApi $hostApi, OperationApi $operationApi)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi, HostApi $hostApi, OperationApi $operationApi, ContainerWorker $containerWorker)
     {
         $type = $request->query->get('type');
 
@@ -568,24 +568,25 @@ class ContainerController extends Controller
             }
         }
 
+        $containerWorker->later()->createContainer($container);
 
-        $result = $api->create($host, $data);
-
-
-        $dispatcher = $this->get('sb_event_queue');
-
-
-
-        if ($result->code != 202) {
-            throw new WrongInputException($result->raw_body);
-        }
-        if ($result->body->metadata->status_code == 400) {
-            throw new WrongInputException($result->raw_body);
-        }
+//        $result = $api->create($host, $data);
+//
+//
+//        $dispatcher = $this->get('sb_event_queue');
 
 
 
-        $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
+//        if ($result->code != 202) {
+//            throw new WrongInputException($result->raw_body);
+//        }
+//        if ($result->body->metadata->status_code == 400) {
+//            throw new WrongInputException($result->raw_body);
+//        }
+
+
+
+//        $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
 
 
 

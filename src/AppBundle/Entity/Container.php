@@ -134,6 +134,13 @@ class Container
     protected $error;
 
     /**
+     * @var mixed
+     * @ORM\Column(type="array", nullable=true)
+     * @JMS\Exclude()
+     */
+    protected $dataBody;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      * @Assert\NotBlank()
@@ -519,6 +526,22 @@ class Container
     public function setProfiles($profiles): void
     {
         $this->profiles = $profiles;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDataBody()
+    {
+        return $this->dataBody;
+    }
+
+    /**
+     * @param mixed $dataBody
+     */
+    public function setDataBody($dataBody): void
+    {
+        $this->dataBody = $dataBody;
     }
 
 
