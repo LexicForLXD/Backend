@@ -6,11 +6,11 @@ use AppBundle\Entity\Backup;
 use AppBundle\Entity\BackupDestination;
 use AppBundle\Entity\BackupSchedule;
 use AppBundle\Entity\Container;
-use AppBundle\Event\ManualBackupEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\ForbiddenException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
+use AppBundle\Worker\BackupWorker;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -170,9 +170,7 @@ class BackupController extends Controller
         $backup->setDestination($backupSchedule->getDestination());
         $backup->setTimestamp();
 
-        if ($errorArray = $this->validation($backup)) {
-            throw new WrongInputExceptionArray($errorArray);
-        }
+        $this->validation($backup);
 
         $em->persist($backup);
         $em->flush();
@@ -273,11 +271,13 @@ class BackupController extends Controller
      *
      * @param Request $request
      * @param EntityManagerInterface $em
+     * @param BackupWorker $backupWorker
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
-    public function storeBackupAction(Request $request, EntityManagerInterface $em)
+    public function storeBackupAction(Request $request, EntityManagerInterface $em, BackupWorker $backupWorker)
     {
         $destination = $this->getDoctrine()->getRepository(BackupDestination::class)->find($request->get("destination"));
 
@@ -295,11 +295,11 @@ class BackupController extends Controller
             );
         }
 
-        $host = $containers[0].getHost();
+        $host = $containers[0]->getHost();
 
         foreach ($containers as $container)
         {
-            if($container->getHost() != $host)
+            if($container->getHost() !== $host)
             {
                 throw new WrongInputException("The selected containers are not on the same host.");
             }
@@ -319,8 +319,7 @@ class BackupController extends Controller
         $em->persist($backup);
         $em->flush();
 
-        $dispatcher = $this->get('sb_event_queue');
-        $dispatcher->on(ManualBackupEvent::class, date('Y-m-d H:i:s'), $host, $backup);
+        $backupWorker->later()->createManualBackup($backup);
 
 
         $serializer = $this->get('jms_serializer');
@@ -328,6 +327,11 @@ class BackupController extends Controller
         return new Response($response, Response::HTTP_CREATED);
     }
 
+    /**
+     * @param $object
+     * @return bool
+     * @throws WrongInputExceptionArray
+     */
     private function validation($object)
     {
         $validator = $this->get('validator');
@@ -338,7 +342,7 @@ class BackupController extends Controller
             foreach ($errors as $error) {
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
-            return $errorArray;
+            throw new WrongInputExceptionArray($errorArray);
         }
         return false;
     }
