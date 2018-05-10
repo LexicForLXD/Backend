@@ -423,9 +423,7 @@ class ContainerController extends Controller
                     }
 
 
-                }
-
-                if ($request->request->has("alias")) {
+                } else {
                     $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findOneBy(["name" => $request->get("alias")]);
 
                     if (!$imageAlias) {

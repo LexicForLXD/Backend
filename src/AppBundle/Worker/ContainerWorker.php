@@ -10,9 +10,10 @@ use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\Profile\ProfileManagerApi;
 use AppBundle\Service\SSH\ScheduleSSH;
 use Doctrine\ORM\EntityManagerInterface;
+use Dtc\QueueBundle\Model\Worker;
 use Httpful\Response;
 
-class ContainerWorker extends \Dtc\QueueBundle\Model\Worker
+class ContainerWorker extends Worker
 {
     protected $em;
     protected $api;
