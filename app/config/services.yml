@@ -87,20 +87,6 @@ services:
                 $nagiosUsername: '%nagiosUsername%'
                 $nagiosPassword: '%nagiosPassword%'
 
-    lxd.image.creation.updater:
-            class: AppBundle\EventListener\ImageCreationListener
-            arguments: [ "@doctrine.orm.entity_manager" ]
-            tags:
-                - { name: kernel.event_listener, event: lxd.image.creation.update }
-
-    lxd.container.creation.updater:
-        class: AppBundle\EventListener\ContainerListener
-        arguments: [ "@doctrine.orm.entity_manager" ]
-        tags:
-            - { name: kernel.event_listener, event: lxd.container.creation.update, method: onLxdContainerCreationUpdate }
-            - { name: kernel.event_listener, event: lxd.container.state.update, method: onLxdContainerStateUpdate }
-            - { name: kernel.event_listener, event: lxd.container.delete.update, method: onLxdContainerDeleteUpdate }
-            - { name: kernel.event_listener, event: lxd.container.update.update, method: onLxdContainerUpdateUpdate }
 
     platform.user.manager:
         class: Doctrine\ORM\EntityManager
@@ -143,24 +129,6 @@ services:
             tags:
                 - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
-    manual_backup.listener:
-            class: AppBundle\EventListener\BackupListener
-            arguments: [ "@doctrine.orm.entity_manager" ]
-            tags:
-                - { name: kernel.event_listener, event: lxd.container.manual.backup, method: onManualBackup }
 
-            
-    SymfonyBundles\EventQueueBundle\Command\Daemon\StopCommand:
-            tags:
-                - { name: 'console.command', command: 'event:queue:daemon:stop' }
-                
-    SymfonyBundles\EventQueueBundle\Command\Daemon\StartCommand:
-            tags:
-                - { name: 'console.command', command: 'event:queue:daemon:start' }
-
-    SymfonyBundles\EventQueueBundle\Command\DispatchCommand:
-            tags:
-                - { name: 'console.command', command: 'event:queue:dispatch' }
-    
     Doctrine\ORM\EntityRepository:
             alias: platform.user.repository
