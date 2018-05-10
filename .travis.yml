@@ -68,11 +68,11 @@ jobs:
         - echo $CERT_CRT >> client.crt
         - echo echo $CERT_KEY >> client.key
         - phpenv config-rm xdebug.ini
+        - cp app/config/parameters.yml.travis app/config/parameters.yml
       install:
         - composer install --no-interaction
       before_script:
         - psql -c 'create database travis_lexic_test;' -U postgres
-        - cp app/config/parameters.yml.travis app/config/parameters.yml
         - php bin/console doctrine:schema:update --force --env=test
         - php bin/console doctrine:fixtures:load -n --env=test
       script: ./vendor/bin/swagger -e vendor -o openapi/openapi.json
