@@ -14,7 +14,7 @@ use AppBundle\Service\Backup\BackupService;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\LxdApi\SnapshotApi;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Dtc\QueueBundle\Model\Worker;
 
 class BackupWorker extends Worker
@@ -27,13 +27,13 @@ class BackupWorker extends Worker
 
     /**
      * BackupWorker constructor.
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @param SnapshotApi $snapshotApi
      * @param OperationApi $operationApi
      * @param ImageApi $imageApi
      * @param BackupService $backupService
      */
-    public function __construct(EntityManager $em, SnapshotApi $snapshotApi, OperationApi $operationApi, ImageApi $imageApi, BackupService $backupService)
+    public function __construct(EntityManagerInterface $em, SnapshotApi $snapshotApi, OperationApi $operationApi, ImageApi $imageApi, BackupService $backupService)
     {
         $this->em = $em;
         $this->operationApi = $operationApi;
