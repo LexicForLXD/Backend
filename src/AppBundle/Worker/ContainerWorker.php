@@ -9,8 +9,8 @@ use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\Profile\ProfileManagerApi;
 use AppBundle\Service\SSH\ScheduleSSH;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Httpful\Response;
 
 class ContainerWorker extends \Dtc\QueueBundle\Model\Worker
 {
@@ -23,7 +23,7 @@ class ContainerWorker extends \Dtc\QueueBundle\Model\Worker
 
     /**
      * ContainerWorker constructor.
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @param ContainerApi $api
      * @param ContainerStateApi $stateApi
      * @param OperationApi $operationApi
@@ -57,35 +57,112 @@ class ContainerWorker extends \Dtc\QueueBundle\Model\Worker
     {
         $result = $this->api->create($container->getHost(), $container->getDataBody());
 
-        if ($result->code != 202) {
-            throw new WrongInputException($result->raw_body);
-        }
-        if ($result->body->metadata->status_code == 400) {
-            throw new WrongInputException($result->raw_body);
-        }
+        $this->checkForErrors($container, $result);
 
-        $operationsResponse = $this->api->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
+        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
-        if ($operationsResponse->body->metadata->status_code != 200) {
-            echo "FAILED-UPDATE : " . $operationsResponse->body->metadata->err . "\n";
-            $container->setError($operationsResponse->body->metadata->err);
-            $this->em->flush($container);
-            return;
-        }
+        $this->checkForErrors($container, $operationsResponse);
+
+//        if ($operationsResponse->body->metadata->status_code != 200) {
+//            $container->setError($operationsResponse->body->metadata->err);
+//            $this->em->flush($container);
+//            return;
+//        }
 
         $container->setState('created');
 
         $this->fetchInfos($container);
     }
 
+    /**
+     * @param Container $container
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
     public function deleteContainer(Container $container)
     {
+        $result = $this->api->remove($container->getHost(), $container);
 
+        $this->checkForErrors($container, $result);
+
+        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
+
+        $this->checkForErrors($container, $operationsResponse);
+
+        foreach ($container->getBackupSchedules() as $schedule) {
+            $this->sshApi->deleteAnacronFile($schedule);
+            $schedule->removeContainer($container);
+            $this->sshApi->sendAnacronFile($schedule);
+            $this->sshApi->makeFileExecuteable($schedule);
+        }
+
+        foreach ($container->getProfiles() as $profile) {
+            $this->profileManagerApi->disableProfileForContainer($profile, $container);
+        }
+
+        $this->em->remove($container);
+        $this->em->flush();
     }
 
+    /**
+     * @param Container $container
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
     public function updateContainer(Container $container)
     {
+        $result = $this->api->update($container->getHost(), $container, $container->getDataBody());
 
+        $this->checkForErrors($container, $result);
+
+        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
+
+        $this->checkForErrors($container, $operationsResponse);
+
+//        if ($operationsResponse->code != 200) {
+//            if ($operationsResponse->body->metadata->status_code != 200) {
+//                $container->setError($operationsResponse->body->metadata->err);
+//                $this->em->flush($container);
+//                return;
+//            }
+//        }
+
+        $this->fetchInfos($container);
+    }
+
+    /**
+     * @param Container $container
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function renameContainer(Container $container)
+    {
+        $result = $this->api->migrate($container->getHost(), $container, $container->getDataBody());
+
+        $this->checkForErrors($container, $result);
+
+        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
+
+        $this->checkForErrors($container, $operationsResponse);
+
+//        if ($operationsResponse->code != 200) {
+//            if ($operationsResponse->body->metadata->status_code != 200) {
+//                $container->setError($operationsResponse->body->metadata->err);
+//                $this->em->flush($container);
+//                return;
+//            }
+//        }
+
+        if ($operationsResponse->code == 409) {
+            $container->setError("The name is already taken.");
+            $this->em->flush($container);
+        }
+
+
+        $this->fetchInfos($container);
     }
 
     /**
@@ -97,11 +174,32 @@ class ContainerWorker extends \Dtc\QueueBundle\Model\Worker
     private function fetchInfos(Container $container)
     {
         $containerResponse = $this->api->show($container->getHost(), $container->getName());
+        $container->setName($containerResponse->body->metadata->name);
+        $container->setEphemeral($containerResponse->body->metadata->ephemeral);
         $container->setExpandedConfig($containerResponse->body->metadata->expanded_config);
         $container->setExpandedDevices($containerResponse->body->metadata->expanded_devices);
         $container->setCreatedAt(new \DateTime($containerResponse->body->metadata->created_at));
         $container->setState(strtolower($containerResponse->body->metadata->status));
         $container->setArchitecture($containerResponse->body->metadata->architecture);
         $this->em->flush($container);
+    }
+
+    private function checkForErrors(Container $container, Response $response)
+    {
+        if ($response->code != 202) {
+            if ($response->code != 200) {
+                if ($response->body->metadata->status_code != 200) {
+                    $container->setError($response->body->metadata->err);
+
+                }
+
+            }
+            $container->setError($response->raw_body);
+        }
+        if ($response->body->metadata->status_code == 400) {
+            $container->setError($response->raw_body);
+        }
+        $this->em->flush($container);
+        return;
     }
 }

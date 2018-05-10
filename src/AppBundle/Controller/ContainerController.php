@@ -2,8 +2,6 @@
 namespace AppBundle\Controller;
 
 
-use AppBundle\Event\ContainerDeleteEvent;
-use AppBundle\Event\ContainerUpdateEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
@@ -361,9 +359,9 @@ class ContainerController extends Controller
      * @param ProfileManagerApi $profileManagerApi
      * @param HostApi $hostApi
      * @param OperationApi $operationApi
+     * @param ContainerWorker $containerWorker
      * @return Response
      * @throws ElementNotFoundException
-     * @throws WrongInputException
      * @throws WrongInputExceptionArray
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -547,16 +545,11 @@ class ContainerController extends Controller
         $container->setConfig($request->get("config"));
         $container->setDevices($request->get("devices"));
         $container->setEphemeral($request->get("ephemeral"));
-
-        if ($request->request->has("name")) {
-            $container->setName($request->get("name"));
-        }
+        $container->setName($request->get("name"));
         $container->setSettings($data);
-
         $container->setState('creating');
 
         $this->validation($container);
-
 
         $em->persist($container);
         $em->flush();
@@ -570,26 +563,7 @@ class ContainerController extends Controller
 
         $containerWorker->later()->createContainer($container);
 
-//        $result = $api->create($host, $data);
 //
-//
-//        $dispatcher = $this->get('sb_event_queue');
-
-
-
-//        if ($result->code != 202) {
-//            throw new WrongInputException($result->raw_body);
-//        }
-//        if ($result->body->metadata->status_code == 400) {
-//            throw new WrongInputException($result->raw_body);
-//        }
-
-
-
-//        $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
-
-
-
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
         return new Response($response, Response::HTTP_CREATED);
@@ -681,14 +655,14 @@ class ContainerController extends Controller
      *)
      * @param int $containerId
      * @param EntityManagerInterface $em
-     * @param ContainerApi $api
      * @param ContainerStateApi $stateApi
+     * @param ContainerWorker $containerWorker
      * @return JsonResponse
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function deleteAction($containerId, EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi)
+    public function deleteAction($containerId, EntityManagerInterface $em, ContainerStateApi $stateApi, ContainerWorker $containerWorker)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
@@ -709,13 +683,7 @@ class ContainerController extends Controller
             throw new WrongInputException("Container is currently not stopped. Please stop the container before you delete it.");
         }
 
-        $result = $api->remove($container->getHost(), $container->getName());
-
-
-
-
-        $dispatcher = $this->get('sb_event_queue');
-        $dispatcher->on(ContainerDeleteEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
+        $containerWorker->later()->deleteContainer($container);
 
         return $this->json(['message' => 'Deletion is ongoing'], 200);
     }
@@ -725,9 +693,8 @@ class ContainerController extends Controller
      * @param Request $request
      * @param int $containerId
      * @param EntityManagerInterface $em
-     * @param ContainerApi $api
-     * @param OperationApi $operationApi
      * @param ProfileManagerApi $profileManagerApi
+     * @param ContainerWorker $containerWorker
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
@@ -804,10 +771,8 @@ class ContainerController extends Controller
      *  ),
      * )
      */
-    public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ContainerApi $api, OperationApi $operationApi, ProfileManagerApi $profileManagerApi)
+    public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ProfileManagerApi $profileManagerApi, ContainerWorker $containerWorker)
     {
-        $dispatcher = $this->get('sb_event_queue');
-
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
 
@@ -822,18 +787,12 @@ class ContainerController extends Controller
 
                 $data = ["name" => $request->get("name")];
 
-                $result = $api->migrate($container->getHost(), $container, $data);
-
-                if ($result->code == 409) {
-                    throw new WrongInputExceptionArray(["name" => "The name is already taken."]);
-                }
-
-                $container->setName($request->get("name"));
-
+                $container->setDataBody($data);
+                $em->flush($container);
+                $containerWorker->later()->renameContainer($container);
             } else {
                 throw new WrongInputExceptionArray(["name" => "The new name is same as current name."]);
             }
-
 
         } else {
             $profileNames = array();
@@ -848,9 +807,6 @@ class ContainerController extends Controller
                 $this->checkProfiles($profiles, $request->get("profiles"));
             }
 
-
-
-
             if (!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral") && !$request->request->has("profiles")) {
                 throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
             }
@@ -863,31 +819,21 @@ class ContainerController extends Controller
                 "profiles" => $profileNames
             ];
 
-            $result = $api->update($container->getHost(), $container, $data);
-
+            $container->setDataBody($data);
             $container->setArchitekture($request->get("architecture"));
             $container->setConfig($request->get("config"));
             $container->setDevices($request->get("devices"));
             $container->setEphemeral($request->get("ephemeral"));
-
-
+            $this->validation($container);
+            $em->flush($container);
+            $containerWorker->later()->updateContainer($container);
         }
 
-        if ($result->code != 202) {
-            throw new WrongInputException($result->raw_body);
-        }
-        if ($result->body->metadata->status_code == 400) {
-            throw new WrongInputException($result->raw_body);
-        }
+//        $serializer = $this->get('jms_serializer');
+//        $response = $serializer->serialize($container, 'json');
+//        return new Response($response, Response::HTTP_OK);
 
-        $dispatcher->on(ContainerUpdateEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
-
-
-        $em->flush();
-
-        $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($container, 'json');
-        return new Response($response, Response::HTTP_OK);
+        return $this->json(['message' => 'Update is ongoing'], 200);
 
 
 
