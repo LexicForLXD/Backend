@@ -559,7 +559,7 @@ class ContainerController extends Controller
             }
         }
 
-        $containerWorker->later()->createContainer($container);
+        $containerWorker->later()->createContainer($container->getId());
 
 //
         $serializer = $this->get('jms_serializer');
@@ -681,7 +681,7 @@ class ContainerController extends Controller
             throw new WrongInputException("Container is currently not stopped. Please stop the container before you delete it.");
         }
 
-        $containerWorker->later()->deleteContainer($container);
+        $containerWorker->later()->deleteContainer($container->getId());
 
         return $this->json(['message' => 'Deletion is ongoing'], 200);
     }
@@ -824,7 +824,7 @@ class ContainerController extends Controller
             $container->setEphemeral($request->get("ephemeral"));
             $this->validation($container);
             $em->flush($container);
-            $containerWorker->later()->updateContainer($container);
+            $containerWorker->later()->updateContainer($container->getId());
         }
 
 //        $serializer = $this->get('jms_serializer');

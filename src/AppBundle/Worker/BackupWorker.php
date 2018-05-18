@@ -48,13 +48,12 @@ class BackupWorker extends Worker
     }
 
     /**
-     * @param Backup $backup
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @param int $backupId
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function createManualBackup(Backup $backup)
+    public function createManualBackup($backupId)
     {
+        $backup = $this->getDoctrine()->getRepository(Backup::class)->find($backupId);
         $containers = $backup->getContainers();
         $host = $containers[0]->getHost();
 

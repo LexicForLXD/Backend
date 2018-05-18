@@ -48,14 +48,15 @@ class ContainerWorker extends Worker
     }
 
     /**
-     * @param Container $container
+     * @param int $containerId
      * @throws WrongInputException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function createContainer(Container $container)
+    public function createContainer($containerId)
     {
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
         $result = $this->api->create($container->getHost(), $container->getDataBody());
 
         $this->checkForErrors($container, $result);
@@ -76,13 +77,15 @@ class ContainerWorker extends Worker
     }
 
     /**
-     * @param Container $container
+     * @param int $containerId
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function deleteContainer(Container $container)
+    public function deleteContainer(Container $containerId)
     {
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
         $result = $this->api->remove($container->getHost(), $container);
 
         $this->checkForErrors($container, $result);
@@ -107,13 +110,15 @@ class ContainerWorker extends Worker
     }
 
     /**
-     * @param Container $container
+     * @param int $containerId
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function updateContainer(Container $container)
+    public function updateContainer($containerId)
     {
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
         $result = $this->api->update($container->getHost(), $container, $container->getDataBody());
 
         $this->checkForErrors($container, $result);
@@ -134,13 +139,15 @@ class ContainerWorker extends Worker
     }
 
     /**
-     * @param Container $container
+     * @param int $containerId
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function renameContainer(Container $container)
+    public function renameContainer($containerId)
     {
+        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+
         $result = $this->api->migrate($container->getHost(), $container, $container->getDataBody());
 
         $this->checkForErrors($container, $result);

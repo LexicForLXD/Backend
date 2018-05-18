@@ -252,7 +252,7 @@ class ImageController extends Controller
                 $em->persist($image);
                 $em->flush();
 
-                $imageWorker->later()->createImage($image, $request->getContent());
+                $imageWorker->later(0)->createImage($image->getId(), $request->getContent());
 
                 $serializer = $this->get('jms_serializer');
                 $response = $serializer->serialize($image, 'json');

@@ -13,9 +13,9 @@ use AppBundle\Entity\Image;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
-use Dtc\QueueBundle\Model\Worker;
+use Dtc\QueueBundle\Model\Worker as BaseWorker;
 
-class ImageWorker extends Worker
+class ImageWorker extends BaseWorker
 {
     protected $em;
     protected $api;
@@ -35,12 +35,13 @@ class ImageWorker extends Worker
     }
 
     /**
-     * @param Image $image
+     * @param int $imageId
      * @param $body
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function createImage(Image $image, $body)
+    public function createImage($imageId, $body)
     {
+        $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
         $result = $this->api->createImage($image->getHost(), $body);
 
         if ($result->code != 202) {
@@ -73,6 +74,6 @@ class ImageWorker extends Worker
 
     public function getName()
     {
-        return "image";
+        return 'image';
     }
 }

@@ -319,7 +319,7 @@ class BackupController extends Controller
         $em->persist($backup);
         $em->flush();
 
-        $backupWorker->later()->createManualBackup($backup);
+        $backupWorker->later()->createManualBackup($backup->getId());
 
 
         $serializer = $this->get('jms_serializer');
