@@ -6,7 +6,7 @@ SYP-LXC Backend
 
 [![coverage report](https://git.janrtr.de/syp-lxc/Backend/badges/master/coverage.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master)
 # Requirements
-- see requirements [here](docs/REQUIREMENTS.md)
+- see requirements [here](../docs/REQUIREMENTS.md)
 
 # Installation from Source
 
@@ -33,8 +33,8 @@ php bin/console app:create-user
 ```
 
 # Installation via Docker
-- see prod environment documentation [here](docs/DOCKER.md)
-- see backend development environment documentation [here](docs/DOCKER_DEV.md)
+- see prod environment documentation [here](../docs/DOCKER.md)
+- see backend development environment documentation [here](../docs/DOCKER_DEV.md)
 
 # Documentation
 ### Create up to date Swagger documentation
