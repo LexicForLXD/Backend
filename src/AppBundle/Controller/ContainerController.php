@@ -367,7 +367,7 @@ class ContainerController extends Controller
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi, HostApi $hostApi, OperationApi $operationApi, ContainerWorker $containerWorker)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ProfileManagerApi $profileManagerApi, ContainerWorker $containerWorker)
     {
         $type = $request->query->get('type');
 
@@ -379,41 +379,29 @@ class ContainerController extends Controller
             );
         }
 
-        $profileNames = array();
 
         if($request->request->has('profiles'))
         {
             $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
-
-            $profileNames = $this->checkProfiles($profiles, $request->get("profiles"));
+            $this->checkProfiles($profiles, $request->get("profiles"));
         }
 
 
         $container = new Container();
+        $container->setHost($host);
+        $container->setConfig($request->get("config"));
+        $container->setDevices($request->get("devices"));
+        $container->setEphemeral($request->get("ephemeral", false));
+        $container->setName($request->get("name"));
+        $container->setArchitecture($request->get("architecture", 'x86_64'));
+        $container->setState('creating');
 
         switch ($type) {
             case 'image':
 
-                $data = [
-                    "name" => $request->request->get("name"),
-                    "architecture" => $request->get("architecture", 'x86_64'),
-                    "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral", false),
-                    "config" => $request->get("config"),
-                    "devices" => $request->get("devices"),
-                    "source" => []
-                ];
 
-                $container->setArchitecture($request->get("architecture"));
-
-                if(!$request->request->has("fingerprint") && !$request->request->has("alias"))
+                if ($request->request->has("fingerprint") && !$request->request->has("alias"))
                 {
-                    throw new WrongInputExceptionArray([
-                        'image' => 'You have to pass either a fingerprint or an alias for the image.'
-                    ]);
-                }
-
-                if ($request->request->has("fingerprint")) {
                     $image = $this->getDoctrine()->getRepository(Image::class)->findOneBy(["fingerprint" => $request->get("fingerprint")]);
 
                     if (!$image) {
@@ -423,7 +411,8 @@ class ContainerController extends Controller
                     }
 
 
-                } else {
+                } else if ($request->request->has("alias") && !$request->request->has("fingerprint"))
+                {
                     $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findOneBy(["name" => $request->get("alias")]);
 
                     if (!$imageAlias) {
@@ -434,6 +423,11 @@ class ContainerController extends Controller
 
                     $image = $imageAlias->getImage();
 
+                } else
+                {
+                    throw new WrongInputExceptionArray([
+                        'image' => 'You have to pass either a fingerprint or an alias for the image.'
+                    ]);
                 }
 
 
@@ -445,11 +439,10 @@ class ContainerController extends Controller
                 }
 
                 $container->setImage($image);
-
-                $data["source"] = [
+                $container->setSource([
                     "type" => "image",
                     "fingerprint" => $image->getFingerPrint()
-                ];
+                ]);
 
                 break;
             case 'migration':
@@ -461,38 +454,17 @@ class ContainerController extends Controller
                     ]);
                 }
 
-                $data = [
-                    "name" => $request->get("name"),
-                    "migration" => true,
-                    "live" => $request->get("live", false)
-
-                ];
-                $oldHost = $oldContainer->getHost();
-                $pushResult = $api->migrate($oldHost, $oldContainer, $data);
-
-                $data = [
-                    "name" => $request->get("name"),
-                    "architecture" => $request->get("architecture"),
-                    "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral", false),
-                    "config" => $request->get("config"),
-                    "devices" => $request->get("devices"),
-                    "source" => [
-                        "type" => "migration",
-                        "mode" => "pull",
-                        "operation" => $operationApi->buildUri($oldHost, 'operations/' . $pushResult->body->metadata->id),
-                        "certificate" => $hostApi->getCertificate($oldHost),
-                        "base-image" => $oldContainer->getImage()->getFingerprint(),
-                        "container_only" => $request->get("containerOnly", true),
-                        "live" => $request->get("live", false),
-                        "secrets" => $pushResult->body->metadata->metadata
-
-                    ]
-                ];
 
                 $container->setImage($oldContainer->getImage());
-                $container->setArchitecture($request->get('architecture'));
+                $this->validation($container);
+                $em->persist($container);
+                $em->flush();
 
+                $containerWorker->later()->migrateContainer($container->getId(), $oldContainer->getId(), $request->get("containerOnly", true), $request->get("live", false), $profiles);
+
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($container, 'json');
+                return new Response($response, Response::HTTP_CREATED);
 
                 break;
             case 'copy':
@@ -504,48 +476,24 @@ class ContainerController extends Controller
                     ]);
                 }
 
-                $data = [
-                    "name" => $request->get("name"),
-                    "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral", false),
-                    "config" => $request->get("config"),
-                    "devices" => $request->get("devices"),
-                    "source" => [
-                        "type" => "copy",
-                        "container_only" => $request->get("containerOnly", true),
-                        "source" => $oldContainer->getName()
-                    ]
-                ];
-
+                $container->setSource([
+                    "type" => "copy",
+                    "container_only" => $request->get("containerOnly", true),
+                    "source" => $oldContainer->getName()
+                ]);
                 $container->setImage($oldContainer->getImage());
 
                 break;
             case 'none':
-                $data = [
-                    "name" => $request->request->get("name"),
-                    "architecture" => $request->get("architecture", 'x86_64'),
-                    "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral", false),
-                    "config" => $request->get("config"),
-                    "devices" => $request->get("devices"),
-                    "source" => [
-                        "type" => "none"
-                    ]
-                ];
-                $container->setArchitecture($request->get('architecture'));
+
+                $container->setSource([
+                    "type" => "none"
+                ]);
 
                 break;
             default:
                 throw new WrongInputExceptionArray(['type' => "The type was wrong. Either use image, migration, copy or none."]);
         }
-
-        $container->setHost($host);
-        $container->setConfig($request->get("config"));
-        $container->setDevices($request->get("devices"));
-        $container->setEphemeral($request->get("ephemeral"));
-        $container->setName($request->get("name"));
-        $container->setSettings($data);
-        $container->setState('creating');
 
         $this->validation($container);
 

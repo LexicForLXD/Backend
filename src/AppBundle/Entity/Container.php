@@ -136,11 +136,10 @@ class Container
     /**
      * @var mixed
      * @ORM\Column(type="array", nullable=true)
-     * @JMS\Exclude()
      */
-    protected $dataBody;
+    protected $source;
 
-    /**
+    /**f
      * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      * @Assert\NotBlank()
@@ -218,37 +217,6 @@ class Container
         }
     }
 
-    /**
-     * @return string | null
-     */
-    public function getIpv4() : ?string
-    {
-        return $this->ipv4;
-    }
-
-    /**
-     * @return string | null
-     */
-    public function getIpv6() : ?string
-    {
-        return $this->ipv6;
-    }
-
-    /**
-     * @param mixed $ipv4
-     */
-    public function setIpv4($ipv4)
-    {
-        $this->ipv4 = $ipv4;
-    }
-
-    /**
-     * @param mixed $ipv6
-     */
-    public function setIpv6($ipv6)
-    {
-        $this->ipv6 = $ipv6;
-    }
 
     /**
      * @return string
@@ -318,21 +286,6 @@ class Container
         $this->host = $host;
     }
 
-    /**
-     * @return string | null
-     */
-    public function getDomainName() : ?string
-    {
-        return $this->domainName;
-    }
-
-    /**
-     * @param mixed $domainName
-     */
-    public function setDomainName($domainName)
-    {
-        $this->domainName = $domainName;
-    }
 
     /**
      * @return string
@@ -531,19 +484,34 @@ class Container
     /**
      * @return mixed
      */
-    public function getDataBody()
+    public function getSource()
     {
-        return $this->dataBody;
+        return $this->source;
     }
 
     /**
-     * @param mixed $dataBody
+     * @param mixed $source
      */
-    public function setDataBody($dataBody): void
+    public function setSource($source): void
     {
-        $this->dataBody = $dataBody;
+        $this->source = $source;
     }
 
+
+    public function getBody(): array
+    {
+        $body = [
+                    "name" => $this->name,
+                    "architecture" => $this->architecture,
+                    "profiles" => $this->getProfileNames(),
+                    "ephemeral" => $this->ephemeral,
+                    "config" => $this->config,
+                    "devices" => $this->devices,
+                    "source" => $this->source
+                ];
+
+        return $body;
+    }
 
 
 
@@ -634,6 +602,23 @@ class Container
         }while($this->profiles->next());
 
         return $ids;
+    }
+
+    public function getProfileNames()
+    {
+        $profileNames = array();
+
+        if($this->profiles->isEmpty()){
+            return $profileNames;
+        }
+
+        foreach ($this->profiles as $profile)
+        {
+            $profileNames[] = $profile->getName();
+        }
+
+        return $profileNames;
+
     }
 
     /**

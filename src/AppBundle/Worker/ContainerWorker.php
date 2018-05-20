@@ -3,9 +3,9 @@
 namespace AppBundle\Worker;
 
 use AppBundle\Entity\Container;
-use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
+use AppBundle\Service\LxdApi\HostApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\Profile\ProfileManagerApi;
 use AppBundle\Service\SSH\ScheduleSSH;
@@ -21,6 +21,7 @@ class ContainerWorker extends Worker
     protected $operationApi;
     protected $profileManagerApi;
     protected $sshApi;
+    protected $hostApi;
 
     /**
      * ContainerWorker constructor.
@@ -30,11 +31,13 @@ class ContainerWorker extends Worker
      * @param OperationApi $operationApi
      * @param ProfileManagerApi $profileManagerApi
      * @param ScheduleSSH $sshApi
+     * @param HostApi $hostApi
      */
-    public function __construct(EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi, ProfileManagerApi $profileManagerApi, ScheduleSSH $sshApi)
+    public function __construct(EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi, ProfileManagerApi $profileManagerApi, ScheduleSSH $sshApi, HostApi $hostApi)
     {
         $this->em = $em;
         $this->api = $api;
+        $this->hostApi = $hostApi;
         $this->stateApi = $stateApi;
         $this->operationApi = $operationApi;
         $this->profileManagerApi = $profileManagerApi;
@@ -49,21 +52,24 @@ class ContainerWorker extends Worker
 
     /**
      * @param int $containerId
-     * @throws WrongInputException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function createContainer($containerId)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
-        $result = $this->api->create($container->getHost(), $container->getDataBody());
+        $container = $this->em->getRepository(Container::class)->find($containerId);
+        $result = $this->api->create($container->getHost(), $container->getBody());
 
-        $this->checkForErrors($container, $result);
+        if ($this->checkForErrors($container, $result)) {
+            return;
+        }
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
-        $this->checkForErrors($container, $operationsResponse);
+        if ($this->checkForErrors($container, $operationsResponse)) {
+            return;
+        }
 
 //        if ($operationsResponse->body->metadata->status_code != 200) {
 //            $container->setError($operationsResponse->body->metadata->err);
@@ -72,6 +78,7 @@ class ContainerWorker extends Worker
 //        }
 
         $container->setState('created');
+        $this->em->flush($container);
 
         $this->fetchInfos($container);
     }
@@ -82,13 +89,15 @@ class ContainerWorker extends Worker
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function deleteContainer(Container $containerId)
+    public function deleteContainer(int $containerId)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+        $container = $this->em->getRepository(Container::class)->find($containerId);
 
         $result = $this->api->remove($container->getHost(), $container);
 
-        $this->checkForErrors($container, $result);
+        if ($this->checkForErrors($container, $result)) {
+            return;
+        }
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
@@ -117,7 +126,7 @@ class ContainerWorker extends Worker
      */
     public function updateContainer($containerId)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+        $container = $this->em->getRepository(Container::class)->find($containerId);
 
         $result = $this->api->update($container->getHost(), $container, $container->getDataBody());
 
@@ -146,7 +155,7 @@ class ContainerWorker extends Worker
      */
     public function renameContainer($containerId)
     {
-        $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
+        $container = $this->em->getRepository(Container::class)->find($containerId);
 
         $result = $this->api->migrate($container->getHost(), $container, $container->getDataBody());
 
@@ -173,10 +182,64 @@ class ContainerWorker extends Worker
         $this->fetchInfos($container);
     }
 
+
     /**
-     * @param Container $container
+     * @param $oldContainerId
+     * @param $containerId
+     * @param $live
+     * @param $containerOnly
+     * @param $profiles
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function migrateContainer($oldContainerId, $containerId, $live, $containerOnly, $profiles)
+    {
+        $oldContainer = $this->em->getRepository(Container::class)->find($oldContainerId);
+        $container = $this->em->getRepository(Container::class)->find($containerId);
+
+        foreach ($profiles as $profile) {
+            $this->profileManagerApi->enableProfileForContainer($profile, $container);
+        }
+
+       $pushResult = $this->api->migrate($oldContainer->getHost(), $oldContainer, [
+           "name" => $oldContainer->getName(),
+           "migration" => true,
+           "live" => $live
+       ]);
+
+        $container->setSource([
+            "type" => "migration",
+            "mode" => "pull",
+            "operation" => $this->operationApi->buildUri($oldContainer->getHost(), 'operations/' . $pushResult->body->metadata->id),
+            "certificate" => $this->hostApi->getCertificate($oldContainer->getHost()),
+            "base-image" => $oldContainer->getImage()->getFingerprint(),
+            "container_only" => $containerOnly,
+            "live" => $live,
+            "secrets" => $pushResult->body->metadata->metadata
+        ]);
+
+
+        $result = $this->api->create($container->getHost(), $container->getBody());
+
+        if ($this->checkForErrors($container, $result)) {
+            return;
+        }
+
+        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
+
+        if ($this->checkForErrors($container, $operationsResponse)) {
+            return;
+        }
+
+        $container->setState('created');
+        $this->em->flush($container);
+
+        $this->fetchInfos($container);
+    }
+
+    /**
+     * @param Container $container
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     private function fetchInfos(Container $container)
@@ -196,18 +259,19 @@ class ContainerWorker extends Worker
     {
         if ($response->code != 202) {
             if ($response->code != 200) {
-                if ($response->body->metadata->status_code != 200) {
-                    $container->setError($response->body->metadata->err);
-
-                }
+//                if ($response->body->metadata->status_code != 200) {
+//                    $container->setError($response->body->metadata->err);
+//
+//                }
+                return true;
 
             }
             $container->setError($response->raw_body);
         }
-        if ($response->body->metadata->status_code == 400) {
+        if (!$response->body->metadata) {
             $container->setError($response->raw_body);
         }
-        $this->em->flush($container);
-        return;
+            $this->em->flush($container);
+            return false;
+        }
     }
-}
