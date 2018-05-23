@@ -26,6 +26,7 @@
         "jms/serializer-bundle": "^2.2",
         "nategood/httpful": "*",
         "nelmio/cors-bundle": "^1.5",
+        "oro/doctrine-extensions": "^1.2",
         "sensio/distribution-bundle": "^5.0.19",
         "sensio/framework-extra-bundle": "^5.1.6",
         "symfony-bundles/event-queue-bundle": "^2.0",
