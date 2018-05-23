@@ -174,7 +174,7 @@ class ContainerStateController extends Controller
 
 
         return new JsonResponse([
-            'state' => $result->body->metadata->status,
+            'state' => mb_strtolower($result->body->metadata->status),
             'stateCode' => $result->body->metadata->status_code
         ]);
     }
