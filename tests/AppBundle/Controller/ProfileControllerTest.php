@@ -246,7 +246,6 @@ class ProfileControllerTest extends WebTestCase
         $container = new Container();
         $container->setName("testContainer");
         $container->setHost($host);
-        $container->setIpv4("192.168.178.20");
         $container->setState('stopped');
         $container->setEphemeral(false);
         $container->setConfig([]);
