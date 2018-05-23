@@ -128,13 +128,19 @@ class Container
 
     /**
      * @var mixed
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      *
      */
     protected $error;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
+     * @var mixed
+     * @ORM\Column(type="array", nullable=true)
+     */
+    protected $source;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      * @Assert\NotBlank()
      * @JMS\Exclude()
@@ -142,7 +148,7 @@ class Container
     protected $host;
 
     /**
-     * @ORM\OneToMany(targetEntity="ContainerStatus", mappedBy="container")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\ContainerStatus", mappedBy="container")
      * @JMS\Exclude()
      */
     protected $statuses;
@@ -218,37 +224,6 @@ class Container
         }
     }
 
-    /**
-     * @return string | null
-     */
-    public function getIpv4() : ?string
-    {
-        return $this->ipv4;
-    }
-
-    /**
-     * @return string | null
-     */
-    public function getIpv6() : ?string
-    {
-        return $this->ipv6;
-    }
-
-    /**
-     * @param mixed $ipv4
-     */
-    public function setIpv4($ipv4)
-    {
-        $this->ipv4 = $ipv4;
-    }
-
-    /**
-     * @param mixed $ipv6
-     */
-    public function setIpv6($ipv6)
-    {
-        $this->ipv6 = $ipv6;
-    }
 
     /**
      * @return string
@@ -303,9 +278,9 @@ class Container
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getStatuses() :PersistentCollection
+    public function getStatuses()
     {
         return $this->statuses;
     }
@@ -318,21 +293,6 @@ class Container
         $this->host = $host;
     }
 
-    /**
-     * @return string | null
-     */
-    public function getDomainName() : ?string
-    {
-        return $this->domainName;
-    }
-
-    /**
-     * @param mixed $domainName
-     */
-    public function setDomainName($domainName)
-    {
-        $this->domainName = $domainName;
-    }
 
     /**
      * @return string
@@ -528,6 +488,37 @@ class Container
         $this->profiles = $profiles;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param mixed $source
+     */
+    public function setSource($source): void
+    {
+        $this->source = $source;
+    }
+
+
+    public function getBody(): array
+    {
+        $body = [
+                    "name" => $this->name,
+                    "architecture" => $this->architecture,
+                    "profiles" => $this->getProfileNames(),
+                    "ephemeral" => $this->ephemeral,
+                    "config" => $this->config,
+                    "devices" => $this->devices,
+                    "source" => $this->source
+                ];
+
+        return $body;
+    }
 
 
 
@@ -640,18 +631,35 @@ class Container
         return $ids;
     }
 
+    public function getProfileNames()
+    {
+        $profileNames = array();
+
+        if($this->profiles->isEmpty()){
+            return $profileNames;
+        }
+
+        foreach ($this->profiles as $profile)
+        {
+            $profileNames[] = $profile->getName();
+        }
+
+        return $profileNames;
+
+    }
+
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getBackupSchedules(): PersistentCollection
+    public function getBackupSchedules()
     {
         return $this->backupSchedules;
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getBackups(): PersistentCollection
+    public function getBackups()
     {
         return $this->backups;
     }

@@ -85,7 +85,6 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container = new Container();
         $container->setName("testContainerGetStatus3".mt_rand());
         $container->setHost($host);
-        $container->setIpv4("192.168.178.120");
         $container->setState('stopped');
         $container->setEphemeral(false);
         $container->setConfig([]);
@@ -134,7 +133,6 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container = new Container();
         $container->setName("testContainerGetStatus2".mt_rand());
         $container->setHost($host);
-        $container->setIpv4("192.168.178.10");
         $container->setState('stopped');
         $container->setConfig([]);
         $container->setEphemeral(false);
@@ -230,7 +228,6 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container = new Container();
         $container->setName("testContainerCreateStatus".mt_rand());
         $container->setHost($host);
-        $container->setIpv4("192.168.178.10");
         $container->setState('stopped');
         $container->setEphemeral(false);
         $container->setConfig([]);
@@ -286,7 +283,6 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container = new Container();
         $container->setName("testContainerCreateStatus".mt_rand());
         $container->setHost($host);
-        $container->setIpv4("192.168.178.11");
         $container->setState('stopped');
         $container->setEphemeral(false);
         $container->setConfig([]);
@@ -379,7 +375,6 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container = new Container();
         $container->setName("testContainerCreateStatus".mt_rand());
         $container->setHost($host);
-        $container->setIpv4("192.168.178.10");
         $container->setState('stopped');
         $container->setEphemeral(false);
         $container->setConfig([]);
@@ -447,7 +442,6 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container = new Container();
         $container->setName("testContainerCreateStatus".mt_rand());
         $container->setHost($host);
-        $container->setIpv4("192.168.178.10");
         $container->setState('stopped');
         $container->setEphemeral(false);
         $container->setConfig([]);
@@ -545,7 +539,6 @@ class MonitoringContainerControllerTest extends WebTestCase
         $container = new Container();
         $container->setName("testContainerGetStatus2".mt_rand());
         $container->setHost($host);
-        $container->setIpv4("192.168.178.11");
         $container->setState('stopped');
         $container->setEphemeral(false);
         $container->setConfig([]);

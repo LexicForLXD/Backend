@@ -127,7 +127,7 @@ class Host
      *
      * @var [type]
      *
-     * @ORM\OneToMany(targetEntity="Container", mappedBy="host")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Container", mappedBy="host")
      * @JMS\Exclude()
      */
     protected $containers;
@@ -145,7 +145,7 @@ class Host
     protected $images;
 
     /**
-     * @ORM\OneToMany(targetEntity="HostStatus", mappedBy="host")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\HostStatus", mappedBy="host")
      * @JMS\Exclude()
      */
     protected $statuses;
@@ -305,9 +305,9 @@ class Host
 
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getContainers(): PersistentCollection
+    public function getContainers()
     {
         return $this->containers;
     }
@@ -321,9 +321,9 @@ class Host
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getProfiles(): PersistentCollection
+    public function getProfiles()
     {
         return $this->profiles;
     }
@@ -337,9 +337,9 @@ class Host
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getImages(): PersistentCollection
+    public function getImages()
     {
         return $this->images;
     }

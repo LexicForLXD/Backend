@@ -15,7 +15,6 @@
 !var/SymfonyRequirements.php
 /vendor/
 /web/bundles/
-/docker-compose.yml
 
 /.idea
 
