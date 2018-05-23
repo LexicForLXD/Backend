@@ -1,9 +1,9 @@
 <?php
 namespace AppBundle\Controller;
 
-use AppBundle\Event\ContainerStateEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
+use AppBundle\Worker\ContainerStateWorker;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Service\LxdApi\ContainerStateApi;
 
 use AppBundle\Entity\Container;
-use AppBundle\Entity\ContainerStatus;
 
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -28,12 +27,11 @@ class ContainerStateController extends Controller
      * @param Request $request
      * @param int $containerId
      * @param EntityManagerInterface $em
-     * @param ContainerStateApi $api
+     * @param ContainerStateWorker $worker
      * @return JsonResponse
      *
-     * @throws WrongInputException
-     * @throws \Httpful\Exception\ConnectionErrorException
      * @throws ElementNotFoundException
+     * @throws WrongInputException
      * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
      *
      * @OAS\Put(path="/containers/{containerId}/state",
@@ -78,9 +76,8 @@ class ContainerStateController extends Controller
      *  ),
      * )
      */
-    public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateApi $api)
+    public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateWorker $worker)
     {
-        $dispatcher = $this->get('sb_event_queue');
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
@@ -96,31 +93,31 @@ class ContainerStateController extends Controller
             "stateful" => $request->get("stateful") ? : false
         ];
 
-        $result = $api->update($container->getHost(), $container, $data);
+
 
         switch($request->get("action")){
             case "start":
                 $container->setState("starting");
                 break;
             case "stop":
-                if($container->isEphemeral())
-                {
-                    $em->remove($container);
-                    $em->flush();
-                    return new JsonResponse(['message' => 'container delete because ephemeral']);
-                }
                 $container->setState("stopping");
                 break;
             case "restart":
                 $container->setState("restarting");
                 break;
+            case "freeze":
+                $container->setState("freezing");
+                break;
+            case "unfreeze":
+                $container->setState("unfreezing");
+                break;
             default:
-                throw new WrongInputException('please use one of the following actions: state, stop, restart');
+                throw new WrongInputException('please use one of the following actions: start, stop, restart, freeze and unfreeze');
                 break;
         }
+        $worker->later()->updateState($container->getId(), $data);
 
-        $dispatcher->on(ContainerStateEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
-
+        $em->flush($container);
 
         return new JsonResponse(['message' => 'update is ongoing'],Response::HTTP_ACCEPTED);
     }
