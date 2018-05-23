@@ -37,6 +37,13 @@ services:
     #     arguments:
     #         $someArgument: 'some_value'
 
+    AppBundle\Worker\:
+       resource: '../../src/AppBundle/Worker'
+       public: true
+       tags:
+            - {name: "dtc_queue.worker"}
+
+
     AppBundle\Service\LxdApi\:
        resource: '../../src/AppBundle/Service/LxdApi'
        arguments:
