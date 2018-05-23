@@ -13,7 +13,7 @@ services:
       - "/path/to/ssh/ssh:/srv/lexic/ssh"
       - "/path/to/ssh/ssh.pub:/srv/lexic/ssh.pub"
   postgres:
-    image: "postgres:9.6.7-alpine"
+    image: "postgres:10-alpine"
     ports:
       - "5432:5432"
     environment:
