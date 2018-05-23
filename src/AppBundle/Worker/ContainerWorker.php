@@ -52,8 +52,6 @@ class ContainerWorker extends Worker
 
     /**
      * @param int $containerId
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function createContainer($containerId)
