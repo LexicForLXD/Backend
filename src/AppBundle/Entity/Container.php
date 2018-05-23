@@ -139,7 +139,7 @@ class Container
      */
     protected $source;
 
-    /**f
+    /**
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      * @Assert\NotBlank()
@@ -271,9 +271,9 @@ class Container
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getStatuses() :PersistentCollection
+    public function getStatuses()
     {
         return $this->statuses;
     }
@@ -622,17 +622,17 @@ class Container
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getBackupSchedules(): PersistentCollection
+    public function getBackupSchedules()
     {
         return $this->backupSchedules;
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection|PersistentCollection
      */
-    public function getBackups(): PersistentCollection
+    public function getBackups()
     {
         return $this->backups;
     }
