@@ -6,12 +6,13 @@ use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
-use AppBundle\Event\ImageCreationEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\ImageAliasApi;
 use AppBundle\Service\LxdApi\ImageApi;
+use AppBundle\Worker\ImageWorker;
+use Doctrine\ORM\EntityManagerInterface;
 use Httpful\Exception\ConnectionErrorException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -111,9 +112,9 @@ class ImageController extends Controller
      *
      * @param int $hostId
      * @param Request $request
-     * @param ImageApi $api
+     * @param ImageWorker $imageWorker
+     * @param EntityManagerInterface $em
      * @return Response
-     * @throws ConnectionErrorException
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws WrongInputExceptionArray
@@ -152,7 +153,7 @@ class ImageController extends Controller
      *      ),
      * )
      */
-    public function createImage(int $hostId, Request $request, ImageApi $api){
+    public function createImage(int $hostId, Request $request, ImageWorker $imageWorker, EntityManagerInterface $em){
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
@@ -190,11 +191,8 @@ class ImageController extends Controller
                     $image->setProperties($request->request->get('properties'));
                 }
 
-                if ($errorArray = $this->validation($image)) {
-                    throw new WrongInputExceptionArray($errorArray);
-                }
+                $this->validation($image);
 
-                $em = $this->getDoctrine()->getManager();
                 //Create aliases
                 if($request->request->has('aliases')) {
                     $aliasArray = $request->request->get('aliases');
@@ -203,29 +201,17 @@ class ImageController extends Controller
                         $alias = new ImageAlias();
                         $alias->setName($aliasArray[$i]['name']);
                         $alias->setDescription($aliasArray[$i]['description']);
-                        if ($errorArray = $this->validation($alias)) {
-                            throw new WrongInputExceptionArray($errorArray);
-                        }
+                        $this->validation($alias);
                         $em->persist($alias);
                         $image->addAlias($alias);
                     }
-                }
-
-                $result = $api->createImage($host, $request->getContent());
-
-                if ($result->code != 202) {
-                    throw new WrongInputException($result->body->error);
-                }
-                if ($result->body->metadata->status_code == 400) {
-                    throw new WrongInputException($result->body->error);
                 }
 
                 $image->setFinished(false);
                 $em->persist($image);
                 $em->flush();
 
-                $dispatcher = $this->get('sb_event_queue');
-                $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
+                $imageWorker->later()->createImage($image, $request->getContent());
 
                 $serializer = $this->get('jms_serializer');
                 $response = $serializer->serialize($image, 'json');
@@ -245,11 +231,8 @@ class ImageController extends Controller
                     $image->setProperties($request->request->get('properties'));
                 }
 
-                if ($errorArray = $this->validation($image)) {
-                    throw new WrongInputExceptionArray($errorArray);
-                }
+                $this->validation($image);
 
-                $em = $this->getDoctrine()->getManager();
                 //Create aliases
                 if($request->request->has('aliases')) {
                     $aliasArray = $request->request->get('aliases');
@@ -258,21 +241,10 @@ class ImageController extends Controller
                         $alias = new ImageAlias();
                         $alias->setName($aliasArray[$i]['name']);
                         $alias->setDescription($aliasArray[$i]['description']);
-                        if ($errorArray = $this->validation($alias)) {
-                            throw new WrongInputExceptionArray($errorArray);
-                        }
+                        $this->validation($alias);
                         $em->persist($alias);
                         $image->addAlias($alias);
                     }
-                }
-
-                $result = $api->createImage($host, $request->getContent());
-
-                if ($result->code != 202) {
-                    throw new WrongInputException($result->body->error);
-                }
-                if ($result->body->metadata->status_code == 400) {
-                    throw new WrongInputException($result->body->error);
                 }
 
                 $image->setFinished(false);
@@ -280,9 +252,7 @@ class ImageController extends Controller
                 $em->persist($image);
                 $em->flush();
 
-                $dispatcher = $this->get('sb_event_queue');
-
-                $dispatcher->on(ImageCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $image->getId());
+                $imageWorker->later(0)->createImage($image->getId(), $request->getContent());
 
                 $serializer = $this->get('jms_serializer');
                 $response = $serializer->serialize($image, 'json');
@@ -325,12 +295,14 @@ class ImageController extends Controller
      *
      * @param $imageId
      * @param ImageApi $api
+     * @param ImageAliasApi $aliasApi
+     * @param EntityManagerInterface $em
      * @return JsonResponse
      * @throws ConnectionErrorException
      * @throws ElementNotFoundException
      * @throws WrongInputException
      */
-    public function deleteImage($imageId, ImageApi $api, ImageAliasApi $aliasApi){
+    public function deleteImage($imageId, ImageApi $api, ImageAliasApi $aliasApi, EntityManagerInterface $em){
         $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
         if (!$image) {
@@ -338,8 +310,6 @@ class ImageController extends Controller
                 'No Image found for id ' . $imageId
             );
         }
-
-        $em = $this->getDoctrine()->getManager();
 
         //Image is not created on the Host
         if(!$image->isFinished()){
@@ -466,12 +436,17 @@ class ImageController extends Controller
      *      ),
      * )
      *
+     * @param $imageId
+     * @param Request $request
+     * @param ImageApi $api
+     * @param EntityManagerInterface $em
+     * @return Response
+     * @throws ConnectionErrorException
      * @throws ElementNotFoundException
      * @throws WrongInputException
-     * @throws ConnectionErrorException
      * @throws WrongInputExceptionArray
      */
-    public function updateImage($imageId, Request $request, ImageApi $api){
+    public function updateImage($imageId, Request $request, ImageApi $api, EntityManagerInterface $em){
         $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
         if (!$image) {
@@ -479,8 +454,6 @@ class ImageController extends Controller
                 'No Image for ID '.$imageId.' found'
             );
         }
-
-        $em = $this->getDoctrine()->getManager();
 
         //Image is not created on the Host
         if(!$image->isFinished()){
@@ -491,9 +464,7 @@ class ImageController extends Controller
 
         $image->setPublic($request->request->get('public'));
 
-        if ($errorArray = $this->validation($image)) {
-            throw new WrongInputExceptionArray($errorArray);
-        }
+        $this->validation($image);
 
         $result = $api->putImageUpdate($image->getHost(), $image->getFingerprint(), $request->getContent());
 
@@ -513,6 +484,11 @@ class ImageController extends Controller
         return new Response($response);
     }
 
+    /**
+     * @param $object
+     * @return bool
+     * @throws WrongInputExceptionArray
+     */
     private function validation($object)
     {
         $validator = $this->get('validator');
@@ -523,7 +499,7 @@ class ImageController extends Controller
             foreach ($errors as $error) {
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
-            return $errorArray;
+            throw new WrongInputExceptionArray($errorArray);
         }
         return false;
     }

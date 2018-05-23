@@ -145,25 +145,6 @@ nelmio_cors:
             allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
             max_age: 3600
 
-sb_event_queue:
-    service_name: 'event_queue'
-    default_name: 'event:default'
-    storage_path: '%kernel.cache_dir%/event-queue-daemon.%s.pid'
-
-sb_redis:
-    class:
-        client:  'SymfonyBundles\RedisBundle\Service\Client'
-        factory: 'SymfonyBundles\RedisBundle\Service\Factory'
-    clients:
-        default:
-            # container alias for service, defaults name for this client: sb_redis.client.default
-            alias:      ~
-            # client options
-            $options:    []
-            # connection parameters
-            $parameters:
-                host: '%redis_hostname%'
-
 jms_serializer:
     visitors:
         json:

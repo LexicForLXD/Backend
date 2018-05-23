@@ -2,9 +2,6 @@
 namespace AppBundle\Controller;
 
 
-use AppBundle\Event\ContainerCreationEvent;
-use AppBundle\Event\ContainerDeleteEvent;
-use AppBundle\Event\ContainerUpdateEvent;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
@@ -15,6 +12,7 @@ use AppBundle\Service\LxdApi\HostApi;
 use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\ContainerApi;
 
+use AppBundle\Worker\ContainerWorker;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -361,15 +359,15 @@ class ContainerController extends Controller
      * @param ProfileManagerApi $profileManagerApi
      * @param HostApi $hostApi
      * @param OperationApi $operationApi
+     * @param ContainerWorker $containerWorker
      * @return Response
      * @throws ElementNotFoundException
-     * @throws WrongInputException
      * @throws WrongInputExceptionArray
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ContainerApi $api, ProfileManagerApi $profileManagerApi, HostApi $hostApi, OperationApi $operationApi)
+    public function storeAction(Request $request, int $hostId, EntityManagerInterface $em, ProfileManagerApi $profileManagerApi, ContainerWorker $containerWorker)
     {
         $type = $request->query->get('type');
 
@@ -381,41 +379,29 @@ class ContainerController extends Controller
             );
         }
 
-        $profileNames = array();
 
         if($request->request->has('profiles'))
         {
             $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
-
-            $profileNames = $this->checkProfiles($profiles, $request->get("profiles"));
+            $this->checkProfiles($profiles, $request->get("profiles"));
         }
 
 
         $container = new Container();
+        $container->setHost($host);
+        $container->setConfig($request->get("config"));
+        $container->setDevices($request->get("devices"));
+        $container->setEphemeral($request->get("ephemeral", false));
+        $container->setName($request->get("name"));
+        $container->setArchitecture($request->get("architecture", 'x86_64'));
+        $container->setState('creating');
 
         switch ($type) {
             case 'image':
 
-                $data = [
-                    "name" => $request->request->get("name"),
-                    "architecture" => $request->get("architecture", 'x86_64'),
-                    "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral", false),
-                    "config" => $request->get("config"),
-                    "devices" => $request->get("devices"),
-                    "source" => []
-                ];
 
-                $container->setArchitecture($request->get("architecture"));
-
-                if(!$request->request->has("fingerprint") && !$request->request->has("alias"))
+                if ($request->request->has("fingerprint") && !$request->request->has("alias"))
                 {
-                    throw new WrongInputExceptionArray([
-                        'image' => 'You have to pass either a fingerprint or an alias for the image.'
-                    ]);
-                }
-
-                if ($request->request->has("fingerprint")) {
                     $image = $this->getDoctrine()->getRepository(Image::class)->findOneBy(["fingerprint" => $request->get("fingerprint")]);
 
                     if (!$image) {
@@ -425,9 +411,8 @@ class ContainerController extends Controller
                     }
 
 
-                }
-
-                if ($request->request->has("alias")) {
+                } else if ($request->request->has("alias") && !$request->request->has("fingerprint"))
+                {
                     $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findOneBy(["name" => $request->get("alias")]);
 
                     if (!$imageAlias) {
@@ -438,6 +423,11 @@ class ContainerController extends Controller
 
                     $image = $imageAlias->getImage();
 
+                } else
+                {
+                    throw new WrongInputExceptionArray([
+                        'image' => 'You have to pass either a fingerprint or an alias for the image.'
+                    ]);
                 }
 
 
@@ -449,11 +439,10 @@ class ContainerController extends Controller
                 }
 
                 $container->setImage($image);
-
-                $data["source"] = [
+                $container->setSource([
                     "type" => "image",
                     "fingerprint" => $image->getFingerPrint()
-                ];
+                ]);
 
                 break;
             case 'migration':
@@ -465,38 +454,17 @@ class ContainerController extends Controller
                     ]);
                 }
 
-                $data = [
-                    "name" => $request->get("name"),
-                    "migration" => true,
-                    "live" => $request->get("live", false)
-
-                ];
-                $oldHost = $oldContainer->getHost();
-                $pushResult = $api->migrate($oldHost, $oldContainer, $data);
-
-                $data = [
-                    "name" => $request->get("name"),
-                    "architecture" => $request->get("architecture"),
-                    "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral", false),
-                    "config" => $request->get("config"),
-                    "devices" => $request->get("devices"),
-                    "source" => [
-                        "type" => "migration",
-                        "mode" => "pull",
-                        "operation" => $operationApi->buildUri($oldHost, 'operations/' . $pushResult->body->metadata->id),
-                        "certificate" => $hostApi->getCertificate($oldHost),
-                        "base-image" => $oldContainer->getImage()->getFingerprint(),
-                        "container_only" => $request->get("containerOnly", true),
-                        "live" => $request->get("live", false),
-                        "secrets" => $pushResult->body->metadata->metadata
-
-                    ]
-                ];
 
                 $container->setImage($oldContainer->getImage());
-                $container->setArchitecture($request->get('architecture'));
+                $this->validation($container);
+                $em->persist($container);
+                $em->flush();
 
+                $containerWorker->later()->migrateContainer($container->getId(), $oldContainer->getId(), $request->get("containerOnly", true), $request->get("live", false), $profiles);
+
+                $serializer = $this->get('jms_serializer');
+                $response = $serializer->serialize($container, 'json');
+                return new Response($response, Response::HTTP_CREATED);
 
                 break;
             case 'copy':
@@ -508,55 +476,26 @@ class ContainerController extends Controller
                     ]);
                 }
 
-                $data = [
-                    "name" => $request->get("name"),
-                    "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral", false),
-                    "config" => $request->get("config"),
-                    "devices" => $request->get("devices"),
-                    "source" => [
-                        "type" => "copy",
-                        "container_only" => $request->get("containerOnly", true),
-                        "source" => $oldContainer->getName()
-                    ]
-                ];
-
+                $container->setSource([
+                    "type" => "copy",
+                    "container_only" => $request->get("containerOnly", true),
+                    "source" => $oldContainer->getName()
+                ]);
                 $container->setImage($oldContainer->getImage());
 
                 break;
             case 'none':
-                $data = [
-                    "name" => $request->request->get("name"),
-                    "architecture" => $request->get("architecture", 'x86_64'),
-                    "profiles" => $profileNames,
-                    "ephemeral" => $request->get("ephemeral", false),
-                    "config" => $request->get("config"),
-                    "devices" => $request->get("devices"),
-                    "source" => [
-                        "type" => "none"
-                    ]
-                ];
-                $container->setArchitecture($request->get('architecture'));
+
+                $container->setSource([
+                    "type" => "none"
+                ]);
 
                 break;
             default:
                 throw new WrongInputExceptionArray(['type' => "The type was wrong. Either use image, migration, copy or none."]);
         }
 
-        $container->setHost($host);
-        $container->setConfig($request->get("config"));
-        $container->setDevices($request->get("devices"));
-        $container->setEphemeral($request->get("ephemeral"));
-
-        if ($request->request->has("name")) {
-            $container->setName($request->get("name"));
-        }
-        $container->setSettings($data);
-
-        $container->setState('creating');
-
         $this->validation($container);
-
 
         $em->persist($container);
         $em->flush();
@@ -568,30 +507,11 @@ class ContainerController extends Controller
             }
         }
 
-
-        $result = $api->create($host, $data);
-
-
-        $dispatcher = $this->get('sb_event_queue');
-
-
-
-        if ($result->code != 202) {
-            throw new WrongInputException($result->raw_body);
-        }
-        if ($result->body->metadata->status_code == 400) {
-            throw new WrongInputException($result->raw_body);
-        }
-
-
-
-        $dispatcher->on(ContainerCreationEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $host, $container->getId());
-
-
+        $containerWorker->later()->createContainer($container->getId());
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
-        return new Response($response, Response::HTTP_CREATED);
+        return new Response($response, Response::HTTP_ACCEPTED);
 
     }
 
@@ -680,14 +600,14 @@ class ContainerController extends Controller
      *)
      * @param int $containerId
      * @param EntityManagerInterface $em
-     * @param ContainerApi $api
      * @param ContainerStateApi $stateApi
+     * @param ContainerWorker $containerWorker
      * @return JsonResponse
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function deleteAction($containerId, EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi)
+    public function deleteAction($containerId, EntityManagerInterface $em, ContainerStateApi $stateApi, ContainerWorker $containerWorker)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
@@ -696,7 +616,7 @@ class ContainerController extends Controller
                 'No container found for id ' . $containerId
             );
         }
-        $stateResult = $stateApi->actual($container->getHost(), $container);
+        $stateResult = $stateApi->actual($container);
 
         if ($stateResult->code == 404) {
             $em->remove($container);
@@ -708,15 +628,9 @@ class ContainerController extends Controller
             throw new WrongInputException("Container is currently not stopped. Please stop the container before you delete it.");
         }
 
-        $result = $api->remove($container->getHost(), $container->getName());
+        $containerWorker->later()->deleteContainer($container->getId());
 
-
-
-
-        $dispatcher = $this->get('sb_event_queue');
-        $dispatcher->on(ContainerDeleteEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
-
-        return $this->json(['message' => 'Deletion is ongoing'], 200);
+        return $this->json(['message' => 'Deletion is ongoing'], Response::HTTP_ACCEPTED);
     }
 
 
@@ -724,9 +638,8 @@ class ContainerController extends Controller
      * @param Request $request
      * @param int $containerId
      * @param EntityManagerInterface $em
-     * @param ContainerApi $api
-     * @param OperationApi $operationApi
      * @param ProfileManagerApi $profileManagerApi
+     * @param ContainerWorker $containerWorker
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
@@ -803,10 +716,8 @@ class ContainerController extends Controller
      *  ),
      * )
      */
-    public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ContainerApi $api, OperationApi $operationApi, ProfileManagerApi $profileManagerApi)
+    public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ProfileManagerApi $profileManagerApi, ContainerWorker $containerWorker)
     {
-        $dispatcher = $this->get('sb_event_queue');
-
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
 
@@ -821,18 +732,12 @@ class ContainerController extends Controller
 
                 $data = ["name" => $request->get("name")];
 
-                $result = $api->migrate($container->getHost(), $container, $data);
-
-                if ($result->code == 409) {
-                    throw new WrongInputExceptionArray(["name" => "The name is already taken."]);
-                }
-
-                $container->setName($request->get("name"));
-
+                $container->setDataBody($data);
+                $em->flush($container);
+                $containerWorker->later()->renameContainer($container);
             } else {
                 throw new WrongInputExceptionArray(["name" => "The new name is same as current name."]);
             }
-
 
         } else {
             $profileNames = array();
@@ -847,9 +752,6 @@ class ContainerController extends Controller
                 $this->checkProfiles($profiles, $request->get("profiles"));
             }
 
-
-
-
             if (!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral") && !$request->request->has("profiles")) {
                 throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
             }
@@ -862,31 +764,21 @@ class ContainerController extends Controller
                 "profiles" => $profileNames
             ];
 
-            $result = $api->update($container->getHost(), $container, $data);
-
+            $container->setDataBody($data);
             $container->setArchitekture($request->get("architecture"));
             $container->setConfig($request->get("config"));
             $container->setDevices($request->get("devices"));
             $container->setEphemeral($request->get("ephemeral"));
-
-
+            $this->validation($container);
+            $em->flush($container);
+            $containerWorker->later()->updateContainer($container->getId());
         }
 
-        if ($result->code != 202) {
-            throw new WrongInputException($result->raw_body);
-        }
-        if ($result->body->metadata->status_code == 400) {
-            throw new WrongInputException($result->raw_body);
-        }
+//        $serializer = $this->get('jms_serializer');
+//        $response = $serializer->serialize($container, 'json');
+//        return new Response($response, Response::HTTP_OK);
 
-        $dispatcher->on(ContainerUpdateEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
-
-
-        $em->flush();
-
-        $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($container, 'json');
-        return new Response($response, Response::HTTP_OK);
+        return $this->json(['message' => 'Update is ongoing'], Response::HTTP_ACCEPTED);
 
 
 

@@ -5,6 +5,7 @@ use AppBundle\Entity\Container;
 use AppBundle\Entity\Host;
 use AppBundle\Service\LxdApi\Util\HttpHelper;
 use Httpful\Request;
+use Httpful\Response;
 
 
 class ContainerApi extends HttpHelper
@@ -26,7 +27,7 @@ class ContainerApi extends HttpHelper
      *  List of all containers on one host
      *
      * @param Host $host
-     * @return object
+     * @return Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function list(Host $host)
@@ -39,7 +40,7 @@ class ContainerApi extends HttpHelper
      * delete a container
      *
      * @param Host $host
-     * @return object
+     * @return Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function remove(Host $host, $containerName)
@@ -105,31 +106,5 @@ class ContainerApi extends HttpHelper
     {
         $uri = $this->buildUri($host, $this->getEndpoint().'/'.$container->getName());
         return Request::post($uri, $data)->timeoutIn(10)->send();
-    }
-
-    /**
-     * @param Host $host
-     * @param $operationsLink
-     * @return \Httpful\Response
-     * @throws \Httpful\Exception\ConnectionErrorException
-     */
-    public function getOperationsLink(Host $host, $operationsLink){
-        $uri = $this->buildUri($host, 'operations/'.$operationsLink);
-        return Request::get($uri)
-            -> send();
-    }
-
-
-
-    /**
-     * @param Host $host
-     * @param $operationsId
-     * @return \Httpful\Response
-     * @throws \Httpful\Exception\ConnectionErrorException
-     */
-    public function getOperationsLinkWithWait(Host $host, $operationsId){
-        $uri = $this->buildUri($host, 'operations/'.$operationsId.'/wait');
-        return Request::get($uri)
-            -> send();
     }
 }
