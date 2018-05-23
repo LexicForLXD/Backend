@@ -170,7 +170,7 @@ class ContainerStateController extends Controller
             );
         }
 
-        $result = $api->actual($container->getHost(), $container);
+        $result = $api->actual($container);
 
         $container->setNetwork($result->body->metadata->network);
         $container->setState(mb_strtolower($result->body->metadata->status));

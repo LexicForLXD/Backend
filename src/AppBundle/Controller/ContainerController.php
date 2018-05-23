@@ -617,7 +617,7 @@ class ContainerController extends Controller
                 'No container found for id ' . $containerId
             );
         }
-        $stateResult = $stateApi->actual($container->getHost(), $container);
+        $stateResult = $stateApi->actual($container);
 
         if ($stateResult->code == 404) {
             $em->remove($container);
