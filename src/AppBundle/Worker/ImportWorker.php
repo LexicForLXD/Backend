@@ -20,20 +20,26 @@ class ImportWorker extends BaseWorker
 {
 
     protected $em;
-    protected $api;
+    protected $imageApi;
+    protected $containerApi;
     protected $operationApi;
+    protected $validator;
 
     /**
      * ImageWorker constructor.
      * @param EntityManagerInterface $em
-     * @param ImageApi $api
+     * @param ImageApi $imageApi
+     * @param ContainerApi $containerApi
      * @param OperationApi $operationApi
+     * @param ValidatorInterface $validator
      */
-    public function __construct(EntityManagerInterface $em, ImageApi $api, OperationApi $operationApi)
+    public function __construct(EntityManagerInterface $em, ImageApi $imageApi, ContainerApi $containerApi, OperationApi $operationApi, ValidatorInterface $validator)
     {
         $this->em = $em;
-        $this->api = $api;
+        $this->imageApi = $imageApi;
+        $this->containerApi = $containerApi;
         $this->operationApi = $operationApi;
+        $this->validator = $validator;
     }
 
     public function getName()
@@ -48,24 +54,38 @@ class ImportWorker extends BaseWorker
     public function importImages(int $hostId)
     {
         $host = $this->em->getRepository(Host::class)->find($hostId);
-        $imageListResult = $this->api->listImages($host);
-
+        $imageListResult = $this->imageApi->listImages($host);
+        $counter = 0;
         $imageList = $imageListResult->body->metadata;
 
         foreach ($imageList as $item) {
-            $imageResult = $this->api->getImageByFingerprint($host, ltrim($item, "/1.0/images/"));
+            $imageResult = $this->imageApi->getImageByFingerprint($host, substr($item, 12));
+
+            $image = $this->em->getRepository(Image::class)->findOneBy(["host" => $host->getId(), "fingerprint" => $imageResult->body->metadata->fingerprint]);
+
+            if ($image) {
+                break;
+            }
 
             $image = new Image();
             $image->setFingerprint($imageResult->body->metadata->fingerprint);
-            $image->setProperties($imageResult->body->metadata->properties);
+            $image->setProperties((array) $imageResult->body->metadata->properties);
             $image->setPublic($imageResult->body->metadata->public);
             $image->setFilename($imageResult->body->metadata->filename);
             $image->setFinished(true);
             $image->setArchitecture($imageResult->body->metadata->architecture);
             $image->setSize($imageResult->body->metadata->size);
             $image->setHost($host);
-            $this->em->persist($image);
-            $this->em->flush();
+            if(!$this->validation($image))
+            {
+                $this->em->persist($image);
+                $this->em->flush();
+                $counter++;
+            }
+
+            //TODO Import alias as well
         }
+        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . " Number of imported images: ". $counter);
+
     }
 }
