@@ -122,11 +122,7 @@ class ContainerStateController extends Controller
         $dispatcher->on(ContainerStateEvent::class, date('Y-m-d H:i:s'), $result->body->metadata->id, $container->getHost(), $container->getId());
 
 
-        //TODO mögliche Fehler abfangen
-
-        $em->flush();
-
-        return new JsonResponse(['message' => 'update is ongoing']);
+        return new JsonResponse(['message' => 'update is ongoing'],Response::HTTP_ACCEPTED);
     }
 
 

@@ -509,10 +509,9 @@ class ContainerController extends Controller
 
         $containerWorker->later()->createContainer($container->getId());
 
-//
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
-        return new Response($response, Response::HTTP_CREATED);
+        return new Response($response, Response::HTTP_ACCEPTED);
 
     }
 
@@ -631,7 +630,7 @@ class ContainerController extends Controller
 
         $containerWorker->later()->deleteContainer($container->getId());
 
-        return $this->json(['message' => 'Deletion is ongoing'], 200);
+        return $this->json(['message' => 'Deletion is ongoing'], Response::HTTP_ACCEPTED);
     }
 
 
@@ -779,7 +778,7 @@ class ContainerController extends Controller
 //        $response = $serializer->serialize($container, 'json');
 //        return new Response($response, Response::HTTP_OK);
 
-        return $this->json(['message' => 'Update is ongoing'], 200);
+        return $this->json(['message' => 'Update is ongoing'], Response::HTTP_ACCEPTED);
 
 
 
