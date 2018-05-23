@@ -51,13 +51,6 @@ services:
             $cert_key_location: '%cert_key_location%'
             $cert_passphrase: '%cert_passphrase%'
 
-    lxd.api.profile:
-        class: AppBundle\Service\LxdApi\ProfileApi
-        public: true
-        arguments:
-            $cert_location: '%cert_location%'
-            $cert_key_location: '%cert_key_location%'
-            $cert_passphrase: '%cert_passphrase%'
 
     AppBundle\Service\SSH\:
         resource: '../../src/AppBundle/Service/SSH'
