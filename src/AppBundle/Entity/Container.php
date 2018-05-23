@@ -140,7 +140,7 @@ class Container
     protected $source;
 
     /**f
-     * @ORM\ManyToOne(targetEntity="Host", inversedBy="containers")
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Host", inversedBy="containers")
      * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
      * @Assert\NotBlank()
      * @JMS\Exclude()
@@ -148,7 +148,7 @@ class Container
     protected $host;
 
     /**
-     * @ORM\OneToMany(targetEntity="ContainerStatus", mappedBy="container")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\ContainerStatus", mappedBy="container")
      * @JMS\Exclude()
      */
     protected $statuses;
