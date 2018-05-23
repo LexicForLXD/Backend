@@ -37,9 +37,9 @@ class ContainerStateApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function actual(Host $host, Container $container)
+    public function actual(Container $container)
     {
-        $uri = $this->buildUri($host, $this->getEndpoint($container->getName()));
+        $uri = $this->buildUri($container->getHost(), $this->getEndpoint($container->getName()));
         return Request::get($uri)->timeoutIn(10)->send();
     }
 
@@ -50,9 +50,9 @@ class ContainerStateApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function update(Host $host, Container $container, $data)
+    public function update(Container $container, $data)
     {
-        $uri = $this->buildUri($host, $this->getEndpoint($container->getName()));
+        $uri = $this->buildUri($container->getHost(), $this->getEndpoint($container->getName()));
         return Request::put($uri, $data)->timeoutIn(10)->send();
     }
 
