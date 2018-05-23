@@ -41,7 +41,7 @@ class ImageWorker extends BaseWorker
      */
     public function createImage($imageId, $body)
     {
-        $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
+        $image = $this->em->getRepository(Image::class)->find($imageId);
         $result = $this->api->createImage($image->getHost(), $body);
 
         if ($result->code != 202) {
