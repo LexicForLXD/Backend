@@ -8,12 +8,15 @@
 
 namespace AppBundle\Worker;
 
+use AppBundle\Entity\Container;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\Host;
+use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Dtc\QueueBundle\Model\Worker as BaseWorker;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class ImportWorker extends BaseWorker
@@ -88,4 +91,72 @@ class ImportWorker extends BaseWorker
         $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . " Number of imported images: ". $counter);
 
     }
+
+
+    /**
+     * @param int $hostId
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function importContainers(int $hostId)
+    {
+        $host = $this->em->getRepository(Host::class)->find($hostId);
+        $counter = 0;
+        $containerListResult = $this->containerApi->list($host);
+        $containerList = $containerListResult->body->metadata;
+
+        foreach ($containerList as $item) {
+            $containerResult = $this->containerApi->show($host, substr($item, 16));
+
+            $container = $this->em->getRepository(Container::class)->findOneBy(["host" => $host->getId(), "name" => $containerResult->body->metadata->name]);
+
+            if ($container) {
+                break;
+            }
+
+            $container = new Container();
+            $container->setArchitecture($containerResult->body->metadata->architecture);
+            $container->setConfig((array) $containerResult->body->metadata->config);
+            $container->setDevices((array) $containerResult->body->metadata->devices);
+            $container->setEphemeral($containerResult->body->metadata->ephemeral);
+//            $container->setProfiles($containerResult->body->metadata->architecture);
+            $container->setCreatedAt(new \DateTime($containerResult->body->metadata->created_at));
+            $container->setExpandedConfig((array) $containerResult->body->metadata->expanded_config);
+            $container->setExpandedDevices((array) $containerResult->body->metadata->expanded_devices);
+            $container->setName($containerResult->body->metadata->name);
+            $container->setState(mb_strtolower($containerResult->body->metadata->status));
+            $container->setHost($host);
+            if(!$this->validation($container))
+            {
+                $this->em->persist($container);
+                $this->em->flush();
+                $counter++;
+            }
+
+        }
+
+        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . " Number of imported containers: ". $counter);
+    }
+
+
+
+    /**
+     * Validates a Object and returns true if error occurs
+     * @param  $object
+     * @return bool
+     */
+    private function validation($object)
+    {
+        $errors = $this->validator->validate($object);
+
+        if (count($errors) > 0) {
+            $errorArray = array();
+            foreach ($errors as $error) {
+                $errorArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . serialize($errorArray));
+            return true;
+        }
+        return false;
+    }
+
 }
