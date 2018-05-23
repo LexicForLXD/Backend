@@ -62,13 +62,13 @@ class ContainerStateWorker extends Worker
         }
 
 
-        if($container->isEphemeral() && $data["action"] === "stop"){
+        if ($container->isEphemeral() && $data["action"] === "stop") {
             $this->em->remove($container);
             $this->em->flush();
             return;
         }
 
-
+        $this->em->refresh($container);
         $stateResult = $this->stateApi->actual($container);
         $container->setState(mb_strtolower($stateResult->body->metadata->status));
         $container->setNetwork($stateResult->body->metadata->network);
@@ -83,19 +83,22 @@ class ContainerStateWorker extends Worker
      */
     private function checkForErrors(Container $container, Response $response)
     {
-        if ($response->code != 202) {
-            if ($response->code != 200) {
-                if ($response->body->metadata->status_code != 200) {
+
+        if ($response->code !== 202 && $response->code !== 200)
+        {
+            if($response->body->metadata)
+            {
+                if ($response->body->metadata->status_code !== 200 && $response->body->metadata->status_code !== 103) {
                     $container->setError($response->body->metadata->err);
                 }
-                return true;
+            } else
+            {
+                $container->setError($response->raw_body);
             }
-            $container->setError($response->raw_body);
-        }
-        if (!$response->body->metadata) {
-            $container->setError($response->raw_body);
-        }
             $this->em->flush($container);
-            return false;
+            $this->getCurrentJob()->setMessage("error");
+            return true;
         }
+        return false;
     }
+}
