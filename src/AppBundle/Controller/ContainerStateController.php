@@ -115,9 +115,11 @@ class ContainerStateController extends Controller
                 throw new WrongInputException('please use one of the following actions: start, stop, restart, freeze and unfreeze');
                 break;
         }
+        $em->flush($container);
+
         $worker->later()->updateState($container->getId(), $data);
 
-        $em->flush($container);
+
 
         return new JsonResponse(['message' => 'update is ongoing'],Response::HTTP_ACCEPTED);
     }
