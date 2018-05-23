@@ -200,11 +200,11 @@ class ContainerWorker extends Worker
             $this->profileManagerApi->enableProfileForContainer($profile, $container);
         }
 
-       $pushResult = $this->api->migrate($oldContainer->getHost(), $oldContainer, [
-           "name" => $oldContainer->getName(),
-           "migration" => true,
-           "live" => $live
-       ]);
+        $pushResult = $this->api->migrate($oldContainer->getHost(), $oldContainer, [
+            "name" => $oldContainer->getName(),
+            "migration" => true,
+            "live" => $live
+        ]);
 
         $container->setSource([
             "type" => "migration",
@@ -253,23 +253,25 @@ class ContainerWorker extends Worker
         $this->em->flush($container);
     }
 
+    /**
+     * @param Container $container
+     * @param Response $response
+     * @return bool
+     */
     private function checkForErrors(Container $container, Response $response)
     {
-        if ($response->code != 202) {
-            if ($response->code != 200) {
-//                if ($response->body->metadata->status_code != 200) {
-//                    $container->setError($response->body->metadata->err);
-//
-//                }
-                return true;
-
+        if ($response->code !== 202 && $response->code !== 200) {
+            if ($response->body->metadata) {
+                if ($response->body->metadata->status_code !== 200 && $response->body->metadata->status_code !== 103) {
+                    $container->setError($response->body->metadata->err);
+                }
+            } else {
+                $container->setError($response->raw_body);
             }
-            $container->setError($response->raw_body);
-        }
-        if (!$response->body->metadata) {
-            $container->setError($response->raw_body);
-        }
             $this->em->flush($container);
-            return false;
+            $this->getCurrentJob()->setMessage("error");
+            return true;
         }
+        return false;
     }
+}
