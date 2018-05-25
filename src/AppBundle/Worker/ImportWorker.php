@@ -138,6 +138,17 @@ class ImportWorker extends BaseWorker
             $container->setName($containerResult->body->metadata->name);
             $container->setState(mb_strtolower($containerResult->body->metadata->status));
             $container->setHost($host);
+            if($config = (array) $containerResult->body->metadata->config)
+            {
+                $image = $this->em->getRepository(Image::class)->findOneBy(["host" => $host->getId(), "fingerprint" => $config["volatile.base_image"]]);
+                if (!$image) {
+                    $this->addMessage("base image not found for container " . $container->getName());
+                } else
+                {
+                    $container->setImage($image);
+                }
+
+            }
             if(!$this->validation($container))
             {
                 $this->em->persist($container);
