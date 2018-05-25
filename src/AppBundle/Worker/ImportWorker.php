@@ -73,7 +73,7 @@ class ImportWorker extends BaseWorker
 
             $image = new Image();
             $image->setFingerprint($imageResult->body->metadata->fingerprint);
-            $image->setProperties((array) $imageResult->body->metadata->properties);
+            $image->setProperties($imageResult->body->metadata->properties);
             $image->setPublic($imageResult->body->metadata->public);
             $image->setFilename($imageResult->body->metadata->filename);
             $image->setFinished(true);
@@ -128,13 +128,13 @@ class ImportWorker extends BaseWorker
 
             $container = new Container();
             $container->setArchitecture($containerResult->body->metadata->architecture);
-            $container->setConfig((array) $containerResult->body->metadata->config);
-            $container->setDevices((array) $containerResult->body->metadata->devices);
+            $container->setConfig($containerResult->body->metadata->config);
+            $container->setDevices($containerResult->body->metadata->devices);
             $container->setEphemeral($containerResult->body->metadata->ephemeral);
 //            $container->setProfiles($containerResult->body->metadata->architecture);
             $container->setCreatedAt(new \DateTime($containerResult->body->metadata->created_at));
-            $container->setExpandedConfig((array) $containerResult->body->metadata->expanded_config);
-            $container->setExpandedDevices((array) $containerResult->body->metadata->expanded_devices);
+            $container->setExpandedConfig($containerResult->body->metadata->expanded_config);
+            $container->setExpandedDevices($containerResult->body->metadata->expanded_devices);
             $container->setName($containerResult->body->metadata->name);
             $container->setState(mb_strtolower($containerResult->body->metadata->status));
             $container->setHost($host);
