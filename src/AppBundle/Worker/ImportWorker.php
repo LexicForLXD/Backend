@@ -11,6 +11,7 @@ namespace AppBundle\Worker;
 use AppBundle\Entity\Container;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\Host;
+use AppBundle\Entity\ImageAlias;
 use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
@@ -67,7 +68,7 @@ class ImportWorker extends BaseWorker
             $image = $this->em->getRepository(Image::class)->findOneBy(["host" => $host->getId(), "fingerprint" => $imageResult->body->metadata->fingerprint]);
 
             if ($image) {
-                break;
+                break 1;
             }
 
             $image = new Image();
@@ -86,7 +87,19 @@ class ImportWorker extends BaseWorker
                 $counter++;
             }
 
-            //TODO Import alias as well
+            foreach ($imageResult->body->metadata->aliases as $alias)
+            {
+                $dbAlias = new ImageAlias();
+                $dbAlias->setName($alias->name);
+                $dbAlias->setDescription($alias->description);
+                $dbAlias->setImage($image);
+                if(!$this->validation($dbAlias))
+                {
+                    $this->em->persist($dbAlias);
+                    $this->em->flush();
+                }
+
+            }
         }
         $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . " Number of imported images: ". $counter);
 
