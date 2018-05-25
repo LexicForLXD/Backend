@@ -242,6 +242,7 @@ class ContainerWorker extends Worker
      */
     private function fetchInfos(Container $container)
     {
+        $this->em->refresh($container);
         $containerResponse = $this->api->show($container->getHost(), $container->getName());
         $container->setName($containerResponse->body->metadata->name);
         $container->setEphemeral($containerResponse->body->metadata->ephemeral);
