@@ -183,6 +183,10 @@ class ImportWorker extends BaseWorker
         return false;
     }
 
+    /**
+     * Appends a string to the message of the job.
+     * @param string $message
+     */
     private function addMessage(string $message)
     {
         $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . "\n" . $message );
