@@ -101,7 +101,7 @@ class ImportWorker extends BaseWorker
 
             }
         }
-        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . " Number of imported images: ". $counter);
+        $this->addMessage("Number of imported images: ". $counter);
 
     }
 
@@ -147,7 +147,7 @@ class ImportWorker extends BaseWorker
 
         }
 
-        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . " Number of imported containers: ". $counter);
+        $this->addMessage(" Number of imported containers: ". $counter);
     }
 
 
@@ -166,10 +166,15 @@ class ImportWorker extends BaseWorker
             foreach ($errors as $error) {
                 $errorArray[$error->getPropertyPath()] = $error->getMessage();
             }
-            $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . serialize($errorArray));
+            $this->addMessage(serialize($errorArray));
             return true;
         }
         return false;
+    }
+
+    private function addMessage(string $message)
+    {
+        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . "\n" . $message );
     }
 
 }
