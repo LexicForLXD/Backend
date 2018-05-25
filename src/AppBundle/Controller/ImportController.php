@@ -12,16 +12,48 @@ use AppBundle\Entity\Host;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Worker\ImportWorker;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
+use Dtc\QueueBundle\Entity\JobArchive;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class ImportController extends BaseController
 {
+
+    /**
+     * @Route("/sync/hosts", name="import_fetch", methods={"GET"})
+     *
+     * @OAS\Get(path="/sync/hosts",
+     *     tags={"import"},
+     *     @OAS\Response(
+     *          response=202,
+     *          description="all import jobs"
+     *     ),
+     * )
+     * @param $hostId
+     * @return Response
+     * @throws ElementNotFoundException
+     */
+    public function indexAction()
+    {
+//        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+//        if (!$host) {
+//            throw new ElementNotFoundException(
+//                'No host found for id ' . $hostId
+//            );
+//        }
+
+        $jobs = $this->getDoctrine()->getRepository(JobArchive::class)->findBy(["workerName" => "import"]);
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($jobs, 'json');
+        return new Response($response);
+    }
 
     /**
      * Import all images from one host.
