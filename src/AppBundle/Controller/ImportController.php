@@ -89,7 +89,6 @@ class ImportController extends BaseController
      *     ),
      * )
      *
-     * @param Request $request
      * @param $hostId
      * @param ImportWorker $worker
      * @return JsonResponse
@@ -123,7 +122,6 @@ class ImportController extends BaseController
      *     ),
      * )
      *
-     * @param Request $request
      * @param $hostId
      * @param ImportWorker $worker
      * @return JsonResponse
