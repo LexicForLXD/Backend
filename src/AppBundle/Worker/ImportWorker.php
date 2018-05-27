@@ -162,6 +162,21 @@ class ImportWorker extends BaseWorker
     }
 
 
+    /**
+     * Import all Entities
+     *
+     * @param int $hostId
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function importAll(int $hostId)
+    {
+        $this->importImages($hostId);
+        $this->importContainers($hostId);
+    }
+
+
+
+
 
     /**
      * Validates a Object and returns true if error occurs

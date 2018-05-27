@@ -1,17 +1,17 @@
 version: '2'
 services:
   web:
-#    image: "lexicforlxd/web-backend"
-    build: .
+    image: "lexicforlxd/web-backend"
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - "./cert.pem:/srv/lexic/client.crt"
-      - "./key.pem:/srv/lexic/client.key"
-      - "./ssh:/srv/lexic/ssh"
-      - "./ssh.pub:/srv/lexic/ssh.pub"
-      - "./:/www/symfony"
+      - "${CLIENT_CERT_PATH}:/srv/lexic/client.crt"
+      - "${CLIENT_KEY_PATH}:/srv/lexic/client.key"
+      - "${SERVER_CERT_PATH}:/etc/nginx/server.crt"
+      - "${SERVER_KEY_PATH}:/etc/nginx/server.key"
+      - "${SSH_KEY_PATH}:/srv/lexic/ssh"
+      - "${SSH_PUB_PATH}:/srv/lexic/ssh.pub"
   postgres:
     image: "postgres:10-alpine"
     ports:
