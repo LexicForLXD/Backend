@@ -6,14 +6,14 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - "/path/to/cert/client.crt:/srv/lexic/client.crt"
-      - "/path/to/cert/client.key:/srv/lexic/client.key"
-      - "/path/to/servercert/server.key:/etc/nginx/server.key"
-      - "/path/to/servercert/server.key:/etc/nginx/server.key"
-      - "/path/to/ssh/ssh:/srv/lexic/ssh"
-      - "/path/to/ssh/ssh.pub:/srv/lexic/ssh.pub"
+      - "${CLIENT_CERT_PATH}:/srv/lexic/client.crt"
+      - "${CLIENT_KEY_PATH}:/srv/lexic/client.key"
+      - "${SERVER_CERT_PATH}:/etc/nginx/server.crt"
+      - "${SERVER_KEY_PATH}:/etc/nginx/server.key"
+      - "${SSH_KEY_PATH}:/srv/lexic/ssh"
+      - "${SSH_PUB_PATH}:/srv/lexic/ssh.pub"
   postgres:
-    image: "postgres:9.6.7-alpine"
+    image: "postgres:10-alpine"
     ports:
       - "5432:5432"
     environment:
