@@ -34,7 +34,7 @@ class ImportController extends BaseController
      * @OAS\Get(path="/sync/hosts",
      *     tags={"import"},
      *     @OAS\Parameter(
-     *          description="Gibt die Art an, wie der Container erstellt wird. (image, migration, copy, none) Default ist none",
+     *          description="Whether to show running or archived jobs. Default is running.",
      *          in="query",
      *          name="type",
      *          @OAS\Schema(
@@ -61,6 +61,7 @@ class ImportController extends BaseController
                 break;
             default:
                 $jobs = $this->getDoctrine()->getRepository(Job::class)->findBy(["workerName" => "import"]);
+                break;
 
         }
 
