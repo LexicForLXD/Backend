@@ -19,3 +19,5 @@
 /.idea
 
 composer\.phar
+/.env
+/supervisord.log
