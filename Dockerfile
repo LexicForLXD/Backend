@@ -1,4 +1,4 @@
-FROM janrtr/docker-symfony-php7-composer:3.7
+FROM chibanglw/docker-symfony-php7-composer:latest
 
 RUN apk --no-cache add git php7-simplexml php7-ssh2
 
