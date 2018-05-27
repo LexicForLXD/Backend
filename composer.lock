@@ -1894,16 +1894,16 @@
         },
         {
             "name": "mmucklo/queue-bundle",
-            "version": "4.5.1",
+            "version": "4.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmucklo/DtcQueueBundle.git",
-                "reference": "8ffdf8eda8397eb5975a60479cdaf9494cf260bd"
+                "reference": "f78d8a866e67280a90e499450e51e3bf11ece997"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmucklo/DtcQueueBundle/zipball/8ffdf8eda8397eb5975a60479cdaf9494cf260bd",
-                "reference": "8ffdf8eda8397eb5975a60479cdaf9494cf260bd",
+                "url": "https://api.github.com/repos/mmucklo/DtcQueueBundle/zipball/f78d8a866e67280a90e499450e51e3bf11ece997",
+                "reference": "f78d8a866e67280a90e499450e51e3bf11ece997",
                 "shasum": ""
             },
             "require": {
@@ -1986,7 +1986,7 @@
                 "redis",
                 "symfony"
             ],
-            "time": "2018-02-11T00:27:47+00:00"
+            "time": "2018-05-24T16:21:51+00:00"
         },
         {
             "name": "monolog/monolog",
