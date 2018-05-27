@@ -1,8 +1,7 @@
 version: '2'
 services:
   web:
-#    image: "lexicforlxd/web-backend"
-    build: .
+    image: "lexicforlxd/web-backend"
     ports:
       - "80:80"
       - "443:443"
