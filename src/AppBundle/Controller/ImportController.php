@@ -11,6 +11,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Host;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Worker\ImportWorker;
+use Dtc\QueueBundle\Entity\Job;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Dtc\QueueBundle\Entity\JobArchive;
 
@@ -26,29 +27,48 @@ class ImportController extends BaseController
 {
 
     /**
+     * Returns all import jobs depending on the type.
+     *
      * @Route("/sync/hosts", name="import_fetch", methods={"GET"})
      *
      * @OAS\Get(path="/sync/hosts",
      *     tags={"import"},
+     *     @OAS\Parameter(
+     *          description="Gibt die Art an, wie der Container erstellt wird. (image, migration, copy, none) Default ist none",
+     *          in="query",
+     *          name="type",
+     *          @OAS\Schema(
+     *              type="string"
+     *          ),
+     *     ),
      *     @OAS\Response(
      *          response=202,
      *          description="all import jobs"
      *     ),
      * )
-     * @param $hostId
+     * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-//        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
-//        if (!$host) {
-//            throw new ElementNotFoundException(
-//                'No host found for id ' . $hostId
-//            );
-//        }
 
-        $jobs = $this->getDoctrine()->getRepository(JobArchive::class)->findBy(["workerName" => "import"]);
+        $type = $request->query->get('type');
+
+        switch ($type) {
+            case "archived":
+                $jobs = $this->getDoctrine()->getRepository(JobArchive::class)->findBy(["workerName" => "import"]);
+                break;
+            default:
+                $jobs = $this->getDoctrine()->getRepository(Job::class)->findBy(["workerName" => "import"]);
+
+        }
+
+        if (!$jobs) {
+            throw new ElementNotFoundException(
+                'No jobs found.'
+            );
+        }
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($jobs, 'json');
@@ -74,7 +94,7 @@ class ImportController extends BaseController
      * @return JsonResponse
      * @throws ElementNotFoundException
      */
-    public function importImages(Request $request, $hostId, ImportWorker $worker)
+    public function importImages($hostId, ImportWorker $worker)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -108,7 +128,7 @@ class ImportController extends BaseController
      * @return JsonResponse
      * @throws ElementNotFoundException
      */
-    public function importContainers(Request $request, $hostId, ImportWorker $worker)
+    public function importContainers($hostId, ImportWorker $worker)
     {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
@@ -121,5 +141,39 @@ class ImportController extends BaseController
         $worker->later()->importContainers($host->getId());
 
         return new JsonResponse(['message' => 'import started'], 202);
+    }
+
+
+    /**
+     * Import all containers and images from one host.
+     *
+     * @Route("/sync/hosts/{hostId}", name="import_all", methods={"POST"})
+     *
+     * @OAS\Post(path="/sync/hosts/{hostId}",
+     *     tags={"import"},
+     *     @OAS\Response(
+     *          response=202,
+     *          description="info if task was started"
+     *     ),
+     * )
+     *
+     * @param $hostId
+     * @param ImportWorker $worker
+     * @return JsonResponse
+     * @throws ElementNotFoundException
+     */
+    public function importAll($hostId, ImportWorker $worker)
+    {
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No host found for id ' . $hostId
+            );
+        }
+
+        $worker->later()->importAll($host->getId());
+
+        return new JsonResponse(['message' => 'import started'], 200);
     }
 }
