@@ -23,8 +23,6 @@ parameters:
     cert_key_location: /srv/lexic/client.key
     cert_passphrase: ~
 
-    redis_hostname: redis
-
     # Location of the SSH Files to access Host-Logs
     ssh_location: /srv/lexic/ssh/logssh.pub
     ssh_key_location: /srv/lexic/ssh/logssh
