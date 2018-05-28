@@ -34,3 +34,6 @@ parameters:
     #PNP4Nagios Configs
     nagiosUsername:
     nagiosPassword:
+
+    #Webfrontend domain
+    web_frontend_domain: lexic.domain.com

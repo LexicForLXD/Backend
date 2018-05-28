@@ -22,3 +22,4 @@ parameters:
     ssh_user: loguser
     nagiosUsername: nagiosUser
     nagiosPassword: nagiosPassword
+    web_frontend_domain: '%env(WEB_FRONTEND_DOMAIN)%'

@@ -139,11 +139,16 @@ nelmio_cors:
         origin_regex: false
         forced_allow_origin_value: ~
     paths:
+        '^/login':
+            allow_origin: ['http://example.com']
+            allow_headers: ['Content-Type']
+            allow_methods: ['POST']
         '^/':
             allow_origin: ['*']
             allow_headers: ['*']
             allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
             max_age: 3600
+
 
 jms_serializer:
     visitors:

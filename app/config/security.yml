@@ -17,8 +17,11 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        oauth_token:                                   # Everyone can access the access token URL.
-            pattern: ^/oauth/v2/token
+#        oauth_token:                                   # Everyone can access the access token URL.
+#            pattern: ^/oauth/v2/token
+#            security: false
+        login:
+            pattern: ^/login
             security: false
 
         backup_webhook:
