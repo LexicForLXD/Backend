@@ -3,10 +3,10 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
 parameters:
     database_host: postgres
-    database_port: ~
-    database_name: syp-lxc
-    database_user: runner
-    database_password: test
+    database_port: 5432
+    database_name: postgres
+    database_user: postgres
+    database_password: password
     # You should uncomment this if you want to use pdo_sqlite
     #database_path: '%kernel.project_dir%/var/data/data.sqlite'
 
@@ -22,8 +22,6 @@ parameters:
     cert_location: /srv/lexic/client.crt
     cert_key_location: /srv/lexic/client.key
     cert_passphrase: ~
-
-    redis_hostname: redis
 
     # Location of the SSH Files to access Host-Logs
     ssh_location: /srv/lexic/ssh/logssh.pub

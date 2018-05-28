@@ -62,10 +62,14 @@ class ImageWorker extends BaseWorker
 
         $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
 
-        //Parse architecture
+        //Fetch info from server
         $result = $this->api->getImageByFingerprint($image->getHost(), $image->getFingerprint());
         $image->setArchitecture($result->body->metadata->architecture);
-        $image->setSize($operationsResponse->body->metadata->metadata->size);
+        $image->setProperties($result->body->metadata->properties);
+        $image->setSize($result->body->metadata->metadata->size);
+        $image->setFilename($result->body->metadata->filename);
+        $image->setPublic($result->body->metadata->public);
+
         $image->setFinished(true);
 
         $this->em->persist($image);

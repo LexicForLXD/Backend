@@ -1,8 +1,7 @@
 # LEXIC requirements 
 
 ## Required services
-- PostgreSQL (recommended version 9.6.x)
-- Redis
+- PostgreSQL (recommended version 10.x)
 
 ## Required PHP-Modules
 
@@ -25,17 +24,14 @@ json
 libxml
 mbstring
 mcrypt
-mysqlnd
 openssl
 pcre
 PDO
 pdo_dblib
-pdo_mysql
 PDO_ODBC
 pdo_pgsql
 Phar
 readline
-redis
 Reflection
 session
 SimpleXML

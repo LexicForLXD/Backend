@@ -116,4 +116,19 @@ class ImageApi extends HttpHelper
             -> send();
     }
 
+
+    /**
+     * Return a list of all images from one host.
+     *
+     * @param Host $host
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function listImages(Host $host)
+    {
+        $uri = $this->buildUri($host, $this->getEndpoint());
+        return Request::get($uri)
+            ->send();
+    }
+
 }
