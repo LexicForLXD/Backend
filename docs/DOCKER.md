@@ -2,11 +2,7 @@
 
 ## Start Docker environment
 
-- Update the path to the LXD-certificate "/path/to/cert/" with your local path in docker-compose.yml
-
-- Update the path to the SSH Key "/path/to/ssh/" with your local path in docker-compose.yml
-
-- Optional (remove not required cert volume links)
+- Copy .env.EXAMPLE to .env and make your changes
 
 - Start all containers
 ```
@@ -18,10 +14,12 @@ docker-compose exec web php bin/console doctrine:schema:update --force
 ```
 - Create the database fixtures
 ```
-docker-compose exec web php bin/console doctrine:fixtures:load
+docker-compose exec web php bin/console fos:oauth-server:create-client --grant-type password
 ```
-- Default user - username : mmustermann - password : password
-
+- Create the first user
+```
+docker-compose exec web php bin/console app:create-user
+```
 - Done :)
 
 ## Useful commands 
@@ -30,12 +28,26 @@ docker-compose exec web php bin/console doctrine:fixtures:load
 ```
 docker-compose exec web php bin/console app:create-user
 ```
+- List all users 
+```
+docker-compose exec web php bin/console app:list-users
+```
+- Delete a user account 
+```
+docker-compose exec web php bin/console app:delete-user
+```
 
 - Execute shell commands in the Web Container
 ```
 docker-compose exec web <command>
 ```
 
+- Get log files
+```
+ docker-compose exec web cat var/logs/prod.log
+ docker-compose exec web cat var/logs/dev.log
+ docker-compose exec web cat var/logs/queue.log
+```
 ## Access to Containers
 - WebServer : localhost port 80
 - Postgres Database : localhost port 5432
