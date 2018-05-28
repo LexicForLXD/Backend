@@ -24,7 +24,7 @@ php bin/console doctrine:schema:update --force
 
 ### Password grant client erzeugen
 ```php
-php bin/console fos:oauth-server:create-client
+php bin/console fos:oauth-server:create-client --grant-type password
 ```
 
 ### User erzeugen
