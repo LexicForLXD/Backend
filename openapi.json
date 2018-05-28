@@ -1685,6 +1685,72 @@
                 }
             }
         },
+        "/sync/hosts": {
+            "get": {
+                "tags": [
+                    "import"
+                ],
+                "summary": "Returns all import jobs depending on the type.",
+                "operationId": "AppBundle\\Controller\\ImportController::indexAction",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Whether to show running or archived jobs. Default is running.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "all import jobs"
+                    }
+                }
+            }
+        },
+        "/sync/hosts/{hostId}/images": {
+            "post": {
+                "tags": [
+                    "import"
+                ],
+                "summary": "Import all images from one host.",
+                "operationId": "AppBundle\\Controller\\ImportController::importImages",
+                "responses": {
+                    "202": {
+                        "description": "info if task was started"
+                    }
+                }
+            }
+        },
+        "/sync/hosts/{hostId}/containers": {
+            "post": {
+                "tags": [
+                    "import"
+                ],
+                "summary": "Import all containers from one host.",
+                "operationId": "AppBundle\\Controller\\ImportController::importContainers",
+                "responses": {
+                    "202": {
+                        "description": "info if task was started"
+                    }
+                }
+            }
+        },
+        "/sync/hosts/{hostId}": {
+            "post": {
+                "tags": [
+                    "import"
+                ],
+                "summary": "Import all containers and images from one host.",
+                "operationId": "AppBundle\\Controller\\ImportController::importAll",
+                "responses": {
+                    "202": {
+                        "description": "info if task was started"
+                    }
+                }
+            }
+        },
         "/monitoring/logs/containers/{containerId}": {
             "get": {
                 "tags": [
