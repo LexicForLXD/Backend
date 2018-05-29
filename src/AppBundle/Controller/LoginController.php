@@ -8,6 +8,7 @@
 
 namespace AppBundle\Controller;
 
+use FOS\OAuthServerBundle\Controller\TokenController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -21,9 +22,10 @@ class LoginController extends BaseController
      * @Route("/login", name="login_proxy", methods={"POST"})
      *
      * @param Request $request
+     * @param TokenController $tokenController
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction(Request $request)
+    public function loginAction(Request $request, TokenController $tokenController)
     {
         $oauthRequest = Request::create('/oauth/v2/token', 'POST', [
             "grant_type" => "password",
@@ -33,8 +35,7 @@ class LoginController extends BaseController
             "password" => $request->get("password")
         ], $request->cookies->all(), $request->files->all(), $request->server->all(), $request->getContent());
 
-        return $this->forward('FOSOAuthServerBundle:Token:token', ["request" => $oauthRequest]);
-
+        return $tokenController->tokenAction($oauthRequest);
     }
 
 
@@ -42,9 +43,10 @@ class LoginController extends BaseController
      * @Route("/refresh", name="refresh_proxy", methods={"POST"})
      *
      * @param Request $request
+     * @param TokenController $tokenController
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function refreshAction(Request $request)
+    public function refreshAction(Request $request ,TokenController $tokenController)
     {
         $oauthRequest = Request::create('/oauth/v2/token', 'POST', [
             "grant_type" => "refresh_token",
@@ -53,6 +55,6 @@ class LoginController extends BaseController
             "refresh_token" => $request->get("refreshToken")
         ], $request->cookies->all(), $request->files->all(), $request->server->all(), $request->getContent());
 
-        return $this->forward('FOSOAuthServerBundle:Token:token', ["request" => $oauthRequest]);
+        return $tokenController->tokenAction($oauthRequest);
     }
 }
