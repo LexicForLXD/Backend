@@ -24,6 +24,10 @@ security:
             pattern: ^/login
             security: false
             methods: POST
+        refresh:
+            pattern: ^/refresh
+            security: false
+            methods: POST
 
         backup_webhook:
             pattern: ^/webhooks/backups

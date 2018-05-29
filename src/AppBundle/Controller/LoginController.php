@@ -36,4 +36,23 @@ class LoginController extends BaseController
         return $this->forward('FOSOAuthServerBundle:Token:token', ["request" => $oauthRequest]);
 
     }
+
+
+    /**
+     * @Route("/refresh", name="refresh_proxy", methods={"POST"})
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function refreshAction(Request $request)
+    {
+        $oauthRequest = Request::create('/oauth/v2/token', 'POST', [
+            "grant_type" => "refresh_token",
+            "client_id" => $this->getParameter('client_id'),
+            "client_secret" => $this->getParameter('client_secret'),
+            "refresh_token" => $request->get("refreshToken")
+        ], $request->cookies->all(), $request->files->all(), $request->server->all(), $request->getContent());
+
+        return $this->forward('FOSOAuthServerBundle:Token:token', ["request" => $oauthRequest]);
+    }
 }
