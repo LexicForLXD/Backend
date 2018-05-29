@@ -111,7 +111,7 @@ class LoginControllerTest extends WebTestCase
                 'CONTENT_TYPE' => 'application/json',
             ),
             '{
-            "refresh_token": "blabla"
+            "refreshToken": "blabla"
             }'
         );
 
