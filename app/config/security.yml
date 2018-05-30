@@ -20,6 +20,11 @@ security:
         oauth_token:                                   # Everyone can access the access token URL.
             pattern: ^/oauth/v2/token
             security: false
+        login:
+            pattern: ^/login|^/refresh
+            security: false
+            methods: POST
+
 
         backup_webhook:
             pattern: ^/webhooks/backups

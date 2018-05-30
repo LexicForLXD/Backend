@@ -19,7 +19,7 @@ class RuntimeExceptionListener
 
         $responseData = [
             'error' => [
-                'code' => 503,
+                'code' => $exception->getCode(),
                 'message' => $exception->getMessage()
             ]
         ];

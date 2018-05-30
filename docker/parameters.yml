@@ -1,7 +1,7 @@
 # This file is auto-generated during the composer install
 parameters:
     database_driver: pdo_pgsql
-    database_host: postgres
+    database_host: '%env(CONTAINER_DB_NAME)%'
     database_port: 5432
     database_name: '%env(DB_NAME)%'
     database_user: '%env(DB_USER)%'
@@ -17,7 +17,8 @@ parameters:
     jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
     ssh_location: /srv/lexic/ssh.pub
     ssh_key_location: /srv/lexic/ssh
-    ssh_passphrase: null
-    ssh_user: loguser
-    nagiosUsername: nagiosUser
-    nagiosPassword: nagiosPassword
+    ssh_passphrase: '%env(SSH_PASSPHRASE)%'
+    ssh_user: '%env(SSH_USER)%'
+    nagiosUsername: '%env(NAGIOS_USERNAME)%'
+    nagiosPassword: '%env(NAGIOS_PASSWORD)%'
+    web_frontend_domain: '%env(WEB_FRONTEND_DOMAIN)%'
