@@ -139,22 +139,11 @@ nelmio_cors:
         origin_regex: false
         forced_allow_origin_value: ~
     paths:
-        '^/login':
-            origin_regex: true
-#            allow_origin: ['^http://localhost:[0-9]+']
-            allow_origin: ['*']
-            allow_headers: ['Content-Type', 'x-requested-with']
-            allow_methods: ['POST']
-            hosts: ['https://example.com']
-            max_age: 3600
 
-        '^/refresh':
-            origin_regex: true
-#            allow_origin: ['^http://localhost:[0-9]+']
+        '^/refresh|^/login':
             allow_origin: ['*']
             allow_headers: ['Content-Type', 'x-requested-with']
             allow_methods: ['POST']
-            max_age: 3600
 
         '^/':
             allow_origin: ['*']
