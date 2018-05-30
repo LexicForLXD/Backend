@@ -12,7 +12,7 @@ use FOS\OAuthServerBundle\Controller\TokenController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
 class LoginController extends BaseController
@@ -27,6 +27,11 @@ class LoginController extends BaseController
      */
     public function loginAction(Request $request, TokenController $tokenController)
     {
+        if($this->getParameter('web_frontend_domain') != $request->getHost())
+        {
+            throw new AccessDeniedException("This endpoint is only available to first party clients");
+        }
+
         $oauthRequest = Request::create('/oauth/v2/token', 'POST', [
             "grant_type" => "password",
             "client_id" => $this->getParameter('client_id'),
@@ -48,6 +53,11 @@ class LoginController extends BaseController
      */
     public function refreshAction(Request $request ,TokenController $tokenController)
     {
+        if($this->getParameter('web_frontend_domain') != $request->getHost())
+        {
+            throw new AccessDeniedException("This endpoint is only available to first party clients");
+        }
+
         $oauthRequest = Request::create('/oauth/v2/token', 'POST', [
             "grant_type" => "refresh_token",
             "client_id" => $this->getParameter('client_id'),
