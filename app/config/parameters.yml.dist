@@ -24,8 +24,8 @@ parameters:
     cert_passphrase: ~
 
     # Location of the SSH Files to access Host-Logs
-    ssh_location: /srv/lexic/ssh/logssh.pub
-    ssh_key_location: /srv/lexic/ssh/logssh
+    ssh_location: /srv/lexic/ssh.pub
+    ssh_key_location: /srv/lexic/ssh
     ssh_passphrase: null
     ssh_user: logUser
 
