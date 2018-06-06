@@ -12,9 +12,17 @@ services:
       - ${SSH_KEY_PATH}:/srv/lexic/ssh
       - ${SSH_PUB_PATH}:/srv/lexic/ssh.pub
     environment:
-      VIRTUAL_HOST: ${DOMAINS}
-      LETSENCRYPT_HOST: ${DOMAINS}
-      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+      SECRET: ${SECRET}
+      CONTAINER_DB_NAME: ${CONTAINER_DB_NAME}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      NAGIOS_USERNAME: ${NAGIOS_USERNAME}
+      NAGIOS_PASSWORD: ${NAGIOS_PASSWORD}
+      WEB_FRONTEND_DOMAIN: ${WEB_FRONTEND_DOMAIN}
+      SSH_PASSPHRASE: ${SSH_PASSPHRASE}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
 
 
   postgres:
@@ -27,9 +35,3 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
-
-
-networks:
-  default:
-    external:
-      name: ${NETWORK}

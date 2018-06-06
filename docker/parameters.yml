@@ -22,3 +22,5 @@ parameters:
     nagiosUsername: '%env(NAGIOS_USERNAME)%'
     nagiosPassword: '%env(NAGIOS_PASSWORD)%'
     web_frontend_domain: '%env(WEB_FRONTEND_DOMAIN)%'
+    client_id: '%env(CLIENT_ID)%'
+    client_secret: '%env(CLIENT_SECRET)%'
