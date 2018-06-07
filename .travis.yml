@@ -90,9 +90,9 @@ jobs:
       deploy:
         provider: script
         skip-cleanup: true
-        before_script:
+        script:
           - npm install -g @semantic-release/changelog
           - npm install -g @semantic-release/git
-        script: npx semantic-release
+          - npx semantic-release
 #     - stage: deploy
 #       if: branch = master
