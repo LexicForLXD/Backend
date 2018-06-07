@@ -87,11 +87,12 @@ jobs:
       language: node_js
       node_js: node
       script:
+        - npm install -g semantic-release
         - npm install -g @semantic-release/changelog
         - npm install -g @semantic-release/git
       deploy:
         provider: script
         skip-cleanup: true
-        script: npx semantic-release
+        script: semantic-release
 #     - stage: deploy
 #       if: branch = master
