@@ -86,13 +86,12 @@ jobs:
       if: branch = master AND type != pull_request
       language: node_js
       node_js: node
-      script: echo "releasing"
+      script:
+        - npm install -g @semantic-release/changelog
+        - npm install -g @semantic-release/git
       deploy:
         provider: script
         skip-cleanup: true
-        script:
-          - npm install -g @semantic-release/changelog
-          - npm install -g @semantic-release/git
-          - npx semantic-release
+        script: npx semantic-release
 #     - stage: deploy
 #       if: branch = master
