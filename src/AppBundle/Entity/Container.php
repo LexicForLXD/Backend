@@ -83,7 +83,6 @@ class Container
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="object")
      * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $config;
@@ -91,7 +90,6 @@ class Container
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="object")
      * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $expandedConfig;
@@ -99,7 +97,6 @@ class Container
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="object")
      * @OAS\Property(example="{'root': {'path': '/'}}")
      * @Assert\NotBlank()
      */
@@ -108,7 +105,6 @@ class Container
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="object")
      * @OAS\Property(example="{'root': {'path': '/'}}")
      */
     protected $expandedDevices;
