@@ -301,7 +301,7 @@ class BackupController extends Controller
         {
             if($container->getHost() !== $host)
             {
-                throw new WrongInputException("The selected containers are not on the same host.");
+                throw new WrongInputExceptionArray(["containers" => "The selected containers are not on the same host."]);
             }
         }
 
