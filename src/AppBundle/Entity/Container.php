@@ -112,7 +112,6 @@ class Container
     /**
      * @var
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="object")
      * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $network;
