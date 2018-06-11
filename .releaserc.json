@@ -13,6 +13,10 @@
     }
   ],
   "publish": [
-    "@semantic-release/github"
+    "@semantic-release/github",
+    {
+      "path": "semantic-release-docker",
+      "name": "lexicforlxd/web-backend"
+    }
   ]
 }
