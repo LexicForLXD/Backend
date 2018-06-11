@@ -82,7 +82,7 @@ jobs:
       node_js: node
       services:
         - docker
-        -postgresql
+        - postgresql
       install:
         - npm install -g semantic-release
         - npm install -g @semantic-release/changelog
