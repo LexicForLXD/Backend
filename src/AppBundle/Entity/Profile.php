@@ -54,17 +54,14 @@ class Profile
 
     /**
      * @ORM\Column(type="json_array", nullable=true)
-     * @Assert\Type("array")
      *
      * @OAS\Property(example="Config JSON Object")
-     * @Assert\Type(type="array")
      * var json_array
      */
     protected $config;
 
     /**
      * @ORM\Column(type="json_array", nullable=true)
-     * @Assert\Type(type="array")
      *
      * @OAS\Property(example="Devices JSON Object")
      * var json_array

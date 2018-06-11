@@ -1,3 +1,10 @@
+## [0.3.3](https://github.com/LexicForLXD/Backend/compare/v0.3.2...v0.3.3) (2018-06-11)
+
+
+### Bug Fixes
+
+* remove php-object validation for json ([2e3efb3](https://github.com/LexicForLXD/Backend/commit/2e3efb3))
+
 ## [0.3.2](https://github.com/LexicForLXD/Backend/compare/v0.3.1...v0.3.2) (2018-06-11)
 
 
