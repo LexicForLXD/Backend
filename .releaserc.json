@@ -1,6 +1,7 @@
 {
   "verifyConditions": [
-    "@semantic-release/github"
+    "@semantic-release/github",
+    "semantic-release-docker"
   ],
   "prepare": [
     {
