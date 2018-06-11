@@ -20,7 +20,7 @@ RUN chown -R www:www /srv/lexic
 
 
 WORKDIR /www/symfony
-ENV SYMFONY_ENV=prod
+ENV SYMFONY_ENV=dev
 
 RUN chown -R www:www /www
 
@@ -30,3 +30,5 @@ COPY docker/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN composer install --no-interaction
 RUN chown -R www:www /www
 COPY /docker/parameters.yml /www/symfony/app/config/parameters.yml
+ENV SYMFONY_ENV=prod
+
