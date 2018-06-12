@@ -181,9 +181,9 @@ class StoragePool
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getConfig(): array
+    public function getConfig()
     {
         return $this->config;
     }

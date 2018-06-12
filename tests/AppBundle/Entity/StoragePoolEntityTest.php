@@ -35,7 +35,7 @@ class StoragePoolEntityTest extends WebTestCase
     {
         $host = new Host();
         $host->setName("testGetterMinimalAttributesSetHost");
-        $host->setDomainName("domain.de");
+        $host->setDomainName("testGetterMinimalAttributesSetHost.de");
         $this->em->persist($host);
 
         $storagePool = new StoragePool();
@@ -68,7 +68,7 @@ class StoragePoolEntityTest extends WebTestCase
     {
         $host = new Host();
         $host->setName("testAllAttributesHost");
-        $host->setDomainName("domain.de");
+        $host->setDomainName("testAllAttributesHost.de");
         $this->em->persist($host);
 
         $storagePool = new StoragePool();
