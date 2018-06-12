@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/LexicForLXD/Backend/compare/v0.3.3...v0.4.0) (2018-06-12)
+
+
+### Features
+
+* docker build and push in travis ([1d7b68b](https://github.com/LexicForLXD/Backend/commit/1d7b68b))
+
 ## [0.3.3](https://github.com/LexicForLXD/Backend/compare/v0.3.2...v0.3.3) (2018-06-11)
 
 
