@@ -145,6 +145,12 @@ class Host
     protected $images;
 
     /**
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\StoragePool", mappedBy="host")
+     *
+     */
+    protected $storagePools;
+
+    /**
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\HostStatus", mappedBy="host")
      * @JMS\Exclude()
      */
@@ -556,9 +562,9 @@ class Host
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection
      */
-    public function getStatuses(): PersistentCollection
+    public function getStatuses()
     {
         return $this->statuses;
     }
@@ -592,4 +598,22 @@ class Host
 
         return $ids;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getStoragePools()
+    {
+        return $this->storagePools;
+    }
+
+    /**
+     * @param mixed $storagePools
+     */
+    public function setStoragePools($storagePools): void
+    {
+        $this->storagePools = $storagePools;
+    }
+
+
 }

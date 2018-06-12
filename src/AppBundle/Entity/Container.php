@@ -177,6 +177,13 @@ class Container
      */
     protected $image;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\StoragePool", inversedBy="containers")
+     * @var StoragePool
+     */
+    protected $storagePool;
+
+
     public function __construct()
     {
         $this->profiles = new ArrayCollection();
@@ -632,4 +639,23 @@ class Container
     {
         return $this->backups;
     }
+
+    /**
+     * @return StoragePool
+     */
+    public function getStoragePool(): StoragePool
+    {
+        return $this->storagePool;
+    }
+
+    /**
+     * @param StoragePool $storagePool
+     */
+    public function setStoragePool(StoragePool $storagePool): void
+    {
+        $this->storagePool = $storagePool;
+    }
+
+
+
 }
