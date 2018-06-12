@@ -14,6 +14,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Swagger\Annotations as OAS;
+use JMS\Serializer\Annotation as JMS;
+
 
 /**
  * Class StoragePool

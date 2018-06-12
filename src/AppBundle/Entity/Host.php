@@ -163,6 +163,7 @@ class Host
         $this->profiles = new ArrayCollection();
         $this->images = new ArrayCollection();
         $this->statuses = new ArrayCollection();
+        $this->storagePools = new ArrayCollection();
     }
 
 
