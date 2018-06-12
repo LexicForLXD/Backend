@@ -82,6 +82,11 @@ class StoragePool
     protected $containers;
 
 
+    public function __construct()
+    {
+        $this->containers = new ArrayCollection();
+    }
+
 
     /**
      * @return ArrayCollection
@@ -154,7 +159,7 @@ class StoragePool
     /**
      * @param string $name
      */
-    public function setName(string $name): void
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -170,7 +175,7 @@ class StoragePool
     /**
      * @param string $driver
      */
-    public function setDriver(string $driver): void
+    public function setDriver($driver): void
     {
         $this->driver = $driver;
     }
@@ -184,9 +189,9 @@ class StoragePool
     }
 
     /**
-     * @param array $config
+     * @param $config
      */
-    public function setConfig(array $config): void
+    public function setConfig($config): void
     {
         $this->config = $config;
     }
