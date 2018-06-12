@@ -74,7 +74,7 @@ class StoragePoolEntityTest extends WebTestCase
         $storagePool = new StoragePool();
         $storagePool->setName("testAllAttributes");
         $storagePool->setDriver("dir");
-        $storagePool->setConfig("{'size': '10GB'}");
+        $storagePool->setConfig(['size' => '10GB']);
         $storagePool->setHost($host);
 
         $this->em->persist($storagePool);
@@ -86,7 +86,7 @@ class StoragePoolEntityTest extends WebTestCase
         $this->assertEquals($storagePool->getName(), $storagePoolFromDB->getName());
         $this->assertEquals($storagePool->getDriver(), $storagePoolFromDB->getDriver());
         $this->assertEquals($host, $storagePoolFromDB->getHost());
-        $this->assertEquals("{'size': '10GB'}", $storagePoolFromDB->getConfig());
+        $this->assertEquals($storagePool->getConfig(), $storagePoolFromDB->getConfig());
         $this->assertEquals(["name" => "testGetterMinimalAttributesSet", "driver" => "dir", "config" => ["size" => "10GB"]], $storagePoolFromDB->getData());
 
         $this->em->remove($storagePoolFromDB);
