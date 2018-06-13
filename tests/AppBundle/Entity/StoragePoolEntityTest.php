@@ -74,7 +74,7 @@ class StoragePoolEntityTest extends WebTestCase
         $storagePool = new StoragePool();
         $storagePool->setName("testAllAttributes");
         $storagePool->setDriver("dir");
-        $storagePool->setConfig(json_decode('{"size" => "10GB"}'));
+        $storagePool->setConfig(json_decode('{"size": "10GB"}'));
         $storagePool->setHost($host);
 
         $this->em->persist($storagePool);
