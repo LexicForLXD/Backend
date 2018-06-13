@@ -12,7 +12,9 @@ use AppBundle\Entity\Container;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\ImageAlias;
+use AppBundle\Entity\StoragePool;
 use AppBundle\Service\LxdApi\ContainerApi;
+use AppBundle\Service\LxdApi\StorageApi;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +28,7 @@ class ImportWorker extends BaseWorker
     protected $em;
     protected $imageApi;
     protected $containerApi;
+    protected $storageApi;
     protected $operationApi;
     protected $validator;
 
@@ -37,11 +40,12 @@ class ImportWorker extends BaseWorker
      * @param OperationApi $operationApi
      * @param ValidatorInterface $validator
      */
-    public function __construct(EntityManagerInterface $em, ImageApi $imageApi, ContainerApi $containerApi, OperationApi $operationApi, ValidatorInterface $validator)
+    public function __construct(EntityManagerInterface $em, ImageApi $imageApi, ContainerApi $containerApi, StorageApi $storageApi, OperationApi $operationApi, ValidatorInterface $validator)
     {
         $this->em = $em;
         $this->imageApi = $imageApi;
         $this->containerApi = $containerApi;
+        $this->storageApi = $storageApi;
         $this->operationApi = $operationApi;
         $this->validator = $validator;
     }
@@ -163,6 +167,49 @@ class ImportWorker extends BaseWorker
 
 
     /**
+     * @param int $hostId
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function importStoragePools(int $hostId)
+    {
+        $host = $this->em->getRepository(Host::class)->find($hostId);
+        $counter = 0;
+        $storagePoolListResult = $this->storageApi->list($host);
+        $storagePoolList = $storagePoolListResult->body->metadata;
+
+        foreach ($storagePoolList as $item) {
+            /**
+             * @todo change number for substr
+             */
+            $storagePoolResult = $this->storageApi->show($host, substr($item, 16));
+
+            $storagePool = $this->em->getRepository(StoragePool::class)->findOneBy(["host" => $host->getId(), "name" => $storagePoolResult->body->metadata->name]);
+
+            if ($storagePool) {
+                break;
+            }
+
+            $storagePool = new StoragePool();
+            $storagePool->setName($storagePoolResult->body->metadata->name);
+            $storagePool->setConfig($storagePoolResult->body->metadata->config);
+            $storagePool->setDriver($storagePoolResult->body->metadata->driver);
+            $storagePool->setHost($host);
+
+            if(!$this->validation($storagePool))
+            {
+                $this->em->persist($storagePool);
+                $this->em->flush();
+                $counter++;
+            }
+
+        }
+        $this->addMessage(" Number of imported storagePools: ". $counter);
+
+    }
+
+
+
+    /**
      * Import all Entities
      *
      * @param int $hostId
@@ -171,6 +218,7 @@ class ImportWorker extends BaseWorker
     public function importAll(int $hostId)
     {
         $this->importImages($hostId);
+        $this->importStoragePools($hostId);
         $this->importContainers($hostId);
     }
 
