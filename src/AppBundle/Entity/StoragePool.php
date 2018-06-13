@@ -203,7 +203,7 @@ class StoragePool
         return [
             "name" => $this->getName(),
             "driver" => $this->getDriver(),
-            "config" => $this->getConfig()
+            "config" => json_decode($this->getConfig(), true)
         ];
     }
 
