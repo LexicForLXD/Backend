@@ -183,9 +183,9 @@ class StoragePool
     /**
      * @return array|null
      */
-    public function getConfig():array
+    public function getConfig(): array
     {
-        return json_decode($this->config);
+        return $this->config;
     }
 
     /**
