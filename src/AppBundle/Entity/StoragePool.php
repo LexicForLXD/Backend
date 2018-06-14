@@ -52,7 +52,8 @@ class StoragePool
      * @ORM\Column(type="text")
      * @Assert\Type(type="string")
      * @Assert\NotBlank()
-     * @OAS\Property(example="zfs")
+     * @Assert\Choice(choices={"btrfs", "ceph", "dir", "lvm", "zfs"}, strict=true)
+     * @OAS\Property(example="dir")
      * @var string
      */
     protected $driver;
