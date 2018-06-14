@@ -21,3 +21,4 @@
 composer\.phar
 /.env
 /supervisord.log
+/docker-compose.override.yml
