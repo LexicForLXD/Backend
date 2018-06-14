@@ -23,9 +23,9 @@ use AppBundle\Entity\StoragePool;
 class StoragePoolController extends BaseController
 {
     /**
-     * Get all storage pools
+     * Get all storage pools from one host
      *
-     * @Route("/hosts/{hostId}/storage-pools", name="storage_pool_all", methods={"GET"})
+     * @Route("/hosts/{hostId}/storage-pools", name="storage_pool_all_from_host", methods={"GET"})
      *
      * @OAS\Get(path="/hosts/{hostId}/storage-pools",
      *     tags={"storage-pools"},
@@ -56,18 +56,58 @@ class StoragePoolController extends BaseController
      * @return Response
      * @throws ElementNotFoundException
      */
-    public function getAllStoragePools($hostId)
+    public function getAllStoragePoolsFromHost($hostId)
     {
-        $profiles = $this->getDoctrine()->getRepository(StoragePool::class)->findBy(['host' => $hostId]);
+        $storagePools = $this->getDoctrine()->getRepository(StoragePool::class)->findBy(['host' => $hostId]);
 
-        if (!$profiles) {
+        if (!$storagePools) {
             throw new ElementNotFoundException(
                 'No storage pools found'
             );
         }
 
         $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($profiles, 'json');
+        $response = $serializer->serialize($storagePools, 'json');
+        return new Response($response);
+    }
+
+
+    /**
+     * Get all storage pools
+     *
+     * @Route("/storage-pools", name="storage_pool_all", methods={"GET"})
+     *
+     * @OAS\Get(path="//storage-pools",
+     *     tags={"storage-pools"},
+     *      @OAS\Response(
+     *          response=200,
+     *          description="List of all storage pools",
+     *          @OAS\JsonContent(ref="#/components/schemas/storage_pool"),
+     *          @OAS\Schema(
+     *              type="array"
+     *          ),
+     *      ),
+     *      @OAS\Response(
+     *          response=404,
+     *          description="No storage pools found",
+     *      ),
+     * )
+     *
+     * @return Response
+     * @throws ElementNotFoundException
+     */
+    public function getAllStoragePools()
+    {
+        $storagePools = $this->getDoctrine()->getRepository(StoragePool::class)->findAll();
+
+        if (!$storagePools) {
+            throw new ElementNotFoundException(
+                'No storage pools found'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($storagePools, 'json');
         return new Response($response);
     }
 

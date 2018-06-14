@@ -2,6 +2,7 @@
 namespace AppBundle\Controller;
 
 
+use AppBundle\Entity\StoragePool;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
@@ -378,6 +379,20 @@ class ContainerController extends BaseController
             );
         }
 
+        if(!$request->request->has("storagePoolId"))
+        {
+            throw new WrongInputExceptionArray(
+                ["storagePool" => "No storagePoolId included in request."]
+            );
+        }
+
+        $storagePool = $this->getDoctrine()->getRepository(StoragePool::class)->find($request->get("storagePoolId"));
+        if (!$storagePool) {
+            throw new WrongInputExceptionArray(
+                ["storagePool" => "No storagePool found for id " . $request->get("storagePoolId")]
+            );
+        }
+
 
         if($request->request->has('profiles'))
         {
@@ -393,6 +408,7 @@ class ContainerController extends BaseController
         $container->setEphemeral($request->get("ephemeral", false));
         $container->setName($request->get("name"));
         $container->setArchitecture($request->get("architecture", 'x86_64'));
+        $container->setStoragePool($storagePool);
         $container->setState('creating');
 
         switch ($type) {
@@ -752,12 +768,17 @@ class ContainerController extends BaseController
                 $this->checkProfiles($profiles, $request->get("profiles"));
             }
 
-            if (!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral") && !$request->request->has("profiles")) {
-                throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
+
+            $storagePool = $this->getDoctrine()->getRepository(StoragePool::class)->find($request->get("storagePoolId"));
+            if (!$storagePool) {
+                throw new WrongInputExceptionArray(
+                    ["storagePool" => "No storagePool found for id " . $request->get("storagePoolId")]
+                );
             }
 
 
-            $container->setDataBody($data);
+
+            $container->setStoragePool($storagePool);
             $container->setArchitekture($request->get("architecture"));
             $container->setConfig($request->get("config"));
             $container->setDevices($request->get("devices"));
@@ -766,10 +787,6 @@ class ContainerController extends BaseController
             $em->flush($container);
             $containerWorker->later()->updateContainer($container->getId());
         }
-
-//        $serializer = $this->get('jms_serializer');
-//        $response = $serializer->serialize($container, 'json');
-//        return new Response($response, Response::HTTP_OK);
 
         return $this->json(['message' => 'Update is ongoing'], Response::HTTP_ACCEPTED);
 

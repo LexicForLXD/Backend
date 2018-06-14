@@ -146,7 +146,7 @@ class Host
 
     /**
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\StoragePool", mappedBy="host")
-     *
+     * @JMS\Exclude()
      */
     protected $storagePools;
 
@@ -616,5 +616,23 @@ class Host
         $this->storagePools = $storagePools;
     }
 
+    /**
+     * @return array
+     * @OAS\Property(property="storagePoolIds", example="[1]")
+     * @JMS\VirtualProperty()
+     */
+    public function getStoragePoolIds()
+    {
+        if ($this->storagePools->isEmpty()) {
+            return null;
+        }
+
+        $this->storagePools->first();
+        do {
+            $ids[] = $this->storagePools->current()->getId();
+        } while ($this->storagePools->next());
+
+        return $ids;
+    }
 
 }

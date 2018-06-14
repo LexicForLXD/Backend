@@ -98,7 +98,6 @@ class Container
      * @var array
      * @ORM\Column(type="json", nullable=true)
      * @OAS\Property(example="{'root': {'path': '/'}}")
-     * @Assert\NotBlank()
      */
     protected $devices;
 
@@ -180,6 +179,7 @@ class Container
     /**
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\StoragePool", inversedBy="containers")
      * @var StoragePool
+     * @Assert\NotBlank()
      */
     protected $storagePool;
 
@@ -503,14 +503,22 @@ class Container
 
     public function getBody(): array
     {
+
+        $bodyDevices = $this->devices;
+        $bodyDevices["root"] = [
+            "path" => "/",
+            "type" => "disk",
+            "pool" => $this->storagePool->getName()
+        ];
+
         $body = [
-                    "name" => $this->name,
-                    "architecture" => $this->architecture,
+                    "name" => $this->getName(),
+                    "architecture" => $this->getArchitecture(),
                     "profiles" => $this->getProfileNames(),
-                    "ephemeral" => $this->ephemeral,
-                    "config" => $this->config,
-                    "devices" => $this->devices,
-                    "source" => $this->source
+                    "ephemeral" => $this->isEphemeral(),
+                    "config" => $this->getConfig(),
+                    "devices" => $bodyDevices,
+                    "source" => $this->getSource()
                 ];
 
         return $body;
