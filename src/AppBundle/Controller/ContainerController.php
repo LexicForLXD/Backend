@@ -739,13 +739,14 @@ class ContainerController extends BaseController
             }
 
         } else {
-            $profileNames = array();
+            $neededFields = ["architecture", "ephemeral", "storagePoolId"];
+            $this->checkForNeededFields($request, $neededFields);
+
 
             if($request->request->has('profiles'))
             {
                 $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
                 foreach ($profiles as $profile) {
-                    $profileNames[] = $profile->getName();
                     $profileManagerApi->enableProfileForContainer($profile, $container);
                 }
                 $this->checkProfiles($profiles, $request->get("profiles"));
@@ -755,13 +756,6 @@ class ContainerController extends BaseController
                 throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
             }
 
-            $data = [
-                "architecture" => $request->get("architecture"),
-                "config" => $request->get("config"),
-                "devices" => $request->get("devices"),
-                "ephemeral" => $request->get("ephemeral"),
-                "profiles" => $profileNames
-            ];
 
             $container->setDataBody($data);
             $container->setArchitekture($request->get("architecture"));

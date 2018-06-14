@@ -11,6 +11,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Exception\WrongInputExceptionArray;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 class BaseController extends Controller
 {
@@ -68,5 +69,25 @@ class BaseController extends Controller
         }
         return $profileNames;
 
+    }
+
+    /**
+     * Checks whether all needed fields are in the request
+     *
+     * @param Request $request
+     * @param $neededFields
+     * @throws WrongInputExceptionArray
+     */
+    public function checkForNeededFields(Request $request, $neededFields)
+    {
+        foreach ($neededFields as $fieldName)
+        {
+            if(!$request->request->has($fieldName))
+            {
+                throw new WrongInputExceptionArray(
+                    [$fieldName => "This field is required"]
+                );
+            }
+        }
     }
 }
