@@ -15,13 +15,12 @@ use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\StorageApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
 use AppBundle\Entity\StoragePool;
 
-class StoragePoolController extends Controller
+class StoragePoolController extends BaseController
 {
     /**
      * Get all storage pools
@@ -357,25 +356,5 @@ class StoragePoolController extends Controller
     }
 
 
-    /**
-     * Validates a StoragePool Object and returns array with errors.
-     * @param StoragePool $object
-     * @return array|bool
-     * @throws WrongInputExceptionArray
-     */
-    private function validation(StoragePool $object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            throw new WrongInputExceptionArray($errorArray);
-        }
-        return false;
-    }
 
 }

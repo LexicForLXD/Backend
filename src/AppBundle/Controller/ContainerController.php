@@ -13,7 +13,6 @@ use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\ContainerApi;
 
 use AppBundle\Worker\ContainerWorker;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +30,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
 
 
-class ContainerController extends Controller
+class ContainerController extends BaseController
 {
     /**
      * Get all saved Containers
@@ -781,62 +780,6 @@ class ContainerController extends Controller
         return $this->json(['message' => 'Update is ongoing'], Response::HTTP_ACCEPTED);
 
 
-
-    }
-
-
-    /**
-     * Validates a Container Object and returns array with errors.
-     * @param Container $object
-     * @return array|bool
-     * @throws WrongInputExceptionArray
-     */
-    private function validation(Container $object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            throw new WrongInputExceptionArray($errorArray);
-        }
-        return false;
-    }
-
-
-    /**
-     * Checks whether the transmitted profiles are in the DB
-     *
-     * @param array $profiles
-     * @param array $profilesRequest
-     * @return array
-     * @throws WrongInputExceptionArray
-     */
-    private function checkProfiles(Array $profiles, Array $profilesRequest)
-    {
-        $profilesDB = array();
-        $profileNames = array();
-
-        foreach ($profiles as $profile)
-        {
-            $profilesDB[] = $profile->getId();
-            $profileNames[] = $profile->getName();
-        }
-
-        $errors = array_diff($profilesRequest, $profilesDB);
-
-        $errorArray = array();
-        foreach ($errors as $error) {
-            $errorArray[] = 'The profile with the id ' . $error . ' is not present in our database.';
-        }
-        if(count($errorArray) > 0)
-        {
-            throw new WrongInputExceptionArray($errorArray);
-        }
-        return $profileNames;
 
     }
 

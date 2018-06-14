@@ -8,17 +8,15 @@ use AppBundle\Entity\BackupSchedule;
 use AppBundle\Entity\Container;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\ForbiddenException;
-use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Worker\BackupWorker;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Swagger\Annotations as OAS;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BackupController extends Controller
+class BackupController extends BaseController
 {
     /**
      * Get all successful Backups
@@ -274,7 +272,6 @@ class BackupController extends Controller
      * @param BackupWorker $backupWorker
      * @return Response
      * @throws ElementNotFoundException
-     * @throws WrongInputException
      * @throws WrongInputExceptionArray
      */
     public function storeBackupAction(Request $request, EntityManagerInterface $em, BackupWorker $backupWorker)
@@ -327,23 +324,5 @@ class BackupController extends Controller
         return new Response($response, Response::HTTP_CREATED);
     }
 
-    /**
-     * @param $object
-     * @return bool
-     * @throws WrongInputExceptionArray
-     */
-    private function validation($object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
 
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            throw new WrongInputExceptionArray($errorArray);
-        }
-        return false;
-    }
 }

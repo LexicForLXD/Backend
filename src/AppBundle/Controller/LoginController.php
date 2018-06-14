@@ -9,7 +9,6 @@
 namespace AppBundle\Controller;
 
 use FOS\OAuthServerBundle\Controller\TokenController;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;

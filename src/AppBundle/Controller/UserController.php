@@ -13,7 +13,6 @@ use AppBundle\Entity\User;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
 
@@ -23,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-class UserController extends Controller
+class UserController extends BaseController
 {
 
     /**
@@ -384,27 +383,4 @@ class UserController extends Controller
     }
 
 
-    /**
-     * Validates a User Object and returns array with errors.
-     *
-     * @param User $object
-     * @return array|bool
-     * @throws WrongInputExceptionArray
-     */
-    private function validation(User $object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            throw new WrongInputExceptionArray($errorArray);
-            return $errorArray;
-
-        }
-        return false;
-    }
 }

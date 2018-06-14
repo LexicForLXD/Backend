@@ -6,12 +6,11 @@ namespace AppBundle\Controller;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Service\CorsProxyApi;
 use Httpful\Exception\ConnectionErrorException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class CorsProxyController extends Controller
+class CorsProxyController extends BaseController
 {
 
     /**

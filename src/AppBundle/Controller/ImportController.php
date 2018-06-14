@@ -12,7 +12,6 @@ use AppBundle\Entity\Host;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Worker\ImportWorker;
 use Dtc\QueueBundle\Entity\Job;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Dtc\QueueBundle\Entity\JobArchive;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
