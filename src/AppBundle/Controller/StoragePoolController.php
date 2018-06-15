@@ -238,6 +238,11 @@ class StoragePoolController extends BaseController
 
         $result = $storageApi->create($host, $storagePool->getData());
 
+        if($result->code !== 201)
+        {
+            throw new WrongInputExceptionArray(["general" => $result->body->error]);
+        }
+
         $em->persist($storagePool);
         $em->flush();
 
@@ -286,7 +291,6 @@ class StoragePoolController extends BaseController
      *     type="integer"
      *  ),
      * ),
-
      * @OAS\Response(
      *  description="No storage pool for the provided id found",
      *  response=404
@@ -304,12 +308,14 @@ class StoragePoolController extends BaseController
      *
      * @param $storagePoolId
      * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param StorageApi $storageApi
      * @return Response
-     * @throws \Httpful\Exception\ConnectionErrorException
      * @throws ElementNotFoundException
      * @throws WrongInputExceptionArray
+     * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function editProfile($storagePoolId, Request $request, EntityManagerInterface $em, StorageApi $storageApi)
+    public function editStoragePool($storagePoolId, Request $request, EntityManagerInterface $em, StorageApi $storageApi)
     {
         $storagePool = $this->getDoctrine()->getRepository(StoragePool::class)->find($storagePoolId);
 
@@ -327,6 +333,11 @@ class StoragePoolController extends BaseController
         $this->validation($storagePool);
 
         $result = $storageApi->create($storagePool->getHost(), $storagePool->getData());
+
+        if($result->code !== 200)
+        {
+            throw new WrongInputExceptionArray(["general" => $result->body->error]);
+        }
 
         $em->persist($storagePool);
         $em->flush();
@@ -373,7 +384,7 @@ class StoragePoolController extends BaseController
      * @throws WrongInputExceptionArray
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function deleteProfile($storagePoolId, EntityManagerInterface $em, StorageApi $storageApi)
+    public function deleteStoragePool($storagePoolId, EntityManagerInterface $em, StorageApi $storageApi)
     {
         $storagePool = $this->getDoctrine()->getRepository(StoragePool::class)->find($storagePoolId);
 
@@ -388,6 +399,11 @@ class StoragePoolController extends BaseController
         }
 
         $result = $storageApi->remove($storagePool->getHost(), $storagePool->getName());
+
+        if($result->code !== 200)
+        {
+            throw new WrongInputExceptionArray(["general" => $result->body->error]);
+        }
 
         $em->remove($storagePool);
         $em->flush();
