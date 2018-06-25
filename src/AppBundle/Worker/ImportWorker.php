@@ -181,7 +181,7 @@ class ImportWorker extends BaseWorker
             /**
              * @todo change number for substr
              */
-            $storagePoolResult = $this->storageApi->show($host, substr($item, 16));
+            $storagePoolResult = $this->storageApi->show($host, substr($item, 19));
 
             $storagePool = $this->em->getRepository(StoragePool::class)->findOneBy(["host" => $host->getId(), "name" => $storagePoolResult->body->metadata->name]);
 
