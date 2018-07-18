@@ -143,6 +143,40 @@ class ImportController extends BaseController
 
 
     /**
+     * Import all storage pools from one host.
+     *
+     * @Route("/sync/hosts/{hostId}/storage-pools", name="import_storage_pools", methods={"POST"})
+     *
+     * @OAS\Post(path="/sync/hosts/{hostId}/storage-pools",
+     *     tags={"import"},
+     *     @OAS\Response(
+     *          response=202,
+     *          description="info if task was started"
+     *     ),
+     * )
+     *
+     * @param $hostId
+     * @param ImportWorker $worker
+     * @return JsonResponse
+     * @throws ElementNotFoundException
+     */
+    public function importStoragePools($hostId, ImportWorker $worker)
+    {
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No host found for id ' . $hostId
+            );
+        }
+
+        $worker->later()->importStoragePools($host->getId());
+
+        return new JsonResponse(['message' => 'import started'], 202);
+    }
+
+
+    /**
      * Import all containers and images from one host.
      *
      * @Route("/sync/hosts/{hostId}", name="import_all", methods={"POST"})
