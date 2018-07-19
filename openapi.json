@@ -1737,6 +1737,20 @@
                 }
             }
         },
+        "/sync/hosts/{hostId}/storage-pools": {
+            "post": {
+                "tags": [
+                    "import"
+                ],
+                "summary": "Import all storage pools from one host.",
+                "operationId": "AppBundle\\Controller\\ImportController::importStoragePools",
+                "responses": {
+                    "202": {
+                        "description": "info if task was started"
+                    }
+                }
+            }
+        },
         "/sync/hosts/{hostId}": {
             "post": {
                 "tags": [
@@ -2657,6 +2671,246 @@
                 }
             }
         },
+        "/hosts/{hostId}/storage-pools": {
+            "get": {
+                "tags": [
+                    "storage-pools"
+                ],
+                "summary": "Get all storage pools from one host",
+                "operationId": "AppBundle\\Controller\\StoragePoolController::getAllStoragePoolsFromHost",
+                "parameters": [
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of all storage pools",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/storage_pool"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No storage pools found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "storage-pools"
+                ],
+                "summary": "Create a storage pool",
+                "operationId": "AppBundle\\Controller\\StoragePoolController::createStoragePool",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters for the new storage pool",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Create a storage pool",
+                                    "type": "string"
+                                },
+                                "driver": {
+                                    "description": "Create a storage pool",
+                                    "type": "string"
+                                },
+                                "config": {
+                                    "description": "Create a storage pool",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "hostId",
+                        "in": "path",
+                        "description": "ID of the Host the storage pool should be created on",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "The provided values for the storage pool are not valid"
+                    },
+                    "201": {
+                        "description": "The storage pool was successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/storage_pool"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "//storage-pools": {
+            "get": {
+                "tags": [
+                    "storage-pools"
+                ],
+                "summary": "Get all storage pools",
+                "operationId": "AppBundle\\Controller\\StoragePoolController::getAllStoragePools",
+                "responses": {
+                    "200": {
+                        "description": "List of all storage pools",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/storage_pool"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No storage pools found"
+                    }
+                }
+            }
+        },
+        "/storage-pools/{storagePoolId}": {
+            "get": {
+                "tags": [
+                    "storage-pools"
+                ],
+                "summary": "Get a single storage pool by its id",
+                "operationId": "AppBundle\\Controller\\StoragePoolController::getSingleStoragePool",
+                "parameters": [
+                    {
+                        "name": "storagePoolId",
+                        "in": "path",
+                        "description": "ID of the storage pool",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detailed information about a specific storage pool",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/storage_pool"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No storage pool for the provided id found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "storage-pools"
+                ],
+                "summary": "Edit a existing storage pool",
+                "operationId": "AppBundle\\Controller\\StoragePoolController::editStoragePool",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Parameters which should be used to update the storage pool",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Edit a existing storage pool",
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "Edit a existing storage pool",
+                                    "type": "string"
+                                },
+                                "config": {
+                                    "description": "Edit a existing storage pool",
+                                    "type": "string"
+                                },
+                                "devices": {
+                                    "description": "Edit a existing storage pool",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "storagePoolId",
+                        "in": "path",
+                        "description": "ID of the storage pool",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "404": {
+                        "description": "No storage pool for the provided id found"
+                    },
+                    "400": {
+                        "description": "The provided values for the storage pool are not valid or the LXD Api call failed"
+                    },
+                    "201": {
+                        "description": "The storage pool was successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/storage_pool"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "storage-pools"
+                ],
+                "summary": "Delete a existing storage pool",
+                "operationId": "AppBundle\\Controller\\StoragePoolController::deleteStoragePool",
+                "parameters": [
+                    {
+                        "name": "storagePoolId",
+                        "in": "path",
+                        "description": "ID of the storage pool",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The storage pool was successfully deleted"
+                    },
+                    "400": {
+                        "description": "The storage pool couldn't be deleted, because it is used by at least one Container or the LXD Api call failed"
+                    },
+                    "404": {
+                        "description": "No storage pool for the provided id found"
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "tags": [
@@ -3092,6 +3346,9 @@
                     },
                     "container_id": {
                         "example": "[1]"
+                    },
+                    "storagePoolIds": {
+                        "example": "[1]"
                     }
                 },
                 "type": "object"
@@ -3205,6 +3462,30 @@
                     },
                     "container_id": {
                         "example": "[1]"
+                    }
+                },
+                "type": "object"
+            },
+            "storage_pool": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": "14"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "pool1"
+                    },
+                    "driver": {
+                        "type": "string",
+                        "example": "dir"
+                    },
+                    "config": {
+                        "type": "array",
+                        "example": "{'size': '10GB'}"
+                    },
+                    "hostId": {
+                        "example": "1"
                     }
                 },
                 "type": "object"
