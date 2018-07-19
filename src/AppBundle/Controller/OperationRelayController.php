@@ -5,16 +5,19 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Host;
 use AppBundle\Service\LxdApi\OperationsRelayApi;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class OperationRelayController extends Controller
+class OperationRelayController extends BaseController
 {
     /**
      * Get an operations link through the LEXIC-API
      *
      * @Route("/operations/{hostId}/{operationsId}", name="relay_operations", methods={"GET"})
+     * @param $hostId
+     * @param $operationsId
+     * @param OperationsRelayApi $api
+     * @return Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
     public function getOperationsFromHost($hostId, $operationsId, OperationsRelayApi $api){

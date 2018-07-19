@@ -6,14 +6,14 @@ use AppBundle\Entity\Profile;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
+use AppBundle\Service\LxdApi\ProfileApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
 
-class ProfileController extends Controller
+class ProfileController extends BaseController
 {
     /**
      * Get all LXC-Profiles
@@ -159,9 +159,7 @@ class ProfileController extends Controller
             $profile->setDevices($request->request->get('devices'));
         }
 
-        if ($errorArray = $this->validation($profile)) {
-            throw new WrongInputExceptionArray($errorArray);
-        }
+        $this->validation($profile);
 
         $em = $this->getDoctrine()->getManager();
 
@@ -256,9 +254,7 @@ class ProfileController extends Controller
             $profile->setName($request->request->get('name'));
         }
 
-        if ($errorArray = $this->validation($profile)) {
-            throw new WrongInputExceptionArray($errorArray);
-        }
+        $this->validation($profile);
 
         if($profile->linkedToHost()){
             if($oldName != null) {
@@ -348,29 +344,16 @@ class ProfileController extends Controller
         return $this->json([], 204);
     }
 
-    private function validation($object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            return $errorArray;
-        }
-        return false;
-    }
 
     /**
      * Used to remove the Profile from als Hosts via the LXD Api
      *
      * @param Profile $profile
+     * @param ProfileApi $profileApi
      * @return array
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function removeProfileFromHosts(Profile $profile) : array{
+    private function removeProfileFromHosts(Profile $profile, ProfileApi $profileApi) : array{
         $hosts = $profile->getHosts();
         if($hosts->isEmpty()){
             return ['status' => 'success'];
@@ -380,7 +363,6 @@ class ProfileController extends Controller
         for($i=0; $i<$hosts->count(); $i++){
             $host = $hosts->get($i);
             //Remove Profile via LXD-API
-            $profileApi = $this->container->get('lxd.api.profile');
             $result = $profileApi->deleteProfileOnHost($host, $profile);
 
             if($result->code != 204){
@@ -406,10 +388,11 @@ class ProfileController extends Controller
      * Used to update the LXC-Profile an all hosts where it's used
      *
      * @param Profile $profile
+     * @param ProfileApi $profileApi
      * @return array
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function updateProfileOnHosts(Profile $profile) : array{
+    private function updateProfileOnHosts(Profile $profile, ProfileApi $profileApi) : array{
         $hosts = $profile->getHosts();
         if($hosts->isEmpty()){
             return ['status' => 'success'];
@@ -419,7 +402,6 @@ class ProfileController extends Controller
         for($i=0; $i<$hosts->count(); $i++){
             $host = $hosts->get($i);
             //Update Profile via LXD-API
-            $profileApi = $this->container->get('lxd.api.profile');
             $result = $profileApi->updateProfileOnHost($host, $profile);
             if($result->code != 200){
                 $return[$host->getName()] = $result->body;
@@ -437,10 +419,11 @@ class ProfileController extends Controller
      *
      * @param Profile $profile
      * @param String $oldName
+     * @param ProfileApi $profileApi
      * @return array
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    private function renameProfileOnHosts(Profile $profile, String $oldName) : array{
+    private function renameProfileOnHosts(Profile $profile, String $oldName, ProfileApi $profileApi) : array{
         $hosts = $profile->getHosts();
         if($hosts->isEmpty()){
             return ['status' => 'success'];
@@ -450,7 +433,6 @@ class ProfileController extends Controller
         for($i=0; $i<$hosts->count(); $i++){
             $host = $hosts->get($i);
             //Update Profile via LXD-API
-            $profileApi = $this->container->get('lxd.api.profile');
             $result = $profileApi->renameProfileOnHost($host, $profile, $oldName);
             if($result->code != 201){
                 $return[$host->getName()] = $result->body;

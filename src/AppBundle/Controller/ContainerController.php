@@ -2,6 +2,7 @@
 namespace AppBundle\Controller;
 
 
+use AppBundle\Entity\StoragePool;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
@@ -13,7 +14,6 @@ use AppBundle\Service\LxdApi\ContainerStateApi;
 use AppBundle\Service\LxdApi\ContainerApi;
 
 use AppBundle\Worker\ContainerWorker;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +31,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
 
 
-class ContainerController extends Controller
+class ContainerController extends BaseController
 {
     /**
      * Get all saved Containers
@@ -379,6 +379,20 @@ class ContainerController extends Controller
             );
         }
 
+        if(!$request->request->has("storagePoolId"))
+        {
+            throw new WrongInputExceptionArray(
+                ["storagePool" => "No storagePoolId included in request."]
+            );
+        }
+
+        $storagePool = $this->getDoctrine()->getRepository(StoragePool::class)->find($request->get("storagePoolId"));
+        if (!$storagePool) {
+            throw new WrongInputExceptionArray(
+                ["storagePool" => "No storagePool found for id " . $request->get("storagePoolId")]
+            );
+        }
+
 
         if($request->request->has('profiles'))
         {
@@ -394,6 +408,7 @@ class ContainerController extends Controller
         $container->setEphemeral($request->get("ephemeral", false));
         $container->setName($request->get("name"));
         $container->setArchitecture($request->get("architecture", 'x86_64'));
+        $container->setStoragePool($storagePool);
         $container->setState('creating');
 
         switch ($type) {
@@ -740,31 +755,30 @@ class ContainerController extends Controller
             }
 
         } else {
-            $profileNames = array();
+            $neededFields = ["architecture", "ephemeral", "storagePoolId"];
+            $this->checkForNeededFields($request, $neededFields);
+
 
             if($request->request->has('profiles'))
             {
                 $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
                 foreach ($profiles as $profile) {
-                    $profileNames[] = $profile->getName();
                     $profileManagerApi->enableProfileForContainer($profile, $container);
                 }
                 $this->checkProfiles($profiles, $request->get("profiles"));
             }
 
-            if (!$request->request->has("architecture") && !$request->request->has("config") && !$request->request->has("devices") && !$request->request->has("ephemeral") && !$request->request->has("profiles")) {
-                throw new WrongInputException("The following fields are all required: architecture, config, devices, profiles and ephemeral");
+
+            $storagePool = $this->getDoctrine()->getRepository(StoragePool::class)->find($request->get("storagePoolId"));
+            if (!$storagePool) {
+                throw new WrongInputExceptionArray(
+                    ["storagePool" => "No storagePool found for id " . $request->get("storagePoolId")]
+                );
             }
 
-            $data = [
-                "architecture" => $request->get("architecture"),
-                "config" => $request->get("config"),
-                "devices" => $request->get("devices"),
-                "ephemeral" => $request->get("ephemeral"),
-                "profiles" => $profileNames
-            ];
 
-            $container->setDataBody($data);
+
+            $container->setStoragePool($storagePool);
             $container->setArchitekture($request->get("architecture"));
             $container->setConfig($request->get("config"));
             $container->setDevices($request->get("devices"));
@@ -774,69 +788,9 @@ class ContainerController extends Controller
             $containerWorker->later()->updateContainer($container->getId());
         }
 
-//        $serializer = $this->get('jms_serializer');
-//        $response = $serializer->serialize($container, 'json');
-//        return new Response($response, Response::HTTP_OK);
-
         return $this->json(['message' => 'Update is ongoing'], Response::HTTP_ACCEPTED);
 
 
-
-    }
-
-
-    /**
-     * Validates a Container Object and returns array with errors.
-     * @param Container $object
-     * @return array|bool
-     * @throws WrongInputExceptionArray
-     */
-    private function validation(Container $object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            throw new WrongInputExceptionArray($errorArray);
-        }
-        return false;
-    }
-
-
-    /**
-     * Checks whether the transmitted profiles are in the DB
-     *
-     * @param array $profiles
-     * @param array $profilesRequest
-     * @return array
-     * @throws WrongInputExceptionArray
-     */
-    private function checkProfiles(Array $profiles, Array $profilesRequest)
-    {
-        $profilesDB = array();
-        $profileNames = array();
-
-        foreach ($profiles as $profile)
-        {
-            $profilesDB[] = $profile->getId();
-            $profileNames[] = $profile->getName();
-        }
-
-        $errors = array_diff($profilesRequest, $profilesDB);
-
-        $errorArray = array();
-        foreach ($errors as $error) {
-            $errorArray[] = 'The profile with the id ' . $error . ' is not present in our database.';
-        }
-        if(count($errorArray) > 0)
-        {
-            throw new WrongInputExceptionArray($errorArray);
-        }
-        return $profileNames;
 
     }
 

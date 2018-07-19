@@ -145,6 +145,12 @@ class Host
     protected $images;
 
     /**
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\StoragePool", mappedBy="host")
+     * @JMS\Exclude()
+     */
+    protected $storagePools;
+
+    /**
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\HostStatus", mappedBy="host")
      * @JMS\Exclude()
      */
@@ -157,6 +163,7 @@ class Host
         $this->profiles = new ArrayCollection();
         $this->images = new ArrayCollection();
         $this->statuses = new ArrayCollection();
+        $this->storagePools = new ArrayCollection();
     }
 
 
@@ -556,9 +563,9 @@ class Host
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection
      */
-    public function getStatuses(): PersistentCollection
+    public function getStatuses()
     {
         return $this->statuses;
     }
@@ -592,4 +599,40 @@ class Host
 
         return $ids;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getStoragePools()
+    {
+        return $this->storagePools;
+    }
+
+    /**
+     * @param mixed $storagePools
+     */
+    public function setStoragePools($storagePools): void
+    {
+        $this->storagePools = $storagePools;
+    }
+
+    /**
+     * @return array
+     * @OAS\Property(property="storagePoolIds", example="[1]")
+     * @JMS\VirtualProperty()
+     */
+    public function getStoragePoolIds()
+    {
+        if ($this->storagePools->isEmpty()) {
+            return null;
+        }
+
+        $this->storagePools->first();
+        do {
+            $ids[] = $this->storagePools->current()->getId();
+        } while ($this->storagePools->next());
+
+        return $ids;
+    }
+
 }
