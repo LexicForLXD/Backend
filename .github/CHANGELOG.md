@@ -1,3 +1,17 @@
+# [0.5.0](https://github.com/LexicForLXD/Backend/compare/v0.4.0...v0.5.0) (2018-07-19)
+
+
+### Bug Fixes
+
+* container worker should work more reliable. ([21ec8c4](https://github.com/LexicForLXD/Backend/commit/21ec8c4))
+
+
+### Features
+
+* enpoint to import storage pools ([484e753](https://github.com/LexicForLXD/Backend/commit/484e753))
+* import for storage pool ([7621e50](https://github.com/LexicForLXD/Backend/commit/7621e50))
+* storage pool crud ([a5104a5](https://github.com/LexicForLXD/Backend/commit/a5104a5))
+
 # [0.4.0](https://github.com/LexicForLXD/Backend/compare/v0.3.3...v0.4.0) (2018-06-12)
 
 
