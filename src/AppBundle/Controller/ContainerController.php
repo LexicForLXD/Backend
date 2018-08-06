@@ -794,4 +794,56 @@ class ContainerController extends BaseController
 
     }
 
+
+
+    /**
+     * Returns all container jobs depending on the type.
+     *
+     * @Route("/jobs/containers", name="container_job_fetch", methods={"GET"})
+     *
+     * @OAS\Get(path="/jobs/containers",
+     *     tags={"container"},
+     *     @OAS\Parameter(
+     *          description="Whether to show running or archived jobs. Default is running.",
+     *          in="query",
+     *          name="type",
+     *          @OAS\Schema(
+     *              type="string"
+     *          ),
+     *     ),
+     *     @OAS\Response(
+     *          response=202,
+     *          description="all import jobs"
+     *     ),
+     * )
+     * @param Request $request
+     * @return Response
+     * @throws ElementNotFoundException
+     */
+    public function indexJobAction(Request $request)
+    {
+
+        $type = $request->query->get('type');
+
+        switch ($type) {
+            case "archived":
+                $jobs = $this->getDoctrine()->getRepository(JobArchive::class)->findBy(["workerName" => "container"]);
+                break;
+            default:
+                $jobs = $this->getDoctrine()->getRepository(Job::class)->findBy(["workerName" => "container"]);
+                break;
+
+        }
+
+        if (!$jobs) {
+            throw new ElementNotFoundException(
+                'No jobs found.'
+            );
+        }
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($jobs, 'json');
+        return new Response($response);
+    }
+
 }
