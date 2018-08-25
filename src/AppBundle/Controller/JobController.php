@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use AppBundle\Exception\ElementNotFoundException;
 use Dtc\QueueBundle\Entity\Job;
 use Dtc\QueueBundle\Entity\JobArchive;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
