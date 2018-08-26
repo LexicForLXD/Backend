@@ -1685,30 +1685,6 @@
                 }
             }
         },
-        "/sync/hosts": {
-            "get": {
-                "tags": [
-                    "import"
-                ],
-                "summary": "Returns all import jobs depending on the type.",
-                "operationId": "AppBundle\\Controller\\ImportController::indexAction",
-                "parameters": [
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Whether to show running or archived jobs. Default is running.",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "202": {
-                        "description": "all import jobs"
-                    }
-                }
-            }
-        },
         "/sync/hosts/{hostId}/images": {
             "post": {
                 "tags": [
@@ -1761,6 +1737,126 @@
                 "responses": {
                     "202": {
                         "description": "info if task was started"
+                    }
+                }
+            }
+        },
+        "/jobs/containers": {
+            "get": {
+                "tags": [
+                    "job"
+                ],
+                "summary": "Returns all container jobs depending on the type.",
+                "operationId": "AppBundle\\Controller\\JobController::indexContainerAction",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Whether to show running or archived jobs. Default is running.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "all container jobs"
+                    }
+                }
+            }
+        },
+        "/jobs/containers/state": {
+            "get": {
+                "tags": [
+                    "job"
+                ],
+                "summary": "Returns all container state jobs depending on the type.",
+                "operationId": "AppBundle\\Controller\\JobController::indexContainerStateAction",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Whether to show running or archived jobs. Default is running.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "all container state jobs"
+                    }
+                }
+            }
+        },
+        "/jobs/import": {
+            "get": {
+                "tags": [
+                    "job"
+                ],
+                "summary": "Returns all import jobs depending on the type.",
+                "operationId": "AppBundle\\Controller\\JobController::indexImportAction",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Whether to show running or archived jobs. Default is running.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "all import jobs"
+                    }
+                }
+            }
+        },
+        "/jobs/backup": {
+            "get": {
+                "tags": [
+                    "job"
+                ],
+                "summary": "Returns all backup jobs depending on the type.",
+                "operationId": "AppBundle\\Controller\\JobController::indexBackupAction",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Whether to show running or archived jobs. Default is running.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "all backup jobs"
+                    }
+                }
+            }
+        },
+        "/jobs/images": {
+            "get": {
+                "tags": [
+                    "job"
+                ],
+                "summary": "Returns all image jobs depending on the type.",
+                "operationId": "AppBundle\\Controller\\JobController::indexImageAction",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Whether to show running or archived jobs. Default is running.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "all image jobs"
                     }
                 }
             }
