@@ -9,13 +9,11 @@ use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\ImageAliasApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Swagger\Annotations as OAS;
 use Symfony\Component\HttpFoundation\Response;
 
-class ImageAliasController extends Controller
+class ImageAliasController extends BaseController
 {
     /**
      * Create an ImageAlias for an existing Image
@@ -91,9 +89,7 @@ class ImageAliasController extends Controller
             $imageAlias->setDescription($request->request->get('description'));
         }
 
-        if ($errorArray = $this->validation($imageAlias)) {
-            throw new WrongInputExceptionArray($errorArray);
-        }
+        $this->validation($imageAlias);
 
         $result = $imageAliasApi->createAliasForImageByFingerprint($image->getHost(), $imageAlias, $image->getFingerprint());
 
@@ -290,18 +286,4 @@ class ImageAliasController extends Controller
         return new Response($response);
     }
 
-    private function validation($object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            return $errorArray;
-        }
-        return false;
-    }
 }

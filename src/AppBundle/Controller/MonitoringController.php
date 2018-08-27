@@ -13,13 +13,12 @@ use AppBundle\Service\LxdApi\MonitoringApi;
 use AppBundle\Service\Nagios\Pnp4NagiosApi;
 use AppBundle\Service\SSH\HostSSH;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
 
-class MonitoringController extends Controller
+class MonitoringController extends BaseController
 {
     /**
      * List all available Logfiles for a Container
@@ -1000,18 +999,4 @@ class MonitoringController extends Controller
         return preg_replace('"\/1.0\/containers\/.*\/logs\/"', '', $logfileUrl);
     }
 
-    private function validation($object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            return $errorArray;
-        }
-        return false;
-    }
 }

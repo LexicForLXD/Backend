@@ -12,7 +12,6 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Host;
 use AppBundle\Exception\ElementNotFoundException;
 use Httpful\Exception\ConnectionErrorException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,7 +23,7 @@ use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 
 
-class HostController extends Controller
+class HostController extends BaseController
 {
     /**
      * Get a list of all saved Hosts
@@ -484,26 +483,4 @@ class HostController extends Controller
         return new JsonResponse(['message' => 'authentication successful']);
 
     }
-
-    /**
-     * @param $object
-     * @return array|bool
-     * @throws WrongInputExceptionArray
-     */
-    private function validation($object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            throw new WrongInputExceptionArray($errorArray);
-        }
-        return false;
-    }
-
-
 }

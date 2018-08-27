@@ -90,7 +90,6 @@ class Container
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="array")
      * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $expandedConfig;
@@ -98,16 +97,13 @@ class Container
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="array")
      * @OAS\Property(example="{'root': {'path': '/'}}")
-     * @Assert\NotBlank()
      */
     protected $devices;
 
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type(type="array")
      * @OAS\Property(example="{'root': {'path': '/'}}")
      */
     protected $expandedDevices;
@@ -182,10 +178,18 @@ class Container
     protected $image;
 
     /**
+
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Network", mappedBy="containers")
      * @JMS\Exclude()
      */
     protected $networks;
+
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\StoragePool", inversedBy="containers")
+     * @var StoragePool
+     * @Assert\NotBlank()
+     */
+    protected $storagePool;
+
 
     public function __construct()
     {
@@ -507,14 +511,22 @@ class Container
 
     public function getBody(): array
     {
+
+        $bodyDevices = $this->devices;
+        $bodyDevices["root"] = [
+            "path" => "/",
+            "type" => "disk",
+            "pool" => $this->storagePool->getName()
+        ];
+
         $body = [
-                    "name" => $this->name,
-                    "architecture" => $this->architecture,
+                    "name" => $this->getName(),
+                    "architecture" => $this->getArchitecture(),
                     "profiles" => $this->getProfileNames(),
-                    "ephemeral" => $this->ephemeral,
-                    "config" => $this->config,
-                    "devices" => $this->devices,
-                    "source" => $this->source
+                    "ephemeral" => $this->isEphemeral(),
+                    "config" => $this->getConfig(),
+                    "devices" => $bodyDevices,
+                    "source" => $this->getSource()
                 ];
 
         return $body;
@@ -663,4 +675,23 @@ class Container
     {
         return $this->backups;
     }
+
+    /**
+     * @return StoragePool
+     */
+    public function getStoragePool(): StoragePool
+    {
+        return $this->storagePool;
+    }
+
+    /**
+     * @param StoragePool $storagePool
+     */
+    public function setStoragePool(StoragePool $storagePool): void
+    {
+        $this->storagePool = $storagePool;
+    }
+
+
+
 }

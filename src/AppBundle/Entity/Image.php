@@ -93,7 +93,6 @@ class Image
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Assert\Type("array")
      *
      * @OAS\Property(example="{json-Object}")
      * @var array

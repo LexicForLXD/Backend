@@ -91,7 +91,7 @@ class ContainerWorker extends Worker
     {
         $container = $this->em->getRepository(Container::class)->find($containerId);
 
-        $result = $this->api->remove($container->getHost(), $container);
+        $result = $this->api->remove($container->getHost(), $container->getName());
 
         if ($this->checkForErrors($container, $result)) {
             return;
@@ -126,7 +126,7 @@ class ContainerWorker extends Worker
     {
         $container = $this->em->getRepository(Container::class)->find($containerId);
 
-        $result = $this->api->update($container->getHost(), $container, $container->getDataBody());
+        $result = $this->api->update($container->getHost(), $container, $container->getBody());
 
         $this->checkForErrors($container, $result);
 
@@ -155,7 +155,7 @@ class ContainerWorker extends Worker
     {
         $container = $this->em->getRepository(Container::class)->find($containerId);
 
-        $result = $this->api->migrate($container->getHost(), $container, $container->getDataBody());
+        $result = $this->api->migrate($container->getHost(), $container, $container->getBody());
 
         $this->checkForErrors($container, $result);
 
@@ -242,6 +242,7 @@ class ContainerWorker extends Worker
      */
     private function fetchInfos(Container $container)
     {
+        $this->em->refresh($container);
         $containerResponse = $this->api->show($container->getHost(), $container->getName());
         $container->setName($containerResponse->body->metadata->name);
         $container->setEphemeral($containerResponse->body->metadata->ephemeral);

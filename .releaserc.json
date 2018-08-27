@@ -1,0 +1,23 @@
+{
+  "verifyConditions": [
+    "@semantic-release/github",
+    "semantic-release-docker"
+  ],
+  "prepare": [
+    {
+      "path": "@semantic-release/changelog",
+      "changelogFile": ".github/CHANGELOG.md"
+    },
+    {
+      "path": "@semantic-release/git",
+      "assets": ".github/CHANGELOG.md"
+    }
+  ],
+  "publish": [
+    "@semantic-release/github",
+    {
+      "path": "semantic-release-docker",
+      "name": "lexicforlxd/web-backend"
+    }
+  ]
+}

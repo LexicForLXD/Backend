@@ -14,12 +14,11 @@ use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\Restore\RestoreService;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
 
-class RestoreController extends Controller
+class RestoreController extends BaseController
 {
     /**
      * Get all files in a duplicity backup

@@ -4,7 +4,6 @@ namespace AppBundle\Controller;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Worker\ContainerStateWorker;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
 
 
-class ContainerStateController extends Controller
+class ContainerStateController extends BaseController
 {
     /**
      * Start, stop or restart a Contaner by ContainerID
@@ -174,7 +173,7 @@ class ContainerStateController extends Controller
 
 
         return new JsonResponse([
-            'state' => $result->body->metadata->status,
+            'state' => mb_strtolower($result->body->metadata->status),
             'stateCode' => $result->body->metadata->status_code
         ]);
     }

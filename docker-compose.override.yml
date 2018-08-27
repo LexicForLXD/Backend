@@ -1,0 +1,17 @@
+version: '3'
+services:
+  web:
+    volumes:
+      - ${CLIENT_CERT_PATH}:/srv/lexic/client.crt
+      - ${CLIENT_KEY_PATH}:/srv/lexic/client.key
+      - ${SSH_KEY_PATH}:/srv/lexic/ssh
+      - ${SSH_PUB_PATH}:/srv/lexic/ssh.pub
+      - ./:/www/symfony
+    ports:
+      - 80:80
+    
+
+
+  postgres:
+    ports:
+      - 5432:5432

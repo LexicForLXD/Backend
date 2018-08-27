@@ -2,7 +2,6 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,15 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Swagger\Annotations as OAS;
 
-use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Exception\ElementNotFoundException;
 
 use AppBundle\Entity\BackupDestination;
-use AppBundle\Entity\Backup;
 
 
-class BackupDestinationController extends Controller
+class BackupDestinationController extends BaseController
 {
     /**
      * List all backup destinations
@@ -202,7 +199,7 @@ class BackupDestinationController extends Controller
      * @param Request $request
      * @param EntityManagerInterface $em
      * @return Response
-     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
     public function createBackupDestinationAction(Request $request, EntityManagerInterface $em)
     {
@@ -330,7 +327,7 @@ class BackupDestinationController extends Controller
      * @param EntityManagerInterface $em
      * @return Response
      * @throws ElementNotFoundException
-     * @throws WrongInputException
+     * @throws WrongInputExceptionArray
      */
     public function updateBackupDestinationAction(Request $request, int $destId, EntityManagerInterface $em)
     {
@@ -402,6 +399,7 @@ class BackupDestinationController extends Controller
      * @param EntityManagerInterface $em
      * @return JsonResponse
      * @throws ElementNotFoundException
+     * @throws WrongInputExceptionArray
      */
     public function deleteBackupDestinationAction(int $destId, EntityManagerInterface $em)
     {
@@ -414,7 +412,7 @@ class BackupDestinationController extends Controller
         }
 
         if (!$dest->getBackupSchedules()->isEmpty()) {
-            throw new WrongInputException('Please first remove this backup destination from the backup schedule.');
+            throw new WrongInputExceptionArray(["general" => 'Please first remove this backup destination from the backup schedule.']);
         }
 
         $em->remove($dest);
@@ -424,30 +422,4 @@ class BackupDestinationController extends Controller
     }
 
 
-
-    /**
-     * Validates a BackupDestination Object and returns array with errors.
-     *
-     *
-     *
-     * @param BackupDestination $object
-     * @return array|bool
-     * @throws WrongInputException
-     */
-    private function validation(BackupDestination $object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            throw new WrongInputExceptionArray($errorArray);
-            return $errorArray;
-
-        }
-        return false;
-    }
 }

@@ -1,20 +1,38 @@
-version: '2'
+version: '3'
 services:
   web:
-    image: "lexicforlxd/web-backend"
-    ports:
-      - "80:80"
-      - "443:443"
+    container_name: ${CONTAINER_WEB_NAME}
+    image: lexicforlxd/web-backend:latest
+    depends_on:
+      - postgres
+    restart: unless-stopped
     volumes:
-      - "/path/to/cert/client.crt:/srv/lexic/client.crt"
-      - "/path/to/cert/client.key:/srv/lexic/client.key"
-      - "/path/to/servercert/server.key:/etc/nginx/server.key"
-      - "/path/to/servercert/server.key:/etc/nginx/server.key"
-      - "/path/to/ssh/ssh:/srv/lexic/ssh"
-      - "/path/to/ssh/ssh.pub:/srv/lexic/ssh.pub"
-  postgres:
-    image: "postgres:10-alpine"
-    ports:
-      - "5432:5432"
+      - ${CLIENT_CERT_PATH}:/srv/lexic/client.crt
+      - ${CLIENT_KEY_PATH}:/srv/lexic/client.key
+      - ${SSH_KEY_PATH}:/srv/lexic/ssh
+      - ${SSH_PUB_PATH}:/srv/lexic/ssh.pub
     environment:
-      - "POSTGRES_PASSWORD=password"
+      SECRET: ${SECRET}
+      CONTAINER_DB_NAME: ${CONTAINER_DB_NAME}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      NAGIOS_USERNAME: ${NAGIOS_USERNAME}
+      NAGIOS_PASSWORD: ${NAGIOS_PASSWORD}
+      WEB_FRONTEND_DOMAIN: ${WEB_FRONTEND_DOMAIN}
+      SSH_USER: ${SSH_USER}
+      SSH_PASSPHRASE: ${SSH_PASSPHRASE}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+
+
+  postgres:
+    container_name: ${CONTAINER_DB_NAME}
+    image: postgres:10-alpine
+    restart: unless-stopped
+    volumes:
+      - ${DB_PATH}:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}

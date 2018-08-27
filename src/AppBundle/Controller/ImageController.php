@@ -18,10 +18,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Swagger\Annotations as OAS;
 
-class ImageController extends Controller
+class ImageController extends BaseController
 {
     /**
      * Get all Images
@@ -484,23 +483,4 @@ class ImageController extends Controller
         return new Response($response);
     }
 
-    /**
-     * @param $object
-     * @return bool
-     * @throws WrongInputExceptionArray
-     */
-    private function validation($object)
-    {
-        $validator = $this->get('validator');
-        $errors = $validator->validate($object);
-
-        if (count($errors) > 0) {
-            $errorArray = array();
-            foreach ($errors as $error) {
-                $errorArray[$error->getPropertyPath()] = $error->getMessage();
-            }
-            throw new WrongInputExceptionArray($errorArray);
-        }
-        return false;
-    }
 }
