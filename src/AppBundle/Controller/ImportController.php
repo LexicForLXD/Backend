@@ -25,55 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ImportController extends BaseController
 {
 
-    /**
-     * Returns all import jobs depending on the type.
-     *
-     * @Route("/sync/hosts", name="import_fetch", methods={"GET"})
-     *
-     * @OAS\Get(path="/sync/hosts",
-     *     tags={"import"},
-     *     @OAS\Parameter(
-     *          description="Whether to show running or archived jobs. Default is running.",
-     *          in="query",
-     *          name="type",
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *     ),
-     *     @OAS\Response(
-     *          response=202,
-     *          description="all import jobs"
-     *     ),
-     * )
-     * @param Request $request
-     * @return Response
-     * @throws ElementNotFoundException
-     */
-    public function indexAction(Request $request)
-    {
-
-        $type = $request->query->get('type');
-
-        switch ($type) {
-            case "archived":
-                $jobs = $this->getDoctrine()->getRepository(JobArchive::class)->findBy(["workerName" => "import"]);
-                break;
-            default:
-                $jobs = $this->getDoctrine()->getRepository(Job::class)->findBy(["workerName" => "import"]);
-                break;
-
-        }
-
-        if (!$jobs) {
-            throw new ElementNotFoundException(
-                'No jobs found.'
-            );
-        }
-
-        $serializer = $this->get('jms_serializer');
-        $response = $serializer->serialize($jobs, 'json');
-        return new Response($response);
-    }
+    
 
     /**
      * Import all images from one host.

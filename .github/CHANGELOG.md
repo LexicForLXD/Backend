@@ -1,3 +1,11 @@
+# [0.6.0](https://github.com/LexicForLXD/Backend/compare/v0.5.0...v0.6.0) (2018-08-26)
+
+
+### Features
+
+* container job overview ([fe57906](https://github.com/LexicForLXD/Backend/commit/fe57906))
+* show running and archived jobs of all workers ([64d2e3b](https://github.com/LexicForLXD/Backend/commit/64d2e3b))
+
 # [0.5.0](https://github.com/LexicForLXD/Backend/compare/v0.4.0...v0.5.0) (2018-07-19)
 
 
