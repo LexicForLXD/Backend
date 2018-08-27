@@ -19,10 +19,10 @@ class SSHController extends BaseController
      */
     public function showSSHPub()
     {
-        if (!$container->hasParameter('ssh_location')) {
+        if (!$this->container->hasParameter('ssh_location')) {
             throw new WrongInputException("No SSH pub key set.");
         }
-        $sshLoc = $container->getParameter('ssh_location');
+        $sshLoc = $this->container->getParameter('ssh_location');
 
         if (!$sshPub = file_get_contents($sshLoc)) {
             throw new WrongInputException("Couldn't read the SSH pub key.");
