@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/LexicForLXD/Backend/compare/v0.7.0...v0.8.0) (2018-08-28)
+
+
+### Features
+
+* delete job ([4bd9962](https://github.com/LexicForLXD/Backend/commit/4bd9962))
+
 # [0.7.0](https://github.com/LexicForLXD/Backend/compare/v0.6.0...v0.7.0) (2018-08-27)
 
 
