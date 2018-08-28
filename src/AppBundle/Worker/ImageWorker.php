@@ -53,7 +53,7 @@ class ImageWorker extends BaseWorker
         }
         if ($result->body->metadata->status_code == 400) {
             $this->em->remove($image);
-            $this->addMessage($result->body->error);
+            $this->addMessage($result->body->metadata->err);
             $this->em->flush();
             return;
         }
