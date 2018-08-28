@@ -153,6 +153,18 @@ class ImportWorker extends BaseWorker
                 }
 
             }
+
+            if ($profiles = (array)$containerResult->body->metadata->profiles) {
+                $profiles = $this->em->getRepository(Profile::class)->findBy(["name" => $profiles]);
+                if (!$profiles) {
+                    $this->addMessage("no profiles for container " . $container->getName() . " found.");
+                } else {
+                    foreach ($profiles as $profile) {
+                        $container->addProfile($profile);
+                    }
+                }
+
+            }
             if (!$this->validation($container)) {
                 $this->em->persist($container);
                 $this->em->flush();
