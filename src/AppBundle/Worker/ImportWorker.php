@@ -137,13 +137,13 @@ class ImportWorker extends BaseWorker
             $container->setConfig($containerResult->body->metadata->config);
             $container->setDevices($containerResult->body->metadata->devices);
             $container->setEphemeral($containerResult->body->metadata->ephemeral);
-//            $container->setProfiles($containerResult->body->metadata->architecture);
             $container->setCreatedAt(new \DateTime($containerResult->body->metadata->created_at));
             $container->setExpandedConfig($containerResult->body->metadata->expanded_config);
             $container->setExpandedDevices($containerResult->body->metadata->expanded_devices);
             $container->setName($containerResult->body->metadata->name);
             $container->setState(mb_strtolower($containerResult->body->metadata->status));
             $container->setHost($host);
+
             if ($config = (array)$containerResult->body->metadata->config) {
                 $image = $this->em->getRepository(Image::class)->findOneBy(["host" => $host->getId(), "fingerprint" => $config["volatile.base_image"]]);
                 if (!$image) {
@@ -151,8 +151,17 @@ class ImportWorker extends BaseWorker
                 } else {
                     $container->setImage($image);
                 }
-
             }
+
+            if ($root = (array)$containerResult->body->metadata->expanded_devices->root) {
+                $storagePool = $this->em->getRepository(StoragePool::class)->findOneBy(["name" => $root["pool"], "host" => $host->getId()]);
+                if (!$storagePool) {
+                    $this->addMessage("Storage-pool " . $root["pool"] . " was not found");
+                } else {
+                    $container->setStoragePool($storagePool);
+                }
+            }
+
 
             if ($profiles = (array)$containerResult->body->metadata->profiles) {
                 $profiles = $this->em->getRepository(Profile::class)->findBy(["name" => $profiles]);
@@ -165,6 +174,7 @@ class ImportWorker extends BaseWorker
                 }
 
             }
+
             if (!$this->validation($container)) {
                 $this->em->persist($container);
                 $this->em->flush();
@@ -214,9 +224,9 @@ class ImportWorker extends BaseWorker
 
         }
         $this->addMessage(" Number of imported storagePools: " . $counter);
-
     }
 
+  
     /**
      * @param int $hostId
      * @throws \Httpful\Exception\ConnectionErrorException
@@ -255,7 +265,6 @@ class ImportWorker extends BaseWorker
 
         }
         $this->addMessage(" Number of imported profiles: " . $counter);
-
     }
 
 
