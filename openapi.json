@@ -1861,6 +1861,39 @@
                 }
             }
         },
+        "/jobs/{jobId}": {
+            "delete": {
+                "tags": [
+                    "jobs"
+                ],
+                "summary": "Delete a job",
+                "operationId": "AppBundle\\Controller\\JobController::deleteJob",
+                "parameters": [
+                    {
+                        "name": "jobId",
+                        "in": "path",
+                        "description": "ID von zu l\u00f6schendem job",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Whether to delete a running or archived job. Default is running.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "delete completed"
+                    }
+                }
+            }
+        },
         "/monitoring/logs/containers/{containerId}": {
             "get": {
                 "tags": [
