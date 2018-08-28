@@ -1727,6 +1727,20 @@
                 }
             }
         },
+        "/sync/hosts/{hostId}/profiles": {
+            "post": {
+                "tags": [
+                    "import"
+                ],
+                "summary": "Import all profiles from one host.",
+                "operationId": "AppBundle\\Controller\\ImportController::importProfiles",
+                "responses": {
+                    "202": {
+                        "description": "info if task was started"
+                    }
+                }
+            }
+        },
         "/sync/hosts/{hostId}": {
             "post": {
                 "tags": [
