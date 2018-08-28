@@ -274,9 +274,11 @@ class JobController extends BaseController
      *
      * @Route("/jobs/{jobId}", name="job_delete", methods={"DELETE"})
      * 
+     * @param Request $request
      * @param int $jobId
      * @param EntityManagerInterface $em
      * @return json
+     *
      * 
      * @OAS\Delete(path="/jobs/{jobId}",
      *  tags={"jobs"},
@@ -289,6 +291,14 @@ class JobController extends BaseController
      *         type="integer"
      *     ),
      *  ),
+     * @OAS\Parameter(
+     *          description="Whether to delete a running or archived job. Default is running.",
+     *          in="query",
+     *          name="type",
+     *          @OAS\Schema(
+     *              type="string"
+     *          ),
+     *     ),
      *
      * @OAS\Response(
      *     response=204,
@@ -296,9 +306,21 @@ class JobController extends BaseController
      *  ),
      * )
      */
-    public function deleteJob(int $jobId, EntityManagerInterface $em)
+    public function deleteJob(Request $request, int $jobId, EntityManagerInterface $em)
     {
-        $job = $this->getDoctrine()->getRepository(JobArchive::class)->find($jobId);
+
+        $type = $request->query->get('type');
+
+        switch ($type) {
+            case "archived":
+                $job = $this->getDoctrine()->getRepository(JobArchive::class)->find($jobId);
+                break;
+            default:
+                $job = $this->getDoctrine()->getRepository(Job::class)->find($jobId);
+                break;
+
+        }
+
 
         if (!$job) {
             throw new ElementNotFoundException(
