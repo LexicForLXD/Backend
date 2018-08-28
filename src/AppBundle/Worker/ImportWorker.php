@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -84,28 +85,25 @@ class ImportWorker extends BaseWorker
             $image->setArchitecture($imageResult->body->metadata->architecture);
             $image->setSize($imageResult->body->metadata->size);
             $image->setHost($host);
-            if(!$this->validation($image))
-            {
+            if (!$this->validation($image)) {
                 $this->em->persist($image);
                 $this->em->flush();
                 $counter++;
             }
 
-            foreach ($imageResult->body->metadata->aliases as $alias)
-            {
+            foreach ($imageResult->body->metadata->aliases as $alias) {
                 $dbAlias = new ImageAlias();
                 $dbAlias->setName($alias->name);
                 $dbAlias->setDescription($alias->description);
                 $dbAlias->setImage($image);
-                if(!$this->validation($dbAlias))
-                {
+                if (!$this->validation($dbAlias)) {
                     $this->em->persist($dbAlias);
                     $this->em->flush();
                 }
 
             }
         }
-        $this->addMessage("Number of imported images: ". $counter);
+        $this->addMessage("Number of imported images: " . $counter);
 
     }
 
@@ -142,19 +140,26 @@ class ImportWorker extends BaseWorker
             $container->setName($containerResult->body->metadata->name);
             $container->setState(mb_strtolower($containerResult->body->metadata->status));
             $container->setHost($host);
-            if($config = (array) $containerResult->body->metadata->config)
-            {
+
+            if ($config = (array)$containerResult->body->metadata->config) {
                 $image = $this->em->getRepository(Image::class)->findOneBy(["host" => $host->getId(), "fingerprint" => $config["volatile.base_image"]]);
                 if (!$image) {
                     $this->addMessage("base image not found for container " . $container->getName());
-                } else
-                {
+                } else {
                     $container->setImage($image);
                 }
-
             }
-            if(!$this->validation($container))
-            {
+
+            if ($root = (array)$containerResult->body->metadata->expanded_devices->root) {
+                $storagePool = $this->em->getRepository(StoragePool::class)->findOneBy(["name" => $root["pool"], "host" => $host->getId()]);
+                if (!$storagePool) {
+                    $this->addMessage("Storage-pool " . $root["pool"] . " was not found");
+                } else {
+                    $container->setStoragePool($storagePool);
+                }
+            }
+
+            if (!$this->validation($container)) {
                 $this->em->persist($container);
                 $this->em->flush();
                 $counter++;
@@ -162,7 +167,7 @@ class ImportWorker extends BaseWorker
 
         }
 
-        $this->addMessage(" Number of imported containers: ". $counter);
+        $this->addMessage(" Number of imported containers: " . $counter);
     }
 
 
@@ -195,15 +200,14 @@ class ImportWorker extends BaseWorker
             $storagePool->setDriver($storagePoolResult->body->metadata->driver);
             $storagePool->setHost($host);
 
-            if(!$this->validation($storagePool))
-            {
+            if (!$this->validation($storagePool)) {
                 $this->em->persist($storagePool);
                 $this->em->flush();
                 $counter++;
             }
 
         }
-        $this->addMessage(" Number of imported storagePools: ". $counter);
+        $this->addMessage(" Number of imported storagePools: " . $counter);
 
     }
 
@@ -252,7 +256,7 @@ class ImportWorker extends BaseWorker
      */
     private function addMessage(string $message)
     {
-        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . "\n" . $message );
+        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . "\n" . $message);
     }
 
 }

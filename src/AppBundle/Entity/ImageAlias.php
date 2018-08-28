@@ -37,8 +37,6 @@ class ImageAlias
 
     /**
      * @ORM\Column(type="string")
-     * @Assert\NotNull()
-     * @Assert\NotBlank()
      * @Assert\Type("string")
      *
      * @OAS\Property(example="This is a description string")
@@ -56,7 +54,7 @@ class ImageAlias
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId() : int
     {
         return $this->id;
     }
@@ -64,7 +62,7 @@ class ImageAlias
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName() : string
     {
         return $this->name;
     }
@@ -80,7 +78,7 @@ class ImageAlias
     /**
      * @return string
      */
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return $this->description;
     }
