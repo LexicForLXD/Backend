@@ -14,6 +14,7 @@ use AppBundle\Entity\Image;
 use AppBundle\Entity\Host;
 use AppBundle\Entity\ImageAlias;
 use AppBundle\Entity\StoragePool;
+use AppBundle\Entity\Profile;
 use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\StorageApi;
 use AppBundle\Service\LxdApi\ImageApi;
@@ -21,6 +22,7 @@ use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Dtc\QueueBundle\Model\Worker as BaseWorker;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use AppBundle\Service\LxdApi\ProfileApi;
 
 
 class ImportWorker extends BaseWorker
@@ -31,6 +33,7 @@ class ImportWorker extends BaseWorker
     protected $containerApi;
     protected $storageApi;
     protected $operationApi;
+    protected $profileApi;
     protected $validator;
 
     /**
@@ -41,13 +44,14 @@ class ImportWorker extends BaseWorker
      * @param OperationApi $operationApi
      * @param ValidatorInterface $validator
      */
-    public function __construct(EntityManagerInterface $em, ImageApi $imageApi, ContainerApi $containerApi, StorageApi $storageApi, OperationApi $operationApi, ValidatorInterface $validator)
+    public function __construct(EntityManagerInterface $em, ImageApi $imageApi, ContainerApi $containerApi, StorageApi $storageApi, OperationApi $operationApi, ProfileApi $profileApi, ValidatorInterface $validator)
     {
         $this->em = $em;
         $this->imageApi = $imageApi;
         $this->containerApi = $containerApi;
         $this->storageApi = $storageApi;
         $this->operationApi = $operationApi;
+        $this->profileApi = $profileApi;
         $this->validator = $validator;
     }
 
@@ -133,7 +137,6 @@ class ImportWorker extends BaseWorker
             $container->setConfig($containerResult->body->metadata->config);
             $container->setDevices($containerResult->body->metadata->devices);
             $container->setEphemeral($containerResult->body->metadata->ephemeral);
-//            $container->setProfiles($containerResult->body->metadata->architecture);
             $container->setCreatedAt(new \DateTime($containerResult->body->metadata->created_at));
             $container->setExpandedConfig($containerResult->body->metadata->expanded_config);
             $container->setExpandedDevices($containerResult->body->metadata->expanded_devices);
@@ -157,6 +160,19 @@ class ImportWorker extends BaseWorker
                 } else {
                     $container->setStoragePool($storagePool);
                 }
+            }
+
+
+            if ($profiles = (array)$containerResult->body->metadata->profiles) {
+                $profiles = $this->em->getRepository(Profile::class)->findBy(["name" => $profiles]);
+                if (!$profiles) {
+                    $this->addMessage("no profiles for container " . $container->getName() . " found.");
+                } else {
+                    foreach ($profiles as $profile) {
+                        $container->addProfile($profile);
+                    }
+                }
+
             }
 
             if (!$this->validation($container)) {
@@ -208,7 +224,47 @@ class ImportWorker extends BaseWorker
 
         }
         $this->addMessage(" Number of imported storagePools: " . $counter);
+    }
 
+  
+    /**
+     * @param int $hostId
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function importProfiles(int $hostId)
+    {
+        $host = $this->em->getRepository(Host::class)->find($hostId);
+        $counter = 0;
+        $profileListResult = $this->profileApi->list($host);
+        $profileList = $profileListResult->body->metadata;
+
+        foreach ($profileList as $item) {
+
+
+
+            $profileResult = $this->profileApi->show($host, substr($item, 14));
+
+            $profile = $this->em->getRepository(Profile::class)->findOneBy(["name" => $profileResult->body->metadata->name]);
+
+            if ($profile) {
+                break;
+            }
+
+            $profile = new Profile();
+            $profile->setName($profileResult->body->metadata->name);
+            $profile->setDescription($profileResult->body->metadata->description);
+            $profile->setConfig($profileResult->body->metadata->config);
+            $profile->setDevices($profileResult->body->metadata->devices);
+            $profile->addHost($host);
+
+            if (!$this->validation($profile)) {
+                $this->em->persist($profile);
+                $this->em->flush();
+                $counter++;
+            }
+
+        }
+        $this->addMessage(" Number of imported profiles: " . $counter);
     }
 
 
@@ -223,6 +279,7 @@ class ImportWorker extends BaseWorker
     {
         $this->importImages($hostId);
         $this->importStoragePools($hostId);
+        $this->importProfiles($hostId);
         $this->importContainers($hostId);
     }
 
