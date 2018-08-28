@@ -1,3 +1,11 @@
+## [0.8.1](https://github.com/LexicForLXD/Backend/compare/v0.8.0...v0.8.1) (2018-08-28)
+
+
+### Bug Fixes
+
+* container import errored with storage pool ([6743b51](https://github.com/LexicForLXD/Backend/commit/6743b51))
+* image alias description isn't required ([d9c991b](https://github.com/LexicForLXD/Backend/commit/d9c991b))
+
 # [0.8.0](https://github.com/LexicForLXD/Backend/compare/v0.7.0...v0.8.0) (2018-08-28)
 
 
