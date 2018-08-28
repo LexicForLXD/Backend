@@ -8,6 +8,7 @@ use Dtc\QueueBundle\Entity\Job;
 use Dtc\QueueBundle\Entity\JobArchive;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Swagger\Annotations as OAS;
+use Doctrine\ORM\EntityManagerInterface;
 
 
 class JobController extends BaseController
@@ -265,5 +266,49 @@ class JobController extends BaseController
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($jobs, 'json');
         return new Response($response);
+    }
+
+
+    /**
+     * Delete a job
+     *
+     * @Route("/jobs/{jobId}", name="job_delete", methods={"DELETE"})
+     * 
+     * @param int $jobId
+     * @param EntityManagerInterface $em
+     * @return json
+     * 
+     * @OAS\Delete(path="/jobs/{jobId}",
+     *  tags={"jobs"},
+     * @OAS\Parameter(
+     *     description="ID von zu löschendem job",
+     *     in="path",
+     *     name="jobId",
+     *     required=true,
+     *     @OAS\Schema(
+     *         type="integer"
+     *     ),
+     *  ),
+     *
+     * @OAS\Response(
+     *     response=204,
+     *     description="delete completed"
+     *  ),
+     * )
+     */
+    public function deleteJob(int $jobId, EntityManagerInterface $em)
+    {
+        $job = $this->getDoctrine()->getRepository(JobArchive::class)->find($jobId);
+
+        if (!$job) {
+            throw new ElementNotFoundException(
+                'Job not found.'
+            );
+        }
+
+        $em->remove($job);
+        $em->flush();
+
+        return $this->json([], 204);
     }
 }
