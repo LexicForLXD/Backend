@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -45,18 +46,24 @@ class ImageWorker extends BaseWorker
         $result = $this->api->createImage($image->getHost(), $body);
 
         if ($result->code != 202) {
-            $image->setError($result->body->error);
+            $this->em->remove($image);
+            $this->addMessage($result->body->error);
+            $this->em->flush();
+            return;
         }
         if ($result->body->metadata->status_code == 400) {
-            $image->setError($result->body->error);
+            $this->em->remove($image);
+            $this->addMessage($result->body->metadata->err);
+            $this->em->flush();
+            return;
         }
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
 
         if ($operationsResponse->body->metadata->status_code != 200) {
-            $image->setError($operationsResponse->body->metadata->err);
-            $this->em->persist($image);
-            $this->em->flush($image);
+            $this->addMessage($operationsResponse->body->metadata->err);
+            $this->em->remove($image);
+            $this->em->flush();
             return;
         }
 
@@ -80,4 +87,15 @@ class ImageWorker extends BaseWorker
     {
         return 'image';
     }
+
+
+    /**
+     * Appends a string to the message of the job.
+     * @param string $message
+     */
+    private function addMessage(string $message)
+    {
+        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . "\n" . $message);
+    }
+
 }
