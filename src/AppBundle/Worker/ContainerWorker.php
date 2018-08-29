@@ -10,10 +10,11 @@ use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\Profile\ProfileManagerApi;
 use AppBundle\Service\SSH\ScheduleSSH;
 use Doctrine\ORM\EntityManagerInterface;
-use Dtc\QueueBundle\Model\Worker;
 use Httpful\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ContainerWorker extends Worker
+
+class ContainerWorker extends BaseWorker
 {
     protected $em;
     protected $api;
@@ -33,13 +34,12 @@ class ContainerWorker extends Worker
      * @param ScheduleSSH $sshApi
      * @param HostApi $hostApi
      */
-    public function __construct(EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi, ProfileManagerApi $profileManagerApi, ScheduleSSH $sshApi, HostApi $hostApi)
+    public function __construct(EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi, ProfileManagerApi $profileManagerApi, ScheduleSSH $sshApi, HostApi $hostApi, ValidatorInterface $validator)
     {
-        $this->em = $em;
+        parent::__construct($em, $operationApi, $validator);
         $this->api = $api;
         $this->hostApi = $hostApi;
         $this->stateApi = $stateApi;
-        $this->operationApi = $operationApi;
         $this->profileManagerApi = $profileManagerApi;
         $this->sshApi = $sshApi;
     }
@@ -59,21 +59,15 @@ class ContainerWorker extends Worker
         $container = $this->em->getRepository(Container::class)->find($containerId);
         $result = $this->api->create($container->getHost(), $container->getBody());
 
-        if ($this->checkForErrors($container, $result)) {
+        if ($this->checkForErrors($result)) {
             return;
         }
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
-        if ($this->checkForErrors($container, $operationsResponse)) {
+        if ($this->checkForErrors($operationsResponse)) {
             return;
         }
-
-//        if ($operationsResponse->body->metadata->status_code != 200) {
-//            $container->setError($operationsResponse->body->metadata->err);
-//            $this->em->flush($container);
-//            return;
-//        }
 
         $container->setState('created');
         $this->em->flush($container);
@@ -93,13 +87,15 @@ class ContainerWorker extends Worker
 
         $result = $this->api->remove($container->getHost(), $container->getName());
 
-        if ($this->checkForErrors($container, $result)) {
+        if ($this->checkForErrors($result)) {
             return;
         }
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
-        $this->checkForErrors($container, $operationsResponse);
+        if ($this->checkForErrors($operationsResponse)) {
+            return;
+        }
 
         foreach ($container->getBackupSchedules() as $schedule) {
             $this->sshApi->deleteAnacronFile($schedule);
@@ -128,19 +124,15 @@ class ContainerWorker extends Worker
 
         $result = $this->api->update($container->getHost(), $container, $container->getBody());
 
-        $this->checkForErrors($container, $result);
+        if ($this->checkForErrors($result)) {
+            return;
+        }
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
-        $this->checkForErrors($container, $operationsResponse);
-
-//        if ($operationsResponse->code != 200) {
-//            if ($operationsResponse->body->metadata->status_code != 200) {
-//                $container->setError($operationsResponse->body->metadata->err);
-//                $this->em->flush($container);
-//                return;
-//            }
-//        }
+        if ($this->checkForErrors($operationsResponse)) {
+            return;
+        }
 
         $this->fetchInfos($container);
     }
@@ -157,19 +149,15 @@ class ContainerWorker extends Worker
 
         $result = $this->api->migrate($container->getHost(), $container, $container->getBody());
 
-        $this->checkForErrors($container, $result);
+        if ($this->checkForErrors($result)) {
+            return;
+        }
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
-        $this->checkForErrors($container, $operationsResponse);
-
-//        if ($operationsResponse->code != 200) {
-//            if ($operationsResponse->body->metadata->status_code != 200) {
-//                $container->setError($operationsResponse->body->metadata->err);
-//                $this->em->flush($container);
-//                return;
-//            }
-//        }
+        if ($this->checkForErrors($operationsResponse)) {
+            return;
+        }
 
         if ($operationsResponse->code == 409) {
             $container->setError("The name is already taken.");
@@ -220,13 +208,13 @@ class ContainerWorker extends Worker
 
         $result = $this->api->create($container->getHost(), $container->getBody());
 
-        if ($this->checkForErrors($container, $result)) {
+        if ($this->checkForErrors($result)) {
             return;
         }
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
 
-        if ($this->checkForErrors($container, $operationsResponse)) {
+        if ($this->checkForErrors($operationsResponse)) {
             return;
         }
 
@@ -251,28 +239,8 @@ class ContainerWorker extends Worker
         $container->setCreatedAt(new \DateTime($containerResponse->body->metadata->created_at));
         $container->setState(strtolower($containerResponse->body->metadata->status));
         $container->setArchitecture($containerResponse->body->metadata->architecture);
-        $this->em->flush($container);
-    }
-
-    /**
-     * @param Container $container
-     * @param Response $response
-     * @return bool
-     */
-    private function checkForErrors(Container $container, Response $response)
-    {
-        if ($response->code !== 202 && $response->code !== 200) {
-            if ($response->body->metadata) {
-                if ($response->body->metadata->status_code !== 200 && $response->body->metadata->status_code !== 103) {
-                    $container->setError($response->body->metadata->err);
-                }
-            } else {
-                $container->setError($response->raw_body);
-            }
+        if (!$this->validation($container)) {
             $this->em->flush($container);
-            $this->getCurrentJob()->setMessage("error");
-            return true;
         }
-        return false;
     }
 }
