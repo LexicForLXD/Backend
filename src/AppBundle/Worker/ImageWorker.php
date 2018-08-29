@@ -50,21 +50,30 @@ class ImageWorker extends BaseWorker
             $this->addMessage($result->body->error);
             $this->em->flush();
             return;
+        } else if ($result->body->metadata) {
+            if ($result->body->metadata->status_code == 400) {
+                $this->em->remove($image);
+                $this->addMessage($result->body->metadata->err);
+                $this->em->flush();
+                return;
+            }
         }
-        if ($result->body->metadata->status_code == 400) {
-            $this->em->remove($image);
-            $this->addMessage($result->body->metadata->err);
-            $this->em->flush();
-            return;
-        }
+
 
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
 
-        if ($operationsResponse->body->metadata->status_code != 200) {
-            $this->addMessage($operationsResponse->body->metadata->err);
+        if ($operationsResponse->code != 200) {
             $this->em->remove($image);
+            $this->addMessage($operationsResponse->body->error);
             $this->em->flush();
             return;
+        } else if ($operationsResponse->body->metadata) {
+            if ($operationsResponse->body->metadata->status_code != 200) {
+                $this->addMessage($operationsResponse->body->metadata->err);
+                $this->em->remove($image);
+                $this->em->flush();
+                return;
+            }
         }
 
         $image->setFingerprint($operationsResponse->body->metadata->metadata->fingerprint);
