@@ -1,3 +1,10 @@
+## [0.9.3](https://github.com/LexicForLXD/Backend/compare/v0.9.2...v0.9.3) (2018-08-29)
+
+
+### Bug Fixes
+
+* refresh ([1a22052](https://github.com/LexicForLXD/Backend/commit/1a22052))
+
 ## [0.9.2](https://github.com/LexicForLXD/Backend/compare/v0.9.1...v0.9.2) (2018-08-29)
 
 
