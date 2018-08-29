@@ -15,7 +15,7 @@ use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Dtc\QueueBundle\Model\Worker;
 
-class BackupWorker extends Worker
+abstract class BackupWorker extends Worker
 {
     protected $em;
     protected $validator;
@@ -34,6 +34,9 @@ class BackupWorker extends Worker
         $this->operationApi = $operationApi;
         $this->validator = $validator;
     }
+
+    abstract public function getName();
+
     /**
      * Appends a string to the message of the job.
      * @param string $message
