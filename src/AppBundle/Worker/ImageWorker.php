@@ -58,7 +58,6 @@ class ImageWorker extends BaseWorker
             return;
         }
 
-
         $operationsResponse = $this->operationApi->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
 
         if ($operationsResponse->code != 200) {
@@ -79,7 +78,7 @@ class ImageWorker extends BaseWorker
         $result = $this->api->getImageByFingerprint($image->getHost(), $image->getFingerprint());
         $image->setArchitecture($result->body->metadata->architecture);
         $image->setProperties($result->body->metadata->properties);
-        $image->setSize($result->body->metadata->metadata->size);
+        $image->setSize($result->body->metadata->size);
         $image->setFilename($result->body->metadata->filename);
         $image->setPublic($result->body->metadata->public);
 
