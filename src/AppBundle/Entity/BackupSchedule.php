@@ -384,11 +384,10 @@ class BackupSchedule
 
             ';
         }
-        if($this->type == "incremental")
-        {
+        if ($this->type == "incremental") {
             $commandTexts = $commandTexts .
                 '# Backup via duplicity
-            duplicity --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . '
+            duplicity --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText($this->name) . '
 
 
             # Make api call to webhook
@@ -399,7 +398,7 @@ class BackupSchedule
         } else {
             $commandTexts = $commandTexts .
                 '# Backup via duplicity
-            duplicity ' . $this->type . ' --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText() . $this->name . '
+            duplicity ' . $this->type . ' --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText($this->name) . '
 
 
             # Make api call to webhook

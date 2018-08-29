@@ -93,12 +93,13 @@ class BackupController extends BaseController
      *      ),
      * )
      */
-    public function getBackupById($id){
+    public function getBackupById($id)
+    {
         $backup = $this->getDoctrine()->getRepository(Backup::class)->find($id);
 
         if (!$backup) {
             throw new ElementNotFoundException(
-                'No Backup for id '.$id .' found'
+                'No Backup for id ' . $id . ' found'
             );
         }
 
@@ -146,7 +147,8 @@ class BackupController extends BaseController
      * ),
      * )
      */
-    public function backupCreationWebhook(Request $request, EntityManagerInterface $em){
+    public function backupCreationWebhook(Request $request, EntityManagerInterface $em)
+    {
         $token = $request->query->get('token');
 
         $backupSchedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->findOneBy(["token" => $token]);
@@ -161,7 +163,7 @@ class BackupController extends BaseController
         $backup->setBackupSchedule($backupSchedule);
 
         //Add containers to Backup
-        foreach ($backupSchedule->getContainers() as $container){
+        foreach ($backupSchedule->getContainers() as $container) {
             $backup->addContainer($container);
         }
 
@@ -211,12 +213,13 @@ class BackupController extends BaseController
      *      ),
      * )
      */
-    public function deleteBackupEntry($id, EntityManagerInterface $em){
+    public function deleteBackupEntry($id, EntityManagerInterface $em)
+    {
         $backup = $this->getDoctrine()->getRepository(Backup::class)->find($id);
 
         if (!$backup) {
             throw new ElementNotFoundException(
-                'No Backup for id '.$id .' found'
+                'No Backup for id ' . $id . ' found'
             );
         }
 
@@ -280,7 +283,7 @@ class BackupController extends BaseController
 
         if (!$destination) {
             throw new ElementNotFoundException(
-                'No backup destination for id '.$request->get("destination") .' found'
+                'No backup destination for id ' . $request->get("destination") . ' found'
             );
         }
 
@@ -288,27 +291,24 @@ class BackupController extends BaseController
 
         if (!$containers) {
             throw new ElementNotFoundException(
-                'No containers for id '.$request->get("containerIds") .' found'
+                'No containers for id ' . $request->get("containerIds") . ' found'
             );
         }
 
         $host = $containers[0]->getHost();
 
-        foreach ($containers as $container)
-        {
-            if($container->getHost() !== $host)
-            {
+        foreach ($containers as $container) {
+            if ($container->getHost() !== $host) {
                 throw new WrongInputExceptionArray(["containers" => "The selected containers are not on the same host."]);
             }
         }
 
         $backup = new Backup();
         $backup->setDestination($destination);
-        foreach ($containers as $container)
-        {
+        foreach ($containers as $container) {
             $backup->addContainer($container);
         }
-        $backup->setManualBackupName($request->get("backupName"));
+        $backup->setManualBackupName($request->get("name"));
         $backup->setTimestamp();
 
         $this->validation($backup);
@@ -321,7 +321,7 @@ class BackupController extends BaseController
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($backup, 'json');
-        return new Response($response, Response::HTTP_CREATED);
+        return new Response($response, 202);
     }
 
 
