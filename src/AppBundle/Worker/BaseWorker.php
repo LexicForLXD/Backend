@@ -40,7 +40,7 @@ abstract class BaseWorker extends Worker
      * Appends a string to the message of the job.
      * @param string $message
      */
-    private function addMessage(string $message)
+    public function addMessage(string $message)
     {
         $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . "\n" . $message);
     }
@@ -50,7 +50,7 @@ abstract class BaseWorker extends Worker
      * @param  $object
      * @return bool
      */
-    private function validation($object)
+    public function validation($object)
     {
         $errors = $this->validator->validate($object);
 
@@ -70,7 +70,7 @@ abstract class BaseWorker extends Worker
      * @param Response $response
      * @return bool
      */
-    private function checkForErrors(Response $response)
+    public function checkForErrors(Response $response)
     {
         if ($response->code !== 202 && $response->code !== 200) {
             $this->addMessage($response->body->error);
