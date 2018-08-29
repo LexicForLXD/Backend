@@ -18,9 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImageWorker extends BaseWorker
 {
-    protected $em;
     protected $api;
-    protected $operationApi;
 
     /**
      * ImageWorker constructor.
