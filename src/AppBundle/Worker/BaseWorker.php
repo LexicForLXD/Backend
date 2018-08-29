@@ -35,7 +35,6 @@ abstract class BackupWorker extends Worker
         $this->validator = $validator;
     }
 
-    abstract public function getName();
 
     /**
      * Appends a string to the message of the job.
