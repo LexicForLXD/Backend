@@ -1,3 +1,10 @@
+## [0.9.1](https://github.com/LexicForLXD/Backend/compare/v0.9.0...v0.9.1) (2018-08-29)
+
+
+### Bug Fixes
+
+* delete image on error while creating ([e4e50be](https://github.com/LexicForLXD/Backend/commit/e4e50be))
+
 # [0.9.0](https://github.com/LexicForLXD/Backend/compare/v0.8.1...v0.9.0) (2018-08-28)
 
 
