@@ -11,7 +11,7 @@ use Httpful\Request;
 class ProfileApi extends HttpHelper
 {
 
-    protected function getEndpoint($urlParam = NULL)
+    protected function getEndpoint($urlParam = null)
     {
         return 'profiles';
     }
@@ -43,6 +43,21 @@ class ProfileApi extends HttpHelper
     }
 
     /**
+     * Get the profile information of the LXD-API by providing a profile name.
+     *
+     * @param Host $host
+     * @param String $name
+     * @return \Httpful\Response
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
+    public function show(Host $host, String $name)
+    {
+        $uri = $this->buildUri($host, $this->getEndpoint() . '/' . $name);
+        return Request::get($uri)
+            ->send();
+    }
+
+    /**
      * Create a given profile on a LXD-Host
      *
      * @param Host $host
@@ -50,27 +65,28 @@ class ProfileApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function createProfileOnHost(Host $host, Profile $profile){
+    public function createProfileOnHost(Host $host, Profile $profile)
+    {
         $uri = $this->buildUri($host, $this->getEndpoint());
 
         //Build body with provided values
         $body = array();
-        if($profile->getName()) {
+        if ($profile->getName()) {
             $body['name'] = $profile->getName();
         }
-        if($profile->getDescription()) {
+        if ($profile->getDescription()) {
             $body['description'] = $profile->getDescription();
         }
-        if($profile->getConfig()) {
+        if ($profile->getConfig()) {
             $body['config'] = $profile->getConfig();
         }
-        if($profile->getDevices()) {
+        if ($profile->getDevices()) {
             $body['devices'] = $profile->getDevices();
         }
 
         return Request::post($uri)
-            -> body(json_encode($body))
-            -> send();
+            ->body(json_encode($body))
+            ->send();
     }
 
     /**
@@ -81,24 +97,25 @@ class ProfileApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function updateProfileOnHost(Host $host, Profile $profile){
-        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$profile->getName());
+    public function updateProfileOnHost(Host $host, Profile $profile)
+    {
+        $uri = $this->buildUri($host, $this->getEndpoint() . '/' . $profile->getName());
 
         //Build body with provided values
         $body = array();
-        if($profile->getDescription()) {
+        if ($profile->getDescription()) {
             $body['description'] = $profile->getDescription();
         }
-        if($profile->getConfig()) {
+        if ($profile->getConfig()) {
             $body['config'] = $profile->getConfig();
         }
-        if($profile->getDevices()) {
+        if ($profile->getDevices()) {
             $body['devices'] = $profile->getDevices();
         }
 
         return Request::put($uri)
-            -> body(json_encode($body))
-            -> send();
+            ->body(json_encode($body))
+            ->send();
     }
 
     /**
@@ -109,8 +126,9 @@ class ProfileApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function deleteProfileOnHost(Host $host, Profile $profile){
-        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$profile->getName());
+    public function deleteProfileOnHost(Host $host, Profile $profile)
+    {
+        $uri = $this->buildUri($host, $this->getEndpoint() . '/' . $profile->getName());
         return Request::delete($uri)->send();
     }
 
@@ -123,13 +141,14 @@ class ProfileApi extends HttpHelper
      * @return \Httpful\Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function renameProfileOnHost(Host $host, Profile $profile, String $oldName){
-        $uri = $this->buildUri($host, $this->getEndpoint().'/'.$oldName);
-        $body = '{ "name" : "'.$profile->getName().'" }';
+    public function renameProfileOnHost(Host $host, Profile $profile, String $oldName)
+    {
+        $uri = $this->buildUri($host, $this->getEndpoint() . '/' . $oldName);
+        $body = '{ "name" : "' . $profile->getName() . '" }';
 
         return Request::post($uri)
-            -> body($body)
-            -> send();
+            ->body($body)
+            ->send();
     }
 
 }
