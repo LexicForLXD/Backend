@@ -15,7 +15,7 @@ use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Dtc\QueueBundle\Model\Worker;
 
-abstract class BackupWorker extends Worker
+abstract class BaseWorker extends Worker
 {
     protected $em;
     protected $validator;
