@@ -1,3 +1,10 @@
+## [0.9.2](https://github.com/LexicForLXD/Backend/compare/v0.9.1...v0.9.2) (2018-08-29)
+
+
+### Bug Fixes
+
+* image create worker ([04516a2](https://github.com/LexicForLXD/Backend/commit/04516a2))
+
 ## [0.9.1](https://github.com/LexicForLXD/Backend/compare/v0.9.0...v0.9.1) (2018-08-29)
 
 
