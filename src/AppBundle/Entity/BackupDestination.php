@@ -383,15 +383,15 @@ class BackupDestination
      *
      * @return string
      */
-    public function getDestinationText()
+    public function getDestinationText(String $backupName = "")
     {
         if ($this->username) {
             if ($this->password) {
-                return $this->protocol . '://' . $this->username . ':' . $this->password . '@' . $this->hostname . '/' . $this->path . '/';
+                return $this->protocol . '://' . $this->username . ':' . $this->password . '@' . $this->hostname . '/' . $this->path . '/' . $backupName;
             }
-            return $this->protocol . '://' . $this->username . '@' . $this->hostname . '/' . $this->path . '/';
+            return $this->protocol . '://' . $this->username . '@' . $this->hostname . '/' . $this->path . '/' . $backupName;
         }
-        return $this->protocol . '://' . $this->hostname . '/' . $this->path . '/';
+        return $this->protocol . '://' . $this->hostname . '/' . $this->path . '/' . $backupName;
     }
 
     /**
