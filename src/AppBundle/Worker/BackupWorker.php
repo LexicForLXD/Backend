@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -15,12 +16,11 @@ use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\LxdApi\SnapshotApi;
 use Doctrine\ORM\EntityManagerInterface;
-use Dtc\QueueBundle\Model\Worker;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class BackupWorker extends Worker
+
+class BackupWorker extends BaseWorker
 {
-    protected $em;
-    protected $operationApi;
     protected $snapshotApi;
     protected $imageApi;
     protected $backupService;
@@ -33,10 +33,9 @@ class BackupWorker extends Worker
      * @param ImageApi $imageApi
      * @param BackupService $backupService
      */
-    public function __construct(EntityManagerInterface $em, SnapshotApi $snapshotApi, OperationApi $operationApi, ImageApi $imageApi, BackupService $backupService)
+    public function __construct(EntityManagerInterface $em, SnapshotApi $snapshotApi, OperationApi $operationApi, ImageApi $imageApi, BackupService $backupService, ValidatorInterface $validator)
     {
-        $this->em = $em;
-        $this->operationApi = $operationApi;
+        parent::__construct($em, $operationApi, $validator);
         $this->snapshotApi = $snapshotApi;
         $this->imageApi = $imageApi;
         $this->backupService = $backupService;
@@ -53,46 +52,69 @@ class BackupWorker extends Worker
      */
     public function createManualBackup($backupId)
     {
-        $backup = $this->getDoctrine()->getRepository(Backup::class)->find($backupId);
+        $backup = $this->em->getRepository(Backup::class)->find($backupId);
         $containers = $backup->getContainers();
         $host = $containers[0]->getHost();
 
         $this->backupService->makeTmpBackupFolder($host, $backup);
 
         foreach ($containers as $container) {
-            $snapshotOperation = $this->snapshotApi->create($host, $container, $backup->getManualBackupName());
-            $this->operationApi->getOperationsLinkWithWait($host, $snapshotOperation->body->metadata->id);
+            $snapOp = $this->snapshotApi->create($host, $container, $backup->getManualBackupName(), false);
+            if ($this->checkForErrors($snapOp)) {
+                return;
+            }
+            $snapOpWait = $this->operationApi->getOperationsLinkWithWait($host, $snapOp->body->metadata->id);
+            if ($this->checkForErrors($snapOpWait)) {
+                return;
+            }
 
 
-            $imageOperation = $this->imageApi->createImage($host, [
+            $imgOp = $this->imageApi->createImage($host, [
                 "filename" => $backup->getManualBackupName() . '_' . $container->getName(),
                 "source" => [
                     "type" => "snapshot",
                     "name" => $container->getName() . "/" . $backup->getManualBackupName()
                 ]
             ]);
-            $operationResult = $this->operationApi->getOperationsLinkWithWait($host, $imageOperation->body->metadata->id);
+            if ($this->checkForErrors($imgOp)) {
+                return;
+            }
+            $imgOpWait = $this->operationApi->getOperationsLinkWithWait($host, $imgOp->body->metadata->id);
+            if ($this->checkForErrors($imgOpWait)) {
+                return;
+            }
 
 
-            $fingerprint = $operationResult->body->metadata->metadata->fingerprint;
-
+            $fingerprint = $imgOpWait->body->metadata->metadata->fingerprint;
             $this->backupService->exportImageToTmp($host, $container, $backup, $fingerprint);
 
+            $snapDelOp = $this->snapshotApi->delete($host, $container, $backup->getManualBackupName());
+            if ($this->checkForErrors($snapDelOp)) {
+                return;
+            }
+            $snapDelOpWait = $this->operationApi->getOperationsLinkWithWait($host, $snapDelOp->body->metadata->id);
+            if ($this->checkForErrors($snapDelOpWait)) {
+                return;
+            }
 
-            $snapshotDeleteOperation = $this->snapshotApi->delete($host, $container, $backup->getManualBackupName());
-            $this->operationApi->getOperationsLinkWithWait($host, $snapshotDeleteOperation->body->metadata->id);
-
-
-            $imageDeleteOperation = $this->imageApi->removeImageByFingerprint($host, $fingerprint);
-            $this->operationApi->getOperationsLinkWithWait($host, $imageDeleteOperation->body->metadata->id);
-
+            $imgDelOp = $this->imageApi->removeImageByFingerprint($host, $fingerprint);
+            if ($this->checkForErrors($imgDelOp)) {
+                return;
+            }
+            $imgDelOpWait = $this->operationApi->getOperationsLinkWithWait($host, $imgDelOp->body->metadata->id);
+            if ($this->checkForErrors($imgDelOpWait)) {
+                return;
+            }
         }
 
         $this->backupService->makeDuplicityCall($host, $backup);
-
         $this->backupService->removeTmpBackupFolder($host, $backup);
 
         $backup->setTimestamp();
-        $this->em->flush($backup);
+        if (!$this->validation($backup)) {
+            $this->em->flush($backup);
+        }
     }
+
+
 }
