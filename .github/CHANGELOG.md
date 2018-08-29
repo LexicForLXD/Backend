@@ -1,3 +1,53 @@
+## [0.9.3](https://github.com/LexicForLXD/Backend/compare/v0.9.2...v0.9.3) (2018-08-29)
+
+
+### Bug Fixes
+
+* refresh ([1a22052](https://github.com/LexicForLXD/Backend/commit/1a22052))
+
+## [0.9.2](https://github.com/LexicForLXD/Backend/compare/v0.9.1...v0.9.2) (2018-08-29)
+
+
+### Bug Fixes
+
+* image create worker ([04516a2](https://github.com/LexicForLXD/Backend/commit/04516a2))
+
+## [0.9.1](https://github.com/LexicForLXD/Backend/compare/v0.9.0...v0.9.1) (2018-08-29)
+
+
+### Bug Fixes
+
+* delete image on error while creating ([e4e50be](https://github.com/LexicForLXD/Backend/commit/e4e50be))
+
+# [0.9.0](https://github.com/LexicForLXD/Backend/compare/v0.8.1...v0.9.0) (2018-08-28)
+
+
+### Features
+
+* import profiles ([a759d47](https://github.com/LexicForLXD/Backend/commit/a759d47))
+
+## [0.8.1](https://github.com/LexicForLXD/Backend/compare/v0.8.0...v0.8.1) (2018-08-28)
+
+
+### Bug Fixes
+
+* container import errored with storage pool ([6743b51](https://github.com/LexicForLXD/Backend/commit/6743b51))
+* image alias description isn't required ([d9c991b](https://github.com/LexicForLXD/Backend/commit/d9c991b))
+
+# [0.8.0](https://github.com/LexicForLXD/Backend/compare/v0.7.0...v0.8.0) (2018-08-28)
+
+
+### Features
+
+* delete job ([4bd9962](https://github.com/LexicForLXD/Backend/commit/4bd9962))
+
+# [0.7.0](https://github.com/LexicForLXD/Backend/compare/v0.6.0...v0.7.0) (2018-08-27)
+
+
+### Features
+
+* get ssh public key ([e248d79](https://github.com/LexicForLXD/Backend/commit/e248d79))
+
 # [0.6.0](https://github.com/LexicForLXD/Backend/compare/v0.5.0...v0.6.0) (2018-08-26)
 
 
