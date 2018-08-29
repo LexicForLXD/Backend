@@ -14,7 +14,7 @@ use AppBundle\Entity\Image;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
-use Dtc\QueueBundle\Model\Worker as BaseWorker;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImageWorker extends BaseWorker
 {
@@ -28,11 +28,10 @@ class ImageWorker extends BaseWorker
      * @param ImageApi $api
      * @param OperationApi $operationApi
      */
-    public function __construct(EntityManagerInterface $em, ImageApi $api, OperationApi $operationApi)
+    public function __construct(EntityManagerInterface $em, ImageApi $api, OperationApi $operationApi, ValidatorInterface $validator)
     {
-        $this->em = $em;
+        parent::__construct($em, $operationApi, $validator);
         $this->api = $api;
-        $this->operationApi = $operationApi;
     }
 
     /**
@@ -43,32 +42,13 @@ class ImageWorker extends BaseWorker
     public function createImage($imageId, $body)
     {
         $image = $this->em->getRepository(Image::class)->find($imageId);
-        $result = $this->api->createImage($image->getHost(), $body);
-
-        if ($result->code != 202) {
-            $this->em->remove($image);
-            $this->addMessage($result->body->error);
-
-            if ($result->body->metadata) {
-                if ($result->body->metadata->status_code == 400) {
-                    $this->addMessage($result->body->metadata->err);
-                }
-            }
-            $this->em->flush();
+        $imgOp = $this->api->createImage($image->getHost(), $body);
+        if ($this->checkForErrors($imgOp)) {
             return;
         }
 
-        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
-
-        if ($operationsResponse->code != 200) {
-            $this->em->remove($image);
-            $this->addMessage($operationsResponse->body->error);
-            if ($operationsResponse->body->metadata) {
-                if ($operationsResponse->body->metadata->status_code != 200) {
-                    $this->addMessage($operationsResponse->body->metadata->err);
-                }
-            }
-            $this->em->flush();
+        $imgOpWait = $this->operationApi->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
+        if ($this->checkForErrors($imgOpWait)) {
             return;
         }
 
@@ -76,6 +56,9 @@ class ImageWorker extends BaseWorker
 
         //Fetch info from server
         $result = $this->api->getImageByFingerprint($image->getHost(), $image->getFingerprint());
+        if ($this->checkForErrors($result)) {
+            return;
+        }
         $image->setArchitecture($result->body->metadata->architecture);
         $image->setProperties($result->body->metadata->properties);
         $image->setSize($result->body->metadata->size);
@@ -84,23 +67,15 @@ class ImageWorker extends BaseWorker
 
         $image->setFinished(true);
 
-        $this->em->persist($image);
-        $this->em->flush($image);
+        if (!$this->validation($image)) {
+            $this->em->persist($image);
+            $this->em->flush($image);
+        }
     }
 
     public function getName()
     {
         return 'image';
-    }
-
-
-    /**
-     * Appends a string to the message of the job.
-     * @param string $message
-     */
-    private function addMessage(string $message)
-    {
-        $this->getCurrentJob()->setMessage($this->getCurrentJob()->getMessage() . "\n" . $message);
     }
 
 }
