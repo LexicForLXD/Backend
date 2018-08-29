@@ -1,3 +1,10 @@
+## [0.9.5](https://github.com/LexicForLXD/Backend/compare/v0.9.4...v0.9.5) (2018-08-29)
+
+
+### Bug Fixes
+
+* base worker private ([416c683](https://github.com/LexicForLXD/Backend/commit/416c683))
+
 ## [0.9.4](https://github.com/LexicForLXD/Backend/compare/v0.9.3...v0.9.4) (2018-08-29)
 
 
