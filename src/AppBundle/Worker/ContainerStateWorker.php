@@ -10,15 +10,13 @@ use AppBundle\Service\LxdApi\OperationApi;
 use AppBundle\Service\Profile\ProfileManagerApi;
 use AppBundle\Service\SSH\ScheduleSSH;
 use Doctrine\ORM\EntityManagerInterface;
-use Dtc\QueueBundle\Model\Worker;
-use Httpful\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ContainerStateWorker extends Worker
+
+class ContainerStateWorker extends BaseWorker
 {
-    protected $em;
     protected $api;
     protected $stateApi;
-    protected $operationApi;
 
 
     /**
@@ -28,12 +26,11 @@ class ContainerStateWorker extends Worker
      * @param ContainerStateApi $stateApi
      * @param OperationApi $operationApi
      */
-    public function __construct(EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi)
+    public function __construct(EntityManagerInterface $em, ContainerApi $api, ContainerStateApi $stateApi, OperationApi $operationApi, ValidatorInterface $validator)
     {
-        $this->em = $em;
+        parent::__construct($em, $operationApi, $validator);
         $this->api = $api;
         $this->stateApi = $stateApi;
-        $this->operationApi = $operationApi;
     }
 
 
@@ -51,13 +48,13 @@ class ContainerStateWorker extends Worker
     public function updateState($containerId, $data)
     {
         $container = $this->em->getRepository(Container::class)->find($containerId);
-        $result = $this->stateApi->update($container, $data);
-        if ($this->checkForErrors($container, $result)) {
+        $stateOp = $this->stateApi->update($container, $data);
+        if ($this->checkForErrors($stateOp)) {
             return;
         }
-        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $result->body->metadata->id);
+        $stateOpWait = $this->operationApi->getOperationsLinkWithWait($container->getHost(), $stateOp->body->metadata->id);
 
-        if ($this->checkForErrors($container, $operationsResponse)) {
+        if ($this->checkForErrors($stateOpWait)) {
             return;
         }
 
@@ -76,29 +73,4 @@ class ContainerStateWorker extends Worker
     }
 
 
-    /**
-     * @param Container $container
-     * @param Response $response
-     * @return bool
-     */
-    private function checkForErrors(Container $container, Response $response)
-    {
-
-        if ($response->code !== 202 && $response->code !== 200)
-        {
-            if($response->body->metadata)
-            {
-                if ($response->body->metadata->status_code !== 200 && $response->body->metadata->status_code !== 103) {
-                    $container->setError($response->body->metadata->err);
-                }
-            } else
-            {
-                $container->setError($response->raw_body);
-            }
-            $this->em->flush($container);
-            $this->getCurrentJob()->setMessage("error");
-            return true;
-        }
-        return false;
-    }
 }
