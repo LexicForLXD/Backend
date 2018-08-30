@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ImportController extends BaseController
 {
 
-    
+
 
     /**
      * Import all images from one host.
@@ -123,6 +124,40 @@ class ImportController extends BaseController
         }
 
         $worker->later()->importStoragePools($host->getId());
+
+        return new JsonResponse(['message' => 'import started'], 202);
+    }
+
+
+    /**
+     * Import all profiles from one host.
+     *
+     * @Route("/sync/hosts/{hostId}/profiles", name="import_profiles", methods={"POST"})
+     *
+     * @OAS\Post(path="/sync/hosts/{hostId}/profiles",
+     *     tags={"import"},
+     *     @OAS\Response(
+     *          response=202,
+     *          description="info if task was started"
+     *     ),
+     * )
+     *
+     * @param $hostId
+     * @param ImportWorker $worker
+     * @return JsonResponse
+     * @throws ElementNotFoundException
+     */
+    public function importProfiles($hostId, ImportWorker $worker)
+    {
+        $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
+
+        if (!$host) {
+            throw new ElementNotFoundException(
+                'No host found for id ' . $hostId
+            );
+        }
+
+        $worker->later()->importProfiles($host->getId());
 
         return new JsonResponse(['message' => 'import started'], 202);
     }

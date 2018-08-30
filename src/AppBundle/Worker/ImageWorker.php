@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -13,13 +14,11 @@ use AppBundle\Entity\Image;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
-use Dtc\QueueBundle\Model\Worker as BaseWorker;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImageWorker extends BaseWorker
 {
-    protected $em;
     protected $api;
-    protected $operationApi;
 
     /**
      * ImageWorker constructor.
@@ -27,11 +26,10 @@ class ImageWorker extends BaseWorker
      * @param ImageApi $api
      * @param OperationApi $operationApi
      */
-    public function __construct(EntityManagerInterface $em, ImageApi $api, OperationApi $operationApi)
+    public function __construct(EntityManagerInterface $em, ImageApi $api, OperationApi $operationApi, ValidatorInterface $validator)
     {
-        $this->em = $em;
+        parent::__construct($em, $operationApi, $validator);
         $this->api = $api;
-        $this->operationApi = $operationApi;
     }
 
     /**
@@ -42,21 +40,13 @@ class ImageWorker extends BaseWorker
     public function createImage($imageId, $body)
     {
         $image = $this->em->getRepository(Image::class)->find($imageId);
-        $result = $this->api->createImage($image->getHost(), $body);
-
-        if ($result->code != 202) {
-            $image->setError($result->body->error);
-        }
-        if ($result->body->metadata->status_code == 400) {
-            $image->setError($result->body->error);
+        $imgOp = $this->api->createImage($image->getHost(), $body);
+        if ($this->checkForErrors($imgOp)) {
+            return;
         }
 
-        $operationsResponse = $this->operationApi->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
-
-        if ($operationsResponse->body->metadata->status_code != 200) {
-            $image->setError($operationsResponse->body->metadata->err);
-            $this->em->persist($image);
-            $this->em->flush($image);
+        $imgOpWait = $this->operationApi->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
+        if ($this->checkForErrors($imgOpWait)) {
             return;
         }
 
@@ -64,20 +54,26 @@ class ImageWorker extends BaseWorker
 
         //Fetch info from server
         $result = $this->api->getImageByFingerprint($image->getHost(), $image->getFingerprint());
+        if ($this->checkForErrors($result)) {
+            return;
+        }
         $image->setArchitecture($result->body->metadata->architecture);
         $image->setProperties($result->body->metadata->properties);
-        $image->setSize($result->body->metadata->metadata->size);
+        $image->setSize($result->body->metadata->size);
         $image->setFilename($result->body->metadata->filename);
         $image->setPublic($result->body->metadata->public);
 
         $image->setFinished(true);
 
-        $this->em->persist($image);
-        $this->em->flush($image);
+        if (!$this->validation($image)) {
+            $this->em->persist($image);
+            $this->em->flush($image);
+        }
     }
 
     public function getName()
     {
         return 'image';
     }
+
 }

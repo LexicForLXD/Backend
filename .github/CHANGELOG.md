@@ -1,3 +1,70 @@
+## [0.9.6](https://github.com/LexicForLXD/Backend/compare/v0.9.5...v0.9.6) (2018-08-29)
+
+
+### Bug Fixes
+
+* profile api ([fa96fc3](https://github.com/LexicForLXD/Backend/commit/fa96fc3))
+* space in endpoints ([27d26a0](https://github.com/LexicForLXD/Backend/commit/27d26a0))
+
+## [0.9.5](https://github.com/LexicForLXD/Backend/compare/v0.9.4...v0.9.5) (2018-08-29)
+
+
+### Bug Fixes
+
+* base worker private ([416c683](https://github.com/LexicForLXD/Backend/commit/416c683))
+
+## [0.9.4](https://github.com/LexicForLXD/Backend/compare/v0.9.3...v0.9.4) (2018-08-29)
+
+
+### Bug Fixes
+
+* backupworker use of em closes [#211](https://github.com/LexicForLXD/Backend/issues/211) ([40f46d2](https://github.com/LexicForLXD/Backend/commit/40f46d2))
+* import will stop after first know entity ([8adab07](https://github.com/LexicForLXD/Backend/commit/8adab07))
+* snapshot api ([15b804c](https://github.com/LexicForLXD/Backend/commit/15b804c))
+
+## [0.9.3](https://github.com/LexicForLXD/Backend/compare/v0.9.2...v0.9.3) (2018-08-29)
+
+
+### Bug Fixes
+
+* refresh ([1a22052](https://github.com/LexicForLXD/Backend/commit/1a22052))
+
+## [0.9.2](https://github.com/LexicForLXD/Backend/compare/v0.9.1...v0.9.2) (2018-08-29)
+
+
+### Bug Fixes
+
+* image create worker ([04516a2](https://github.com/LexicForLXD/Backend/commit/04516a2))
+
+## [0.9.1](https://github.com/LexicForLXD/Backend/compare/v0.9.0...v0.9.1) (2018-08-29)
+
+
+### Bug Fixes
+
+* delete image on error while creating ([e4e50be](https://github.com/LexicForLXD/Backend/commit/e4e50be))
+
+# [0.9.0](https://github.com/LexicForLXD/Backend/compare/v0.8.1...v0.9.0) (2018-08-28)
+
+
+### Features
+
+* import profiles ([a759d47](https://github.com/LexicForLXD/Backend/commit/a759d47))
+
+## [0.8.1](https://github.com/LexicForLXD/Backend/compare/v0.8.0...v0.8.1) (2018-08-28)
+
+
+### Bug Fixes
+
+* container import errored with storage pool ([6743b51](https://github.com/LexicForLXD/Backend/commit/6743b51))
+* image alias description isn't required ([d9c991b](https://github.com/LexicForLXD/Backend/commit/d9c991b))
+
+# [0.8.0](https://github.com/LexicForLXD/Backend/compare/v0.7.0...v0.8.0) (2018-08-28)
+
+
+### Features
+
+* delete job ([4bd9962](https://github.com/LexicForLXD/Backend/commit/4bd9962))
+
 # [0.7.0](https://github.com/LexicForLXD/Backend/compare/v0.6.0...v0.7.0) (2018-08-27)
 
 

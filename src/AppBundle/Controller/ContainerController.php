@@ -379,8 +379,7 @@ class ContainerController extends BaseController
             );
         }
 
-        if(!$request->request->has("storagePoolId"))
-        {
+        if (!$request->request->has("storagePoolId")) {
             throw new WrongInputExceptionArray(
                 ["storagePool" => "No storagePoolId included in request."]
             );
@@ -394,8 +393,7 @@ class ContainerController extends BaseController
         }
 
 
-        if($request->request->has('profiles'))
-        {
+        if ($request->request->has('profiles')) {
             $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
             $this->checkProfiles($profiles, $request->get("profiles"));
         }
@@ -415,8 +413,7 @@ class ContainerController extends BaseController
             case 'image':
 
 
-                if ($request->request->has("fingerprint") && !$request->request->has("alias"))
-                {
+                if ($request->request->has("fingerprint") && !$request->request->has("alias")) {
                     $image = $this->getDoctrine()->getRepository(Image::class)->findOneBy(["fingerprint" => $request->get("fingerprint")]);
 
                     if (!$image) {
@@ -426,8 +423,7 @@ class ContainerController extends BaseController
                     }
 
 
-                } else if ($request->request->has("alias") && !$request->request->has("fingerprint"))
-                {
+                } else if ($request->request->has("alias") && !$request->request->has("fingerprint")) {
                     $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->findOneBy(["name" => $request->get("alias")]);
 
                     if (!$imageAlias) {
@@ -438,16 +434,14 @@ class ContainerController extends BaseController
 
                     $image = $imageAlias->getImage();
 
-                } else
-                {
+                } else {
                     throw new WrongInputExceptionArray([
                         'image' => 'You have to pass either a fingerprint or an alias for the image.'
                     ]);
                 }
 
 
-                if($host !== $image->getHost())
-                {
+                if ($host !== $image->getHost()) {
                     throw new WrongInputExceptionArray([
                         'image' => 'The image you selected is not available on the selected host.'
                     ]);
@@ -515,8 +509,7 @@ class ContainerController extends BaseController
         $em->persist($container);
         $em->flush();
 
-        if($request->request->has('profiles'))
-        {
+        if ($request->request->has('profiles')) {
             foreach ($profiles as $profile) {
                 $profileManagerApi->enableProfileForContainer($profile, $container);
             }
@@ -562,7 +555,7 @@ class ContainerController extends BaseController
      * @throws ElementNotFoundException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function showSingleAction(Request $request, int $containerId, ContainerApi $api, EntityManagerInterface $em)
+    public function showSingleAction(Request $request, int $containerId, ContainerApi $api, ContainerStateApi $stateApi, EntityManagerInterface $em)
     {
         $fresh = $request->query->get('fresh');
 
@@ -578,13 +571,21 @@ class ContainerController extends BaseController
 
             $result = $api->show($container->getHost(), $container->getName());
 
-            $container->setSettings($result->body->metadata);
-            $container->setState(strtolower($result->body->metadata->status));
+            $container->setArchitecture($result->body->metadata->architecture);
+            $container->setConfig($result->body->metadata->config);
+            $container->setDevices($result->body->metadata->devices);
+            $container->setEphemeral($result->body->metadata->ephemeral);
+            $container->setCreatedAt(new \DateTime($result->body->metadata->created_at));
+            $container->setExpandedConfig($result->body->metadata->expanded_config);
+            $container->setExpandedDevices($result->body->metadata->expanded_devices);
+            $container->setState(mb_strtolower($result->body->metadata->status));
 
+            $result = $stateApi->actual($container);
+            $container->setNetwork($result->body->metadata->network);
 
-            $em->flush($container);
+            $this->validation($container);
+            $em->flush();
         }
-
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
         return new Response($response);
@@ -759,8 +760,7 @@ class ContainerController extends BaseController
             $this->checkForNeededFields($request, $neededFields);
 
 
-            if($request->request->has('profiles'))
-            {
+            if ($request->request->has('profiles')) {
                 $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
                 foreach ($profiles as $profile) {
                     $profileManagerApi->enableProfileForContainer($profile, $container);
