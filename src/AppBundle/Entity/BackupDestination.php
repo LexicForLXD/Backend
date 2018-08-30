@@ -79,6 +79,7 @@ class BackupDestination
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
      * @OAS\Property(example="secret")
+     * @JMS\Exclude()
      * @var string
      */
     protected $password;
