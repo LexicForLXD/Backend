@@ -1,3 +1,11 @@
+## [0.9.6](https://github.com/LexicForLXD/Backend/compare/v0.9.5...v0.9.6) (2018-08-29)
+
+
+### Bug Fixes
+
+* profile api ([fa96fc3](https://github.com/LexicForLXD/Backend/commit/fa96fc3))
+* space in endpoints ([27d26a0](https://github.com/LexicForLXD/Backend/commit/27d26a0))
+
 ## [0.9.5](https://github.com/LexicForLXD/Backend/compare/v0.9.4...v0.9.5) (2018-08-29)
 
 
