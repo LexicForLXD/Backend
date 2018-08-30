@@ -1,0 +1,152 @@
+openapi: 3.0.0
+info:
+  title: Lexic API
+  version: 1.0.0
+  description: Central set of REST Api endpoints to manage multi LXD Host environments
+paths:
+  /backups:
+    get:
+      tags:
+        - backups
+      summary: Get all successful Backups
+      operationId: 'AppBundle\Controller\BackupController::getAllBackups'
+      responses:
+        "200":
+          description: List of all successful Backups
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backup"
+        "404":
+          description: No Backups found
+    post:
+      summary: Stores a new manual backup.
+      tags:
+        - backups
+      operationId: 'AppBundle\Controller\BackupController::storeBackupAction'
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                destination:
+                  type: integer
+                containerIds:
+                  type: array
+                name:
+                  type: string
+              required:
+                - destination
+                - containerIds
+                - name
+            example:
+              destination: 1
+              containerIds:
+                - 1
+                - 2
+              name: justabackup
+      responses:
+        "201":
+          description: The new Backup object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backup"
+        "400":
+          description: The provided parameters are invalid
+        "403":
+          description: The backup token is invalid
+
+  /backups/{id}:
+    get:
+      tags:
+        - backups
+      summary: Get single Backup by it's id
+      operationId: 'AppBundle\Controller\BackupController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the Backup
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Single Backup with the provided id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backup"
+        "404":
+          description: No Backup for the id found
+    delete:
+      tags:
+        - backups
+      summary: Delete an existing Backup
+      operationId: 'AppBundle\Controller\BackupController::deleteBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the Backup
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Backup for the provided id deleted
+        "404":
+          description: No Backup for the id found
+  /webhooks/backups:
+    post:
+      tags:
+        - backups
+      summary: Webhook to create a new Backup object based on a Backup Schedule
+      operationId: 'AppBundle\Controller\BackupController::backupCreationWebhook'
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token set in the Backup Schedule
+          required: true
+          schema:
+            type: string
+
+      responses:
+        "201":
+          description: The new Backup object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backup"
+        "400":
+          description: The provided parameters are invalid
+        "403":
+          description: The backup token is invalid
+
+components:
+  schemas:
+    backup:
+      properties:
+        id:
+          type: integer
+          example: 1
+        timestamp:
+          type: string
+          format: date-time
+          example: "2018-03-10T22:40:28+00:00"
+        destinationId:
+          example: 1
+        containerId:
+          example: [1]
+        backupScheduleId:
+          example: 2
+      type: object
+    backupDestination:
+      properties:
+        id:
+          type: integer
+          example: 1
+        protocol:
+          type: string
+          example: "sftp"
+      type: object
