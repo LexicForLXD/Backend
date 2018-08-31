@@ -4,16 +4,19 @@ namespace AppBundle\EventListener;
 
 
 use AppBundle\Exception\WrongInputException;
+use AppBundle\Exception\WrongInputExceptionArray;
+
 use AppBundle\Exception\Utils\UserInputException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 
 class WrongInputExceptionListener
 {
-    public function onKernelException(GetResponseForExceptionEvent $event){
+    public function onKernelException(GetResponseForExceptionEvent $event)
+    {
         $exception = $event->getException();
 
-        if(!$exception instanceof WrongInputException){
+        if (!$exception instanceof WrongInputException && !$exception instanceof WrongInputExceptionArray) {
             return;
         }
 
@@ -25,6 +28,7 @@ class WrongInputExceptionListener
                 'message' => $exception->getMessage()
             ]
         ];
+
 
         $event->setResponse(new JsonResponse($responseData, $code));
     }
