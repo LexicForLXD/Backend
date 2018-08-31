@@ -571,6 +571,12 @@ class ContainerController extends BaseController
 
             $result = $api->show($container->getHost(), $container->getName());
 
+            if ($error = $this->checkForErrors($result)) {
+                throw new ElementNotFoundException(
+                    'No container found for name: ' . $container->getName()
+                );
+            }
+
             $container->setArchitecture($result->body->metadata->architecture);
             $container->setConfig($result->body->metadata->config);
             $container->setDevices($result->body->metadata->devices);
@@ -746,11 +752,7 @@ class ContainerController extends BaseController
         if ($request->request->has("name")) {
             if ($container->getName() != $request->get("name")) {
 
-                $data = ["name" => $request->get("name")];
-
-                $container->setDataBody($data);
-                $em->flush($container);
-                $containerWorker->later()->renameContainer($container);
+                $containerWorker->later()->renameContainer($container->getId(), $request->get("name"));
             } else {
                 throw new WrongInputExceptionArray(["name" => "The new name is same as current name."]);
             }
