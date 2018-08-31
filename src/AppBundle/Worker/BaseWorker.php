@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use AppBundle\Service\LxdApi\OperationApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Dtc\QueueBundle\Model\Worker;
+use Httpful\Response;
 
 abstract class BaseWorker extends Worker
 {
