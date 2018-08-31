@@ -1,3 +1,10 @@
+## [0.9.8](https://github.com/LexicForLXD/Backend/compare/v0.9.7...v0.9.8) (2018-08-30)
+
+
+### Bug Fixes
+
+* worker response validation ([82b63a0](https://github.com/LexicForLXD/Backend/commit/82b63a0))
+
 ## [0.9.7](https://github.com/LexicForLXD/Backend/compare/v0.9.6...v0.9.7) (2018-08-30)
 
 
