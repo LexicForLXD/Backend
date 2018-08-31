@@ -592,6 +592,8 @@ class ContainerController extends BaseController
             $this->validation($container);
             $em->flush();
         }
+
+        $em->refresh($container);
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
         return new Response($response);
