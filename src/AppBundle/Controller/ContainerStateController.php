@@ -7,8 +7,8 @@ use AppBundle\Worker\ContainerStateWorker;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 use AppBundle\Service\LxdApi\ContainerStateApi;
+use AppBundle\Service\LxdApi\OperationApi;
 
 use AppBundle\Entity\Container;
 
@@ -75,7 +75,7 @@ class ContainerStateController extends BaseController
      *  ),
      * )
      */
-    public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateWorker $worker)
+    public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateApi $stateApi, OperationApi $opApi)
     {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
@@ -94,7 +94,7 @@ class ContainerStateController extends BaseController
 
 
 
-        switch($request->get("action")){
+        switch ($request->get("action")) {
             case "start":
                 $container->setState("starting");
                 break;
@@ -116,11 +116,28 @@ class ContainerStateController extends BaseController
         }
         $em->flush($container);
 
-        $worker->later()->updateState($container->getId(), $data);
+
+        $stateOp = $stateApi->update($container, $data);
+        $this->checkForErrors($stateOp);
+
+        $stateOpWait = $opApi->getOperationsLinkWithWait($container->getHost(), $stateOp->body->metadata->id);
+        $this->checkForErrorsInOps($stateOpWait);
 
 
 
-        return new JsonResponse(['message' => 'update is ongoing'],Response::HTTP_ACCEPTED);
+        if ($container->isEphemeral() && $data["action"] === "stop") {
+            $em->remove($container);
+            $em->flush();
+            return new JsonResponse(['message' => 'container delted'], Response::HTTP_OK);
+        }
+
+        $stateResult = $stateApi->actual($container);
+        $container->setState(mb_strtolower($stateResult->body->metadata->status));
+        $container->setNetwork($stateResult->body->metadata->network);
+        $em->flush($container);
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($container, 'json');
+        return new Response($response);
     }
 
 
