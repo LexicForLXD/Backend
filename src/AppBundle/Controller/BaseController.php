@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -12,6 +13,10 @@ namespace AppBundle\Controller;
 use AppBundle\Exception\WrongInputExceptionArray;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Httpful\Response as HttpfulResponse;
+use AppBundle\Exception\LxdApiException;
+use AppBundle\Exception\LxdOpApiException;
+
 
 class BaseController extends Controller
 {
@@ -46,13 +51,12 @@ class BaseController extends Controller
      * @return array
      * @throws WrongInputExceptionArray
      */
-    public function checkProfiles(Array $profiles, Array $profilesRequest)
+    public function checkProfiles(array $profiles, array $profilesRequest)
     {
         $profilesDB = array();
         $profileNames = array();
 
-        foreach ($profiles as $profile)
-        {
+        foreach ($profiles as $profile) {
             $profilesDB[] = $profile->getId();
             $profileNames[] = $profile->getName();
         }
@@ -63,8 +67,7 @@ class BaseController extends Controller
         foreach ($errors as $error) {
             $errorArray[] = 'The profile with the id ' . $error . ' is not present in our database.';
         }
-        if(count($errorArray) > 0)
-        {
+        if (count($errorArray) > 0) {
             throw new WrongInputExceptionArray($errorArray);
         }
         return $profileNames;
@@ -80,12 +83,59 @@ class BaseController extends Controller
      */
     public function checkForNeededFields(Request $request, $neededFields)
     {
-        foreach ($neededFields as $fieldName)
-        {
-            if(!$request->request->has($fieldName))
-            {
+        foreach ($neededFields as $fieldName) {
+            if (!$request->request->has($fieldName)) {
                 throw new WrongInputExceptionArray(
                     [$fieldName => "This field is required"]
+                );
+            }
+        }
+    }
+
+    /**
+     * Checks if the response has any errors
+     * @param HttpfulResponse $response
+     * @throws LxdApiException
+     */
+    public function checkForErrors(HttpfulResponse $response)
+    {
+        if ($response->code !== 202 && $response->code !== 200) {
+            if ($response->body->metadata) {
+                if ($response->body->metadata->status_code !== 200 && $response->body->metadata->status_code !== 103) {
+                    throw new LxdApiException(
+                        $response->body->metadata->err,
+                        $response->body->metadata->status_code
+                    );
+                }
+            }
+            throw new LxdApiException(
+                $response->body->error,
+                $response->code
+            );
+        }
+    }
+
+
+    /**
+     * Checks if the operation response has any errors
+     * @param HttpfulResponse $response
+     * @throws LxdApiException
+     */
+    public function checkForErrorsInOps(HttpfulResponse $response)
+    {
+        if ($response->code !== 200) {
+            throw new LxdApiException(
+                $response->body->error,
+                $response->code
+            );
+
+        }
+        if ($response->body->metadata) {
+            if ($response->body->metadata->status_code !== 200 && $response->body->metadata->status_code !== 103) {
+                throw new LxdOpApiException(
+                    $response->body->metadata->err,
+                    $response->body->metadata->status_code,
+                    $response->body->metadata->description
                 );
             }
         }

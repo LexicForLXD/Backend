@@ -25,7 +25,7 @@ class HttpHelper
         $this->cert_location = $cert_location;
         $this->cert_key_location = $cert_key_location;
         $this->cert_passphrase = $cert_passphrase;
-        if(!is_readable($cert_location) || !is_readable($cert_key_location)){
+        if (!is_readable($cert_location) || !is_readable($cert_key_location)) {
             throw new WrongInputException("Couldn't read the server certificate files for LXD-Host connection");
         }
 
@@ -40,11 +40,11 @@ class HttpHelper
      */
     public function buildUri(Host $host, String $endpoint, String $apiVersion = null)
     {
-        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
-
-        $port = $host->getPort() ?: '8443';
-        $apiVersion = $apiVersion ?: '1.0';
-        $url = 'https://'.$hostname.':'.$port.'/'.$apiVersion.'/'.$endpoint;
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
+        $endpoint = str_replace(" ", "%20", $endpoint);
+        $port = $host->getPort() ? : '8443';
+        $apiVersion = $apiVersion ? : '1.0';
+        $url = 'https://' . $hostname . ':' . $port . '/' . $apiVersion . '/' . $endpoint;
 
         return $url;
     }
@@ -56,11 +56,11 @@ class HttpHelper
      */
     public function buildUriWithoutEndpoint(Host $host, String $apiVersion = null)
     {
-        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
 
-        $port = $host->getPort() ?: '8443';
-        $apiVersion = $apiVersion ?: '1.0';
-        $url = 'https://'.$hostname.':'.$port.'/'.$apiVersion;
+        $port = $host->getPort() ? : '8443';
+        $apiVersion = $apiVersion ? : '1.0';
+        $url = 'https://' . $hostname . ':' . $port . '/' . $apiVersion;
 
         return $url;
     }
@@ -68,19 +68,18 @@ class HttpHelper
     public function init()
     {
 
-        if($this->cert_passphrase != null)
-        {
+        if ($this->cert_passphrase != null) {
             $template = Request::init()
-            ->sendsJson()    // Send application/x-www-form-urlencoded
-            ->withoutStrictSsl()        // Ease up on some of the SSL checks
-            ->expectsJson()             // Expect JSON responses
-            ->authenticateWithCert($this->cert_location, $this->cert_key_location, $this->cert_passphrase); //uses cert from parameters.yml
+                ->sendsJson()    // Send application/x-www-form-urlencoded
+                ->withoutStrictSsl()        // Ease up on some of the SSL checks
+                ->expectsJson()             // Expect JSON responses
+                ->authenticateWithCert($this->cert_location, $this->cert_key_location, $this->cert_passphrase); //uses cert from parameters.yml
         } else {
             $template = Request::init()
-            ->sendsJson()    // Send application/x-www-form-urlencoded
-            ->withoutStrictSsl()        // Ease up on some of the SSL checks
-            ->expectsJson()             // Expect JSON responses
-            ->authenticateWithCert($this->cert_location, $this->cert_key_location);
+                ->sendsJson()    // Send application/x-www-form-urlencoded
+                ->withoutStrictSsl()        // Ease up on some of the SSL checks
+                ->expectsJson()             // Expect JSON responses
+                ->authenticateWithCert($this->cert_location, $this->cert_key_location);
         }
 
         Request::ini($template);

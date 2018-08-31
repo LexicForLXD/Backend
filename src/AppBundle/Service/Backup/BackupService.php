@@ -38,7 +38,7 @@ class BackupService
 
     public function exportImageToTmp(Host $host, Container $container, Backup $backup, string $fingerprint)
     {
-        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
@@ -46,7 +46,7 @@ class BackupService
 
         $exec = $session->getExec();
 
-        $result = $exec->run('lxc image export ' . $fingerprint . ' /tmp/'.$backup->getManualBackupName().'/'. $container->getName());
+        $result = $exec->run('lxc image export ' . $fingerprint . ' /tmp/' . $backup->getManualBackupName() . '/' . $container->getName());
 
         if (strpos($result, 'Error') !== false) {
             return substr($result, strpos($result, 'Error'));
@@ -56,7 +56,7 @@ class BackupService
 
     public function makeTmpBackupFolder(Host $host, Backup $backup)
     {
-        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
@@ -74,7 +74,7 @@ class BackupService
 
     public function makeDuplicityCall(Host $host, Backup $backup)
     {
-        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 
@@ -82,7 +82,7 @@ class BackupService
 
         $exec = $session->getExec();
 
-        $result = $exec->run('duplicity --no-encryption /tmp/' . $backup->getManualBackupName() . ' ' . $this->destination->getDestinationText() . $backup->getManualBackupName());
+        $result = $exec->run('duplicity --no-encryption /tmp/' . $backup->getManualBackupName() . ' ' . $destination->getDestinationText($backup->getManualBackupName()));
 
         if (strpos($result, 'Error') !== false) {
             return substr($result, strpos($result, 'Error'));
@@ -92,7 +92,7 @@ class BackupService
 
     public function removeTmpBackupFolder(Host $host, Backup $backup)
     {
-        $hostname = $host->getIpv4() ?: $host->getIpv6() ?: $host->getDomainName() ?: 'localhost';
+        $hostname = $host->getIpv4() ? : $host->getIpv6() ? : $host->getDomainName() ? : 'localhost';
         $configuration = new Configuration($hostname);
         $authentication = new PublicKeyFile($this->ssh_user, $this->ssh_location, $this->ssh_key_location, $this->ssh_passphrase);
 

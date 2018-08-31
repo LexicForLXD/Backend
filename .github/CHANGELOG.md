@@ -1,3 +1,41 @@
+## [0.9.8](https://github.com/LexicForLXD/Backend/compare/v0.9.7...v0.9.8) (2018-08-30)
+
+
+### Bug Fixes
+
+* worker response validation ([82b63a0](https://github.com/LexicForLXD/Backend/commit/82b63a0))
+
+## [0.9.7](https://github.com/LexicForLXD/Backend/compare/v0.9.6...v0.9.7) (2018-08-30)
+
+
+### Bug Fixes
+
+* destination password  send to frontend ([f97670b](https://github.com/LexicForLXD/Backend/commit/f97670b))
+
+## [0.9.6](https://github.com/LexicForLXD/Backend/compare/v0.9.5...v0.9.6) (2018-08-29)
+
+
+### Bug Fixes
+
+* profile api ([fa96fc3](https://github.com/LexicForLXD/Backend/commit/fa96fc3))
+* space in endpoints ([27d26a0](https://github.com/LexicForLXD/Backend/commit/27d26a0))
+
+## [0.9.5](https://github.com/LexicForLXD/Backend/compare/v0.9.4...v0.9.5) (2018-08-29)
+
+
+### Bug Fixes
+
+* base worker private ([416c683](https://github.com/LexicForLXD/Backend/commit/416c683))
+
+## [0.9.4](https://github.com/LexicForLXD/Backend/compare/v0.9.3...v0.9.4) (2018-08-29)
+
+
+### Bug Fixes
+
+* backupworker use of em closes [#211](https://github.com/LexicForLXD/Backend/issues/211) ([40f46d2](https://github.com/LexicForLXD/Backend/commit/40f46d2))
+* import will stop after first know entity ([8adab07](https://github.com/LexicForLXD/Backend/commit/8adab07))
+* snapshot api ([15b804c](https://github.com/LexicForLXD/Backend/commit/15b804c))
+
 ## [0.9.3](https://github.com/LexicForLXD/Backend/compare/v0.9.2...v0.9.3) (2018-08-29)
 
 

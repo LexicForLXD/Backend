@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -17,7 +18,7 @@ use Httpful\Request;
 class SnapshotApi extends HttpHelper
 {
 
-    protected function getEndpoint($urlParam = NULL)
+    protected function getEndpoint($urlParam = null)
     {
         return 'containers/' . $urlParam . '/snapshots';
     }
@@ -84,7 +85,7 @@ class SnapshotApi extends HttpHelper
      */
     public function delete(Host $host, Container $container, string $snapshotName)
     {
-        $uri = $this->buildUri($host, $this->getEndpoint($container->getName()).$snapshotName);
+        $uri = $this->buildUri($host, $this->getEndpoint($container->getName()) . "/" . $snapshotName);
 
         return Request::delete($uri)->timeoutIn(10)->send();
     }
