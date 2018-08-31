@@ -14,6 +14,8 @@ use AppBundle\Exception\WrongInputExceptionArray;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Httpful\Response as HttpfulResponse;
+use AppBundle\Exception\LxdApiException;
+
 
 class BaseController extends Controller
 {
@@ -92,17 +94,23 @@ class BaseController extends Controller
     /**
      * Checks if the response has any errors
      * @param HttpfulResponse $response
-     * @return bool
+     * @throws LxdApiException
      */
     public function checkForErrors(HttpfulResponse $response)
     {
         if ($response->code !== 202 && $response->code !== 200) {
             if ($response->body->metadata) {
                 if ($response->body->metadata->status_code !== 200 && $response->body->metadata->status_code !== 103) {
+                    throw new LxdApiException(
+                        $response->body->metadata->err,
+                        $response->body->metadata->status_code
+                    );
                 }
             }
-            return true;
+            throw new LxdApiException(
+                $response->body->error,
+                $response->code
+            );
         }
-        return false;
     }
 }
