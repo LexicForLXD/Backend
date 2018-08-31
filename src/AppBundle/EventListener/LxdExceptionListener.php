@@ -4,6 +4,8 @@ namespace AppBundle\EventListener;
 
 
 use AppBundle\Exception\LxdApiException;
+use AppBundle\Exception\LxdOpApiException;
+use AppBundle\Exception\Utils\OpException;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -14,7 +16,7 @@ class LxdExceptionListener
     {
         $exception = $event->getException();
 
-        if (!$exception instanceof LxdApiException) {
+        if (!$exception instanceof LxdApiException && !$exception instanceof LxdOpApiException) {
             return;
         }
 
@@ -25,6 +27,10 @@ class LxdExceptionListener
                 'message' => $exception->getMessage()
             ]
         ];
+
+        if ($exception instanceof OpException) {
+            $responseData["error"]["operation"] = $exception->getOperation();
+        }
 
 
         $event->setResponse(new JsonResponse($responseData, 502));

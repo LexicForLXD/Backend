@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Httpful\Response as HttpfulResponse;
 use AppBundle\Exception\LxdApiException;
+use AppBundle\Exception\LxdOpApiException;
 
 
 class BaseController extends Controller
@@ -111,6 +112,32 @@ class BaseController extends Controller
                 $response->body->error,
                 $response->code
             );
+        }
+    }
+
+
+    /**
+     * Checks if the operation response has any errors
+     * @param HttpfulResponse $response
+     * @throws LxdApiException
+     */
+    public function checkForErrorsInOps(HttpfulResponse $response)
+    {
+        if ($response->code !== 200) {
+            throw new LxdApiException(
+                $response->body->error,
+                $response->code
+            );
+
+        }
+        if ($response->body->metadata) {
+            if ($response->body->metadata->status_code !== 200 && $response->body->metadata->status_code !== 103) {
+                throw new LxdOpApiException(
+                    $response->body->metadata->err,
+                    $response->body->metadata->status_code,
+                    $response->body->metadata->description
+                );
+            }
         }
     }
 }
