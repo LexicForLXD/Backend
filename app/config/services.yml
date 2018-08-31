@@ -97,52 +97,8 @@ services:
     class: AppBundle\Provider\UserProvider
     arguments: ["@platform.user.repository"]
 
-  httpful_connection_exception.listener:
-    class: AppBundle\EventListener\HttpfulConnectionExceptionListener
-    tags:
-      - {
-          name: kernel.event_listener,
-          event: kernel.exception,
-          method: onKernelException,
-        }
-
-  element_not_found_exception.listener:
-    class: AppBundle\EventListener\ElementNotFoundExceptionListener
-    tags:
-      - {
-          name: kernel.event_listener,
-          event: kernel.exception,
-          method: onKernelException,
-        }
-
-  wrong_input_exception.listener:
-    class: AppBundle\EventListener\WrongInputExceptionListener
-    tags:
-      - {
-          name: kernel.event_listener,
-          event: kernel.exception,
-          method: onKernelException,
-        }
-
-  forbidden_exception.listener:
-    class: AppBundle\EventListener\ForbiddenExceptionListener
-    tags:
-      - {
-          name: kernel.event_listener,
-          event: kernel.exception,
-          method: onKernelException,
-        }
-
-  runtime_exception.listener:
-    class: AppBundle\EventListener\RuntimeExceptionListener
-    tags:
-      - {
-          name: kernel.event_listener,
-          event: kernel.exception,
-          method: onKernelException,
-        }
-  lxd_exception.listener:
-    class: AppBundle\EventListener\LxdExceptionListener
+  AppBundle\EventListener\:
+    resource: "../../src/AppBundle/EventListener"
     tags:
       - {
           name: kernel.event_listener,
