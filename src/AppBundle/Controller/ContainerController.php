@@ -571,6 +571,8 @@ class ContainerController extends BaseController
 
             $result = $api->show($container->getHost(), $container->getName());
 
+            $this->checkForErrors($result);
+
             $container->setArchitecture($result->body->metadata->architecture);
             $container->setConfig($result->body->metadata->config);
             $container->setDevices($result->body->metadata->devices);
@@ -586,6 +588,8 @@ class ContainerController extends BaseController
             $this->validation($container);
             $em->flush();
         }
+
+        $em->refresh($container);
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($container, 'json');
         return new Response($response);
@@ -746,11 +750,7 @@ class ContainerController extends BaseController
         if ($request->request->has("name")) {
             if ($container->getName() != $request->get("name")) {
 
-                $data = ["name" => $request->get("name")];
-
-                $container->setDataBody($data);
-                $em->flush($container);
-                $containerWorker->later()->renameContainer($container);
+                $containerWorker->later()->renameContainer($container->getId(), $request->get("name"));
             } else {
                 throw new WrongInputExceptionArray(["name" => "The new name is same as current name."]);
             }
