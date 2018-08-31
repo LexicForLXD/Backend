@@ -135,10 +135,15 @@ components:
           format: date-time
           example: "2018-03-10T22:40:28+00:00"
         destinationId:
+          type: integer
           example: 1
         containerId:
+          type: array
+          items:
+            type: integer
           example: [1]
         backupScheduleId:
+          type: integer
           example: 2
       type: object
     backupDestination:
@@ -146,7 +151,25 @@ components:
         id:
           type: integer
           example: 1
+        name:
+          type: string
+          example: "DestName"
+        description:
+          type: string
+          example: "DestDesc"
+        path:
+          type: string
+          example: "/path/to/folder"
+        hostname:
+          type: string
+          example: "192.168.10.10"
         protocol:
           type: string
           example: "sftp"
+        username:
+          type: string
+          example: "username"
+        password:
+          type: string
+          example: "password"
       type: object
