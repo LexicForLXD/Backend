@@ -33,6 +33,8 @@ paths:
                   type: integer
                 containerIds:
                   type: array
+                  items:
+                    type: integer
                 name:
                   type: string
               required:
@@ -173,3 +175,19 @@ components:
           type: string
           example: "password"
       type: object
+    backupSchedule:
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "DestName"
+        description:
+          type: string
+          example: "DestDesc"
+        executionTime:
+          type: string
+          example: "daily"
+        destination:
+          type: object
