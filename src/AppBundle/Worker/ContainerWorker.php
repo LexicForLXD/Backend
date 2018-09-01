@@ -143,11 +143,11 @@ class ContainerWorker extends BaseWorker
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function renameContainer($containerId)
+    public function renameContainer($containerId, $newName)
     {
         $container = $this->em->getRepository(Container::class)->find($containerId);
 
-        $result = $this->api->migrate($container->getHost(), $container, $container->getBody());
+        $result = $this->api->migrate($container->getHost(), $container, ["name" => $newName]);
 
         if ($this->checkForErrors($result)) {
             return;
@@ -162,7 +162,11 @@ class ContainerWorker extends BaseWorker
         if ($operationsResponse->code == 409) {
             $container->setError("The name is already taken.");
             $this->em->flush($container);
+        } else {
+            $container->setName($newName);
+            $this->em->flush($container);
         }
+
 
 
         $this->fetchInfos($container);
