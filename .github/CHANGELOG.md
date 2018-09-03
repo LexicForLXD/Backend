@@ -1,3 +1,12 @@
+## [0.9.9](https://github.com/LexicForLXD/Backend/compare/v0.9.8...v0.9.9) (2018-08-31)
+
+
+### Bug Fixes
+
+* correct response when refreshing container ([8440cb7](https://github.com/LexicForLXD/Backend/commit/8440cb7))
+* made container state update sync ([1523876](https://github.com/LexicForLXD/Backend/commit/1523876))
+* update container name closes [#221](https://github.com/LexicForLXD/Backend/issues/221) ([b93577a](https://github.com/LexicForLXD/Backend/commit/b93577a))
+
 ## [0.9.8](https://github.com/LexicForLXD/Backend/compare/v0.9.7...v0.9.8) (2018-08-30)
 
 
