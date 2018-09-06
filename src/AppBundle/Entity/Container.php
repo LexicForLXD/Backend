@@ -617,9 +617,9 @@ class Container
             return null;
         }
 
-        return array_map(function ($o) {
+        return $this->profiles->map(function ($o) {
             return $o->getId();
-        }, $this->profiles);
+        });
     }
 
     /**
@@ -629,9 +629,9 @@ class Container
      */
     public function getProfileNames()
     {
-        return array_map(function ($o) {
+        return $this->profiles->map(function ($o) {
             return $o->getName();
-        }, $this->profiles);
+        })->toArray();
     }
 
     /**
