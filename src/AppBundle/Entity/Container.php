@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Leon
@@ -195,7 +196,7 @@ class Container
     /**
      * @return int
      */
-    public function getId() :int
+    public function getId() : int
     {
         return $this->id;
     }
@@ -203,8 +204,9 @@ class Container
     /**
      * @param ContainerStatus $containerStatus
      */
-    public function addStatus(ContainerStatus $containerStatus){
-        if(!$this->statuses->contains($containerStatus)){
+    public function addStatus(ContainerStatus $containerStatus)
+    {
+        if (!$this->statuses->contains($containerStatus)) {
             $containerStatus->setContainer($this);
             $this->statuses->add($containerStatus);
         }
@@ -213,8 +215,9 @@ class Container
     /**
      * @param ContainerStatus $containerStatus
      */
-    public function removeStatus(ContainerStatus $containerStatus){
-        if(!$this->statuses->contains($containerStatus)){
+    public function removeStatus(ContainerStatus $containerStatus)
+    {
+        if (!$this->statuses->contains($containerStatus)) {
             $containerStatus->setContainer(null);
             $this->statuses->remove($containerStatus);
         }
@@ -309,7 +312,7 @@ class Container
     /**
      * @return string
      */
-    public function getArchitecture(): string
+    public function getArchitecture() : string
     {
         return $this->architecture;
     }
@@ -333,7 +336,7 @@ class Container
     /**
      * @param mixed $config
      */
-    public function setConfig($config): void
+    public function setConfig($config) : void
     {
         $this->config = $config;
     }
@@ -349,7 +352,7 @@ class Container
     /**
      * @param mixed $expandedConfig
      */
-    public function setExpandedConfig($expandedConfig): void
+    public function setExpandedConfig($expandedConfig) : void
     {
         $this->expandedConfig = $expandedConfig;
     }
@@ -365,7 +368,7 @@ class Container
     /**
      * @param mixed $devices
      */
-    public function setDevices($devices): void
+    public function setDevices($devices) : void
     {
         $this->devices = $devices;
     }
@@ -381,7 +384,7 @@ class Container
     /**
      * @param mixed $expandedDevices
      */
-    public function setExpandedDevices($expandedDevices): void
+    public function setExpandedDevices($expandedDevices) : void
     {
         $this->expandedDevices = $expandedDevices;
     }
@@ -397,7 +400,7 @@ class Container
     /**
      * @param mixed $network
      */
-    public function setNetwork($network): void
+    public function setNetwork($network) : void
     {
         $this->network = $network;
     }
@@ -405,7 +408,7 @@ class Container
     /**
      * @return \DateTime
      */
-    public function getCreatedAt(): \DateTime
+    public function getCreatedAt() : \DateTime
     {
         return $this->createdAt;
     }
@@ -413,7 +416,7 @@ class Container
     /**
      * @param \DateTime $createdAt
      */
-    public function setCreatedAt($createdAt): void
+    public function setCreatedAt($createdAt) : void
     {
         $this->createdAt = $createdAt;
     }
@@ -429,7 +432,7 @@ class Container
     /**
      * @param mixed $error
      */
-    public function setError($error): void
+    public function setError($error) : void
     {
         $this->error = $error;
     }
@@ -437,7 +440,7 @@ class Container
     /**
      * @return bool
      */
-    public function isEphemeral(): bool
+    public function isEphemeral() : bool
     {
         return $this->ephemeral;
     }
@@ -445,7 +448,7 @@ class Container
     /**
      * @param bool $ephemeral
      */
-    public function setEphemeral($ephemeral): void
+    public function setEphemeral($ephemeral) : void
     {
         $this->ephemeral = $ephemeral;
     }
@@ -455,7 +458,7 @@ class Container
     /**
      * @return Image
      */
-    public function getImage(): Image
+    public function getImage() : Image
     {
         return $this->image;
     }
@@ -463,7 +466,7 @@ class Container
     /**
      * @param Image $image
      */
-    public function setImage(Image $image): void
+    public function setImage(Image $image) : void
     {
         $this->image = $image;
     }
@@ -479,7 +482,7 @@ class Container
     /**
      * @param mixed $profiles
      */
-    public function setProfiles($profiles): void
+    public function setProfiles($profiles) : void
     {
         $this->profiles = $profiles;
     }
@@ -495,13 +498,13 @@ class Container
     /**
      * @param mixed $source
      */
-    public function setSource($source): void
+    public function setSource($source) : void
     {
         $this->source = $source;
     }
 
 
-    public function getBody(): array
+    public function getBody() : array
     {
 
         $bodyDevices = $this->devices;
@@ -512,14 +515,14 @@ class Container
         ];
 
         $body = [
-                    "name" => $this->getName(),
-                    "architecture" => $this->getArchitecture(),
-                    "profiles" => $this->getProfileNames(),
-                    "ephemeral" => $this->isEphemeral(),
-                    "config" => $this->getConfig(),
-                    "devices" => $bodyDevices,
-                    "source" => $this->getSource()
-                ];
+            "name" => $this->getName(),
+            "architecture" => $this->getArchitecture(),
+            "profiles" => $this->getProfileNames(),
+            "ephemeral" => $this->isEphemeral(),
+            "config" => $this->getConfig(),
+            "devices" => $bodyDevices,
+            "source" => $this->getSource()
+        ];
 
         return $body;
     }
@@ -530,7 +533,8 @@ class Container
     /**
      * @param Profile $profile
      */
-    public function addProfile(Profile $profile){
+    public function addProfile(Profile $profile)
+    {
         if ($this->profiles->contains($profile)) {
             return;
         }
@@ -541,7 +545,8 @@ class Container
     /**
      * @param Profile $profile
      */
-    public function removeProfile(Profile $profile){
+    public function removeProfile(Profile $profile)
+    {
         if (!$this->profiles->contains($profile)) {
             return;
         }
@@ -552,7 +557,8 @@ class Container
     /**
      * @param BackupSchedule $backupSchedule
      */
-    public function addBackupSchedule(BackupSchedule $backupSchedule){
+    public function addBackupSchedule(BackupSchedule $backupSchedule)
+    {
         if ($this->backupSchedules->contains($backupSchedule)) {
             return;
         }
@@ -563,7 +569,8 @@ class Container
     /**
      * @param BackupSchedule $backupSchedule
      */
-    public function removeBackupSchedule(BackupSchedule $backupSchedule){
+    public function removeBackupSchedule(BackupSchedule $backupSchedule)
+    {
         if (!$this->backupSchedules->contains($backupSchedule)) {
             return;
         }
@@ -574,7 +581,8 @@ class Container
     /**
      * @param Backup $backup
      */
-    public function addBackup(Backup $backup){
+    public function addBackup(Backup $backup)
+    {
         if ($this->backups->contains($backup)) {
             return;
         }
@@ -585,7 +593,8 @@ class Container
     /**
      * @param Backup $backup
      */
-    public function removeBackup(Backup $backup){
+    public function removeBackup(Backup $backup)
+    {
         if (!$this->backups->contains($backup)) {
             return;
         }
@@ -602,34 +611,27 @@ class Container
      *
      * @JMS\VirtualProperty()
      */
-    public function getProfileId(){
-        if($this->profiles->isEmpty()){
+    public function getProfileId()
+    {
+        if ($this->profiles->isEmpty()) {
             return null;
         }
 
-        $this->profiles->first();
-        do{
-            $ids[] = $this->profiles->current()->getId();
-        }while($this->profiles->next());
-
-        return $ids;
+        return array_map(function ($o) {
+            return $o->getId();
+        }, $this->profiles);
     }
 
+    /**
+     * Returns an array of all profilenames associated with this container
+     *
+     * @return array
+     */
     public function getProfileNames()
     {
-        $profileNames = array();
-
-        if($this->profiles->isEmpty()){
-            return $profileNames;
-        }
-
-        foreach ($this->profiles as $profile)
-        {
-            $profileNames[] = $profile->getName();
-        }
-
-        return $profileNames;
-
+        return array_map(function ($o) {
+            return $o->getName();
+        }, $this->profiles);
     }
 
     /**
@@ -651,7 +653,7 @@ class Container
     /**
      * @return StoragePool
      */
-    public function getStoragePool(): StoragePool
+    public function getStoragePool() : StoragePool
     {
         return $this->storagePool;
     }
@@ -659,7 +661,7 @@ class Container
     /**
      * @param StoragePool $storagePool
      */
-    public function setStoragePool(StoragePool $storagePool): void
+    public function setStoragePool(StoragePool $storagePool) : void
     {
         $this->storagePool = $storagePool;
     }
