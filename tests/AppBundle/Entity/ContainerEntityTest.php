@@ -33,18 +33,7 @@ class ContainerEntityTest extends WebTestCase
 
     public function testSetterAllWithoutAssociations()
     {
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setSettings("Settings");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
-
-
-        $this->em->persist($container);
-        $this->em->flush();
+        $container = $this->createContainer("WithoutAssoc_ContainerEntityTest");
 
 
         $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
@@ -62,15 +51,7 @@ class ContainerEntityTest extends WebTestCase
 
     public function testAddRemoveProfile()
     {
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
-
-        $this->em->persist($container);
+        $container = $this->createContainer("AddRemoveProfile_ContainerEntityTest");
 
         $profile = new Profile();
         $profile->setName("Profile_ContainerEntityTest");
@@ -98,15 +79,7 @@ class ContainerEntityTest extends WebTestCase
 
     public function testSetGetHost()
     {
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
-
-        $this->em->persist($container);
+        $container = $this->createContainer("SetGetHost_ContainerEntityTest");
 
         $host = new Host();
         $host->setName("Host_ContainerEntityTest");
@@ -131,15 +104,7 @@ class ContainerEntityTest extends WebTestCase
 
     public function testSetGetImage()
     {
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
-
-        $this->em->persist($container);
+        $container = $this->createContainer("SetGetImage_ContainerEntityTest");
 
 
         $image = new Image();
@@ -172,16 +137,10 @@ class ContainerEntityTest extends WebTestCase
         $this->em->flush();
 
 
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
+        $container = $this->createContainer("ProfileNames_ContainerEntityTest");
         $container->addProfile($profile);
 
-        $this->em->persist($container);
+        $this->em->flush();
 
 
         $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
@@ -203,16 +162,10 @@ class ContainerEntityTest extends WebTestCase
         $this->em->flush();
 
 
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
+        $container = $this->createContainer("ProfileIDs_ContainerEntityTest");
         $container->addProfile($profile);
 
-        $this->em->persist($container);
+        $this->em->flush();
 
 
         $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
@@ -237,5 +190,19 @@ class ContainerEntityTest extends WebTestCase
         $this->em->close();
     }
 
+    private function createContainer(string $name)
+    {
+        $container = new Container();
+        $container->setName($name);
+        $container->setState("testing");
+        $container->setArchitecture("x86_64");
+        $container->setEphemeral(false);
+        $container->setConfig([]);
+        $container->setDevices([]);
+
+        $this->em->persist($container);
+        $this->em->flush();
+        return $container;
+    }
 
 }
