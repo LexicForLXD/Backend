@@ -613,13 +613,9 @@ class Container
      */
     public function getProfileId()
     {
-        if ($this->profiles->isEmpty()) {
-            return null;
-        }
-
         return $this->profiles->map(function ($o) {
             return $o->getId();
-        });
+        })->toArray();
     }
 
     /**
