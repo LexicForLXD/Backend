@@ -27,8 +27,7 @@ class ContainerEntityTest extends WebTestCase
         static::$kernel->boot();
         $this->em = static::$kernel->getContainer()
             ->get('doctrine')
-            ->getManager()
-        ;
+            ->getManager();
 
     }
 
@@ -161,6 +160,68 @@ class ContainerEntityTest extends WebTestCase
 
         $this->em->remove($containerFromDb);
         $this->em->remove($image);
+        $this->em->flush();
+    }
+
+
+    public function testGetProfileNames()
+    {
+        $profile = new Profile();
+        $profile->setName("Profile_ContainerEntityTest");
+        $this->em->persist($profile);
+        $this->em->flush();
+
+
+        $container = new Container();
+        $container->setName("Container_ContainerEntityTest");
+        $container->setState("testing");
+        $container->setArchitecture("x86_64");
+        $container->setEphemeral(false);
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->addProfile($profile);
+
+        $this->em->persist($container);
+
+
+        $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
+
+
+        $this->assertEquals(["Profile_ContainerEntityTest"], $containerFromDb->getProfileNames());
+
+        $this->em->remove($containerFromDb);
+        $this->em->remove($profile);
+        $this->em->flush();
+    }
+
+
+    public function testGetProfileIds()
+    {
+        $profile = new Profile();
+        $profile->setName("Profile_ContainerEntityTest");
+        $this->em->persist($profile);
+        $this->em->flush();
+
+
+        $container = new Container();
+        $container->setName("Container_ContainerEntityTest");
+        $container->setState("testing");
+        $container->setArchitecture("x86_64");
+        $container->setEphemeral(false);
+        $container->setConfig([]);
+        $container->setDevices([]);
+        $container->addProfile($profile);
+
+        $this->em->persist($container);
+
+
+        $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
+
+
+        $this->assertEquals([$profile->getId()], $containerFromDb->getProfileId());
+
+        $this->em->remove($containerFromDb);
+        $this->em->remove($profile);
         $this->em->flush();
     }
 
