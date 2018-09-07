@@ -265,6 +265,250 @@ components:
           example: "daily"
         destination:
           $ref: "#/components/schemas/backupDestination"
+    container:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        hostId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: C1
+        ephemeral:
+          type: boolean
+          example: false
+        architecture:
+          type: string
+          example: x86_64
+        config:
+          type: object
+        expandedConfig:
+          type: object
+        devices:
+          type: object
+        expandedDevices:
+          type: object
+        profileIds:
+          type: array
+          items:
+            type: integer
+        state:
+          type: string
+          example: running
+    containerStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nagiosEnabled:
+          type: boolean
+          example: true
+        nagiosName:
+          type: string
+          example: ContainerWeb1
+        nagiosUrl:
+          type: string
+          example: https://nagios.example.com/pnp4nagios/
+        checkName:
+          type: string
+          example: check_http
+        sourceNumber:
+          type: integer
+          example: 1
+    host:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        ipv4:
+          type: string
+          example: "192.168.10.10"
+        ipv6:
+          type: string
+          example: fe80::50
+        domainName:
+          type: string
+          example: host.domain.de
+        mac:
+          type: string
+        port:
+          type: integer
+          example: 8443
+        authenticated:
+          type: boolean
+          example: false
+        containerIds:
+          type: array
+          items:
+            type: integer
+          example: [1, 2]
+        storagePoolIds:
+          type: array
+          items:
+            type: integer
+          example: [3, 4]
+    hostStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nagiosEnabled:
+          type: boolean
+          example: true
+        nagiosName:
+          type: string
+          example: Host1
+        nagiosUrl:
+          type: string
+          example: https://nagios.example.com/pnp4nagios/
+        checkName:
+          type: string
+          example: check_http
+        sourceNumber:
+          type: integer
+          example: 1
+    image:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        hostId:
+          type: integer
+          example: 1
+        fingerprint:
+          type: string
+          example: 459b996bc8db8701fcbe87c09dbb7412c4e52858f40bd60b3a99ce329d09850f
+        architecture:
+          type: string
+          example: x86_64
+        size:
+          type: integer
+        public:
+          type: boolean
+          example: false
+        filename:
+          type: string
+          example: imageName
+        finished:
+          type: boolean
+          example: false
+        aliases:
+          type: array
+          items:
+            $ref: "#/components/models/imageAlias"
+        properties:
+          type: object
+        containerId:
+          type: array
+          items:
+            type: integer
+    imageAlias:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Alias1
+        description:
+          type: string
+          example: Just a description
+    profile:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        hostId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Profile1
+        description:
+          type: string
+          example: Just a description+
+        config:
+          type: object
+        devices:
+          type: object
+        containerIds:
+          type: array
+          items:
+            type: integer
+    storagePool:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        hostId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: pool1
+        driver:
+          type: string
+          example: zfs
+        config:
+          type: object
+    job:
+      type: object
+      properties:
+        id:
+          type: integer
+        args:
+          type: string
+        className:
+          type: string
+        crcHash:
+          type: string
+        createdAt:
+          type: timestamp
+        startedAt:
+          type: timestamp
+        finishedAt:
+          type: timestamp
+        updatedAt:
+          type: timestamp
+        elapsed:
+          type: number
+        exceptions:
+          type: integer
+        failures:
+          type: integer
+        retries:
+          type: integer
+        stalls:
+          type: integer
+
+        maxExceptions:
+          type: integer
+        maxFailures:
+          type: integer
+        maxRetries:
+          type: integer
+        maxStalls:
+          type: integer
+        method:
+          type: string
+        runId:
+          type: string
+        status:
+          type: string
+        whenUs:
+          type: integer
+        workerName:
+          type: string
 
   #Responses
   responses:
