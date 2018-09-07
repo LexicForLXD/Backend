@@ -187,7 +187,7 @@ class ContainerEntityTest extends WebTestCase
         $container = $this->createContainer("GetBody_ContainerEntityTest");
         $body = $container->getBody();
 
-        $this->assertInteralType('array', $body);
+        $this->assertInternalType('array', $body);
         $this->assertEquals("GetBody_ContainerEntityTest", $body["name"]);
         $this->assertEquals("x86_64", $body["architecture"]);
         $this->assertEquals(false, $body["ephemeral"]);
