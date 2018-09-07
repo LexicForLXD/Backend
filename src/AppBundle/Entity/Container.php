@@ -52,6 +52,7 @@ class Container
 
     /**
      * @ORM\Column(type="json", nullable=true)
+     * @deprecated 2.0
      */
     protected $settings;
 
@@ -243,6 +244,7 @@ class Container
 
     /**
      * @return mixed
+     * @deprecated 2.0
      */
     public function getSettings()
     {
@@ -251,6 +253,7 @@ class Container
 
     /**
      * @param mixed $settings
+     * @deprecated 2.0
      */
     public function setSettings($settings)
     {
