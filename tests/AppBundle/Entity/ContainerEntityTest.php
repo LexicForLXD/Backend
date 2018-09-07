@@ -41,7 +41,7 @@ class ContainerEntityTest extends WebTestCase
         $this->assertEquals("WithoutAssoc_ContainerEntityTest", $containerFromDb->getName());
         $this->assertEquals("testing", $containerFromDb->getState());
         $this->assertEquals("x86_64", $containerFromDb->getArchitecture());
-        $this->assertEquals(false, $containerFromDb->isEpemeral());
+        $this->assertEquals(false, $containerFromDb->isEphemeral());
         $this->assertEquals([], $containerFromDb->getDevices());
         $this->assertEquals([], $containerFromDb->getConfig());
 
