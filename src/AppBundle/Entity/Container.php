@@ -511,11 +511,13 @@ class Container
     {
 
         $bodyDevices = $this->devices;
-        $bodyDevices["root"] = [
-            "path" => "/",
-            "type" => "disk",
-            "pool" => $this->storagePool->getName()
-        ];
+        if ($this->storagePool) {
+            $bodyDevices["root"] = [
+                "path" => "/",
+                "type" => "disk",
+                "pool" => $this->storagePool->getName()
+            ];
+        }
 
         $body = [
             "name" => $this->getName(),
