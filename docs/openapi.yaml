@@ -18,7 +18,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/backup"
         "404":
-          description: No Backups found
+          $ref: "#/components/responses/NotFound"
     post:
       summary: Stores a new manual backup.
       tags:
@@ -55,10 +55,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/backup"
         "400":
-          description: The provided parameters are invalid
+          $ref: "#/components/responses/BadRequest"
         "403":
           description: The backup token is invalid
-
   /backups/{id}:
     get:
       tags:
@@ -81,7 +80,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/backup"
         "404":
-          description: No Backup for the id found
+          $ref: "#/components/responses/NotFound"
     delete:
       tags:
         - backups
@@ -98,7 +97,7 @@ paths:
         "204":
           description: Backup for the provided id deleted
         "404":
-          description: No Backup for the id found
+          $ref: "#/components/responses/NotFound"
   /webhooks/backups:
     post:
       tags:
@@ -121,13 +120,83 @@ paths:
               schema:
                 $ref: "#/components/schemas/backup"
         "400":
-          description: The provided parameters are invalid
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          description: The backup token is invalid
+
+  /schedules:
+    get:
+      tags:
+        - backupSchedules
+      summary: Get all successful Backups
+      operationId: 'AppBundle\Controller\BackupScheduleController::getAllBackups'
+      responses:
+        "200":
+          description: List of all BackupSchedules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupSchedule"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Stores a new backupSchedule.
+      tags:
+        - backupSchedules
+      operationId: 'AppBundle\Controller\BackupScheduleController::storeBackupAction'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                executionTime:
+                  type: string
+                  enum:
+                    - "daily"
+                    - "weekly"
+                    - "monthly"
+                destination:
+                  type: integer
+                containerIds:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - destination
+                - containerIds
+                - name
+                - executionTime
+            example:
+              name: justabackup
+              description: Jus a description.
+              destination: 1
+              containerIds:
+                - 1
+                - 2
+              executionTime: daily
+      responses:
+        "201":
+          description: The new BackupSchedule object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupSchedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "403":
           description: The backup token is invalid
 
 components:
+  #Models
   schemas:
     backup:
+      type: object
       properties:
         id:
           type: integer
@@ -139,7 +208,7 @@ components:
         destinationId:
           type: integer
           example: 1
-        containerId:
+        containerIds:
           type: array
           items:
             type: integer
@@ -147,7 +216,12 @@ components:
         backupScheduleId:
           type: integer
           example: 2
-      type: object
+      example:
+        id: 1
+        timestamp: 2018-03-10T22:40:28+00:00
+        destinationId: 1
+        containerIds: [1, 2]
+        backupScheduleId: 1
     backupDestination:
       properties:
         id:
@@ -190,4 +264,40 @@ components:
           type: string
           example: "daily"
         destination:
-          type: object
+          $ref: "#/components/schemas/backupDestination"
+
+  #Responses
+  responses:
+    NotFound:
+      description: Entity was not found.
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: No <entity> for ID <ID> found
+    BadRequest:
+      description: There were some errors in the submitted data.
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: object
+                    properties:
+                      nameOfParameter:
+                        type: string
+                        example: The key is the parameter which has an error. The value is error.
