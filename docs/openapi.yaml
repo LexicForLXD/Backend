@@ -4,6 +4,7 @@ info:
   version: 1.0.0
   description: Central set of REST Api endpoints to manage multi LXD Host environments
 paths:
+  #Backups
   /backups:
     get:
       tags:
@@ -16,7 +17,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/backup"
+                type: array
+                items:
+                  $ref: "#/components/schemas/backup"
         "404":
           $ref: "#/components/responses/NotFound"
     post:
@@ -41,12 +44,12 @@ paths:
                 - destination
                 - containerIds
                 - name
-            example:
-              destination: 1
-              containerIds:
-                - 1
-                - 2
-              name: justabackup
+              example:
+                destination: 1
+                containerIds:
+                  - 1
+                  - 2
+                name: justabackup
       responses:
         "201":
           description: The new Backup object was created
@@ -123,7 +126,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           description: The backup token is invalid
-
+  #BackupSchedules
   /schedules:
     get:
       tags:
@@ -136,7 +139,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/backupSchedule"
+                type: array
+                items:
+                  $ref: "#/components/schemas/backupSchedule"
         "404":
           $ref: "#/components/responses/NotFound"
     post:
@@ -189,9 +194,497 @@ paths:
                 $ref: "#/components/schemas/backupSchedule"
         "400":
           $ref: "#/components/responses/BadRequest"
-        "403":
-          description: The backup token is invalid
+  /schedules/{id}:
+    get:
+      tags:
+        - backupSchedules
+      summary: Get single BackupSchedule by it's id
+      operationId: 'AppBundle\Controller\BackupScheduleController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the BackupSchedule
+          required: true
+          schema:
+            type: integer
 
+      responses:
+        "200":
+          description: Single BackupSchedule with the provided id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupSchedule"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - backupSchedules
+      summary: Delete an existing BackupSchedule
+      operationId: 'AppBundle\Controller\BackupScheduleController::deleteBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the BackupSchedule
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: BackupSchedule for the provided id deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - backupSchedules
+      summary: Update an existing BackupSchedule
+      operationId: 'AppBundle\Controller\BackupScheduleController::updateBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the BackupSchedule
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                executionTime:
+                  type: string
+                  enum:
+                    - "daily"
+                    - "weekly"
+                    - "monthly"
+                destination:
+                  type: integer
+                containerIds:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - destination
+                - containerIds
+                - name
+                - executionTime
+            example:
+              name: justabackup
+              description: Jus a description.
+              destination: 1
+              containerIds:
+                - 1
+                - 2
+              executionTime: daily
+      responses:
+        "200":
+          description: The BackupSchedule object was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupSchedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #backupDestinations
+  /backupdestinations:
+    get:
+      tags:
+        - backupDestinations
+      summary: Get all successful backupDestination
+      operationId: 'AppBundle\Controller\BackupDestinationController::getAllBackups'
+      responses:
+        "200":
+          description: List of all backupDestinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/backupDestination"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Stores a new backupDestination.
+      tags:
+        - backupDestinations
+      operationId: 'AppBundle\Controller\BackupDestinationController::storeBackupAction'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                hostname:
+                  type: string
+                protocol:
+                  type: string
+                path:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - protocol
+                - path
+            examples:
+              sftp:
+                summary: example for remote sftp
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: sftp
+                  path: /path/to/backupfolder
+                  hostname: remote.server.de
+                  username: user
+                  password: password
+              local:
+                summary: example for local filesystem
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: local
+      responses:
+        "201":
+          description: The new backupDestination object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupDestination"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /backupdestinations/{id}:
+    get:
+      tags:
+        - backupDestinations
+      summary: Get single backupDestination by it's id
+      operationId: 'AppBundle\Controller\BackupDestinationController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the backupDestination
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Single backupDestination with the provided id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupDestination"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - backupDestinations
+      summary: Delete an existing backupDestination
+      operationId: 'AppBundle\Controller\BackupDestinationController::deleteBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the backupDestination
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: backupDestination for the provided id deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - backupDestinations
+      summary: Update an existing backupDestination
+      operationId: 'AppBundle\Controller\BackupDestinationController::updateBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the backupDestination
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                hostname:
+                  type: string
+                protocol:
+                  type: string
+                path:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - protocol
+                - path
+            examples:
+              sftp:
+                summary: example for remote sftp
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: sftp
+                  path: /path/to/backupfolder
+                  hostname: remote.server.de
+                  username: user
+                  password: password
+              local:
+                summary: example for local filesystem
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: local
+      responses:
+        "200":
+          description: The backupDestination object was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupDestination"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #containers
+  /containers:
+    get:
+      tags:
+        - containers
+      summary: Get all containers
+      responses:
+        "200":
+          description: List of all containers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/container"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /hosts/{hostId}/containers:
+    get:
+      tags:
+        - containers
+      summary: Get all containers from one host
+      operationId: 'AppBundle\Controller\ContainerController::getAllBackups'
+      parameters:
+        - name: fresh
+          in: query
+          description: If the config of the containers should be fetch fresh from the lxc host. defaults to false
+          schema:
+            type: string
+            example: "true"
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of all containers from selected host
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/container"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Stores a new container.
+      tags:
+        - containers
+      operationId: 'AppBundle\Controller\ContainerController::storeBackupAction'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                architecture:
+                  type: string
+                ephemeral:
+                  type: boolean
+                config:
+                  type: object
+                devices:
+                  type: object
+                profiles:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - name
+                - protocol
+                - path
+            examples:
+              sftp:
+                summary: example for remote sftp
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: sftp
+                  path: /path/to/backupfolder
+                  hostname: remote.server.de
+                  username: user
+                  password: password
+              local:
+                summary: example for local filesystem
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: local
+      responses:
+        "201":
+          description: The new container object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /containers/{id}:
+    get:
+      tags:
+        - containers
+      summary: Get single container by it's id
+      operationId: 'AppBundle\Controller\ContainerController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Single container with the provided id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - containers
+      summary: Delete an existing container
+      operationId: 'AppBundle\Controller\ContainerController::deleteBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: container for the provided id deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - containers
+      summary: Update an existing container
+      operationId: 'AppBundle\Controller\ContainerController::updateBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                hostname:
+                  type: string
+                protocol:
+                  type: string
+                path:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - protocol
+                - path
+            examples:
+              sftp:
+                summary: example for remote sftp
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: sftp
+                  path: /path/to/backupfolder
+                  hostname: remote.server.de
+                  username: user
+                  password: password
+              local:
+                summary: example for local filesystem
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: local
+      responses:
+        "200":
+          description: The container object was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
   #Models
   schemas:
@@ -402,7 +895,7 @@ components:
         aliases:
           type: array
           items:
-            $ref: "#/components/models/imageAlias"
+            $ref: "#/components/schemas/imageAlias"
         properties:
           type: object
         containerId:
@@ -473,13 +966,13 @@ components:
         crcHash:
           type: string
         createdAt:
-          type: timestamp
+          type: string
         startedAt:
-          type: timestamp
+          type: string
         finishedAt:
-          type: timestamp
+          type: string
         updatedAt:
-          type: timestamp
+          type: string
         elapsed:
           type: number
         exceptions:
