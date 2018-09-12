@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Lexic API
-  version: 1.0.0
+  version: 0.9.9
   description: Central set of REST Api endpoints to manage multi LXD Host environments
 paths:
   #Backups
@@ -491,7 +491,6 @@ paths:
                   $ref: "#/components/schemas/container"
         "404":
           $ref: "#/components/responses/NotFound"
-
   /hosts/{hostId}/containers:
     get:
       tags:
@@ -501,7 +500,7 @@ paths:
       parameters:
         - name: fresh
           in: query
-          description: If the config of the containers should be fetch fresh from the lxc host. defaults to false
+          description: If the config of the containers should be fetched fresh from the lxc host. defaults to false
           schema:
             type: string
             example: "true"
@@ -532,45 +531,185 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                description:
-                  type: string
-                architecture:
-                  type: string
-                ephemeral:
-                  type: boolean
-                config:
-                  type: object
-                devices:
-                  type: object
-                profiles:
-                  type: array
-                  items:
-                    type: integer
-              required:
-                - name
-                - protocol
-                - path
+              oneOf:
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    architecture:
+                      type: string
+                      default: x86_64
+                    ephemeral:
+                      type: boolean
+                      default: false
+                    config:
+                      type: object
+                    devices:
+                      type: object
+                    storagePoolId:
+                      type: integer
+                    profiles:
+                      type: array
+                      items:
+                        type: integer
+                    fingerprint:
+                      type: string
+                  required:
+                    - name
+                    - storagePoolId
+                    - fingerprint
+                  example:
+                    name: c1
+                    description: Jus a description.
+                    architecture: x86_64
+                    storagePoolId: 1
+                    ephemeral: false
+                    profiles: [1, 2]
+                    fingerprint: 459b996bc8db8701fcbe87c09dbb7412c4e52858f40bd60b3a99ce329d09850fs
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    architecture:
+                      type: string
+                      default: x86_64
+                    ephemeral:
+                      type: boolean
+                      default: false
+                    config:
+                      type: object
+                    devices:
+                      type: object
+                    storagePoolId:
+                      type: integer
+                    profiles:
+                      type: array
+                      items:
+                        type: integer
+                    alias:
+                      type: string
+                  required:
+                    - name
+                    - storagePoolId
+                    - alias
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    architecture:
+                      type: string
+                      default: x86_64
+                    ephemeral:
+                      type: boolean
+                      default: false
+                    config:
+                      type: object
+                    devices:
+                      type: object
+                    storagePoolId:
+                      type: integer
+                    profiles:
+                      type: array
+                      items:
+                        type: integer
+                    oldContainerId:
+                      type: integer
+                    containerOnly:
+                      type: boolean
+                      default: true
+                  required:
+                    - name
+                    - storagePoolId
+                    - oldContainerId
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    architecture:
+                      type: string
+                      default: x86_64
+                    ephemeral:
+                      type: boolean
+                      default: false
+                    config:
+                      type: object
+                    devices:
+                      type: object
+                    storagePoolId:
+                      type: integer
+                    profiles:
+                      type: array
+                      items:
+                        type: integer
+                    oldContainerId:
+                      type: integer
+                    containerOnly:
+                      type: boolean
+                      default: true
+                    live:
+                      type: boolean
+                      default: false
+                  required:
+                    - name
+                    - storagePoolId
+                    - oldContainerId
+                  example:
+                    name: c4
+                    description: Jus a description.
+                    architecture: x86_64
+                    storagePoolId: 1
+                    ephemeral: false
+                    profiles: [1, 2]
+                    oldContainerId: 2
             examples:
-              sftp:
-                summary: example for remote sftp
+              fingerprint:
+                summary: example for fingerprint
                 value:
-                  name: backupDest1
+                  name: c1
                   description: Jus a description.
-                  protocol: sftp
-                  path: /path/to/backupfolder
-                  hostname: remote.server.de
-                  username: user
-                  password: password
-              local:
-                summary: example for local filesystem
+                  architecture: x86_64
+                  storagePoolId: 1
+                  ephemeral: false
+                  profiles: [1, 2]
+                  fingerprint: 459b996bc8db8701fcbe87c09dbb7412c4e52858f40bd60b3a99ce329d09850fs
+              alias:
+                summary: example for alias
                 value:
-                  name: backupDest1
+                  name: c2
                   description: Jus a description.
-                  protocol: local
+                  architecture: x86_64
+                  storagePoolId: 1
+                  ephemeral: false
+                  profiles: [1, 2]
+                  alias: 1
+              copy:
+                summary: example for copy
+                value:
+                  name: c3
+                  description: Jus a description.
+                  architecture: x86_64
+                  storagePoolId: 1
+                  ephemeral: false
+                  profiles: [1, 2]
+                  oldContainerId: 2
+              migration:
+                summary: example for migratioon
+                value:
+                  name: c4
+                  description: Jus a description.
+                  architecture: x86_64
+                  storagePoolId: 1
+                  ephemeral: false
+                  profiles: [1, 2]
+                  oldContainerId: 2
       responses:
         "201":
           description: The new container object was created
@@ -580,6 +719,8 @@ paths:
                 $ref: "#/components/schemas/container"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /containers/{id}:
     get:
       tags:
@@ -593,6 +734,12 @@ paths:
           required: true
           schema:
             type: integer
+        - name: fresh
+          in: query
+          description: If the config of the container should be fetched fresh from the lxc host. defaults to false
+          schema:
+            type: string
+            example: "true"
 
       responses:
         "200":
@@ -643,37 +790,17 @@ paths:
                   type: string
                 description:
                   type: string
-                hostname:
-                  type: string
-                protocol:
-                  type: string
-                path:
-                  type: string
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - name
-                - protocol
-                - path
-            examples:
-              sftp:
-                summary: example for remote sftp
-                value:
-                  name: backupDest1
-                  description: Jus a description.
-                  protocol: sftp
-                  path: /path/to/backupfolder
-                  hostname: remote.server.de
-                  username: user
-                  password: password
-              local:
-                summary: example for local filesystem
-                value:
-                  name: backupDest1
-                  description: Jus a description.
-                  protocol: local
+                ephemeral:
+                  type: boolean
+                  default: false
+                config:
+                  type: object
+                devices:
+                  type: object
+                profiles:
+                  type: array
+                  items:
+                    type: integer
       responses:
         "200":
           description: The container object was updated
@@ -685,6 +812,134 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
+
+  #containerStates
+  /containers/{containerId}/state:
+    get:
+      tags:
+        - containerStates
+      summary: Get state of container
+      operationId: 'AppBundle\Controller\ContainerStateController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: State of container
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/containerState"
+              example:
+                state: running
+                stateCode: 103
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - containerStates
+      summary: Update containers state
+      operationId: 'AppBundle\Controller\ContainerStateController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                timeout:
+                  type: integer
+                  default: 30
+                  description: in seconds
+                force:
+                  type: boolean
+                  default: false
+                stateful:
+                  type: boolean
+                  default: false
+              required:
+                - action
+      responses:
+        "200":
+          description: Single container updated with current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #hosts
+  /hosts:
+    get:
+      tags:
+        - hosts
+      summary: Gets all hosts
+      responses:
+        "200":
+          description: Array of hosts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/host"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - hosts
+      summary: Adds new host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                ipv4:
+                  type: string
+                ipv6:
+                  type: string
+                domainName:
+                  type: string
+                mac:
+                  type: string
+                port:
+                  type: integer
+                  default: 8443
+                password:
+                  type: string
+              required:
+                - name
+      responses:
+        "201":
+          description: The host object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/host"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
 components:
   #Models
   schemas:
@@ -791,6 +1046,15 @@ components:
         state:
           type: string
           example: running
+        storagePool:
+          $ref: "#/components/schemas/storagePool"
+    containerState:
+      type: object
+      properties:
+        state:
+          type: string
+        stateCode:
+          type: integer
     containerStatus:
       type: object
       properties:
