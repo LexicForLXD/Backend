@@ -821,7 +821,7 @@ paths:
       summary: Get state of container
       operationId: 'AppBundle\Controller\ContainerStateController::getBackupById'
       parameters:
-        - name: id
+        - name: containerId
           in: path
           description: Id of the container
           required: true
@@ -939,6 +939,121 @@ paths:
                 $ref: "#/components/schemas/host"
         "400":
           $ref: "#/components/responses/BadRequest"
+  /hosts/{hostId}:
+    get:
+      tags:
+        - hosts
+      summary: Get one hosts
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: One host
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/host"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - hosts
+      summary: Update a host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                ipv4:
+                  type: string
+                ipv6:
+                  type: string
+                domainName:
+                  type: string
+                mac:
+                  type: string
+                port:
+                  type: integer
+                  default: 8443
+              required:
+                - name
+      responses:
+        "200":
+          description: One host
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/host"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    delete:
+      tags:
+        - hosts
+      summary: Delete a host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "204":
+          description: Host was successful deleted.
+  /hosts/{hostId}/authentication:
+    post:
+      tags:
+        - hosts
+      summary: Authentcate a host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required:
+                - password
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "200":
+          description: Successful authenticated
+
+  #images
 
 components:
   #Models
