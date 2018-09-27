@@ -27,33 +27,24 @@ class ContainerEntityTest extends WebTestCase
         static::$kernel->boot();
         $this->em = static::$kernel->getContainer()
             ->get('doctrine')
-            ->getManager()
-        ;
+            ->getManager();
 
     }
 
     public function testSetterAllWithoutAssociations()
     {
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setSettings("Settings");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
-
-
-        $this->em->persist($container);
-        $this->em->flush();
+        $container = $this->createContainer("WithoutAssoc_ContainerEntityTest");
 
 
         $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
 
-        $this->assertEquals("Container_ContainerEntityTest", $containerFromDb->getName());
-        $this->assertEquals("Settings", $containerFromDb->getSettings());
+        $this->assertEquals("WithoutAssoc_ContainerEntityTest", $containerFromDb->getName());
         $this->assertEquals("testing", $containerFromDb->getState());
         $this->assertEquals("x86_64", $containerFromDb->getArchitecture());
+        $this->assertEquals(false, $containerFromDb->isEphemeral());
+        $this->assertEquals([], $containerFromDb->getDevices());
+        $this->assertEquals([], $containerFromDb->getConfig());
+
 
         $this->em->remove($containerFromDb);
         $this->em->flush();
@@ -63,15 +54,7 @@ class ContainerEntityTest extends WebTestCase
 
     public function testAddRemoveProfile()
     {
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
-
-        $this->em->persist($container);
+        $container = $this->createContainer("AddRemoveProfile_ContainerEntityTest");
 
         $profile = new Profile();
         $profile->setName("Profile_ContainerEntityTest");
@@ -99,15 +82,7 @@ class ContainerEntityTest extends WebTestCase
 
     public function testSetGetHost()
     {
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
-
-        $this->em->persist($container);
+        $container = $this->createContainer("SetGetHost_ContainerEntityTest");
 
         $host = new Host();
         $host->setName("Host_ContainerEntityTest");
@@ -132,15 +107,7 @@ class ContainerEntityTest extends WebTestCase
 
     public function testSetGetImage()
     {
-        $container = new Container();
-        $container->setName("Container_ContainerEntityTest");
-        $container->setState("testing");
-        $container->setArchitecture("x86_64");
-        $container->setEphemeral(false);
-        $container->setConfig([]);
-        $container->setDevices([]);
-
-        $this->em->persist($container);
+        $container = $this->createContainer("SetGetImage_ContainerEntityTest");
 
 
         $image = new Image();
@@ -165,6 +132,71 @@ class ContainerEntityTest extends WebTestCase
     }
 
 
+    public function testGetProfileNames()
+    {
+        $profile = new Profile();
+        $profile->setName("Profile_ContainerEntityTest");
+        $this->em->persist($profile);
+        $this->em->flush();
+
+
+        $container = $this->createContainer("ProfileNames_ContainerEntityTest");
+        $container->addProfile($profile);
+
+        $this->em->flush();
+
+
+        $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
+
+
+        $this->assertEquals(["Profile_ContainerEntityTest"], $containerFromDb->getProfileNames());
+
+        $this->em->remove($containerFromDb);
+        $this->em->remove($profile);
+        $this->em->flush();
+    }
+
+
+    public function testGetProfileIds()
+    {
+        $profile = new Profile();
+        $profile->setName("Profile_ContainerEntityTest");
+        $this->em->persist($profile);
+        $this->em->flush();
+
+
+        $container = $this->createContainer("ProfileIDs_ContainerEntityTest");
+        $container->addProfile($profile);
+
+        $this->em->flush();
+
+
+        $containerFromDb = $this->em->getRepository(Container::class)->find($container->getId());
+
+
+        $this->assertEquals([$profile->getId()], $containerFromDb->getProfileId());
+
+        $this->em->remove($containerFromDb);
+        $this->em->remove($profile);
+        $this->em->flush();
+    }
+
+
+    public function testGetBody()
+    {
+        $container = $this->createContainer("GetBody_ContainerEntityTest");
+        $body = $container->getBody();
+
+        $this->assertInternalType('array', $body);
+        $this->assertEquals("GetBody_ContainerEntityTest", $body["name"]);
+        $this->assertEquals("x86_64", $body["architecture"]);
+        $this->assertEquals(false, $body["ephemeral"]);
+        $this->assertEquals([], $body["config"]);
+
+        $this->em->remove($container);
+        $this->em->flush();
+    }
+
 
 
     /**
@@ -176,5 +208,19 @@ class ContainerEntityTest extends WebTestCase
         $this->em->close();
     }
 
+    private function createContainer(string $name)
+    {
+        $container = new Container();
+        $container->setName($name);
+        $container->setState("testing");
+        $container->setArchitecture("x86_64");
+        $container->setEphemeral(false);
+        $container->setConfig([]);
+        $container->setDevices([]);
+
+        $this->em->persist($container);
+        $this->em->flush();
+        return $container;
+    }
 
 }
