@@ -310,6 +310,20 @@ class BackupSchedule
     }
 
     /**
+     * returns an array of all backups
+     *
+     *
+     * @return array
+     * @JMS\VirtualProperty()
+     */
+    public function getBackupIds()
+    {
+        return $this->backups->map(function ($o) {
+            return $o->getId();
+        })->toArray();
+    }
+
+    /**
      * Adds a successful Backup to the BackupSchedule.
      * @param Backup $backup
      */
