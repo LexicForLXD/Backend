@@ -973,17 +973,11 @@
                         "description": "Body f\u00fcr die Aenderung eines Containers.",
                         "schema": {
                             "properties": {
-                                "architecture": {
-                                    "type": "string"
-                                },
                                 "config": {
                                     "type": "string"
                                 },
                                 "devices": {
                                     "type": "string"
-                                },
-                                "ephemeral": {
-                                    "type": "bool"
                                 },
                                 "profiles": {
                                     "type": "array"
