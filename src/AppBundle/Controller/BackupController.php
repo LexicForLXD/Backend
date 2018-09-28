@@ -325,4 +325,30 @@ class BackupController extends BaseController
     }
 
 
+    /**
+     * Return all backups from on schedule
+     * 
+     * @Route("/schedules/{scheduleId}/backups", name="get_schedule_backups", methods={"GET"})
+     *
+     * @param int $scheduleId
+     * @param EntityManagerInterface $em
+     * @throws ElementNotFoundException
+     * @return Response
+     */
+    public function getBackupsFromSchedule($scheduleId, EntityManagerInterface $em)
+    {
+        $backupSchedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($id);
+
+        if (!$backupSchedule) {
+            throw new ElementNotFoundException(
+                'No BackupSchedule for id ' . $scheduleId . ' found'
+            );
+        }
+
+        $backups = $backupSchedule->getBackups();
+
+        $serializer = $this->get('jms_serializer');
+        $response = $serializer->serialize($backups, 'json');
+        return new Response($response, 200);
+    }
 }

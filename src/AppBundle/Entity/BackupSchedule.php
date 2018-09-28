@@ -324,6 +324,16 @@ class BackupSchedule
     }
 
     /**
+     * Returns all associated backups
+     *
+     * @return ArrayCollection
+     */
+    public function getBackups()
+    {
+        return $this->backups;
+    }
+
+    /**
      * Adds a successful Backup to the BackupSchedule.
      * @param Backup $backup
      */
