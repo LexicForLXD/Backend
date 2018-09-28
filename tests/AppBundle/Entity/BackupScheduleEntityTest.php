@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Entity\BackupSchedule;
 use AppBundle\Entity\BackupDestination;
+use AppBundle\Entity\Container;
 
 
 class BackupScheduleEntityTest extends WebTestCase
@@ -85,7 +86,7 @@ class BackupScheduleEntityTest extends WebTestCase
         $this->em->flush();
     }
 
-    public function testSetterwithBackupSchedule()
+    public function testRemoveContainer()
     {
         $container = new Container();
         $container->setName("SchedSetTest" . mt_rand());
