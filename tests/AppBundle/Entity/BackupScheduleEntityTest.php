@@ -82,7 +82,7 @@ class BackupScheduleEntityTest extends WebTestCase
 
         $this->em->remove($container);
         $this->em->remove($destination);
-        $this->em->remove($destFromDB);
+        $this->em->remove($schedFromDB);
         $this->em->flush();
     }
 
