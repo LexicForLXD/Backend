@@ -297,16 +297,9 @@ class BackupSchedule
      */
     public function getContainerId()
     {
-        if ($this->containers->isEmpty()) {
-            return null;
-        }
-
-        $this->containers->first();
-        do {
-            $ids[] = $this->containers->current()->getId();
-        } while ($this->containers->next());
-
-        return $ids;
+        return $this->containers->map(function ($o) {
+            return $o->getId();
+        })->toArray();
     }
 
     /**
