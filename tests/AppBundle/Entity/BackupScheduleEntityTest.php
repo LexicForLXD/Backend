@@ -123,7 +123,7 @@ class BackupScheduleEntityTest extends WebTestCase
 
         $this->assertEquals([], $scheduleFromDB->getContainerId());
 
-        $this->em->remove($contianer);
+        $this->em->remove($container);
         $this->em->remove($scheduleFromDB);
         $this->em->flush();
 
