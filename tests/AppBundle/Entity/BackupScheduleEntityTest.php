@@ -69,7 +69,7 @@ class BackupScheduleEntityTest extends WebTestCase
 
         $this->em->flush();
 
-        $scheduleFromDB = $this->em->getRepository(BackupDestination::class)->find($destination->getId());
+        $schedFromDB = $this->em->getRepository(BackupSchedule::class)->find($schedule->getId());
 
 
         $this->assertEquals($schedule->getName(), $schedFromDB->getName());
@@ -105,7 +105,6 @@ class BackupScheduleEntityTest extends WebTestCase
         $schedule->setDescription('desc');
         $schedule->setExecutionTime('daily');
         $schedule->setType('full');
-        $schedule->setDestination($destination);
         $schedule->setWebhookUrl("testwebhook");
         $schedule->addContainer($container);
 
