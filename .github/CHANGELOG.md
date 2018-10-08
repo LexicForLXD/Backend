@@ -1,3 +1,10 @@
+## [0.9.10](https://github.com/LexicForLXD/Backend/compare/v0.9.9...v0.9.10) (2018-09-27)
+
+
+### Bug Fixes
+
+* backup destination not found ([4301688](https://github.com/LexicForLXD/Backend/commit/4301688))
+
 ## [0.9.9](https://github.com/LexicForLXD/Backend/compare/v0.9.8...v0.9.9) (2018-08-31)
 
 
