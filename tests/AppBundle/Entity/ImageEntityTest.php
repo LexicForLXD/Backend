@@ -165,8 +165,8 @@ class ImageEntityTest extends WebTestCase
         $this->em->flush();
 
         $imageFromDB = $this->em->getRepository(Image::class)->find($image->getId());
-        $this->assertEquals([$container->getId()], $imageFromDB->getContainerId());
         $containerFromDB = $this->em->getRepository(Container::class)->find($container->getId());
+        $this->assertEquals([$containerFromDB->getId()], $imageFromDB->getContainerId());
         $this->assertEquals($image, $containerFromDB->getImage());
 
         $image->removeContainer($container);
