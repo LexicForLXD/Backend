@@ -161,6 +161,7 @@ class ImageEntityTest extends WebTestCase
         $container->setDevices([]);
         $container->setImage($image);
 
+        $image->addContainer($container);
         $this->em->persist($container);
         $this->em->flush();
 
