@@ -461,7 +461,7 @@ class Container
     /**
      * @return Image
      */
-    public function getImage() : Image
+    public function getImage()
     {
         return $this->image;
     }
