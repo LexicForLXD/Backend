@@ -13,7 +13,7 @@ use AppBundle\Entity\User;
 use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Swagger\Annotations as OAS;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -172,8 +172,7 @@ class UserController extends BaseController
         $user->setLastName($request->request->get('lastName'));
         $user->setUsername($request->request->get('username'));
 
-        if($request->request->has('password'))
-        {
+        if ($request->request->has('password')) {
             $user->setPassword($encoder->encodePassword($user, $request->request->get('password')));
         }
 

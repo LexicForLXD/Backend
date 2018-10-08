@@ -27,7 +27,7 @@ use AppBundle\Entity\Profile;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Swagger\Annotations as OAS;
 
 

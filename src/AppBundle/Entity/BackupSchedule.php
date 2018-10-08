@@ -297,16 +297,33 @@ class BackupSchedule
      */
     public function getContainerId()
     {
-        if ($this->containers->isEmpty()) {
-            return null;
-        }
+        return $this->containers->map(function ($o) {
+            return $o->getId();
+        })->toArray();
+    }
 
-        $this->containers->first();
-        do {
-            $ids[] = $this->containers->current()->getId();
-        } while ($this->containers->next());
+    /**
+     * returns an array of all backups
+     *
+     *
+     * @return array
+     * @JMS\VirtualProperty()
+     */
+    public function getBackupIds()
+    {
+        return $this->backups->map(function ($o) {
+            return $o->getId();
+        })->toArray();
+    }
 
-        return $ids;
+    /**
+     * Returns all associated backups
+     *
+     * @return ArrayCollection
+     */
+    public function getBackups()
+    {
+        return $this->backups;
     }
 
     /**

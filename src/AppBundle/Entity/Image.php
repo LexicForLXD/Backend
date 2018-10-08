@@ -136,7 +136,7 @@ class Image
     /**
      * @return string | null
      */
-    public function getFingerprint() : ?string
+    public function getFingerprint() : ? string
     {
         return $this->fingerprint;
     }
@@ -160,7 +160,7 @@ class Image
     /**
      * @return string | null
      */
-    public function getArchitecture() : ?string
+    public function getArchitecture() : ? string
     {
         return $this->architecture;
     }
@@ -176,7 +176,7 @@ class Image
     /**
      * @return int | null
      */
-    public function getSize() : ?int
+    public function getSize() : ? int
     {
         return $this->size;
     }
@@ -218,7 +218,7 @@ class Image
     /**
      * @return bool
      */
-    public function isPublic(): bool
+    public function isPublic() : bool
     {
         return $this->public;
     }
@@ -234,7 +234,7 @@ class Image
     /**
      * @return string | null
      */
-    public function getFilename(): ?string
+    public function getFilename() : ? string
     {
         return $this->filename;
     }
@@ -250,7 +250,7 @@ class Image
     /**
      * @return array | null
      */
-    public function getProperties(): ?array
+    public function getProperties() : ? array
     {
         return $this->properties;
     }
@@ -263,7 +263,8 @@ class Image
         $this->properties = $properties;
     }
 
-    public function addAlias(ImageAlias $imageAlias){
+    public function addAlias(ImageAlias $imageAlias)
+    {
         if ($this->aliases->contains($imageAlias)) {
             return;
         }
@@ -271,14 +272,15 @@ class Image
         $imageAlias->setImage($this);
     }
 
-    public function removeAlias(ImageAlias $imageAlias){
+    public function removeAlias(ImageAlias $imageAlias)
+    {
         $this->aliases->removeElement($imageAlias);
     }
 
     /**
      * @return bool
      */
-    public function isFinished(): bool
+    public function isFinished() : bool
     {
         return $this->finished;
     }
@@ -294,7 +296,7 @@ class Image
     /**
      * @return string | null
      */
-    public function getError() : ?string
+    public function getError() : ? string
     {
         return $this->error;
     }
@@ -310,7 +312,7 @@ class Image
     /**
      * @return PersistentCollection
      */
-    public function getContainers(): PersistentCollection
+    public function getContainers() : PersistentCollection
     {
         return $this->containers;
     }
@@ -322,23 +324,17 @@ class Image
      *
      * @JMS\VirtualProperty()
      */
-    public function getContainerId(){
-        if($this->containers->isEmpty()){
-            return null;
-        }
-
-        $this->containers->first();
-        do{
-            $ids[] = $this->containers->current()->getId();
-        }while($this->containers->next());
-
-        return $ids;
+    public function getContainerId()
+    {
+        return $this->containers->map(function ($o) {
+            return $o->getId();
+        })->toArray();
     }
 
     /**
      * @param ArrayCollection $containers
      */
-    public function setContainers(ArrayCollection $containers): void
+    public function setContainers(ArrayCollection $containers) : void
     {
         $this->containers = $containers;
     }
@@ -350,6 +346,14 @@ class Image
         }
         $this->containers->add($container);
         $container->setImage($this);
+    }
+
+
+    public function removeContainer(Container $container)
+    {
+        if ($this->containers->removeElement($container)) {
+            $container->setImage();
+        }
     }
 
 

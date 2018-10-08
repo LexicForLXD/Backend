@@ -461,7 +461,7 @@ class Container
     /**
      * @return Image
      */
-    public function getImage() : Image
+    public function getImage()
     {
         return $this->image;
     }
@@ -469,7 +469,7 @@ class Container
     /**
      * @param Image $image
      */
-    public function setImage(Image $image) : void
+    public function setImage(Image $image = null) : void
     {
         $this->image = $image;
     }

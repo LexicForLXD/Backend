@@ -8,7 +8,7 @@ use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\ImageAliasApi;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Swagger\Annotations as OAS;
 use Symfony\Component\HttpFoundation\Response;
@@ -76,7 +76,7 @@ class ImageAliasController extends BaseController
             );
         }
 
-        if(!$image->isFinished()){
+        if (!$image->isFinished()) {
             throw new WrongInputException('ImageAlias creation is only supported for Images where the creation process is finished');
         }
 
@@ -93,8 +93,8 @@ class ImageAliasController extends BaseController
 
         $result = $imageAliasApi->createAliasForImageByFingerprint($image->getHost(), $imageAlias, $image->getFingerprint());
 
-        if($result->code != 201 || $result->body->status_code != 200){
-            throw new WrongInputException('LXD-Error - '.$result->body->error);
+        if ($result->code != 201 || $result->body->status_code != 200) {
+            throw new WrongInputException('LXD-Error - ' . $result->body->error);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -143,7 +143,8 @@ class ImageAliasController extends BaseController
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function deleteImageAlias($aliasId, ImageAliasApi $imageAliasApi){
+    public function deleteImageAlias($aliasId, ImageAliasApi $imageAliasApi)
+    {
         $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->find($aliasId);
 
         if (!$imageAlias) {
@@ -154,14 +155,14 @@ class ImageAliasController extends BaseController
 
         $image = $imageAlias->getImage();
 
-        if(!$image->isFinished()){
+        if (!$image->isFinished()) {
             throw new WrongInputException('Deleting of the ImageAlias for an Image which is in the creation process is not possible');
         }
 
         $result = $imageAliasApi->removeAliasByName($image->getHost(), $imageAlias->getName());
 
-        if($result->code != 200 || $result->body->status_code != 200){
-            throw new WrongInputException('LXD-Error - '.$result->body->error);
+        if ($result->code != 200 || $result->body->status_code != 200) {
+            throw new WrongInputException('LXD-Error - ' . $result->body->error);
         }
 
         $image->removeAlias($imageAlias);
@@ -229,7 +230,8 @@ class ImageAliasController extends BaseController
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws WrongInputExceptionArray
      */
-    public function editImageAlias($aliasId, Request $request,ImageAliasApi $imageAliasApi){
+    public function editImageAlias($aliasId, Request $request, ImageAliasApi $imageAliasApi)
+    {
         $imageAlias = $this->getDoctrine()->getRepository(ImageAlias::class)->find($aliasId);
 
         if (!$imageAlias) {
@@ -240,12 +242,12 @@ class ImageAliasController extends BaseController
 
         $image = $imageAlias->getImage();
 
-        if(!$image->isFinished()){
+        if (!$image->isFinished()) {
             throw new WrongInputException('Editing of the ImageAlias for an Image which is in the creation process is not possible');
         }
 
         $previousName = null;
-        if ($request->request->has('name')){
+        if ($request->request->has('name')) {
             $previousName = $imageAlias->getName();
             $imageAlias->setName($request->request->get('name'));
         }
@@ -262,18 +264,18 @@ class ImageAliasController extends BaseController
         }
 
         //Check if a name update via LXD is necessary
-        if($previousName != null && $previousName != $imageAlias->getName()){
+        if ($previousName != null && $previousName != $imageAlias->getName()) {
             $result = $imageAliasApi->editAliasName($image->getHost(), $imageAlias, $previousName);
-            if($result->code != 201 || $result->body->status_code != 200){
-                throw new WrongInputException('LXD-Error - '.$result->body->error);
+            if ($result->code != 201 || $result->body->status_code != 200) {
+                throw new WrongInputException('LXD-Error - ' . $result->body->error);
             }
         }
 
         //Check if a description update via LXD is necessary
-        if($previousDescription != null && $previousDescription != $imageAlias->getDescription()){
+        if ($previousDescription != null && $previousDescription != $imageAlias->getDescription()) {
             $result = $imageAliasApi->editAliasDescription($image->getHost(), $imageAlias);
-            if($result->code != 200 || $result->body->status_code != 200){
-                throw new WrongInputException('LXD-Error - '.$result->body->error);
+            if ($result->code != 200 || $result->body->status_code != 200) {
+                throw new WrongInputException('LXD-Error - ' . $result->body->error);
             }
         }
 
