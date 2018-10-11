@@ -365,10 +365,6 @@ class BackupDestination
      */
     public function setPath($path)
     {
-        if (substr($path, 0, 1) == '/') {
-            $path = substr_replace($path, '', 0, 1);
-        }
-
         if (substr($path, -1) == '/') {
             $path = substr_replace($path, '', -1);
         }
