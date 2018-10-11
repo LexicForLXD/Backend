@@ -421,7 +421,8 @@ class BackupControllerTest extends WebTestCase
             )
         );
 
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals([], $client->getResponse()->getContent());
 
         $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
 
