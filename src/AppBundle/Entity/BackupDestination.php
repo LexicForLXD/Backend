@@ -386,6 +386,7 @@ class BackupDestination
      */
     public function getDestinationText(String $backupName = "")
     {
+        $backupName = str_replace(" ", "", $backupName);
         if ($this->username) {
             if ($this->password) {
                 return $this->protocol . '://' . $this->username . ':' . $this->password . '@' . $this->hostname . '/' . $this->path . '/' . $backupName;
