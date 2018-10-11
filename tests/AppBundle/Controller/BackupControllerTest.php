@@ -361,6 +361,8 @@ class BackupControllerTest extends WebTestCase
         $this->em->persist($backup);
         $this->em->flush();
 
+        $client = static::createClient();
+
         $client->request(
             'GET',
             '/schedules/' . $backupSchedule->getId() . '/backups',
@@ -391,6 +393,41 @@ class BackupControllerTest extends WebTestCase
         $this->em->remove($backupDestination);
         $this->em->remove($container);
         $this->em->remove($host);
+        $this->em->flush();
+    }
+
+    public function testBackupFromScheduleNotFound()
+    {
+
+        $backupSchedule = new BackupSchedule();
+        $backupSchedule->setExecutionTime("daily");
+        $backupSchedule->setName("TestBackupPlan" . mt_rand());
+        $backupSchedule->setType("full");
+        $backupSchedule->setDestination($backupDestination);
+        $backupSchedule->setWebhookUrl("testWebhookUrl");
+        $backupSchedule->addContainer($container);
+
+        $this->em->persist($backupSchedule);
+        $this->em->flush();
+
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/schedules/' . $backupSchedule->getId() . '/backups',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+
+        $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
+
+        $this->em->remove($backupSchedule);
         $this->em->flush();
     }
 
