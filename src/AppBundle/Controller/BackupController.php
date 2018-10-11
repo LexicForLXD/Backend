@@ -347,7 +347,7 @@ class BackupController extends BaseController
 
         $backups = $backupSchedule->getBackups();
 
-        if (count($backup) == 0) {
+        if (count($backups) == 0) {
             throw new ElementNotFoundException(
                 'No Backups for schedule ' . $scheduleId . ' found'
             );
