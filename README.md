@@ -1,0 +1,2 @@
+# Backend
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1ec4483b01044b448a57242390642077)](https://app.codacy.com/app/LexicForLXD/Backend?utm_source=github.com&utm_medium=referral&utm_content=LexicForLXD/Backend&utm_campaign=Badge_Grade_Settings)
