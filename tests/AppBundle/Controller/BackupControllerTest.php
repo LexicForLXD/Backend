@@ -316,13 +316,13 @@ class BackupControllerTest extends WebTestCase
     public function testBackupFromSchedule()
     {
         $host = new Host();
-        $host->setName("Test-Host1111" . mt_rand());
+        $host->setName("testBackupFromSchedule" . mt_rand());
         $host->setDomainName("test." . mt_rand() . ".de");
         $host->setPort(8443);
         $host->setSettings("settings");
 
         $container = new Container();
-        $container->setName("testContainerBackupWebhook" . mt_rand());
+        $container->setName("testBackupFromSchedule" . mt_rand());
         $container->setHost($host);
         $container->setState('stopped');
         $container->setEphemeral(false);
@@ -331,7 +331,7 @@ class BackupControllerTest extends WebTestCase
         $container->setDevices([]);
 
         $backupDestination = new BackupDestination();
-        $backupDestination->setName("testBackupDestWebhook" . mt_rand());
+        $backupDestination->setName("testBackupFromSchedule" . mt_rand());
         $backupDestination->setDescription("Desc");
         $backupDestination->setHostname("test.local");
         $backupDestination->setProtocol("scp");
@@ -340,7 +340,7 @@ class BackupControllerTest extends WebTestCase
 
         $backupSchedule = new BackupSchedule();
         $backupSchedule->setExecutionTime("daily");
-        $backupSchedule->setName("TestBackupPlan" . mt_rand());
+        $backupSchedule->setName("TestBackupFromSchedule" . mt_rand());
         $backupSchedule->setType("full");
         $backupSchedule->setDestination($backupDestination);
         $backupSchedule->setWebhookUrl("testWebhookUrl");
@@ -401,7 +401,7 @@ class BackupControllerTest extends WebTestCase
 
         $backupSchedule = new BackupSchedule();
         $backupSchedule->setExecutionTime("daily");
-        $backupSchedule->setName("TestBackupPlan" . mt_rand());
+        $backupSchedule->setName("TestBackupFromScheduleNotFound" . mt_rand());
         $backupSchedule->setType("full");
         $backupSchedule->setWebhookUrl("testWebhookUrl");
 
