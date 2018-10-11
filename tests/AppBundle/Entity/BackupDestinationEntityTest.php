@@ -96,6 +96,75 @@ class BackupDestinationEntityTest extends WebTestCase
     }
 
 
+    public function testAbsolutePath()
+    {
+        $destination = new BackupDestination();
+        $destination->setName('DestTestAbsolutePath' . mt_rand());
+        $destination->setDescription('AbsolutePathDesc');
+        $destination->setHostname('pc.local');
+        $destination->setPath('/home/test/backup');
+        $destination->setProtocol('scp');
+
+        $this->assertEquals("scp://pc.local//home/test/backup/backupname", $destination->getDestinationText("backupname"));
+    }
+
+    public function testRelativePath()
+    {
+        $destination = new BackupDestination();
+        $destination->setName('DestTestRelativePath' . mt_rand());
+        $destination->setDescription('RelativePathDesc');
+        $destination->setHostname('pc.local');
+        $destination->setPath('home/test/backup');
+        $destination->setProtocol('scp');
+
+        $this->assertEquals("scp://pc.local/home/test/backup/backupname", $destination->getDestinationText("backupname"));
+    }
+
+
+    public function testTextWithPasswordAndUser()
+    {
+        $destination = new BackupDestination();
+        $destination->setName('DestTestWithPassword' . mt_rand());
+        $destination->setDescription('WithPasswordDesc');
+        $destination->setHostname('pc.local');
+        $destination->setPath('home/test/backup');
+        $destination->setProtocol('scp');
+        $destination->setUsername('backup');
+        $destination->setPassword("password");
+
+        $this->assertEquals("scp://backup:password@pc.local/home/test/backup/backupname", $destination->getDestinationText("backupname"));
+    }
+
+
+    public function testTextWithUser()
+    {
+        $destination = new BackupDestination();
+        $destination->setName('DestTestWithUser' . mt_rand());
+        $destination->setDescription('WithUserDesc');
+        $destination->setHostname('pc.local');
+        $destination->setPath('home/test/backup');
+        $destination->setProtocol('scp');
+        $destination->setUsername('backup');
+
+        $this->assertEquals("scp://backup@pc.local/home/test/backup/backupname", $destination->getDestinationText("backupname"));
+    }
+
+
+    public function testTextWithoutPasswordAndUser()
+    {
+        $destination = new BackupDestination();
+        $destination->setName('DestTestWithPassword' . mt_rand());
+        $destination->setDescription('WithPasswordDesc');
+        $destination->setHostname('pc.local');
+        $destination->setPath('home/test/backup');
+        $destination->setProtocol('scp');
+
+        $this->assertEquals("scp://pc.local/home/test/backup/backupname", $destination->getDestinationText("backupname"));
+    }
+
+
+
+
 
     /**
      * {@inheritDoc}
@@ -105,4 +174,6 @@ class BackupDestinationEntityTest extends WebTestCase
         parent::tearDown();
         $this->em->close();
     }
+
+
 }
