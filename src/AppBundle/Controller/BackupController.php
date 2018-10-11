@@ -354,8 +354,9 @@ class BackupController extends BaseController
                 'No Backups for schedule ' . $scheduleId . ' found'
             );
         }
-
-        $backups = array_slice($backups, 0, $count);
+        if ($count) {
+            $backups = array_slice($backups, 0, $count);
+        }
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($backups, 'json');
