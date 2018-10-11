@@ -337,6 +337,8 @@ class BackupController extends BaseController
      */
     public function getBackupsFromSchedule($scheduleId, EntityManagerInterface $em)
     {
+        $count = $request->query->get('count');
+
         $backupSchedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($scheduleId);
 
         if (!$backupSchedule) {
@@ -352,6 +354,8 @@ class BackupController extends BaseController
                 'No Backups for schedule ' . $scheduleId . ' found'
             );
         }
+
+        $backups = array_slice($backups, 0, $count);
 
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($backups, 'json');
