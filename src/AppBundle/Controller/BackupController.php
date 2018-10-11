@@ -337,7 +337,7 @@ class BackupController extends BaseController
      */
     public function getBackupsFromSchedule($scheduleId, EntityManagerInterface $em)
     {
-        $backupSchedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($id);
+        $backupSchedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($scheduleId);
 
         if (!$backupSchedule) {
             throw new ElementNotFoundException(
