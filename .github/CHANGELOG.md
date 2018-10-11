@@ -1,3 +1,13 @@
+## [0.10.1](https://github.com/LexicForLXD/Backend/compare/v0.10.0...v0.10.1) (2018-10-11)
+
+
+### Bug Fixes
+
+* delete temp folder after script execution fixes [#236](https://github.com/LexicForLXD/Backend/issues/236) ([b77160e](https://github.com/LexicForLXD/Backend/commit/b77160e))
+* Escape spacing in destination text fixes [#229](https://github.com/LexicForLXD/Backend/issues/229) ([026b04d](https://github.com/LexicForLXD/Backend/commit/026b04d))
+* Escape spacing on backup schedule refers # 229 ([aaa16ed](https://github.com/LexicForLXD/Backend/commit/aaa16ed))
+* Leading "/" removed from destination path fixes [#237](https://github.com/LexicForLXD/Backend/issues/237) ([141eff6](https://github.com/LexicForLXD/Backend/commit/141eff6))
+
 # [0.10.0](https://github.com/LexicForLXD/Backend/compare/v0.9.10...v0.10.0) (2018-10-08)
 
 
