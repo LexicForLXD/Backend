@@ -365,10 +365,6 @@ class BackupDestination
      */
     public function setPath($path)
     {
-        if (substr($path, 0, 1) == '/') {
-            $path = substr_replace($path, '', 0, 1);
-        }
-
         if (substr($path, -1) == '/') {
             $path = substr_replace($path, '', -1);
         }
@@ -386,6 +382,7 @@ class BackupDestination
      */
     public function getDestinationText(String $backupName = "")
     {
+        $backupName = str_replace(" ", "", $backupName);
         if ($this->username) {
             if ($this->password) {
                 return $this->protocol . '://' . $this->username . ':' . $this->password . '@' . $this->hostname . '/' . $this->path . '/' . $backupName;
