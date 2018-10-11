@@ -403,9 +403,7 @@ class BackupControllerTest extends WebTestCase
         $backupSchedule->setExecutionTime("daily");
         $backupSchedule->setName("TestBackupPlan" . mt_rand());
         $backupSchedule->setType("full");
-        $backupSchedule->setDestination($backupDestination);
         $backupSchedule->setWebhookUrl("testWebhookUrl");
-        $backupSchedule->addContainer($container);
 
         $this->em->persist($backupSchedule);
         $this->em->flush();
