@@ -1,3 +1,16 @@
+# [0.10.0](https://github.com/LexicForLXD/Backend/compare/v0.9.10...v0.10.0) (2018-10-08)
+
+
+### Bug Fixes
+
+* delete used image references [#231](https://github.com/LexicForLXD/Backend/issues/231) ([539b11f](https://github.com/LexicForLXD/Backend/commit/539b11f))
+* get backups of schedule refers LexicForLxd/web-frontend[#88](https://github.com/LexicForLXD/Backend/issues/88) ([d80cff5](https://github.com/LexicForLXD/Backend/commit/d80cff5))
+
+
+### Features
+
+* get backups from schedule ([f8f87a6](https://github.com/LexicForLXD/Backend/commit/f8f87a6))
+
 ## [0.9.10](https://github.com/LexicForLXD/Backend/compare/v0.9.9...v0.9.10) (2018-09-27)
 
 

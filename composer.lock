@@ -1329,16 +1329,16 @@
         },
         {
             "name": "friendsofsymfony/rest-bundle",
-            "version": "2.3.1",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSRestBundle.git",
-                "reference": "1abdf3d82502ac67b93c7f84c844fa147f0ec70e"
+                "reference": "3725279a6554c1d894eee0b377f49d3f69e3c217"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSRestBundle/zipball/1abdf3d82502ac67b93c7f84c844fa147f0ec70e",
-                "reference": "1abdf3d82502ac67b93c7f84c844fa147f0ec70e",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSRestBundle/zipball/3725279a6554c1d894eee0b377f49d3f69e3c217",
+                "reference": "3725279a6554c1d894eee0b377f49d3f69e3c217",
                 "shasum": ""
             },
             "require": {
@@ -1372,10 +1372,10 @@
                 "symfony/asset": "^2.7|^3.0|^4.0",
                 "symfony/browser-kit": "^2.7|^3.0|^4.0",
                 "symfony/css-selector": "^2.7|^3.0|^4.0",
-                "symfony/dependency-injection": "^2.7|^3.0|^4.0",
+                "symfony/dependency-injection": "^2.7.20|^3.0|^4.0",
                 "symfony/expression-language": "~2.7|^3.0|^4.0",
                 "symfony/form": "^2.7|^3.0|^4.0",
-                "symfony/phpunit-bridge": "^3.2|^4.0",
+                "symfony/phpunit-bridge": "^4.0",
                 "symfony/security-bundle": "^2.7|^3.0|^4.0",
                 "symfony/serializer": "^2.7.11|^3.0.4|^4.0",
                 "symfony/twig-bundle": "^2.7|^3.0|^4.0",
@@ -1385,7 +1385,7 @@
             },
             "suggest": {
                 "jms/serializer-bundle": "Add support for advanced serialization capabilities, recommended, requires ^1.0",
-                "sensio/framework-extra-bundle": "Add support for route annotations and the view response listener, requires ^3.0",
+                "sensio/framework-extra-bundle": "Add support for the request body converter and the view response listener, requires ^3.0",
                 "symfony/expression-language": "Add support for using the expression language in the routing, requires ^2.7|^3.0",
                 "symfony/serializer": "Add support for basic serialization capabilities and xml decoding, requires ^2.7|^3.0",
                 "symfony/validator": "Add support for validation capabilities in the ParamFetcher, requires ^2.7|^3.0"
@@ -1393,7 +1393,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.4-dev"
                 }
             },
             "autoload": {
@@ -1427,7 +1427,7 @@
             "keywords": [
                 "rest"
             ],
-            "time": "2018-02-28T13:57:04+00:00"
+            "time": "2018-08-21T16:54:14+00:00"
         },
         {
             "name": "herzult/php-ssh",
@@ -1830,16 +1830,16 @@
         },
         {
             "name": "mmucklo/grid-bundle",
-            "version": "4.0.7",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmucklo/DtcGridBundle.git",
-                "reference": "091323fd618a459a4d4397264bebbbaf06ea0b5c"
+                "reference": "c7affd748abec33a810c21e541b77ae857519df5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmucklo/DtcGridBundle/zipball/091323fd618a459a4d4397264bebbbaf06ea0b5c",
-                "reference": "091323fd618a459a4d4397264bebbbaf06ea0b5c",
+                "url": "https://api.github.com/repos/mmucklo/DtcGridBundle/zipball/c7affd748abec33a810c21e541b77ae857519df5",
+                "reference": "c7affd748abec33a810c21e541b77ae857519df5",
                 "shasum": ""
             },
             "require": {
@@ -1891,26 +1891,26 @@
                 "jqgrid",
                 "table"
             ],
-            "time": "2018-02-24T16:15:12+00:00"
+            "time": "2018-07-13T01:57:40+00:00"
         },
         {
             "name": "mmucklo/queue-bundle",
-            "version": "4.5.2",
+            "version": "4.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mmucklo/DtcQueueBundle.git",
-                "reference": "f78d8a866e67280a90e499450e51e3bf11ece997"
+                "reference": "cb8a803be01d578ad04997a2a68e6d6b20669877"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mmucklo/DtcQueueBundle/zipball/f78d8a866e67280a90e499450e51e3bf11ece997",
-                "reference": "f78d8a866e67280a90e499450e51e3bf11ece997",
+                "url": "https://api.github.com/repos/mmucklo/DtcQueueBundle/zipball/cb8a803be01d578ad04997a2a68e6d6b20669877",
+                "reference": "cb8a803be01d578ad04997a2a68e6d6b20669877",
                 "shasum": ""
             },
             "require": {
                 "cocur/background-process": ">=0.7",
                 "dstuecken/php7ify": ">=1.1",
-                "mmucklo/grid-bundle": ">=4.0.6",
+                "mmucklo/grid-bundle": ">=4.2.0",
                 "php": ">=5.6",
                 "sensio/framework-extra-bundle": "2.*|3.*|4.*|5.*",
                 "symfony/framework-bundle": ">=2.7|>=3.3|4.*"
@@ -1987,7 +1987,7 @@
                 "redis",
                 "symfony"
             ],
-            "time": "2018-05-24T16:21:51+00:00"
+            "time": "2018-07-15T22:34:22+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -4413,16 +4413,16 @@
         },
         {
             "name": "symfony/phpunit-bridge",
-            "version": "v4.1.0",
+            "version": "v4.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/phpunit-bridge.git",
-                "reference": "b3451fc442baaf9169e50491a059ef17582c4424"
+                "reference": "2474c5d4a5e3431fee2f6f0dddde9d34983d9ceb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/b3451fc442baaf9169e50491a059ef17582c4424",
-                "reference": "b3451fc442baaf9169e50491a059ef17582c4424",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/2474c5d4a5e3431fee2f6f0dddde9d34983d9ceb",
+                "reference": "2474c5d4a5e3431fee2f6f0dddde9d34983d9ceb",
                 "shasum": ""
             },
             "require": {
@@ -4475,7 +4475,7 @@
             ],
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
-            "time": "2018-05-25T14:55:38+00:00"
+            "time": "2018-10-02T12:40:59+00:00"
         }
     ],
     "aliases": [],
