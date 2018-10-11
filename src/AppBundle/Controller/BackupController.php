@@ -347,6 +347,12 @@ class BackupController extends BaseController
 
         $backups = $backupSchedule->getBackups();
 
+        if (count($backup) == 0) {
+            throw new ElementNotFoundException(
+                'No Backups for schedule ' . $scheduleId . ' found'
+            );
+        }
+
         $serializer = $this->get('jms_serializer');
         $response = $serializer->serialize($backups, 'json');
         return new Response($response, 200);
