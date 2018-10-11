@@ -363,13 +363,15 @@ class BackupSchedule
         $commandTexts = '#!/bin/sh
 
         ';
+        
+        $backupName = str_replace(" ", "", $this->name);
 
 
         foreach ($this->containers as $container) {
             $commandTexts = $commandTexts . '
                 # Backup for Container ' . $container->getName() . ' to ' . $this->destination->getName() . '
 
-                DIRECTORY=/tmp/' . $this->name . '/
+                DIRECTORY=/tmp/' . $backupName . '/
                 CONTAINER=' . $container->getName() . '
 
                 # Just generating a random number
@@ -404,11 +406,11 @@ class BackupSchedule
         if ($this->type == "incremental") {
             $commandTexts = $commandTexts .
                 '# Backup via duplicity
-                duplicity --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText($this->name);
+                duplicity --no-encryption /tmp/' . $backupName . ' ' . $this->destination->getDestinationText($this->name);
         } else {
             $commandTexts = $commandTexts .
                 '# Backup via duplicity
-                duplicity ' . $this->type . ' --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText($this->name);
+                duplicity ' . $this->type . ' --no-encryption /tmp/' . $backupName . ' ' . $this->destination->getDestinationText($this->name);
         }
         
         $commandTexts = $commandTexts .
