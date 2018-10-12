@@ -335,8 +335,10 @@ class BackupController extends BaseController
      * @throws ElementNotFoundException
      * @return Response
      */
-    public function getBackupsFromSchedule($scheduleId, EntityManagerInterface $em)
+    public function getBackupsFromSchedule(Request $request, $scheduleId, EntityManagerInterface $em)
     {
+        $count = $request->query->get('count');
+
         $backupSchedule = $this->getDoctrine()->getRepository(BackupSchedule::class)->find($scheduleId);
 
         if (!$backupSchedule) {
@@ -351,6 +353,9 @@ class BackupController extends BaseController
             throw new ElementNotFoundException(
                 'No Backups for schedule ' . $scheduleId . ' found'
             );
+        }
+        if ($count) {
+            $backups = array_slice($backups, 0, $count);
         }
 
         $serializer = $this->get('jms_serializer');
