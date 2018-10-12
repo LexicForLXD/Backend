@@ -335,7 +335,7 @@ class BackupController extends BaseController
      * @throws ElementNotFoundException
      * @return Response
      */
-    public function getBackupsFromSchedule($scheduleId, EntityManagerInterface $em)
+    public function getBackupsFromSchedule(Request $request, $scheduleId, EntityManagerInterface $em)
     {
         $count = $request->query->get('count');
 
