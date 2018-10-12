@@ -1,3 +1,10 @@
+## [0.10.2](https://github.com/LexicForLXD/Backend/compare/v0.10.1...v0.10.2) (2018-10-12)
+
+
+### Bug Fixes
+
+* count for backups from schedule ([90df513](https://github.com/LexicForLXD/Backend/commit/90df513))
+
 ## [0.10.1](https://github.com/LexicForLXD/Backend/compare/v0.10.0...v0.10.1) (2018-10-11)
 
 
