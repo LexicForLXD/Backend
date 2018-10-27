@@ -1054,6 +1054,122 @@ paths:
           description: Successful authenticated
 
   #images
+  /images:
+    get:
+      tags:
+        - images
+      summary: Get all images
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "200":
+          description: Array of images.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/image"
+  /hosts/{hostId}/images:
+    get:
+      tags:
+        - images
+      summary: Get all images from on host.
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "200":
+          description: Array of images.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/image"
+    post:
+      tags:
+        - images
+      summary: Create new image on host.
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "container"
+                        - "image"
+                        - "url"
+                    name:
+                      type: string
+                      description: Container name if type == container
+                    server:
+                      type: string
+                      description: server if type == image
+                    protocol:
+                      type: string
+                      enum:
+                        - "lxd"
+                        - "simplestreams"
+                      default: "lxd"
+                    secret:
+                      type: string
+                    certificate:
+                      type: string
+                    fingerprint:
+                      type: string
+                    alias:
+                      type: string
+
+                filename:
+                  type: string
+                public:
+                  type: boolean
+                properties:
+                  type: object
+                auto_update:
+                  type: boolean
+                aliases:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      description:
+                        type: string
+
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "201":
+          description: Created image.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/image"
+        "400":
+          $ref: "#/components/responses/WrongInput"
 
 components:
   #Models
