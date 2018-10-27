@@ -27,9 +27,10 @@ class CorsProxyController extends BaseController
      * @throws ConnectionErrorException
      * @throws WrongInputException
      */
-    public function corsProxy(CorsProxyApi $api, Request $request){
+    public function corsProxy(CorsProxyApi $api, Request $request)
+    {
         $url = $request->query->get('url');
-        if(!$url){
+        if (!$url) {
             throw new WrongInputException("No URL provided");
         }
         $result = $api->getUrl($url);

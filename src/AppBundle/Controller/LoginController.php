@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -10,7 +11,7 @@ namespace AppBundle\Controller;
 
 use FOS\OAuthServerBundle\Controller\TokenController;
 use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
@@ -26,8 +27,7 @@ class LoginController extends BaseController
      */
     public function loginAction(Request $request, TokenController $tokenController)
     {
-        if($this->getParameter('web_frontend_domain') != $request->getHost())
-        {
+        if ($this->getParameter('web_frontend_domain') != $request->getHost()) {
             throw new AccessDeniedException("This endpoint is only available to first party clients");
         }
 
@@ -50,10 +50,9 @@ class LoginController extends BaseController
      * @param TokenController $tokenController
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function refreshAction(Request $request ,TokenController $tokenController)
+    public function refreshAction(Request $request, TokenController $tokenController)
     {
-        if($this->getParameter('web_frontend_domain') != $request->getHost())
-        {
+        if ($this->getParameter('web_frontend_domain') != $request->getHost()) {
             throw new AccessDeniedException("This endpoint is only available to first party clients");
         }
 

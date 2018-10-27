@@ -20,12 +20,13 @@ class OperationRelayController extends BaseController
      * @return Response
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function getOperationsFromHost($hostId, $operationsId, OperationsRelayApi $api){
+    public function getOperationsFromHost($hostId, $operationsId, OperationsRelayApi $api)
+    {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw $this->createNotFoundException(
-                'No Host with id '.$hostId.' found'
+                'No Host with id ' . $hostId . ' found'
             );
         }
 

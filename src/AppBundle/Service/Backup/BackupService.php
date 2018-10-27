@@ -82,7 +82,7 @@ class BackupService
 
         $exec = $session->getExec();
 
-        $result = $exec->run('duplicity --no-encryption /tmp/' . $backup->getManualBackupName() . ' ' . $destination->getDestinationText($backup->getManualBackupName()));
+        $result = $exec->run('duplicity --no-encryption /tmp/' . $backup->getManualBackupName() . ' ' . $backup->getDestination()->getDestinationText($backup->getManualBackupName()));
 
         if (strpos($result, 'Error') !== false) {
             return substr($result, strpos($result, 'Error'));

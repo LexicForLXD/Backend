@@ -313,6 +313,122 @@ class BackupControllerTest extends WebTestCase
         $this->assertNull($backup);
     }
 
+    public function testBackupFromSchedule()
+    {
+        $host = new Host();
+        $host->setName("testBackupFromSchedule" . mt_rand());
+        $host->setDomainName("test." . mt_rand() . ".de");
+        $host->setPort(8443);
+        $host->setSettings("settings");
+
+        $container = new Container();
+        $container->setName("testBackupFromSchedule" . mt_rand());
+        $container->setHost($host);
+        $container->setState('stopped');
+        $container->setEphemeral(false);
+        $container->setArchitecture('x86_64');
+        $container->setConfig([]);
+        $container->setDevices([]);
+
+        $backupDestination = new BackupDestination();
+        $backupDestination->setName("testBackupFromSchedule" . mt_rand());
+        $backupDestination->setDescription("Desc");
+        $backupDestination->setHostname("test.local");
+        $backupDestination->setProtocol("scp");
+        $backupDestination->setPath("/var/backup");
+        $backupDestination->setUsername("backupuser");
+
+        $backupSchedule = new BackupSchedule();
+        $backupSchedule->setExecutionTime("daily");
+        $backupSchedule->setName("TestBackupFromSchedule" . mt_rand());
+        $backupSchedule->setType("full");
+        $backupSchedule->setDestination($backupDestination);
+        $backupSchedule->setWebhookUrl("testWebhookUrl");
+        $backupSchedule->addContainer($container);
+
+        $this->em->persist($host);
+        $this->em->persist($container);
+        $this->em->persist($backupSchedule);
+        $this->em->persist($backupDestination);
+        $this->em->flush();
+
+        $backup = new Backup();
+        $backup->setBackupSchedule($backupSchedule);
+        $backup->setTimestamp();
+        $backup->addContainer($container);
+        $backup->setDestination($backupDestination);
+        $backup->setManualBackupName("backupFromScheduleTest");
+        $this->em->persist($backup);
+        $this->em->flush();
+
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/schedules/' . $backupSchedule->getId() . '/backups',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $jsonArray = json_decode($client->getResponse()->getContent());
+
+        $object = $jsonArray[0];
+
+        $this->assertEquals($backup->getId(), $object->id);
+        $this->assertEquals(date_format($backup->getTimestamp(), DATE_ISO8601), date_format(new \DateTime($object->timestamp), DATE_ISO8601));
+
+        $backup = $this->em->getRepository(Backup::class)->find($object->id);
+        $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
+        $backupDestination = $this->em->getRepository(BackupDestination::class)->find($backupDestination->getId());
+        $container = $this->em->getRepository(Container::class)->find($container->getId());
+        $host = $this->em->getRepository(Host::class)->find($host->getId());
+
+        $this->em->remove($backup);
+        $this->em->remove($backupSchedule);
+        $this->em->remove($backupDestination);
+        $this->em->remove($container);
+        $this->em->remove($host);
+        $this->em->flush();
+    }
+
+    public function testBackupFromScheduleNotFound()
+    {
+
+        $backupSchedule = new BackupSchedule();
+        $backupSchedule->setExecutionTime("daily");
+        $backupSchedule->setName("TestBackupFromScheduleNotFound" . mt_rand());
+        $backupSchedule->setType("full");
+        $backupSchedule->setWebhookUrl("testWebhookUrl");
+
+        $this->em->persist($backupSchedule);
+        $this->em->flush();
+
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/schedules/' . $backupSchedule->getId() . '/backups',
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_Authorization' => $this->token
+            )
+        );
+
+        $this->assertTrue($client->getResponse()->isNotFound());
+
+        $backupSchedule = $this->em->getRepository(BackupSchedule::class)->find($backupSchedule->getId());
+
+        $this->em->remove($backupSchedule);
+        $this->em->flush();
+    }
+
     /**
      * {@inheritDoc}
      */

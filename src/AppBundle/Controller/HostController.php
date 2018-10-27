@@ -12,7 +12,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Host;
 use AppBundle\Exception\ElementNotFoundException;
 use Httpful\Exception\ConnectionErrorException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;

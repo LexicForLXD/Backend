@@ -13,7 +13,7 @@ use AppBundle\Service\LxdApi\ContainerApi;
 use AppBundle\Service\LxdApi\ImageApi;
 use AppBundle\Service\Restore\RestoreService;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
@@ -71,16 +71,17 @@ class RestoreController extends BaseController
      * @throws ElementNotFoundException
      * @throws WrongInputException
      */
-    public function listAllFilesInBackup($backupID, RestoreService $restoreService, Request $request){
+    public function listAllFilesInBackup($backupID, RestoreService $restoreService, Request $request)
+    {
         $backup = $this->getDoctrine()->getRepository(Backup::class)->find($backupID);
 
         if (!$backup) {
             throw new ElementNotFoundException(
-                'No Backup for id '.$backupID .' found'
+                'No Backup for id ' . $backupID . ' found'
             );
         }
 
-        if(!$request->query->has('host')){
+        if (!$request->query->has('host')) {
             throw new WrongInputException("Host query paramater is missing");
         }
 
@@ -88,13 +89,13 @@ class RestoreController extends BaseController
 
         if (!$host) {
             throw new ElementNotFoundException(
-                'No Host for id '.$request->query->get('host') .' found'
+                'No Host for id ' . $request->query->get('host') . ' found'
             );
         }
 
         $result = $restoreService->getFilesInBackupForTimestamp($backup, $host);
 
-        if(is_array($result) == false){
+        if (is_array($result) == false) {
             throw new WrongInputException($result);
         }
 
@@ -173,37 +174,38 @@ class RestoreController extends BaseController
      * @throws WrongInputException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function createContainerFromBackup($backupID, Request $request, EntityManagerInterface $entityManager, RestoreService $restoreService, ImageApi $imageApi, ContainerApi $containerApi){
-        if(!$request->request->has('tarball') || !$request->request->has('containerName') || !$request->request->has('hostID')) {
+    public function createContainerFromBackup($backupID, Request $request, EntityManagerInterface $entityManager, RestoreService $restoreService, ImageApi $imageApi, ContainerApi $containerApi)
+    {
+        if (!$request->request->has('tarball') || !$request->request->has('containerName') || !$request->request->has('hostID')) {
             throw new WrongInputException('At least one of the required parameters in the body is missing');
         }
 
         $backup = $this->getDoctrine()->getRepository(Backup::class)->find($backupID);
         if (!$backup) {
             throw new ElementNotFoundException(
-                'No Backup for id '.$backupID .' found'
+                'No Backup for id ' . $backupID . ' found'
             );
         }
 
         $host = $this->getDoctrine()->getRepository(Host::class)->find($request->request->get('hostID'));
         if (!$host) {
             throw new ElementNotFoundException(
-                'No Host for id '.$request->request->get('hostID') .' found'
+                'No Host for id ' . $request->request->get('hostID') . ' found'
             );
         }
 
         //Check if Container name is already in use
-        if($this->getDoctrine()->getRepository(Container::class)->findBy(['name' => $request->request->get('containerName')])){
+        if ($this->getDoctrine()->getRepository(Container::class)->findBy(['name' => $request->request->get('containerName')])) {
             throw new WrongInputException("The Container name needs to be unique, please select another name");
         }
 
         $tarball = $request->request->get('tarball');
-        $containerName  = $request->request->get('containerName');
+        $containerName = $request->request->get('containerName');
 
         $restoreService->restoreBackupForTimestampInTmp($host, $containerName, $tarball, $backup);
 
         //Restoring image from tarball
-        $result = $restoreService->createLXCImageFromTarball($host ,$containerName, $backup);
+        $result = $restoreService->createLXCImageFromTarball($host, $containerName, $backup);
 
         if (strpos($result, 'error') !== false) {
             throw new WrongInputException("Couldn't import LXC Image from tarball - LXC Error : " . $result);
@@ -213,13 +215,13 @@ class RestoreController extends BaseController
         //Get fingerprint
         $fingerprint = str_replace('Image imported with fingerprint: ', '', $result);
         //Remove line break \n at the end of the string
-        $fingerprint = preg_replace( "/\r|\n/", "", $fingerprint );
+        $fingerprint = preg_replace("/\r|\n/", "", $fingerprint);
 
         $image->setFingerprint($fingerprint);
 
         $result = $imageApi->getImageByFingerprint($host, $fingerprint);
-        if($result->code != 200){
-            throw new WrongInputException("Couldn't find the Image with fingerprint ".$fingerprint." on the Host");
+        if ($result->code != 200) {
+            throw new WrongInputException("Couldn't find the Image with fingerprint " . $fingerprint . " on the Host");
         }
 
         $image->setFilename($result->body->metadata->architecture);
@@ -252,8 +254,8 @@ class RestoreController extends BaseController
         }
 
         $result = $containerApi->show($host, $containerName);
-        if($result->code != 200){
-            throw new WrongInputException("Couldn't find the Container with the name ".$containerName." on the Host");
+        if ($result->code != 200) {
+            throw new WrongInputException("Couldn't find the Container with the name " . $containerName . " on the Host");
         }
 
         $container = new Container();
