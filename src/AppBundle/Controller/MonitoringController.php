@@ -12,7 +12,7 @@ use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\MonitoringApi;
 use AppBundle\Service\Nagios\Pnp4NagiosApi;
 use AppBundle\Service\SSH\HostSSH;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,27 +56,28 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function listAllLogfilesForContainer($containerId, MonitoringApi $api){
+    public function listAllLogfilesForContainer($containerId, MonitoringApi $api)
+    {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
             throw new ElementNotFoundException(
-                'No Container for ID '.$containerId.' found'
+                'No Container for ID ' . $containerId . ' found'
             );
         }
 
         $result = $api->getListOfLogfilesFromContainer($container);
 
-        if($result->code != 200){
-            throw new WrongInputException("LXD-Error - ".$result->body->error);
+        if ($result->code != 200) {
+            throw new WrongInputException("LXD-Error - " . $result->body->error);
         }
-        if($result->body->status_code != 200){
-            throw new WrongInputException("LXD-Error - ".$result->body->error);
+        if ($result->body->status_code != 200) {
+            throw new WrongInputException("LXD-Error - " . $result->body->error);
         }
 
         //Parse logfile names
         $logfileArray = array();
-        for($i=0; $i<sizeof($result->body->metadata); $i++){
+        for ($i = 0; $i < sizeof($result->body->metadata); $i++) {
             $logfileArray[] = $this->parseLogfileUrlToLogfileName($result->body->metadata[$i]);
         }
 
@@ -131,19 +132,20 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function getSingleLogfileFromContainer($containerId, $logfile, MonitoringApi $api){
+    public function getSingleLogfileFromContainer($containerId, $logfile, MonitoringApi $api)
+    {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
             throw new ElementNotFoundException(
-                'No Container for ID '.$containerId.' found'
+                'No Container for ID ' . $containerId . ' found'
             );
         }
         $result = $api->getSingleLogfileFromContainer($container, $logfile);
 
-        if($result->code != 200){
+        if ($result->code != 200) {
             $result = json_decode($result->body);
-            throw new WrongInputException("LXD-Error - ".$result->error);
+            throw new WrongInputException("LXD-Error - " . $result->error);
         }
 
         $response = new Response();
@@ -196,20 +198,21 @@ class MonitoringController extends BaseController
      * )
      * @throws WrongInputException
      */
-    public function getSingleLogfileFromHost($hostId, Request $request, HostSSH $ssh){
+    public function getSingleLogfileFromHost($hostId, Request $request, HostSSH $ssh)
+    {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw new ElementNotFoundException(
-                'No Host for ID '.$hostId.' found'
+                'No Host for ID ' . $hostId . ' found'
             );
         }
-        if(!$request->query->has('logpath')) {
+        if (!$request->query->has('logpath')) {
             throw new WrongInputException("No logpath provided");
         }
         try {
             $result = $ssh->getLogFileFromHost($host, $request->query->get('logpath'));
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             throw new WrongInputException($e->getMessage());
         }
 
@@ -246,12 +249,13 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function getStatusChecksContainer($containerId){
+    public function getStatusChecksContainer($containerId)
+    {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
             throw new ElementNotFoundException(
-                'No Container for ID '.$containerId.' found'
+                'No Container for ID ' . $containerId . ' found'
             );
         }
 
@@ -259,7 +263,7 @@ class MonitoringController extends BaseController
 
         if ($containerStatuses->count() == 0) {
             throw new ElementNotFoundException(
-                'No ContainerStatuses for Container with ID '.$containerId.' found'
+                'No ContainerStatuses for Container with ID ' . $containerId . ' found'
             );
         }
 
@@ -332,12 +336,13 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function createStatusCheckForContainer($containerId, Request $request) {
+    public function createStatusCheckForContainer($containerId, Request $request)
+    {
         $container = $this->getDoctrine()->getRepository(Container::class)->find($containerId);
 
         if (!$container) {
             throw new ElementNotFoundException(
-                'No Container for ID '.$containerId.' found'
+                'No Container for ID ' . $containerId . ' found'
             );
         }
 
@@ -345,23 +350,23 @@ class MonitoringController extends BaseController
 
         $containerStatus = new ContainerStatus();
 
-        if($request->request->has('nagiosEnabled')) {
+        if ($request->request->has('nagiosEnabled')) {
             $containerStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
         }
 
-        if($request->request->has('nagiosName')) {
+        if ($request->request->has('nagiosName')) {
             $containerStatus->setNagiosName($request->request->get('nagiosName'));
         }
 
-        if($request->request->has('checkName')) {
+        if ($request->request->has('checkName')) {
             $containerStatus->setCheckName($request->request->get('checkName'));
         }
 
-        if($request->request->has('sourceNumber')) {
+        if ($request->request->has('sourceNumber')) {
             $containerStatus->setSourceNumber($request->request->get('sourceNumber'));
         }
 
-        if($request->request->has('nagiosUrl')) {
+        if ($request->request->has('nagiosUrl')) {
             $containerStatus->setNagiosUrl($request->request->get('nagiosUrl'));
         }
 
@@ -448,12 +453,13 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function configureStatusCheckForContainer($checkId, Request $request) {
+    public function configureStatusCheckForContainer($checkId, Request $request)
+    {
         $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
 
         if (!$containerStatus) {
             throw new ElementNotFoundException(
-                'No ContainerStatus for ID '.$checkId.' found'
+                'No ContainerStatus for ID ' . $checkId . ' found'
             );
         }
 
@@ -511,12 +517,13 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function deleteContainerStatus($checkId){
+    public function deleteContainerStatus($checkId)
+    {
         $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
 
         if (!$containerStatus) {
             throw new ElementNotFoundException(
-                'No ContainerStatus for ID '.$checkId.' found'
+                'No ContainerStatus for ID ' . $checkId . ' found'
             );
         }
 
@@ -578,25 +585,26 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function getPnp4NagiosImageForContainer($checkId, Request $request, Pnp4NagiosApi $api){
+    public function getPnp4NagiosImageForContainer($checkId, Request $request, Pnp4NagiosApi $api)
+    {
         $containerStatus = $this->getDoctrine()->getRepository(ContainerStatus::class)->find($checkId);
 
         if (!$containerStatus) {
             throw new ElementNotFoundException(
-                'No ContainerStatus with ID '.$checkId.' found'
+                'No ContainerStatus with ID ' . $checkId . ' found'
             );
         }
 
         $timerange = $request->query->get('timerange');
 
-        if(!$timerange){
+        if (!$timerange) {
             $timerange = '-1day';
         }
 
         $result = $api->getNagiosImageForContainerTimerange($containerStatus, $timerange);
 
-        if($result->code != 200){
-            throw new WrongInputException("Error loading the Graph - HTTP-Code ".$result->code);
+        if ($result->code != 200) {
+            throw new WrongInputException("Error loading the Graph - HTTP-Code " . $result->code);
         }
 
         $response = new Response();
@@ -634,12 +642,13 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function getStatusChecksHost($hostId){
+    public function getStatusChecksHost($hostId)
+    {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw new ElementNotFoundException(
-                'No Host for ID '.$hostId.' found'
+                'No Host for ID ' . $hostId . ' found'
             );
         }
 
@@ -647,7 +656,7 @@ class MonitoringController extends BaseController
 
         if ($hostStatuses->count() == 0) {
             throw new ElementNotFoundException(
-                'No HostStatuses for Host with ID '.$hostId.' found'
+                'No HostStatuses for Host with ID ' . $hostId . ' found'
             );
         }
 
@@ -701,25 +710,26 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function getPnp4NagiosImageForHost($checkId, Request $request, Pnp4NagiosApi $api){
+    public function getPnp4NagiosImageForHost($checkId, Request $request, Pnp4NagiosApi $api)
+    {
         $hostStatus = $this->getDoctrine()->getRepository(HostStatus::class)->find($checkId);
 
         if (!$hostStatus) {
             throw new ElementNotFoundException(
-                'No HostStatus with ID '.$checkId.' found'
+                'No HostStatus with ID ' . $checkId . ' found'
             );
         }
 
         $timerange = $request->query->get('timerange');
 
-        if(!$timerange){
+        if (!$timerange) {
             $timerange = '-1day';
         }
 
         $result = $api->getNagiosImageForHostTimerange($hostStatus, $timerange);
 
-        if($result->code != 200){
-            throw new WrongInputException("Error loading the Graph - HTTP-Code ".$result->code);
+        if ($result->code != 200) {
+            throw new WrongInputException("Error loading the Graph - HTTP-Code " . $result->code);
         }
 
         $response = new Response();
@@ -792,12 +802,13 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function createStatusCheckForHost($hostId, Request $request) {
+    public function createStatusCheckForHost($hostId, Request $request)
+    {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw new ElementNotFoundException(
-                'No Host for ID '.$hostId.' found'
+                'No Host for ID ' . $hostId . ' found'
             );
         }
 
@@ -805,23 +816,23 @@ class MonitoringController extends BaseController
 
         $hostStatus = new HostStatus();
 
-        if($request->request->has('nagiosEnabled')) {
+        if ($request->request->has('nagiosEnabled')) {
             $hostStatus->setNagiosEnabled($request->request->get('nagiosEnabled'));
         }
 
-        if($request->request->has('nagiosName')) {
+        if ($request->request->has('nagiosName')) {
             $hostStatus->setNagiosName($request->request->get('nagiosName'));
         }
 
-        if($request->request->has('checkName')) {
+        if ($request->request->has('checkName')) {
             $hostStatus->setCheckName($request->request->get('checkName'));
         }
 
-        if($request->request->has('sourceNumber')) {
+        if ($request->request->has('sourceNumber')) {
             $hostStatus->setSourceNumber($request->request->get('sourceNumber'));
         }
 
-        if($request->request->has('nagiosUrl')) {
+        if ($request->request->has('nagiosUrl')) {
             $hostStatus->setNagiosUrl($request->request->get('nagiosUrl'));
         }
 
@@ -904,12 +915,13 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function configureStatusCheckForHost($checkId, Request $request) {
+    public function configureStatusCheckForHost($checkId, Request $request)
+    {
         $hostStatus = $this->getDoctrine()->getRepository(HostStatus::class)->find($checkId);
 
         if (!$hostStatus) {
             throw new ElementNotFoundException(
-                'No HostStatus for ID '.$checkId.' found'
+                'No HostStatus for ID ' . $checkId . ' found'
             );
         }
 
@@ -967,12 +979,13 @@ class MonitoringController extends BaseController
      *      ),
      * )
      */
-    public function deleteHostStatus($checkId){
+    public function deleteHostStatus($checkId)
+    {
         $hostStatus = $this->getDoctrine()->getRepository(HostStatus::class)->find($checkId);
 
         if (!$hostStatus) {
             throw new ElementNotFoundException(
-                'No HostStatus for ID '.$checkId.' found'
+                'No HostStatus for ID ' . $checkId . ' found'
             );
         }
 
@@ -995,7 +1008,8 @@ class MonitoringController extends BaseController
      * @param String $logfileUrl
      * @return null|string|string[]
      */
-    private function parseLogfileUrlToLogfileName(String $logfileUrl){
+    private function parseLogfileUrlToLogfileName(String $logfileUrl)
+    {
         return preg_replace('"\/1.0\/containers\/.*\/logs\/"', '', $logfileUrl);
     }
 

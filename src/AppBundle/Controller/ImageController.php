@@ -45,7 +45,8 @@ class ImageController extends BaseController
      *
      * @throws ElementNotFoundException
      */
-    public function getAllImages(){
+    public function getAllImages()
+    {
         $images = $this->getDoctrine()->getRepository(Image::class)->findAll();
 
         if (!$images) {
@@ -91,12 +92,13 @@ class ImageController extends BaseController
      *
      * @throws ElementNotFoundException
      */
-    public function getAllImagesOnHost($hostId){
+    public function getAllImagesOnHost($hostId)
+    {
         $images = $this->getDoctrine()->getRepository(Image::class)->findBy(array('host' => $hostId));
 
         if (!$images) {
             throw new ElementNotFoundException(
-                'No Images for Host '.$hostId.' found'
+                'No Images for Host ' . $hostId . ' found'
             );
         }
 
@@ -152,51 +154,52 @@ class ImageController extends BaseController
      *      ),
      * )
      */
-    public function createImage(int $hostId, Request $request, ImageWorker $imageWorker, EntityManagerInterface $em){
+    public function createImage(int $hostId, Request $request, ImageWorker $imageWorker, EntityManagerInterface $em)
+    {
         $host = $this->getDoctrine()->getRepository(Host::class)->find($hostId);
 
         if (!$host) {
             throw new ElementNotFoundException(
-                'No Host for '.$hostId.' found'
+                'No Host for ' . $hostId . ' found'
             );
         }
 
-        if(!$request->request->has('source')){
+        if (!$request->request->has('source')) {
             throw new WrongInputException("Missing source object in json");
         }
 
         $source = $request->request->get('source');
 
-        switch ($source['type']){
+        switch ($source['type']) {
             case "container":
                 //Check if container exists on host
                 $container = $this->getDoctrine()->getRepository(Container::class)->findBy(['name' => $source['name'], 'host' => $host]);
                 if (!$container) {
                     throw new ElementNotFoundException(
-                        'No Container for name '.$source['name'].' with host '.$host->getId().' found'
+                        'No Container for name ' . $source['name'] . ' with host ' . $host->getId() . ' found'
                     );
                 }
 
                 $image = new Image();
                 $image->setHost($host);
 
-                if($request->request->has('filename')) {
+                if ($request->request->has('filename')) {
                     $image->setFilename($request->request->get('filename'));
                 }
-                if($request->request->has('public')) {
+                if ($request->request->has('public')) {
                     $image->setPublic($request->request->get('public'));
                 }
-                if($request->request->has('properties')) {
+                if ($request->request->has('properties')) {
                     $image->setProperties($request->request->get('properties'));
                 }
 
                 $this->validation($image);
 
                 //Create aliases
-                if($request->request->has('aliases')) {
+                if ($request->request->has('aliases')) {
                     $aliasArray = $request->request->get('aliases');
 
-                    for($i=0; $i<sizeof($aliasArray); $i++){
+                    for ($i = 0; $i < sizeof($aliasArray); $i++) {
                         $alias = new ImageAlias();
                         $alias->setName($aliasArray[$i]['name']);
                         $alias->setDescription($aliasArray[$i]['description']);
@@ -220,23 +223,23 @@ class ImageController extends BaseController
                 $image = new Image();
                 $image->setHost($host);
 
-                if($request->request->has('filename')) {
+                if ($request->request->has('filename')) {
                     $image->setFilename($request->request->get('filename'));
                 }
-                if($request->request->has('public')) {
+                if ($request->request->has('public')) {
                     $image->setPublic($request->request->get('public'));
                 }
-                if($request->request->has('properties')) {
+                if ($request->request->has('properties')) {
                     $image->setProperties($request->request->get('properties'));
                 }
 
                 $this->validation($image);
 
                 //Create aliases
-                if($request->request->has('aliases')) {
+                if ($request->request->has('aliases')) {
                     $aliasArray = $request->request->get('aliases');
 
-                    for($i=0; $i<sizeof($aliasArray); $i++){
+                    for ($i = 0; $i < sizeof($aliasArray); $i++) {
                         $alias = new ImageAlias();
                         $alias->setName($aliasArray[$i]['name']);
                         $alias->setDescription($aliasArray[$i]['description']);
@@ -301,7 +304,8 @@ class ImageController extends BaseController
      * @throws ElementNotFoundException
      * @throws WrongInputException
      */
-    public function deleteImage($imageId, ImageApi $api, ImageAliasApi $aliasApi, EntityManagerInterface $em){
+    public function deleteImage($imageId, ImageApi $api, ImageAliasApi $aliasApi, EntityManagerInterface $em)
+    {
         $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
         if (!$image) {
@@ -311,9 +315,9 @@ class ImageController extends BaseController
         }
 
         //Image is not created on the Host
-        if(!$image->isFinished()){
+        if (!$image->isFinished()) {
             $aliases = $image->getAliases();
-            for($i = 0; $i < $aliases->count(); $i++){
+            for ($i = 0; $i < $aliases->count(); $i++) {
                 $em->remove($aliases->get($i));
             }
 
@@ -324,15 +328,15 @@ class ImageController extends BaseController
         }
 
         //Image is used by at least one Container
-        if($image->getContainers()->count() > 0){
-            throw new WrongInputException("The Image is still used by at least one Container");
+        if ($image->getContainers()->count() > 0) {
+            // throw new WrongInputException("The Image is still used by at least one Container");
         }
 
         $aliases = $image->getAliases();
-        for($i = 0; $i < $aliases->count(); $i++){
+        for ($i = 0; $i < $aliases->count(); $i++) {
             $result = $aliasApi->removeAliasByName($image->getHost(), $aliases->get($i)->getName());
-            if($result->code != 200 && $result->code != 404){
-                throw new WrongInputException("Couldn't delete alias - ".$result->body->error);
+            if ($result->code != 200 && $result->code != 404) {
+                throw new WrongInputException("Couldn't delete alias - " . $result->body->error);
             }
             $imageAlias = $aliases->get($i);
             $image->removeAlias($imageAlias);
@@ -342,8 +346,12 @@ class ImageController extends BaseController
 
         $result = $api->getOperationsLinkWithWait($image->getHost(), $result->body->metadata->id);
 
-        if($result->body->metadata->status_code != 200 && $result->body->metadata->err != "not found"){
-            throw new WrongInputException("Couldn't delete image - ".$result->body->metadata->err);
+        if ($result->body->metadata->status_code != 200 && $result->body->metadata->err != "not found") {
+            throw new WrongInputException("Couldn't delete image - " . $result->body->metadata->err);
+        }
+
+        foreach ($image->getContainers() as $container) {
+            $image->removeContainer($container);
         }
 
         $em->remove($image);
@@ -381,12 +389,13 @@ class ImageController extends BaseController
      *
      * @throws ElementNotFoundException
      */
-    public function getSingleImage($imageId){
+    public function getSingleImage($imageId)
+    {
         $images = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
         if (!$images) {
             throw new ElementNotFoundException(
-                'No Image for ID '.$imageId.' found'
+                'No Image for ID ' . $imageId . ' found'
             );
         }
 
@@ -445,17 +454,18 @@ class ImageController extends BaseController
      * @throws WrongInputException
      * @throws WrongInputExceptionArray
      */
-    public function updateImage($imageId, Request $request, ImageApi $api, EntityManagerInterface $em){
+    public function updateImage($imageId, Request $request, ImageApi $api, EntityManagerInterface $em)
+    {
         $image = $this->getDoctrine()->getRepository(Image::class)->find($imageId);
 
         if (!$image) {
             throw new ElementNotFoundException(
-                'No Image for ID '.$imageId.' found'
+                'No Image for ID ' . $imageId . ' found'
             );
         }
 
         //Image is not created on the Host
-        if(!$image->isFinished()){
+        if (!$image->isFinished()) {
             throw new WrongInputException("The Image is not yet created on the Host or there was an error creating it - You can't update the Image in this state");
         }
 
@@ -467,11 +477,11 @@ class ImageController extends BaseController
 
         $result = $api->putImageUpdate($image->getHost(), $image->getFingerprint(), $request->getContent());
 
-        if($result->code != 200){
-            throw new WrongInputException("Couldn't update Image - ".$result->body->error);
+        if ($result->code != 200) {
+            throw new WrongInputException("Couldn't update Image - " . $result->body->error);
         }
-        if($result->body->status_code != 200){
-            throw new WrongInputException("Couldn't update Image - ".$result->body->error);
+        if ($result->body->status_code != 200) {
+            throw new WrongInputException("Couldn't update Image - " . $result->body->error);
         }
 
         //Update Image in DB

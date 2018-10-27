@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Exception\ElementNotFoundException;
 use Dtc\QueueBundle\Entity\Job;
 use Dtc\QueueBundle\Entity\JobArchive;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Swagger\Annotations as OAS;
 use Doctrine\ORM\EntityManagerInterface;
 

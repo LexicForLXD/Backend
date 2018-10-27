@@ -297,16 +297,33 @@ class BackupSchedule
      */
     public function getContainerId()
     {
-        if ($this->containers->isEmpty()) {
-            return null;
-        }
+        return $this->containers->map(function ($o) {
+            return $o->getId();
+        })->toArray();
+    }
 
-        $this->containers->first();
-        do {
-            $ids[] = $this->containers->current()->getId();
-        } while ($this->containers->next());
+    /**
+     * returns an array of all backups
+     *
+     *
+     * @return array
+     * @JMS\VirtualProperty()
+     */
+    public function getBackupIds()
+    {
+        return $this->backups->map(function ($o) {
+            return $o->getId();
+        })->toArray();
+    }
 
-        return $ids;
+    /**
+     * Returns all associated backups
+     *
+     * @return ArrayCollection
+     */
+    public function getBackups()
+    {
+        return $this->backups;
     }
 
     /**
@@ -346,13 +363,15 @@ class BackupSchedule
         $commandTexts = '#!/bin/sh
 
         ';
+        
+        $backupName = str_replace(" ", "", $this->name);
 
 
         foreach ($this->containers as $container) {
             $commandTexts = $commandTexts . '
                 # Backup for Container ' . $container->getName() . ' to ' . $this->destination->getName() . '
 
-                DIRECTORY=/tmp/' . $this->name . '/
+                DIRECTORY=/tmp/' . $backupName . '/
                 CONTAINER=' . $container->getName() . '
 
                 # Just generating a random number
@@ -387,26 +406,22 @@ class BackupSchedule
         if ($this->type == "incremental") {
             $commandTexts = $commandTexts .
                 '# Backup via duplicity
-            duplicity --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText($this->name) . '
-
-
-            # Make api call to webhook
-            curl -X POST -k ' . $this->webhookUrl . '
-
-
-            ';
+                duplicity --no-encryption /tmp/' . $backupName . ' ' . $this->destination->getDestinationText($this->name);
         } else {
             $commandTexts = $commandTexts .
                 '# Backup via duplicity
-            duplicity ' . $this->type . ' --no-encryption /tmp/' . $this->name . ' ' . $this->destination->getDestinationText($this->name) . '
-
+                duplicity ' . $this->type . ' --no-encryption /tmp/' . $backupName . ' ' . $this->destination->getDestinationText($this->name);
+        }
+        
+        $commandTexts = $commandTexts .
+                '
 
             # Make api call to webhook
             curl -X POST -k ' . $this->webhookUrl . '
 
-
+            # Delete temp data
+            rm -Rf "$DIRECTORY"           
             ';
-        }
 
         return $commandTexts;
     }

@@ -1,3 +1,49 @@
+## [0.10.2](https://github.com/LexicForLXD/Backend/compare/v0.10.1...v0.10.2) (2018-10-12)
+
+
+### Bug Fixes
+
+* count for backups from schedule ([90df513](https://github.com/LexicForLXD/Backend/commit/90df513))
+
+## [0.10.1](https://github.com/LexicForLXD/Backend/compare/v0.10.0...v0.10.1) (2018-10-11)
+
+
+### Bug Fixes
+
+* delete temp folder after script execution fixes [#236](https://github.com/LexicForLXD/Backend/issues/236) ([b77160e](https://github.com/LexicForLXD/Backend/commit/b77160e))
+* Escape spacing in destination text fixes [#229](https://github.com/LexicForLXD/Backend/issues/229) ([026b04d](https://github.com/LexicForLXD/Backend/commit/026b04d))
+* Escape spacing on backup schedule refers # 229 ([aaa16ed](https://github.com/LexicForLXD/Backend/commit/aaa16ed))
+* Leading "/" removed from destination path fixes [#237](https://github.com/LexicForLXD/Backend/issues/237) ([141eff6](https://github.com/LexicForLXD/Backend/commit/141eff6))
+
+# [0.10.0](https://github.com/LexicForLXD/Backend/compare/v0.9.10...v0.10.0) (2018-10-08)
+
+
+### Bug Fixes
+
+* delete used image references [#231](https://github.com/LexicForLXD/Backend/issues/231) ([539b11f](https://github.com/LexicForLXD/Backend/commit/539b11f))
+* get backups of schedule refers LexicForLxd/web-frontend[#88](https://github.com/LexicForLXD/Backend/issues/88) ([d80cff5](https://github.com/LexicForLXD/Backend/commit/d80cff5))
+
+
+### Features
+
+* get backups from schedule ([f8f87a6](https://github.com/LexicForLXD/Backend/commit/f8f87a6))
+
+## [0.9.10](https://github.com/LexicForLXD/Backend/compare/v0.9.9...v0.9.10) (2018-09-27)
+
+
+### Bug Fixes
+
+* backup destination not found ([4301688](https://github.com/LexicForLXD/Backend/commit/4301688))
+
+## [0.9.9](https://github.com/LexicForLXD/Backend/compare/v0.9.8...v0.9.9) (2018-08-31)
+
+
+### Bug Fixes
+
+* correct response when refreshing container ([8440cb7](https://github.com/LexicForLXD/Backend/commit/8440cb7))
+* made container state update sync ([1523876](https://github.com/LexicForLXD/Backend/commit/1523876))
+* update container name closes [#221](https://github.com/LexicForLXD/Backend/issues/221) ([b93577a](https://github.com/LexicForLXD/Backend/commit/b93577a))
+
 ## [0.9.8](https://github.com/LexicForLXD/Backend/compare/v0.9.7...v0.9.8) (2018-08-30)
 
 

@@ -15,7 +15,7 @@ use AppBundle\Worker\ImportWorker;
 use Dtc\QueueBundle\Entity\Job;
 use Dtc\QueueBundle\Entity\JobArchive;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Swagger\Annotations as OAS;
 
 use Symfony\Component\HttpFoundation\JsonResponse;

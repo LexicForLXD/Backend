@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -14,7 +15,7 @@ use AppBundle\Exception\ElementNotFoundException;
 use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Service\LxdApi\StorageApi;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as OAS;
@@ -238,8 +239,7 @@ class StoragePoolController extends BaseController
 
         $result = $storageApi->create($host, $storagePool->getData());
 
-        if($result->code !== 201)
-        {
+        if ($result->code !== 201) {
             throw new WrongInputExceptionArray(["general" => $result->body->error]);
         }
 
@@ -334,8 +334,7 @@ class StoragePoolController extends BaseController
 
         $result = $storageApi->create($storagePool->getHost(), $storagePool->getData());
 
-        if($result->code !== 200)
-        {
+        if ($result->code !== 200) {
             throw new WrongInputExceptionArray(["general" => $result->body->error]);
         }
 
@@ -400,8 +399,7 @@ class StoragePoolController extends BaseController
 
         $result = $storageApi->remove($storagePool->getHost(), $storagePool->getName());
 
-        if($result->code !== 200)
-        {
+        if ($result->code !== 200) {
             throw new WrongInputExceptionArray(["general" => $result->body->error]);
         }
 

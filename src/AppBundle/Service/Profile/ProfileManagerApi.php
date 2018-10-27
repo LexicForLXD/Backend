@@ -30,16 +30,17 @@ class ProfileManagerApi
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function enableProfileForContainer(Profile $profile, Container $container) : bool {
+    public function enableProfileForContainer(Profile $profile, Container $container) : bool
+    {
         $profile->addContainer($container);
         $host = $container->getHost();
-        if($profile->isHostLinked($host)){
+        if ($profile->isHostLinked($host)) {
             return true;
         }
 
         $result = $this->injectedService->createProfileOnHost($host, $profile);
 
-        if($result->code != 201 && $result->code != 400){
+        if ($result->code != 201 && $result->code != 400) {
             return false;
         }
         //HTTP 400 - Profile is already located on the Host but was not linked in Lexic - create link in Lexic
@@ -62,13 +63,14 @@ class ProfileManagerApi
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Httpful\Exception\ConnectionErrorException
      */
-    public function disableProfileForContainer(Profile $profile, Container $container) : bool {
+    public function disableProfileForContainer(Profile $profile, Container $container) : bool
+    {
         $host = $container->getHost();
         //Check if this container was the only one using this profile on the host
-        if($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1){
+        if ($profile->numberOfContainersMatchingProfile($host->getContainers()) == 1) {
             $profile->removeHost($host);
             $result = $this->injectedService->deleteProfileOnHost($host, $profile);
-            if($result->code != 200){
+            if ($result->code != 200) {
                 return false;
             }
         }
@@ -79,6 +81,25 @@ class ProfileManagerApi
         $this->em->persist($profile);
         $this->em->flush();
         return true;
+    }
+
+    /**
+     * Calculate all profiles which aren't present in the request.
+     *
+     * @param array $requestProfiles
+     * @return array
+     */
+    public function checkForUnusedProfiles(array $requestProfiles)
+    {
+        $profiles = $this->em->getRepository(Profile::class)->findAll();
+        $profilesDB = array();
+        foreach ($profiles as $profile) {
+            $profilesDB[] = $profile->getId();
+        }
+
+        $profilesDiff = array_diff($profilesDB, $requestProfiles);
+
+        return $profiles;
     }
 
 }

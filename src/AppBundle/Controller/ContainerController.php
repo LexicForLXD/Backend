@@ -27,7 +27,7 @@ use AppBundle\Entity\Profile;
 use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Swagger\Annotations as OAS;
 
 
@@ -699,20 +699,12 @@ class ContainerController extends BaseController
      *      name="bodyProps",
      *      @OAS\Schema(
      *          @OAS\Property(
-     *              property="architecture",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
      *              property="config",
      *              type="string"
      *          ),
      *          @OAS\Property(
      *              property="devices",
      *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="ephemeral",
-     *              type="bool"
      *          ),
      *          @OAS\Property(
      *              property="profiles",
@@ -756,33 +748,32 @@ class ContainerController extends BaseController
             }
 
         } else {
-            $neededFields = ["architecture", "ephemeral", "storagePoolId"];
-            $this->checkForNeededFields($request, $neededFields);
+            $requestProfiles = $request->get("profiles", []);
 
-
-            if ($request->request->has('profiles')) {
-                $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $request->get("profiles")]);
-                foreach ($profiles as $profile) {
-                    $profileManagerApi->enableProfileForContainer($profile, $container);
-                }
-                $this->checkProfiles($profiles, $request->get("profiles"));
+            $profiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $requestProfiles]);
+            foreach ($profiles as $profile) {
+                $profileManagerApi->enableProfileForContainer($profile, $container);
+            }
+            $profiles = $this->getDoctrine()->getRepository(Profile::class)->findAll();
+            $profilesDB = array();
+            foreach ($profiles as $profile) {
+                $profilesDB[] = $profile->getId();
             }
 
+            $unusedProfilesId = (array)array_diff($profilesDB, $requestProfiles);
+            $unusedProfiles = $this->getDoctrine()->getRepository(Profile::class)->findBy(['id' => $unusedProfilesId]);
 
-            $storagePool = $this->getDoctrine()->getRepository(StoragePool::class)->find($request->get("storagePoolId"));
-            if (!$storagePool) {
-                throw new WrongInputExceptionArray(
-                    ["storagePool" => "No storagePool found for id " . $request->get("storagePoolId")]
-                );
+            foreach ($unusedProfiles as $profile) {
+                $profileManagerApi->disableProfileForContainer($profile, $container);
             }
 
+            $this->checkProfiles($profiles, $requestProfiles);
 
 
-            $container->setStoragePool($storagePool);
-            $container->setArchitekture($request->get("architecture"));
-            $container->setConfig($request->get("config"));
-            $container->setDevices($request->get("devices"));
-            $container->setEphemeral($request->get("ephemeral"));
+
+
+            $container->setConfig($request->get("config", []));
+            $container->setDevices($request->get("devices", []));
             $this->validation($container);
             $em->flush($container);
             $containerWorker->later()->updateContainer($container->getId());
