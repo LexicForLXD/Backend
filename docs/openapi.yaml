@@ -1158,7 +1158,6 @@ paths:
                         type: string
                       description:
                         type: string
-
       responses:
         "404":
           $ref: "#/components/responses/NotFound"
@@ -1170,6 +1169,392 @@ paths:
                 $ref: "#/components/schemas/image"
         "400":
           $ref: "#/components/responses/WrongInput"
+  /images/{imageId}:
+    get:
+      tags:
+        - images
+      summary: Info about a single image
+      parameters:
+        - name: imageId
+          in: path
+          description: Id of image
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: requested image
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/image"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - images
+      summary: Delete a single image
+      parameters:
+        - name: imageId
+          in: path
+          description: Id of image
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Image with the specified ImageId successfully deleted
+        "400":
+          description: There was an error deleting the Image, the error contains the message 'Couldn't delete alias - {LXD-Error}' or 'Couldn't delete image - {LXD-Error}'
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - images
+      summary: update image by id
+      parameters:
+        - name: imageId
+          in: path
+          description: Id of image
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                public:
+                  type: boolean
+                properties:
+                  type: object
+                auto_update:
+                  type: boolean
+      responses:
+        "200":
+          description: requested image
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/image"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /images/{imageId}/aliases:
+    post:
+      tags:
+        - image-alias
+      summary: create alias for existing image
+      parameters:
+        - name: imageId
+          in: path
+          description: Id of image
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "201":
+          description: Created image-alias
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/image"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+  /images/aliases/{aliasId}:
+    delete:
+      tags:
+        - image-alias
+      summary: delete image-alias by id
+      parameters:
+        - name: aliasId
+          in: path
+          description: Id of alias
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: The ImageAlias was successfully deleted
+        "400":
+          description: Deleting of the ImageAlias for an Image which is in the creation process is not possible or a LXD Error
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags:
+        - image-alias
+      summary: change name or description of image-alias
+      parameters:
+        - name: aliasId
+          in: path
+          description: Id of alias
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "200":
+          description: image-alias successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/imageAlias"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #Import
+  /sync/hosts/{hostId}/images:
+    post:
+      tags:
+        - import
+      summary: Import all images from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+  /sync/hosts/{hostId}/containers:
+    post:
+      tags:
+        - import
+      summary: Import all containers from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+  /sync/hosts/{hostId}/storage-pools:
+    post:
+      tags:
+        - import
+      summary: Import all storage pools from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+  /sync/hosts/{hostId}/profiles:
+    post:
+      tags:
+        - import
+      summary: Import all profiles from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+  /sync/hosts/{hostId}:
+    post:
+      tags:
+        - import
+      summary: Import all from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+
+  #jobs
+  /jobs/containers:
+    get:
+      tags:
+        - job
+      summary: get all container jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all container jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/containers/state:
+    get:
+      tags:
+        - job
+      summary: get all container state jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all container state jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/import:
+    get:
+      tags:
+        - job
+      summary: get all import jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all import jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/backup:
+    get:
+      tags:
+        - job
+      summary: get all backup jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all backup jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/images:
+    get:
+      tags:
+        - job
+      summary: get all image jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all image jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/{jobId}:
+    delete:
+      tags:
+        - job
+      summary: Delete job by id
+      parameters:
+        - name: jobId
+          in: path
+          description: Id of job
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: The job was successfully deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
 
 components:
   #Models
