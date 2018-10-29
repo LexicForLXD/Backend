@@ -1556,6 +1556,235 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  #Containter-Monitoring
+  /monitoring/logs/containers/{containerId}:
+    get:
+      tags:
+        - container-monitoring
+      summary: List all available logfiles form one container
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of container
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of all available logfiles for the Container as an array under the attribute logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: string
+                      example: lxc.conf
+        "400":
+          description: Returns an LXD Error 'LXD-Error - {LXD-Response}'
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/logs/containers/{containerId}/{logfile}:
+    get:
+      tags:
+        - container-monitoring
+      summary: Get the content of a logfile
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of container
+          required: true
+          schema:
+            type: integer
+        - name: logfile
+          in: path
+          description: name of logfile with fileending
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns the filecontent as text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Returns an LXD Error 'LXD-Error - {LXD-Response}'
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/containers/{containerId}:
+    get:
+      tags:
+        - container-monitoring
+      summary: Get all containerstatus nagios configs for a container
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of container
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: list of all container status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/containerStatus"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - container-monitoring
+      summary: create container status config
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of container
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                nagiosEnabled:
+                  type: boolean
+                nagiosName:
+                  type: string
+                nagiosUrl:
+                  type: string
+                checkName:
+                  type: string
+                sourceNumber:
+                  type: integer
+              required:
+                - nagiosEnabled
+                - nagiosName
+                - nagiosUrl
+                - checkName
+                - sourceNumber
+              example:
+                nagiosEnabled: true
+                nagiosName: ContainerWebServer
+                nagiosUrl: https://nagios.example.com/pnp4nagios/
+                checkName: check_http
+                sourceNumber: 0
+      responses:
+        "201":
+          description: created container status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/containerStatus"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/{checkId}/containers:
+    put:
+      tags:
+        - container-monitoring
+      summary: update container status config
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of container status
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                nagiosEnabled:
+                  type: boolean
+                nagiosName:
+                  type: string
+                nagiosUrl:
+                  type: string
+                checkName:
+                  type: string
+                sourceNumber:
+                  type: integer
+              required:
+                - nagiosEnabled
+                - nagiosName
+                - nagiosUrl
+                - checkName
+                - sourceNumber
+              example:
+                nagiosEnabled: true
+                nagiosName: ContainerWebServer
+                nagiosUrl: https://nagios.example.com/pnp4nagios/
+                checkName: check_http
+                sourceNumber: 0
+      responses:
+        "200":
+          description: updated container status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/containerStatus"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - container-monitoring
+      summary: delete container status config
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of container status
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: container status deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/{checkId}/containers/graph:
+    get:
+      tags:
+        - container-monitoring
+      summary: get nagios graph
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of container status
+          required: true
+          schema:
+            type: integer
+        - name: timerange
+          in: query
+          description: Define a custom timerange for the output graph, examples -1day or -3weeks or -1year or yesterday
+          schema:
+            type: string
+            example: -1year
+
+      responses:
+        "200":
+          description: Returns the Nagios stats graph as png with mime-type image/png
+          content: 
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description:   Error getting the Nagios graph image - returns json error with mime-type application/json
+        "404":
+          $ref: "#/components/responses/NotFound"  
+
 components:
   #Models
   schemas:
