@@ -1785,6 +1785,206 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"  
 
+  # Monitoring host
+  /monitoring/logs/hosts/{hostId}:
+    get:
+      tags:
+        - host-monitoring
+      summary: get content of single logfile
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+        - name: logpath
+          in: query
+          description: path of logfile on host
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns the filecontent as text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Error getting the logfile
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/hosts/{hostId}:
+    get:
+      tags:
+        - host-monitoring
+      summary: Get all hoststatus nagios configs for a host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: list of all host status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/hostStatus"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - host-monitoring
+      summary: create host status config
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                nagiosEnabled:
+                  type: boolean
+                nagiosName:
+                  type: string
+                nagiosUrl:
+                  type: string
+                checkName:
+                  type: string
+                sourceNumber:
+                  type: integer
+              required:
+                - nagiosEnabled
+                - nagiosName
+                - nagiosUrl
+                - checkName
+                - sourceNumber
+              example:
+                nagiosEnabled: true
+                nagiosName: hostWebServer
+                nagiosUrl: https://nagios.example.com/pnp4nagios/
+                checkName: check_http
+                sourceNumber: 0
+      responses:
+        "201":
+          description: created host status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hostStatus"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/{checkId}/hosts:
+    put:
+      tags:
+        - host-monitoring
+      summary: update host status config
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of host status
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                nagiosEnabled:
+                  type: boolean
+                nagiosName:
+                  type: string
+                nagiosUrl:
+                  type: string
+                checkName:
+                  type: string
+                sourceNumber:
+                  type: integer
+              required:
+                - nagiosEnabled
+                - nagiosName
+                - nagiosUrl
+                - checkName
+                - sourceNumber
+              example:
+                nagiosEnabled: true
+                nagiosName: hostWebServer
+                nagiosUrl: https://nagios.example.com/pnp4nagios/
+                checkName: check_http
+                sourceNumber: 0
+      responses:
+        "200":
+          description: updated host status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hostStatus"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - host-monitoring
+      summary: delete host status config
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of host status
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: host status deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/{checkId}/hosts/graph:
+    get:
+      tags:
+        - host-monitoring
+      summary: get nagios graph
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of host status
+          required: true
+          schema:
+            type: integer
+        - name: timerange
+          in: query
+          description: Define a custom timerange for the output graph, examples -1day or -3weeks or -1year or yesterday
+          schema:
+            type: string
+            example: -1year
+
+      responses:
+        "200":
+          description: Returns the Nagios stats graph as png with mime-type image/png
+          content: 
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description:   Error getting the Nagios graph image - returns json error with mime-type application/json
+        "404":
+          $ref: "#/components/responses/NotFound"  
+
 components:
   #Models
   schemas:
