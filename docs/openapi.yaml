@@ -2111,6 +2111,23 @@ components:
           type: integer
         workerName:
           type: string
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
 
   #Responses
   responses:
