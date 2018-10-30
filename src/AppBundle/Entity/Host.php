@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Leon
@@ -13,7 +14,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
 
 
@@ -28,7 +28,6 @@ use JMS\Serializer\Annotation as JMS;
  * @UniqueEntity("name")
  * @UniqueEntity("mac")
  *
- * @OAS\Schema(schema="host", type="object")
  */
 class Host
 {
@@ -37,7 +36,6 @@ class Host
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
-     * @OAS\Property(example="2")
      * @var integer
      */
     protected $id;
@@ -47,7 +45,6 @@ class Host
      * @Assert\Ip
      *
      * @Assert\Type(type="string")
-     * @OAS\Property(example="192.168.178.5")
      * @var string
      */
     protected $ipv4;
@@ -57,7 +54,6 @@ class Host
      * @Assert\Ip(version = 6)
      *
      * @Assert\Type(type="string")
-     * @OAS\Property(example="fe80::5")
      * @var string
      */
     protected $ipv6;
@@ -66,7 +62,6 @@ class Host
      * @ORM\Column(type="string", unique=true, nullable=true)
      *
      * @Assert\Type(type="string")
-     * @OAS\Property(example="host2.localnet.com")
      * @var string
      */
     protected $domainName;
@@ -76,7 +71,6 @@ class Host
      * @Assert\NotBlank()
      *
      * @Assert\Type(type="string")
-     * @OAS\Property(example="host2")
      * @var string
      */
     protected $name;
@@ -85,7 +79,6 @@ class Host
      * @ORM\Column(type="string", unique=true, nullable=true)
      *
      * @Assert\Type(type="string")
-     * @OAS\Property(example="82-75-93-4D-B8-6F")
      * @var string
      */
     protected $mac;
@@ -100,7 +93,6 @@ class Host
      *      minMessage = "The port number must be greater than {{ limit }}",
      *      maxMessage = "The port number must be smaller than {{ limit }}"
      * )
-     * @OAS\Property(example="22")
      * @var integer
      */
     protected $port;
@@ -108,7 +100,6 @@ class Host
     /**
      * @ORM\Column(type="json", nullable=true)
      *
-     * @OAS\Property(example="TODO Settings")
      * @var string
      */
     protected $settings;
@@ -117,7 +108,6 @@ class Host
      * @ORM\Column(type="boolean", options={"default":false}, nullable=true)
      *
      * @Assert\Type(type="bool")
-     * @OAS\Property(example="true")
      * @var boolean
      */
     protected $authenticated;
@@ -170,7 +160,7 @@ class Host
     /**
      * @return int
      */
-    public function getId(): ?int
+    public function getId() : ? int
     {
         return $this->id;
     }
@@ -178,7 +168,7 @@ class Host
     /**
      * @return string | null
      */
-    public function getIpv4(): ?string
+    public function getIpv4() : ? string
     {
         return $this->ipv4;
     }
@@ -186,7 +176,7 @@ class Host
     /**
      * @return string | null
      */
-    public function getIpv6(): ?string
+    public function getIpv6() : ? string
     {
         return $this->ipv6;
     }
@@ -194,7 +184,7 @@ class Host
     /**
      * @return string | null
      */
-    public function getDomainName(): ?string
+    public function getDomainName() : ? string
     {
         return $this->domainName;
     }
@@ -226,7 +216,7 @@ class Host
     /**
      * @return string
      */
-    public function getName(): ?string
+    public function getName() : ? string
     {
         return $this->name;
     }
@@ -242,7 +232,7 @@ class Host
     /**
      * @return string
      */
-    public function getMac(): ?string
+    public function getMac() : ? string
     {
         return $this->mac;
     }
@@ -258,7 +248,7 @@ class Host
     /**
      * @return string
      */
-    public function getSettings(): ?string
+    public function getSettings() : ? string
     {
         return $this->settings;
     }
@@ -274,7 +264,7 @@ class Host
     /**
      * @return int
      */
-    public function getPort(): ?int
+    public function getPort() : ? int
     {
         return $this->port;
     }
@@ -290,7 +280,7 @@ class Host
     /**
      * @return bool
      */
-    public function isAuthenticated(): bool
+    public function isAuthenticated() : bool
     {
         return $this->authenticated;
     }
@@ -298,7 +288,7 @@ class Host
     /**
      * @param mixed $authenticated
      */
-    public function setAuthenticated($authenticated): void
+    public function setAuthenticated($authenticated) : void
     {
         $this->authenticated = $authenticated;
     }
@@ -381,7 +371,7 @@ class Host
      *
      * @return boolean
      */
-    public function hasUri(): bool
+    public function hasUri() : bool
     {
         if ($this->ipv4 || $this->ipv6 || $this->domainName) {
             return true;
@@ -470,7 +460,7 @@ class Host
      * Checks whether the Host has any Containers
      * @return bool
      */
-    public function hasContainers(): bool
+    public function hasContainers() : bool
     {
         if ($this->containers->count() > 0) {
             return true;
@@ -483,7 +473,7 @@ class Host
      * Checks whether the Host has any Profiles
      * @return bool
      */
-    public function hasProfiles(): bool
+    public function hasProfiles() : bool
     {
         if ($this->profiles->count() > 0) {
             return true;
@@ -496,7 +486,7 @@ class Host
      * Checks whether the Host has any Images
      * @return bool
      */
-    public function hasImages(): bool
+    public function hasImages() : bool
     {
         if ($this->images->count() > 0) {
             return true;
@@ -509,7 +499,7 @@ class Host
      * Checks whether the Host has any images or profiles or containers
      * @return bool
      */
-    public function hasAnything(): bool
+    public function hasAnything() : bool
     {
         if ($this->hasImages() || $this->hasContainers() || $this->hasProfiles()) {
             return true;
@@ -523,7 +513,7 @@ class Host
      * Deletes all associations
      * @return bool
      */
-    public function deleteAnything(): bool
+    public function deleteAnything() : bool
     {
 
         if ($this->hasProfiles()) {
@@ -551,11 +541,11 @@ class Host
      * Returns the url for a host.
      * @return string
      */
-    public function getUri(): string
+    public function getUri() : string
     {
-        $hostname = $this->getIpv4() ?: $this->getIpv6() ?: $this->getDomainName() ?: 'localhost';
+        $hostname = $this->getIpv4() ? : $this->getIpv6() ? : $this->getDomainName() ? : 'localhost';
 
-        $port = $this->getPort() ?: '8443';
+        $port = $this->getPort() ? : '8443';
         $apiVersion = '1.0';
         $url = 'https://' . $hostname . ':' . $port . '/' . $apiVersion . '/';
 
@@ -582,7 +572,6 @@ class Host
     /**
      * @return array
      *
-     * @OAS\Property(property="container_id", example="[1]")
      *
      * @JMS\VirtualProperty()
      */
@@ -611,14 +600,13 @@ class Host
     /**
      * @param mixed $storagePools
      */
-    public function setStoragePools($storagePools): void
+    public function setStoragePools($storagePools) : void
     {
         $this->storagePools = $storagePools;
     }
 
     /**
      * @return array
-     * @OAS\Property(property="storagePoolIds", example="[1]")
      * @JMS\VirtualProperty()
      */
     public function getStoragePoolIds()

@@ -7,15 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
-use Swagger\Annotations as OAS;
 
 /**
  * Class Image
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="images")
- *
- * @OAS\Schema(schema="image", type="object")
  */
 class Image
 {
@@ -24,8 +21,7 @@ class Image
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
-     * @OAS\Property(example="3")
-     * var integer
+     * @var integer
      */
     protected $id;
 
@@ -33,15 +29,13 @@ class Image
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
      *
-     * @OAS\Property(example="a49d26ce5808075f5175bf31f5cb90561f5023dcd408da8ac5e834096d46b2d8")
-     * var string
+     * @var string
      */
     protected $fingerprint;
 
     /**
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\ImageAlias", mappedBy="image")
      * @ORM\JoinColumn(name="alias_id", referencedColumnName="id")
-     * @OAS\Property(ref="#/components/schemas/imageAlias")
      * var string
      */
     protected $aliases;
@@ -50,8 +44,7 @@ class Image
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
      *
-     * @OAS\Property(example="x86_64")
-     * var string
+     * @var string
      */
     protected $architecture;
 
@@ -59,8 +52,7 @@ class Image
      * @ORM\Column(type="integer", nullable=true)
      * @Assert\Type("int")
      *
-     * @OAS\Property(example="1602345")
-     * var int
+     * @var int
      */
     protected $size;
 
@@ -77,7 +69,6 @@ class Image
      * @Assert\NotNull
      * @Assert\Type("bool")
      *
-     * @OAS\Property(example="true")
      * @var bool
      */
     protected $public;
@@ -86,7 +77,6 @@ class Image
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
      *
-     * @OAS\Property(example="imageFilename")
      * @var string
      */
     protected $filename;
@@ -94,7 +84,6 @@ class Image
     /**
      * @ORM\Column(type="json", nullable=true)
      *
-     * @OAS\Property(example="{json-Object}")
      * @var array
      */
     protected $properties;
@@ -106,7 +95,6 @@ class Image
     protected $error;
     /**
      * @ORM\Column(type="boolean")
-     * @OAS\Property(example="true")
      * @var bool
      */
     protected $finished;
@@ -191,7 +179,6 @@ class Image
 
     /**
      * @return int | null
-     * @OAS\Property(property="hostId", example="1")
      * @JMS\VirtualProperty()
      */
     public function getHostId()
@@ -319,8 +306,6 @@ class Image
 
     /**
      * @return array
-     *
-     * @OAS\Property(property="container_id", example="[1]")
      *
      * @JMS\VirtualProperty()
      */

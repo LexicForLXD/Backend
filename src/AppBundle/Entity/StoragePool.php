@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: leon
@@ -13,7 +14,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
 
 
@@ -24,8 +24,6 @@ use JMS\Serializer\Annotation as JMS;
  * @ORM\Table(name="storage_pools")
  *
  * @UniqueEntity("name")
- *
- * @OAS\Schema(schema="storage_pool", type="object")
  */
 class StoragePool
 {
@@ -34,7 +32,6 @@ class StoragePool
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
-     * @OAS\Property(example="14")
      * @var integer
      */
     protected $id;
@@ -43,7 +40,6 @@ class StoragePool
      * @ORM\Column(type="text")
      * @Assert\Type(type="string")
      * @Assert\NotBlank()
-     * @OAS\Property(example="pool1")
      * @var string
      */
     protected $name;
@@ -53,7 +49,6 @@ class StoragePool
      * @Assert\Type(type="string")
      * @Assert\NotBlank()
      * @Assert\Choice(choices={"btrfs", "ceph", "dir", "lvm", "zfs"}, strict=true)
-     * @OAS\Property(example="dir")
      * @var string
      */
     protected $driver;
@@ -61,7 +56,6 @@ class StoragePool
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @OAS\Property(example="{'size': '10GB'}")
      */
     protected $config;
 
@@ -92,7 +86,7 @@ class StoragePool
     /**
      * @return ArrayCollection
      */
-    public function getContainers(): ArrayCollection
+    public function getContainers() : ArrayCollection
     {
         return $this->containers;
     }
@@ -100,7 +94,7 @@ class StoragePool
     /**
      * @param ArrayCollection $containers
      */
-    public function setContainers(ArrayCollection $containers): void
+    public function setContainers(ArrayCollection $containers) : void
     {
         $this->containers = $containers;
     }
@@ -118,14 +112,13 @@ class StoragePool
     /**
      * @param mixed $host
      */
-    public function setHost($host): void
+    public function setHost($host) : void
     {
         $this->host = $host;
     }
 
     /**
      * @return int | null
-     * @OAS\Property(property="hostId", example="1")
      * @JMS\VirtualProperty()
      */
     public function getHostId()
@@ -136,7 +129,7 @@ class StoragePool
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId() : int
     {
         return $this->id;
     }
@@ -144,7 +137,7 @@ class StoragePool
     /**
      * @param int $id
      */
-    public function setId(int $id): void
+    public function setId(int $id) : void
     {
         $this->id = $id;
     }
@@ -152,7 +145,7 @@ class StoragePool
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName() : string
     {
         return $this->name;
     }
@@ -160,7 +153,7 @@ class StoragePool
     /**
      * @param string $name
      */
-    public function setName($name): void
+    public function setName($name) : void
     {
         $this->name = $name;
     }
@@ -168,7 +161,7 @@ class StoragePool
     /**
      * @return string
      */
-    public function getDriver(): string
+    public function getDriver() : string
     {
         return $this->driver;
     }
@@ -176,7 +169,7 @@ class StoragePool
     /**
      * @param string $driver
      */
-    public function setDriver($driver): void
+    public function setDriver($driver) : void
     {
         $this->driver = $driver;
     }
@@ -192,14 +185,14 @@ class StoragePool
     /**
      * @param $config
      */
-    public function setConfig($config): void
+    public function setConfig($config) : void
     {
         $this->config = $config;
     }
 
 
 
-    public function getData(): array
+    public function getData() : array
     {
         return [
             "name" => $this->getName(),
@@ -213,8 +206,9 @@ class StoragePool
      *
      * @return bool
      */
-    public function isUsedByContainer() : bool {
-        if($this->containers->count() > 0){
+    public function isUsedByContainer() : bool
+    {
+        if ($this->containers->count() > 0) {
             return true;
         }
 
