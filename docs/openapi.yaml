@@ -2158,6 +2158,148 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  # Storage pool
+  /hosts/{hostId}/storage-pools:
+    get:
+      summary: Get all storage pools from one host
+      tags:
+        - storage-pool
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: list of storage pools from single host
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/storagePool"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: create storage pool
+      tags:
+        - storage-pool
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                driver:
+                  type: string
+                config:
+                  type: string
+      responses:
+        "201":
+          description: new storage pool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/storagePool"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+  /storage-pools:
+    get:
+      summary: get all storage pools
+      tags:
+        - storage-pool
+      responses:
+        "200":
+          description: all storage pools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/storagePool"
+  /storage-pools/{storagePoolId}:
+    get:
+      summary: get single storage pool
+      tags:
+        - storage-pool
+      parameters:
+        - name: storagePoolId
+          in: path
+          description: Id of storage pool
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: single storage pool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/storagePool"
+        "404":
+          $ref: "#/components/response/NotFound"
+    put:
+      summary: update single storage pool
+      tags:
+        - storage-pool
+      parameters:
+        - name: storagePoolId
+          in: path
+          description: Id of storage pool
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                driver:
+                  type: string
+                config:
+                  type: string
+      responses:
+        "200":
+          description: new storage pool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/storagePool"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+    delete:
+      summary: delete storage pool
+      tags:
+        - storage-pool
+      parameters:
+        - name: storagePoolId
+          in: path
+          description: Id of storage pool
+          required: true
+          schema:
+            type: integer
+      responses: 
+        "204":
+          description: storage pool successfully deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+        
+      
+
 components:
   #Models
   schemas:
