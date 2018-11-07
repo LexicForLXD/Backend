@@ -1775,15 +1775,15 @@ paths:
       responses:
         "200":
           description: Returns the Nagios stats graph as png with mime-type image/png
-          content: 
+          content:
             image/png:
               schema:
                 type: string
                 format: binary
         "400":
-          description:   Error getting the Nagios graph image - returns json error with mime-type application/json
+          description: Error getting the Nagios graph image - returns json error with mime-type application/json
         "404":
-          $ref: "#/components/responses/NotFound"  
+          $ref: "#/components/responses/NotFound"
 
   # Monitoring host
   /monitoring/logs/hosts/{hostId}:
@@ -1975,15 +1975,128 @@ paths:
       responses:
         "200":
           description: Returns the Nagios stats graph as png with mime-type image/png
-          content: 
+          content:
             image/png:
               schema:
                 type: string
                 format: binary
         "400":
-          description:   Error getting the Nagios graph image - returns json error with mime-type application/json
+          description: Error getting the Nagios graph image - returns json error with mime-type application/json
         "404":
-          $ref: "#/components/responses/NotFound"  
+          $ref: "#/components/responses/NotFound"
+  # Profiles
+  /profiles:
+    get:
+      summary: get all profiles
+      tags:
+        - profile
+      responses:
+        "200":
+          description: array with all profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/profile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - profile
+      summary: create profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                config:
+                  type: object
+                devices:
+                  type: object
+      responses:
+        "201":
+          description: created profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/profile"
+  /profiles/{profileId}:
+    get:
+      summary: get single profile
+      tags:
+        - profile
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of profile
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: single profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/profile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: update single profile
+      tags:
+        - profile
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of profile
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                config:
+                  type: object
+                devicces:
+                  type: object
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "200":
+          description: single profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/profile"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+    delete:
+      summary: delete single profile
+      tags:
+        - profile
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of profile
+          required: true
+          schema:
+            type: integer
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "204":
+          description: profile deleted
 
 components:
   #Models
