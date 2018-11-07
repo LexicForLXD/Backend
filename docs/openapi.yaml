@@ -2098,6 +2098,66 @@ paths:
         "204":
           description: profile deleted
 
+  # Backup Restore
+  /restores/backups/{backupId}:
+    get:
+      summary: get all files in a duplicity backup
+      tags:
+        - backup-restore
+      parameters:
+        - name: backupId
+          in: path
+          description: Id of backup
+          required: true
+          schema:
+            type: integer
+        - name: host
+          in: query
+          description: ID of the Host, where the Duplicity command should be executed on. Could be any host which is allowed to access the Backups backupDestination
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Array of all Container backup tarballs included in the specified duplicity Backup
+        "400":
+          description: Error getting the list of files from the duplicity backup
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: restore backup
+      tags:
+        - backup-restore
+      parameters:
+        - name: backupId
+          in: path
+          description: Id of backup
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                tarball:
+                  type: string
+                containerName:
+                  type: string
+                hostId:
+                  type: integer
+      responses:
+        "201":
+          description: new container
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "400":
+          description: One of the body parameters is missing or an error occurred in the image restore process or in the Container creation
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 components:
   #Models
   schemas:
