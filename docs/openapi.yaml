@@ -2297,6 +2297,145 @@ paths:
           description: storage pool successfully deleted
         "404":
           $ref: "#/components/responses/NotFound"
+
+  # User
+  /users:
+    get:
+      summary: get all users
+      tags:
+        - user
+      responses:
+        "200":
+          description: list with all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/user"
+    post:
+      summary: create new user
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+  /users/{userId}:
+    get:
+      summary: get single user
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          description: Id of user
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: update single user
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          description: Id of user
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+    delete:
+      summary: delete single user
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          description: Id of user
+          required: true
+          schema:
+            type: integer
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "204":
+          description: successfully deleted user
+  /user:
+    get:
+      summary: get current user
+      tags:
+        - user
+      responses:
+        "200":
+          description: single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        
         
       
 
