@@ -15,7 +15,6 @@ use AppBundle\Entity\Container;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\Routing\Annotation\Route;
-use Swagger\Annotations as OAS;
 
 
 class ContainerStateController extends BaseController
@@ -23,6 +22,8 @@ class ContainerStateController extends BaseController
     /**
      * Start, stop or restart a Contaner by ContainerID
      *
+     * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
+     * 
      * @param Request $request
      * @param int $containerId
      * @param EntityManagerInterface $em
@@ -31,49 +32,6 @@ class ContainerStateController extends BaseController
      *
      * @throws ElementNotFoundException
      * @throws WrongInputException
-     * @Route("/containers/{containerId}/state", name="update_container_state", methods={"PUT"})
-     *
-     * @OAS\Put(path="/containers/{containerId}/state",
-     *  tags={"containerStates"},
-     *  @OAS\Parameter(
-     *      name="actionData",
-     *      in="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="action",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="timeout",
-     *              type="integer",
-     *          ),
-     *          @OAS\Property(
-     *              property="force",
-     *              type="boolean",
-     *          ),
-     *          @OAS\Property(
-     *              property="stateful",
-     *              type="boolean",
-     *          ),
-     *      ),
-     *  ),
-     *  @OAS\Parameter(
-     *      description="ID von Container",
-     *      in="path",
-     *      name="containerId",
-     *      required=true,
-     *      @OAS\Schema(
-     *         type="integer"
-     *      ),
-     *  ),
-     *
-     *
-     *  @OAS\Response(
-     *      response=200,
-     *      description="Erfolgsmeldung für Container Status Update.",
-     *  ),
-     * )
      */
     public function updateStateAction(Request $request, $containerId, EntityManagerInterface $em, ContainerStateApi $stateApi, OperationApi $opApi)
     {
@@ -144,6 +102,8 @@ class ContainerStateController extends BaseController
     /**
      * Get the current state of the Container by ContainerID
      *
+     * @Route("/containers/{containerId}/state", name="show_container_state", methods={"GET"})
+     * 
      * @param int $containerId
      * @param ContainerStateApi $api
      * @param EntityManagerInterface $em
@@ -151,25 +111,6 @@ class ContainerStateController extends BaseController
      *
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws ElementNotFoundException
-     * @Route("/containers/{containerId}/state", name="show_container_state", methods={"GET"})
-     *
-     * @OAS\Get(path="/containers/{containerId}/state",
-     *  tags={"containerStates"},
-     *  @OAS\Parameter(
-     *      description="ID von Container",
-     *      in="path",
-     *      name="containerId",
-     *      required=true,
-     *      @OAS\Schema(
-     *         type="integer"
-     *      ),
-     *  ),
-     *
-     *  @OAS\Response(
-     *      response=200,
-     *      description="Aktueller Status des Contianers"
-     *  ),
-     * )
      */
     public function showCurrentStateAction(int $containerId, ContainerStateApi $api, EntityManagerInterface $em)
     {

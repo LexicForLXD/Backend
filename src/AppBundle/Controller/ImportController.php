@@ -16,7 +16,6 @@ use Dtc\QueueBundle\Entity\Job;
 use Dtc\QueueBundle\Entity\JobArchive;
 
 use Symfony\Component\Routing\Annotation\Route;
-use Swagger\Annotations as OAS;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,14 +31,6 @@ class ImportController extends BaseController
      * Import all images from one host.
      *
      * @Route("/sync/hosts/{hostId}/images", name="import_images", methods={"POST"})
-     *
-     * @OAS\Post(path="/sync/hosts/{hostId}/images",
-     *     tags={"import"},
-     *     @OAS\Response(
-     *          response=202,
-     *          description="info if task was started"
-     *     ),
-     * )
      *
      * @param $hostId
      * @param ImportWorker $worker
@@ -65,14 +56,6 @@ class ImportController extends BaseController
      * Import all containers from one host.
      *
      * @Route("/sync/hosts/{hostId}/containers", name="import_containers", methods={"POST"})
-     *
-     * @OAS\Post(path="/sync/hosts/{hostId}/containers",
-     *     tags={"import"},
-     *     @OAS\Response(
-     *          response=202,
-     *          description="info if task was started"
-     *     ),
-     * )
      *
      * @param $hostId
      * @param ImportWorker $worker
@@ -100,14 +83,6 @@ class ImportController extends BaseController
      *
      * @Route("/sync/hosts/{hostId}/storage-pools", name="import_storage_pools", methods={"POST"})
      *
-     * @OAS\Post(path="/sync/hosts/{hostId}/storage-pools",
-     *     tags={"import"},
-     *     @OAS\Response(
-     *          response=202,
-     *          description="info if task was started"
-     *     ),
-     * )
-     *
      * @param $hostId
      * @param ImportWorker $worker
      * @return JsonResponse
@@ -134,14 +109,6 @@ class ImportController extends BaseController
      *
      * @Route("/sync/hosts/{hostId}/profiles", name="import_profiles", methods={"POST"})
      *
-     * @OAS\Post(path="/sync/hosts/{hostId}/profiles",
-     *     tags={"import"},
-     *     @OAS\Response(
-     *          response=202,
-     *          description="info if task was started"
-     *     ),
-     * )
-     *
      * @param $hostId
      * @param ImportWorker $worker
      * @return JsonResponse
@@ -167,14 +134,6 @@ class ImportController extends BaseController
      * Import all containers and images from one host.
      *
      * @Route("/sync/hosts/{hostId}", name="import_all", methods={"POST"})
-     *
-     * @OAS\Post(path="/sync/hosts/{hostId}",
-     *     tags={"import"},
-     *     @OAS\Response(
-     *          response=202,
-     *          description="info if task was started"
-     *     ),
-     * )
      *
      * @param $hostId
      * @param ImportWorker $worker

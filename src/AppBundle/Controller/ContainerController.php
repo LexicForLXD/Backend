@@ -28,7 +28,6 @@ use AppBundle\Entity\Image;
 use AppBundle\Entity\ImageAlias;
 
 use Symfony\Component\Routing\Annotation\Route;
-use Swagger\Annotations as OAS;
 
 
 class ContainerController extends BaseController
@@ -38,21 +37,6 @@ class ContainerController extends BaseController
      *
      * @Route("/containers", name="containers_all", methods={"GET"})
      *
-     * @OAS\Get(path="/containers",
-     *     tags={"containers"},
-     *      @OAS\Response(
-     *          response=200,
-     *          description="List of all containers",
-     *          @OAS\JsonContent(ref="#/components/schemas/container"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No containers found",
-     *      ),
-     * )
      * @throws ElementNotFoundException
      */
     public function indexAction()
@@ -75,33 +59,6 @@ class ContainerController extends BaseController
      *
      * @Route("/hosts/{hostId}/containers", name="containers_from_host", methods={"GET"})
      *
-     * @OAS\Get(path="/hosts/{hostId}/containers?fresh={fresh}",
-     *  tags={"containers"},
-     *  @OAS\Response(
-     *      response=200,
-     *      description="List of containers from one host",
-     *      @OAS\JsonContent(ref="#/components/schemas/container"),
-     *  ),
-     *
-     *  @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *
-     *  @OAS\Parameter(
-     *      description="true = force collect new data and return them, false = return cached data from the database",
-     *      in="query",
-     *      name="fresh",
-     *      @OAS\Schema(
-     *          type="boolean"
-     *      ),
-     *  ),
-     *)
      * @param Request $request
      * @param int $hostId
      * @param ContainerApi $api
@@ -155,202 +112,6 @@ class ContainerController extends BaseController
      * Create a new Container on a specific Host
      *
      * @Route("/hosts/{hostId}/containers", name="containers_store", methods={"POST"})
-     *
-     * @OAS\Post(path="/hosts/{hostId}/containers",
-     *  tags={"containers"},
-     *
-     *  @OAS\Parameter(
-     *      description="Gibt die Art an, wie der Container erstellt wird. (image, migration, copy, none) Default ist none",
-     *      in="query",
-     *      name="type",
-     *      @OAS\Schema(
-     *          type="string"
-     *      ),
-     *  ),
-     *
-     *
-     *
-     * @OAS\Parameter(
-     *  description="Parameters for the new Container with fingerprint",
-     *  in="body",
-     *  name="bodyFingerprint",
-     *  @OAS\Schema(
-     *      @OAS\Property(
-     *          property="name",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="architecture",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="profiles",
-     *          type="array",
-     *      ),
-     *      @OAS\Property(
-     *          property="ephemeral",
-     *          type="bool"
-     *      ),
-     *      @OAS\Property(
-     *          property="config",
-     *          type="string",
-     *      ),
-     *      @OAS\Property(
-     *          property="devices",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="fingerprint",
-     *          type="string"
-     *      )
-     *  ),
-     * ),
-     *
-     * @OAS\Parameter(
-     *  description="Parameters for the new Container with alias",
-     *  in="body",
-     *  name="bodyAlias",
-     *  @OAS\Schema(
-     *      @OAS\Property(
-     *          property="name",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="architecture",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="profiles",
-     *          type="array",
-     *      ),
-     *      @OAS\Property(
-     *          property="ephemeral",
-     *          type="bool"
-     *      ),
-     *      @OAS\Property(
-     *          property="config",
-     *          type="string",
-     *      ),
-     *      @OAS\Property(
-     *          property="devices",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="alias",
-     *          type="string"
-     *      )
-     *  ),
-     * ),
-     *
-     * @OAS\Parameter(
-     *  description="Parameters for the new Container with migration",
-     *  in="body",
-     *  name="bodyMigration",
-     *  @OAS\Schema(
-     *      @OAS\Property(
-     *          property="name",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="architecture",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="profiles",
-     *          type="array",
-     *      ),
-     *      @OAS\Property(
-     *          property="ephemeral",
-     *          type="bool"
-     *      ),
-     *      @OAS\Property(
-     *          property="config",
-     *          type="string",
-     *      ),
-     *      @OAS\Property(
-     *          property="devices",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="oldContainerId",
-     *          type="int"
-     *      ),
-     *      @OAS\Property(
-     *          property="containerOnly",
-     *          type="bool"
-     *      ),
-     *      @OAS\Property(
-     *          property="live",
-     *          type="bool"
-     *      )
-     *  ),
-     * ),
-     *
-     *  @OAS\Parameter(
-     *  description="Parameters for copying a Container",
-     *  in="body",
-     *  name="bodyCopy",
-     *  @OAS\Schema(
-     *      @OAS\Property(
-     *          property="name",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="architecture",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="profiles",
-     *          type="array",
-     *      ),
-     *      @OAS\Property(
-     *          property="ephemeral",
-     *          type="bool"
-     *      ),
-     *      @OAS\Property(
-     *          property="config",
-     *          type="string",
-     *      ),
-     *      @OAS\Property(
-     *          property="devices",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="oldContainerId",
-     *          type="int"
-     *      ),
-     *      @OAS\Property(
-     *          property="containerOnly",
-     *          type="bool"
-     *      )
-     *  ),
-     * ),
-     *
-     * @OAS\Parameter(
-     *  description="ID of the Host the container should be created on",
-     *  in="path",
-     *  name="hostId",
-     *  required=true,
-     *  @OAS\Schema(
-     *     type="integer"
-     *  ),
-     * ),
-     *
-     * @OAS\Response(
-     *  description="The Container was successfully created",
-     *  response=201
-     * ),
-     *
-     * @OAS\Response(
-     *     description="The Host was not found",
-     *     response=404
-     * ),
-     *
-     * @OAS\Response(
-     *     description="The input was wrong",
-     *     response=400
-     * )
-     * )
      *
      * @param Request $request
      * @param int $hostId
@@ -529,24 +290,6 @@ class ContainerController extends BaseController
      *
      * @Route("/containers/{containerId}", name="containers_show", methods={"GET"})
      *
-     * @OAS\Get(path="/containers/{containerId}",
-     * tags={"containers"},
-     * @OAS\Parameter(
-     *  description="ID of the Container",
-     *  in="path",
-     *  name="containerId",
-     *  required=true,
-     *   @OAS\Schema(
-     *         type="integer"
-     *   ),
-     * ),
-     *
-     * @OAS\Response(
-     *      response=200,
-     *      description="Returns the informationen of a single Container",
-     *      @OAS\JsonContent(ref="#/components/schemas/container"),
-     * ),
-     *)
      * @param Request $request
      * @param int $containerId
      * @param ContainerApi $api
@@ -602,22 +345,6 @@ class ContainerController extends BaseController
      *
      * @Route("/containers/{containerId}", name="containers_delete", methods={"DELETE"})
      *
-     *SWG\Delete(path="/containers/{containerId}",
-     * tags={"containers"},
-     * SWG\Parameter(
-     *  description="ID des Containers",
-     *  format="int64",
-     *  in="path",
-     *  name="containerId",
-     *  required=true,
-     *  type="integer"
-     * ),
-     *
-     * SWG\Response(
-     *      response=200,
-     *      description="show a single container"
-     * ),
-     *)
      * @param int $containerId
      * @param EntityManagerInterface $em
      * @param ContainerStateApi $stateApi
@@ -669,64 +396,6 @@ class ContainerController extends BaseController
      * @throws \Httpful\Exception\ConnectionErrorException
      * @Route("/containers/{containerId}", name="containers_update", methods={"PUT"})
      *
-     * @OAS\Put(path="/containers/{containerId}",
-     *  tags={"containers"},
-     *  @OAS\Parameter(
-     *      description="ID of the Container",
-     *      in="path",
-     *      name="containerId",
-     *      required=true,
-     *      @OAS\Schema(
-     *         type="integer"
-     *      ),
-     *  ),
-     *
-     *  @OAS\Parameter(
-     *      description="Body für die Namensaenderung eines Containers.",
-     *      in="body",
-     *      name="bodyName",
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="name",
-     *              type="string"
-     *          ),
-     *      ),
-     *  ),
-     *
-     *  @OAS\Parameter(
-     *      description="Body für die Aenderung eines Containers.",
-     *      in="body",
-     *      name="bodyProps",
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="config",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="devices",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="profiles",
-     *              type="array"
-     *          ),
-     *      ),
-     *  ),
-     *
-     *  @OAS\Response(
-     *      response=200,
-     *      description="Returns the informationen of a single Container",
-     *      @OAS\JsonContent(ref="#/components/schemas/container"),
-     *  ),
-     *  @OAS\Response(
-     *      response=400,
-     *      description="Returns an 400 error if the new is already chosen."
-     *  ),
-     *  @OAS\Response(
-     *      response=400,
-     *      description="Returns an 400 error if something else was wrong."
-     *  ),
-     * )
      */
     public function updateAction(Request $request, int $containerId, EntityManagerInterface $em, ProfileManagerApi $profileManagerApi, ContainerWorker $containerWorker)
     {

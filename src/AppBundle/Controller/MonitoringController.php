@@ -16,7 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Swagger\Annotations as OAS;
 
 class MonitoringController extends BaseController
 {
@@ -27,34 +26,6 @@ class MonitoringController extends BaseController
      * @throws ElementNotFoundException
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws WrongInputException
-     *
-     * @OAS\Get(path="/monitoring/logs/containers/{containerId}",
-     *     tags={"container-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Container",
-     *      in="path",
-     *      name="containerId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="List of all available logfiles for the Container as an array under the attribute logs",
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Container for the id found",
-     *      ),
-     *     @OAS\Response(
-     *          response=400,
-     *          description="Returns an LXD Error 'LXD-Error - {LXD-Response}' ",
-     *      ),
-     * )
      */
     public function listAllLogfilesForContainer($containerId, MonitoringApi $api)
     {
@@ -97,40 +68,6 @@ class MonitoringController extends BaseController
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @return Response
-     *
-     * @OAS\Get(path="/monitoring/logs/containers/{containerId}/{logfile}",
-     *     tags={"container-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Container",
-     *      in="path",
-     *      name="containerId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *     @OAS\Parameter(
-     *      description="Filename of the Logfile, including type",
-     *      in="path",
-     *      name="logfile",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Returns the File content as text/plain",
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Container for the id found",
-     *      ),
-     *     @OAS\Response(
-     *          response=400,
-     *          description="Returns an LXD Error 'LXD-Error - {LXD-Response}' ",
-     *      ),
-     * )
      */
     public function getSingleLogfileFromContainer($containerId, $logfile, MonitoringApi $api)
     {
@@ -162,40 +99,6 @@ class MonitoringController extends BaseController
      * @param HostSSH $ssh
      * @return Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Get(path="/monitoring/logs/hosts/{hostId}?logpath={logpath}",
-     *     tags={"host-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *     @OAS\Parameter(
-     *      description="Path of the logfile on the Host",
-     *      in="path",
-     *      name="logpath",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Returns the File content as text/plain",
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Host for the id found",
-     *      ),
-     *     @OAS\Response(
-     *          response=400,
-     *          description="Error getting the logfile",
-     *      ),
-     * )
      * @throws WrongInputException
      */
     public function getSingleLogfileFromHost($hostId, Request $request, HostSSH $ssh)
@@ -226,28 +129,6 @@ class MonitoringController extends BaseController
      * Get all ContainerStatus Nagios configurations for a Container
      * @Route("/monitoring/checks/containers/{containerId}", name="get_status_check_container", methods={"GET"})
      * @throws ElementNotFoundException
-     *
-     * @OAS\Get(path="/monitoring/checks/containers/{containerId}",
-     *     tags={"container-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Container",
-     *      in="path",
-     *      name="containerId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Returns the ContainerStatus",
-     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Container for the id found or no StatusCheck for Container found",
-     *      ),
-     * )
      */
     public function getStatusChecksContainer($containerId)
     {
@@ -281,60 +162,6 @@ class MonitoringController extends BaseController
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
      * @throws WrongInputExceptionArray
-     *
-     * @OAS\Post(path="/monitoring/checks/containers/{containerId}",
-     *     tags={"container-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Container",
-     *      in="path",
-     *      name="containerId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *     @OAS\Parameter(
-     *      in="body",
-     *      name="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *      @OAS\Property(
-     *          property="nagiosEnabled",
-     *          type="boolean",
-     *          example=true,
-     *      ),
-     *      @OAS\Property(
-     *          property="nagiosName",
-     *          type="string",
-     *          example="ContainerWebServer1",
-     *      ),
-     *      @OAS\Property(
-     *          property="nagiosUrl",
-     *          type="string",
-     *          example="https://nagios.example.com/pnp4nagios/",
-     *      ),
-     *      @OAS\Property(
-     *          property="checkName",
-     *          type="string",
-     *          example="check_http",
-     *      ),
-     *      @OAS\Property(
-     *          property="sourceNumber",
-     *          type="string",
-     *          example=0,
-     *      ),
-     *      ),
-     *      ),
-     *      @OAS\Response(
-     *          response=201,
-     *          description="Returns the ContainerStatus",
-     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Container for the id found",
-     *      ),
-     * )
      */
     public function createStatusCheckForContainer($containerId, Request $request)
     {
@@ -394,64 +221,6 @@ class MonitoringController extends BaseController
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
      * @throws WrongInputExceptionArray
-     *
-     * @OAS\Put(path="/monitoring/checks/{checkId}/containers",
-     *     tags={"container-monitoring"},
-     * @OAS\Parameter(
-     *      description="ID of the ContainerStatus",
-     *      in="path",
-     *      name="checkId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     * @OAS\Parameter(
-     *      in="body",
-     *      name="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *      @OAS\Property(
-     *          property="nagiosEnabled",
-     *          type="boolean",
-     *          example=true,
-     *      ),
-     *      @OAS\Property(
-     *          property="nagiosName",
-     *          type="string",
-     *          example="ContainerWebServer1",
-     *      ),
-     *      @OAS\Property(
-     *          property="nagiosUrl",
-     *          type="string",
-     *          example="https://nagios.example.com/pnp4nagios/",
-     *      ),
-     *      @OAS\Property(
-     *          property="checkName",
-     *          type="string",
-     *          example="check_http",
-     *      ),
-     *      @OAS\Property(
-     *          property="sourceNumber",
-     *          type="string",
-     *          example=0,
-     *      ),
-     *      ),
-     *      ),
-     * @OAS\Response(
-     *          response=200,
-     *          description="Returns the ContainerStatus",
-     *          @OAS\JsonContent(ref="#/components/schemas/containerStatus"),
-     *      ),
-     * @OAS\Response(
-     *          response=404,
-     *          description="No ContainerStatus for the id found",
-     *      ),
-     * @OAS\Response(
-     *          response=400,
-     *          description="Validation for new ContainerStatus object failed, wrong input",
-     *      ),
-     * )
      */
     public function configureStatusCheckForContainer($checkId, Request $request)
     {
@@ -495,27 +264,6 @@ class MonitoringController extends BaseController
      * @param $checkId
      * @return Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Delete(path="/monitoring/checks/{checkId}/containers",
-     *     tags={"container-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the ContainerStatus",
-     *      in="path",
-     *      name="checkId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=204,
-     *          description="ContainerStatus deleted",
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No ContainerStatus for the provided id found",
-     *      ),
-     * )
      */
     public function deleteContainerStatus($checkId)
     {
@@ -549,41 +297,6 @@ class MonitoringController extends BaseController
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
-     *
-     * @OAS\Get(path="/monitoring/checks/{checkId}/containers/graph?timerange={timerange}",
-     *     tags={"container-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the ContainerStatus",
-     *      in="path",
-     *      name="checkId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Parameter(
-     *      description="Define a custom timerange for the output graph, examples : -1day or -3weeks or -1year or yesterday",
-     *      in="path",
-     *      name="timerange",
-     *      required=false,
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Returns the Nagios stats graph as png with mime-type image/png",
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No ContainerStatus with ID found - returns json error with mime-type application/json",
-     *      ),
-     *
-     *     @OAS\Response(
-     *          response=400,
-     *          description="Error getting the Nagios graph image - returns json error with mime-type application/json",
-     *      ),
-     * )
      */
     public function getPnp4NagiosImageForContainer($checkId, Request $request, Pnp4NagiosApi $api)
     {
@@ -619,28 +332,6 @@ class MonitoringController extends BaseController
      * @param $hostId
      * @return Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Get(path="/monitoring/checks/hosts/{hostId}",
-     *     tags={"host-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Returns the HostStatuses",
-     *          @OAS\JsonContent(ref="#/components/schemas/hostStatus"),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Host for the id found or no HostStatus configuration for Host found",
-     *      ),
-     * )
      */
     public function getStatusChecksHost($hostId)
     {
@@ -674,41 +365,6 @@ class MonitoringController extends BaseController
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputException
-     *
-     * @OAS\Get(path="/monitoring/checks/{checkId}/hosts/graph?timerange={timerange}",
-     *     tags={"host-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the HostStatus",
-     *      in="path",
-     *      name="checkId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Parameter(
-     *      description="Define a custom timerange for the output graph, examples : -1day or -3weeks or -1year or yesterday",
-     *      in="path",
-     *      name="timerange",
-     *      required=false,
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Returns the Nagios stats graph as png with mime-type image/png",
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No HostStatus with ID found - returns json error with mime-type application/json",
-     *      ),
-     *
-     *     @OAS\Response(
-     *          response=400,
-     *          description="Error getting the Nagios graph image - returns json error with mime-type application/json",
-     *      ),
-     * )
      */
     public function getPnp4NagiosImageForHost($checkId, Request $request, Pnp4NagiosApi $api)
     {
@@ -747,60 +403,6 @@ class MonitoringController extends BaseController
      * @return JsonResponse|Response
      * @throws ElementNotFoundException
      * @throws WrongInputExceptionArray
-     *
-     * @OAS\Post(path="/monitoring/checks/hosts/{hostId}",
-     *     tags={"host-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *     @OAS\Parameter(
-     *      in="body",
-     *      name="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *      @OAS\Property(
-     *          property="nagiosEnabled",
-     *          type="boolean",
-     *          example=true,
-     *      ),
-     *      @OAS\Property(
-     *          property="nagiosName",
-     *          type="string",
-     *          example="LXC-Host1",
-     *      ),
-     *      @OAS\Property(
-     *          property="nagiosUrl",
-     *          type="string",
-     *          example="https://nagios.example.com/pnp4nagios/",
-     *      ),
-     *      @OAS\Property(
-     *          property="checkName",
-     *          type="string",
-     *          example="check_http",
-     *      ),
-     *      @OAS\Property(
-     *          property="sourceNumber",
-     *          type="string",
-     *          example=0,
-     *      ),
-     *      ),
-     *      ),
-     *      @OAS\Response(
-     *          response=201,
-     *          description="Returns the HostStatus",
-     *          @OAS\JsonContent(ref="#/components/schemas/hostStatus"),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Host for the id found",
-     *      ),
-     * )
      */
     public function createStatusCheckForHost($hostId, Request $request)
     {
@@ -860,60 +462,6 @@ class MonitoringController extends BaseController
      * @return Response
      * @throws ElementNotFoundException
      * @throws WrongInputExceptionArray
-     *
-     * @OAS\Put(path="/monitoring/checks/{checkId}/hosts",
-     *     tags={"host-monitoring"},
-     *      @OAS\Parameter(
-     *      description="ID of the HostStatus",
-     *      in="path",
-     *      name="checkId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Parameter(
-     *      in="body",
-     *      name="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *      @OAS\Property(
-     *          property="nagiosEnabled",
-     *          type="boolean",
-     *          example=true,
-     *      ),
-     *      @OAS\Property(
-     *          property="nagiosName",
-     *          type="string",
-     *          example="LXC-Host1",
-     *      ),
-     *      @OAS\Property(
-     *          property="nagiosUrl",
-     *          type="string",
-     *          example="https://nagios.example.com/pnp4nagios/",
-     *      ),
-     *      @OAS\Property(
-     *          property="checkName",
-     *          type="string",
-     *          example="check_http",
-     *      ),
-     *      @OAS\Property(
-     *          property="sourceNumber",
-     *          type="string",
-     *          example=0,
-     *      ),
-     *      ),
-     *      ),
-     * @OAS\Response(
-     *          response=200,
-     *          description="Returns the HostStatus",
-     *          @OAS\JsonContent(ref="#/components/schemas/hostStatus"),
-     *      ),
-     * @OAS\Response(
-     *          response=404,
-     *          description="No HostStatus for the id found",
-     *      ),
-     * )
      */
     public function configureStatusCheckForHost($checkId, Request $request)
     {
@@ -957,27 +505,6 @@ class MonitoringController extends BaseController
      * @param $checkId
      * @return Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Delete(path="/monitoring/checks/{checkId}/hosts",
-     *     tags={"host-monitoring"},
-     *     @OAS\Parameter(
-     *      description="ID of the HostStatus",
-     *      in="path",
-     *      name="checkId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=204,
-     *          description="HostStatus deleted",
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No HostStatus for the provided id found",
-     *      ),
-     * )
      */
     public function deleteHostStatus($checkId)
     {

@@ -18,7 +18,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Service\LxdApi\HostApi;
-use Swagger\Annotations as OAS;
 use AppBundle\Exception\WrongInputException;
 use AppBundle\Exception\WrongInputExceptionArray;
 
@@ -30,22 +29,6 @@ class HostController extends BaseController
      *
      * @Route("/hosts", name="hosts_index", methods={"GET"})
      * @return Response
-     *
-     * @OAS\Get(path="/hosts",
-     *      tags={"hosts"},
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Zeigt eine Liste aller Hosts an",
-     *          @OAS\JsonContent(ref="#/components/schemas/host"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *     @OAS\Response(
-     *          response=404,
-     *          description="No Images found",
-     *      ),
-     * )
      *
      * @throws ElementNotFoundException
      */
@@ -76,60 +59,6 @@ class HostController extends BaseController
      *
      * @throws WrongInputExceptionArray
      * @throws \Httpful\Exception\ConnectionErrorException
-     *
-     *
-     * @OAS\POST(path="/hosts",
-     *  tags={"hosts"},
-     * @OAS\Response(
-     *     response=201,
-     *     description="gibt den neu gespeicherten Host zurück",
-     *     @OAS\JsonContent(ref="#/components/schemas/host"),
-     *     @OAS\Schema(
-     *         type="array"
-     *     ),
-     *  ),
-     *
-     * @OAS\Parameter(
-     *      description="Parameters for new Host",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="ipv4",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="ipv6",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="domainName",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="name",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="mac",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="settings",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="port",
-     *              type="integer"
-     *          ),
-     *          @OAS\Property(
-     *              property="password",
-     *              type="string"
-     *          ),
-     *      ),
-     * ),
-     *)
      */
     public function storeAction(Request $request, EntityManagerInterface $em, HostApi $api)
     {
@@ -188,28 +117,6 @@ class HostController extends BaseController
      * @Route("/hosts/{hostId}", name="hosts_show", methods={"GET"})
      * @param int $hostId
      * @return Response
-     *
-     * @OAS\Get(path="/hosts/{hostId}",
-     *  tags={"hosts"},
-     *  @OAS\Parameter(
-     *     description="ID von anzuzeigendem Host",
-     *     in="path",
-     *     name="hostId",
-     *     required=true,
-     *     @OAS\Schema(
-     *         type="integer"
-     *     ),
-     *  ),
-     *
-     *  @OAS\Response(
-     *      response=200,
-     *      description="gibt einen Host zurück",
-     *      @OAS\JsonContent(ref="#/components/schemas/host"),
-     *      @OAS\Schema(
-     *          type="array"
-     *      ),
-     *  ),
-     * )
      * @throws ElementNotFoundException
      */
     public function showAction($hostId)
@@ -239,69 +146,6 @@ class HostController extends BaseController
      * @throws ConnectionErrorException
      * @throws ElementNotFoundException
      * @throws WrongInputExceptionArray
-     *
-     * @OAS\Put(path="/hosts/{hostId}",
-     *  tags={"hosts"},
-     *
-     * @OAS\Parameter(
-     *     description="ID von anzuzeigendem Host",
-     *     in="path",
-     *     name="hostId",
-     *     required=true,
-     *     @OAS\Schema(
-     *         type="integer"
-     *     ),
-     *  ),
-     *
-     * @OAS\Response(
-     *     response=201,
-     *     description="gibt den neu gespeicherten Host zurück",
-     *     @OAS\JsonContent(ref="#/components/schemas/host"),
-     *     @OAS\Schema(
-     *         type="array"
-     *     ),
-     *  ),
-     *
-     * @OAS\Parameter(
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="ipv4",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="ipv6",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="domainName",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="name",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="mac",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="settings",
-     *              type="string"
-     *          ),
-     *          @OAS\Property(
-     *              property="port",
-     *              type="integer"
-     *          ),
-     *          @OAS\Property(
-     *              property="password",
-     *              type="string"
-     *          ),
-     *      ),
-     * ),
-     *)
      */
     public function updateAction(Request $request, $hostId, EntityManagerInterface $em, HostApi $api)
     {
@@ -360,24 +204,6 @@ class HostController extends BaseController
      *
      * @throws ElementNotFoundException
      * @throws WrongInputException
-     *
-     * @OAS\Delete(path="/hosts/{hostId}",
-     *  tags={"hosts"},
-     * @OAS\Parameter(
-     *     description="ID von anzuzeigendem Host",
-     *     in="path",
-     *     name="hostId",
-     *     required=true,
-     *     @OAS\Schema(
-     *         type="integer"
-     *     ),
-     *  ),
-     *
-     * @OAS\Response(
-     *     response=204,
-     *     description="löscht einen Host"
-     *  ),
-     * )
      */
     public function deleteAction(int $hostId, EntityManagerInterface $em)
     {
@@ -415,40 +241,6 @@ class HostController extends BaseController
      * @throws ConnectionErrorException
      * @throws ElementNotFoundException
      * @throws WrongInputException
-     *
-     * @OAS\Post(path="/hosts/{hostId}/authorization",
-     *  tags={"hosts"},
-     *  @OAS\Parameter(
-     *     description="ID von anzuzeigendem Host",
-     *     in="path",
-     *     name="hostId",
-     *     required=true,
-     *     @OAS\Schema(
-     *         type="integer"
-     *     ),
-     *  ),
-     *
-     *  @OAS\Parameter(
-     *      description="password of lxd host",
-     *      in="body",
-     *      name="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              type="string",
-     *              property="password"
-     *          ),
-     *      ),
-     *  ),
-     *
-     *  @OAS\Response(
-     *      response = 200,
-     *      description="erfolgsmeldung dass Host erfolgreich authorisiert"
-     *  ),
-     *  @OAS\Response(
-     *      response = 400,
-     *      description="liefert den Fehler zurück."
-     * ))
      */
     public function authorizeAction(Request $request, $hostId, HostApi $api, EntityManagerInterface $em)
     {
