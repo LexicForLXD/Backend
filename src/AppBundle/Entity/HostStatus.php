@@ -5,7 +5,6 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
 
 
@@ -15,7 +14,6 @@ use JMS\Serializer\Annotation as JMS;
  * @ORM\Table(name="host_status")
  *
  * @ORM\Entity
- * @OAS\Schema(schema="hostStatus", type="object")
  */
 class HostStatus
 {
@@ -23,7 +21,6 @@ class HostStatus
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @OAS\Property(example="4")
      */
     protected $id;
 
@@ -32,8 +29,6 @@ class HostStatus
      * @ORM\Column(type="boolean")
      * @Assert\NotNull()
      * @Assert\Type("bool")
-     *
-     * @OAS\Property(example="true")
      */
     protected $nagiosEnabled;
 
@@ -43,8 +38,6 @@ class HostStatus
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     *
-     * @OAS\Property(example="LXC-Host1")
      */
     protected $nagiosName;
 
@@ -54,8 +47,6 @@ class HostStatus
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     *
-     * @OAS\Property(example="check_http")
      */
     protected $checkName;
 
@@ -65,8 +56,6 @@ class HostStatus
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("int")
-     *
-     * @OAS\Property(example="1")
      */
     protected $sourceNumber;
 
@@ -76,8 +65,6 @@ class HostStatus
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Url()
-     *
-     * @OAS\Property(example="https://nagios.example.com/pnp4nagios/")
      */
     protected $nagiosUrl;
 
@@ -100,7 +87,7 @@ class HostStatus
     /**
      * @return bool
      */
-    public function isNagiosEnabled(): bool
+    public function isNagiosEnabled() : bool
     {
         return $this->nagiosEnabled;
     }
@@ -116,7 +103,7 @@ class HostStatus
     /**
      * @return string
      */
-    public function getNagiosName(): string
+    public function getNagiosName() : string
     {
         return $this->nagiosName;
     }
@@ -132,7 +119,7 @@ class HostStatus
     /**
      * @return string
      */
-    public function getCheckName(): string
+    public function getCheckName() : string
     {
         return $this->checkName;
     }
@@ -148,7 +135,7 @@ class HostStatus
     /**
      * @return int
      */
-    public function getSourceNumber(): int
+    public function getSourceNumber() : int
     {
         return $this->sourceNumber;
     }
@@ -156,7 +143,7 @@ class HostStatus
     /**
      * @param int $sourceNumber
      */
-    public function setSourceNumber( $sourceNumber)
+    public function setSourceNumber($sourceNumber)
     {
         $this->sourceNumber = $sourceNumber;
     }
@@ -164,7 +151,7 @@ class HostStatus
     /**
      * @return string
      */
-    public function getNagiosUrl(): string
+    public function getNagiosUrl() : string
     {
         return $this->nagiosUrl;
     }

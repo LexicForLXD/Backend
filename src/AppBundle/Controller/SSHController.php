@@ -5,7 +5,6 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Swagger\Annotations as OAS;
 use AppBundle\Exception\WrongInputException;
 
 

@@ -5,7 +5,6 @@ namespace AppBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
-use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -18,7 +17,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *
  * @UniqueEntity("name")
  *
- * @OAS\Schema(schema="profile", type="object")
  */
 class Profile
 {
@@ -27,8 +25,7 @@ class Profile
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
-     * @OAS\Property(example="2")
-     * var integer
+     * @var integer
      */
     protected $id;
 
@@ -38,8 +35,7 @@ class Profile
      * @Assert\NotBlank()
      * @Assert\Type("string")
      *
-     * @OAS\Property(example="my-profilename")
-     * var string
+     * @var string
      */
     protected $name;
 
@@ -47,24 +43,21 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
      *
-     * @OAS\Property(example="Some description string")
-     * var string
+     * @var string
      */
     protected $description;
 
     /**
      * @ORM\Column(type="json_array", nullable=true)
      *
-     * @OAS\Property(example="Config JSON Object")
-     * var json_array
+     * @var json_array
      */
     protected $config;
 
     /**
      * @ORM\Column(type="json_array", nullable=true)
      *
-     * @OAS\Property(example="Devices JSON Object")
-     * var json_array
+     * @var json_array
      */
     protected $devices;
 
@@ -122,7 +115,8 @@ class Profile
     /**
      * @param Host $host
      */
-    public function removeHost(Host $host){
+    public function removeHost(Host $host)
+    {
         if (!$this->hosts->contains($host)) {
             return;
         }
@@ -145,7 +139,8 @@ class Profile
     /**
      * @param Container $container
      */
-    public function removeContainer(Container $container){
+    public function removeContainer(Container $container)
+    {
         if (!$this->containers->contains($container)) {
             return;
         }
@@ -164,7 +159,7 @@ class Profile
     /**
      * @return string | null
      */
-    public function getDescription() : ?string
+    public function getDescription() : ? string
     {
         return $this->description;
     }
@@ -180,7 +175,7 @@ class Profile
     /**
      * @return array | null
      */
-    public function getConfig() : ?array
+    public function getConfig() : ? array
     {
         return $this->config;
     }
@@ -196,7 +191,7 @@ class Profile
     /**
      * @return array | null
      */
-    public function getDevices() : ?array
+    public function getDevices() : ? array
     {
         return $this->devices;
     }
@@ -244,19 +239,18 @@ class Profile
     /**
      * @return array
      *
-     * @OAS\Property(property="hostId", example="[1]")
-     *
      * @JMS\VirtualProperty()
      */
-    public function getHostId(){
-        if($this->hosts->isEmpty()){
+    public function getHostId()
+    {
+        if ($this->hosts->isEmpty()) {
             return null;
         }
 
         $this->hosts->first();
-        do{
+        do {
             $ids[] = $this->hosts->current()->getId();
-        }while($this->hosts->next());
+        } while ($this->hosts->next());
 
         return $ids;
     }
@@ -264,19 +258,18 @@ class Profile
     /**
      * @return array
      *
-     * @OAS\Property(property="container_id", example="[1]")
-     *
      * @JMS\VirtualProperty()
      */
-    public function getContainerId(){
-        if($this->containers->isEmpty()){
+    public function getContainerId()
+    {
+        if ($this->containers->isEmpty()) {
             return null;
         }
 
         $this->containers->first();
-        do{
+        do {
             $ids[] = $this->containers->current()->getId();
-        }while($this->containers->next());
+        } while ($this->containers->next());
 
         return $ids;
     }
@@ -286,8 +279,9 @@ class Profile
      *
      * @return bool
      */
-    public function isUsedByContainer() : bool {
-        if($this->containers->count() > 0){
+    public function isUsedByContainer() : bool
+    {
+        if ($this->containers->count() > 0) {
             return true;
         }
 
@@ -299,11 +293,12 @@ class Profile
      * @param PersistentCollection $containers
      * @return int
      */
-    public function numberOfContainersMatchingProfile(PersistentCollection $containers) : int {
+    public function numberOfContainersMatchingProfile(PersistentCollection $containers) : int
+    {
         $total = 0;
-        for($i=0; $i<$containers->count(); $i++){
+        for ($i = 0; $i < $containers->count(); $i++) {
             $container = $containers->get($i);
-            if($this->containers->contains($container)){
+            if ($this->containers->contains($container)) {
                 $total++;
             }
         }
@@ -314,8 +309,9 @@ class Profile
      * Internally used to check if a profile is present on one or more hosts
      * @return bool
      */
-    public function linkedToHost() : bool {
-        if($this->hosts->count() > 0){
+    public function linkedToHost() : bool
+    {
+        if ($this->hosts->count() > 0) {
             return true;
         }
 
@@ -327,7 +323,8 @@ class Profile
      * @param Host $host
      * @return bool
      */
-    public function isHostLinked(Host $host) : bool {
+    public function isHostLinked(Host $host) : bool
+    {
         return $this->hosts->contains($host);
     }
 }

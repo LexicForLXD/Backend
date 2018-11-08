@@ -11,7 +11,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Swagger\Annotations as OAS;
 
 class ProfileController extends BaseController
 {
@@ -19,23 +18,7 @@ class ProfileController extends BaseController
      * Get all LXC-Profiles
      *
      * @Route("/profiles", name="profiles_all", methods={"GET"})
-     *
-     * @OAS\Get(path="/profiles",
-     *     tags={"profiles"},
-     *      @OAS\Response(
-     *          response=200,
-     *          description="List of all LXC-Profiles",
-     *          @OAS\JsonContent(ref="#/components/schemas/profile"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No LXC-Profiles found",
-     *      ),
-     * )
-     *
+     * 
      * @throws ElementNotFoundException
      */
     public function getAllProfiles()
@@ -58,29 +41,6 @@ class ProfileController extends BaseController
      *
      * @Route("/profiles/{profileId}", name="profile_single", methods={"GET"})
      *
-     * @OAS\Get(path="/profiles/{profileId}",
-     *  tags={"profiles"},
-     *  @OAS\Response(
-     *      response=200,
-     *      description="Detailed information about a specific LXC-Profile",
-     *      @OAS\JsonContent(ref="#/components/schemas/profile"),
-     *  ),
-     *  @OAS\Response(
-     *      description="No LXC-Profile for the provided id found",
-     *      response=404
-     * ),
-     *
-     *  @OAS\Parameter(
-     *      description="ID of the LXC-Profile",
-     *      in="path",
-     *      name="profileId",
-     *      required=true,
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *)
-     *
      * @throws ElementNotFoundException
      */
     public function getSingleProfile($profileId)
@@ -102,43 +62,6 @@ class ProfileController extends BaseController
      * Create a LXC-Profile
      *
      * @Route("/profiles", name="create_profile", methods={"POST"})
-     *
-     * @OAS\Post(path="/profiles",
-     * tags={"profiles"},
-     * @OAS\Parameter(
-     *      description="Parameters for the new LXC-Profile",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *      @OAS\Property(
-     *          property="name",
-     *          type="string",
-     *      ),
-     *      @OAS\Property(
-     *          property="description",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="config",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="devices",
-     *          type="string"
-     *      ),
-     *  ),
-     * ),
-     * @OAS\Response(
-     *  description="The provided values for the LXC-Profile are not valid",
-     *  response=400
-     * ),
-     * @OAS\Response(
-     *  description="The LXC-Profile was successfully created",
-     *  response=201,
-     *  @OAS\JsonContent(ref="#/components/schemas/profile"),
-     * ),
-     * )
      *
      * @param Request $request
      * @return JsonResponse|Response
@@ -178,56 +101,6 @@ class ProfileController extends BaseController
      * Edit a existing LXC-Profile
      *
      * @Route("/profiles/{profileId}", name="edit_profile", methods={"PUT"})
-     *
-     * @OAS\Put(path="/profiles/{profileId}",
-     * tags={"profiles"},
-     * @OAS\Parameter(
-     *      description="Parameters which should be used to update the LXC-Profile",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *      @OAS\Property(
-     *          property="name",
-     *          type="string",
-     *      ),
-     *      @OAS\Property(
-     *          property="description",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="config",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="devices",
-     *          type="string"
-     *      ),
-     *  ),
-     * ),
-     * @OAS\Parameter(
-     *  description="ID of the LXC-Profile",
-     *  in="path",
-     *  name="profileId",
-     *  required=true,
-     *  @OAS\Schema(
-     *     type="integer"
-     *  ),
-     * ),
-     * @OAS\Response(
-     *  description="No LXC-Profile for the provided id found",
-     *  response=404
-     * ),
-     * @OAS\Response(
-     *  description="The provided values for the LXC-Profile are not valid or the LXD Api call failed",
-     *  response=400
-     * ),
-     * @OAS\Response(
-     *  description="The LXC-Profile was successfully updated",
-     *  @OAS\JsonContent(ref="#/components/schemas/profile"),
-     *  response=201
-     * ),
-     * )
      *
      * @param $profileId
      * @param Request $request
@@ -288,30 +161,6 @@ class ProfileController extends BaseController
      *
      * @Route("/profiles/{profileId}", name="delete_profile", methods={"DELETE"})
      *
-     * @OAS\Delete(path="/profiles/{profileId}",
-     *  tags={"profiles"},
-     *  @OAS\Parameter(
-     *      description="ID of the LXC-Profile",
-     *      in="path",
-     *      name="profileId",
-     *      required=true,
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *  @OAS\Response(
-     *      response=204,
-     *      description="The LXC-Profile was successfully deleted",
-     *  ),
-     *  @OAS\Response(
-     *      response=400,
-     *      description="The LXC-Profile couldn't be deleted, because it is used by at least one Container or the LXD Api call failed",
-     *  ),
-     *  @OAS\Response(
-     *      description="No LXC-Profile for the provided id found",
-     *      response=404
-     * ),
-     *)
      * @throws \Httpful\Exception\ConnectionErrorException
      * @throws ElementNotFoundException
      * @throws WrongInputException

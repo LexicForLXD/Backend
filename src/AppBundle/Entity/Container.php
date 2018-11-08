@@ -15,7 +15,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Swagger\Annotations as OAS;
 use JMS\Serializer\Annotation as JMS;
 
 
@@ -26,7 +25,6 @@ use JMS\Serializer\Annotation as JMS;
  * @UniqueEntity("name")
  * @ORM\Entity
  *
- * @OAS\Schema(schema="container", type="object")
  */
 class Container
 {
@@ -35,7 +33,6 @@ class Container
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
-     * @OAS\Property(example="14")
      * @var integer
      */
     protected $id;
@@ -44,7 +41,6 @@ class Container
      * @ORM\Column(type="text")
      * @Assert\Type(type="string")
      * @Assert\NotBlank()
-     * @OAS\Property(example="WebServer1")
      * @var string
      */
     protected $name;
@@ -60,7 +56,6 @@ class Container
      * @ORM\Column(type="boolean")
      * @Assert\Type(type="bool")
      * @Assert\NotNull()
-     * @OAS\Property(example="false")
      * @var bool
      */
     protected $ephemeral;
@@ -68,7 +63,6 @@ class Container
     /**
      * @ORM\Column(type="text", nullable=true)
      * @Assert\Type(type="string")
-     * @OAS\Property(example="TODO Settings")
      * @var string
      */
     protected $state;
@@ -78,42 +72,36 @@ class Container
      * @var string
      * @ORM\Column(type="text", nullable=true)
      * @Assert\Type(type="string")
-     * @OAS\Property(example="x86_64")
      */
     protected $architecture;
 
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $config;
 
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $expandedConfig;
 
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @OAS\Property(example="{'root': {'path': '/'}}")
      */
     protected $devices;
 
     /**
      * @var array
      * @ORM\Column(type="json", nullable=true)
-     * @OAS\Property(example="{'root': {'path': '/'}}")
      */
     protected $expandedDevices;
 
     /**
      * @var
      * @ORM\Column(type="json", nullable=true)
-     * @OAS\Property(example="{'limits.cpu': '2'}")
      */
     protected $network;
 
@@ -271,7 +259,6 @@ class Container
 
     /**
      * @return int | null
-     * @OAS\Property(property="hostId", example="1")
      * @JMS\VirtualProperty()
      */
     public function getHostId()
@@ -611,8 +598,6 @@ class Container
 
     /**
      * @return array
-     *
-     * @OAS\Property(property="profile_id", example="[1]")
      *
      * @JMS\VirtualProperty()
      */

@@ -3,7 +3,6 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Swagger\Annotations as OAS;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -11,7 +10,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @package AppBundle\Entity
  * @ORM\Entity
  * @ORM\Table(name="imagealias")
- * @OAS\Schema(schema="imageAlias", type="object")
  */
 class ImageAlias
 {
@@ -19,7 +17,6 @@ class ImageAlias
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @OAS\Property(example="3")
      * @var integer
      */
     protected $id;
@@ -30,7 +27,6 @@ class ImageAlias
      * @Assert\NotBlank()
      * @Assert\Type("string")
      *
-     * @OAS\Property(example="my-alias")
      * @var string
      */
     protected $name;
@@ -39,7 +35,6 @@ class ImageAlias
      * @ORM\Column(type="string")
      * @Assert\Type("string")
      *
-     * @OAS\Property(example="This is a description string")
      * @var string
      */
     protected $description;

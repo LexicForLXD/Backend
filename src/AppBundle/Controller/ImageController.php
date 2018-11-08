@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Swagger\Annotations as OAS;
 
 class ImageController extends BaseController
 {
@@ -26,22 +25,6 @@ class ImageController extends BaseController
      * Get all Images
      *
      * @Route("/images", name="images_all", methods={"GET"})
-     *
-     * @OAS\Get(path="/images",
-     *     tags={"images"},
-     *      @OAS\Response(
-     *          response=200,
-     *          description="List of all Images",
-     *          @OAS\JsonContent(ref="#/components/schemas/image"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Images found",
-     *      ),
-     * )
      *
      * @throws ElementNotFoundException
      */
@@ -64,31 +47,6 @@ class ImageController extends BaseController
      * Get all Images on a specific Host
      *
      * @Route("/hosts/{hostId}/images", name="all_images_on_host", methods={"GET"})
-     *
-     * @OAS\Get(path="/hosts/{hostId}/images",
-     *     tags={"images"},
-     *     @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="List of all Images for a specified Host",
-     *          @OAS\JsonContent(ref="#/components/schemas/image"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Images on the Host found",
-     *      ),
-     * )
      *
      * @throws ElementNotFoundException
      */
@@ -119,40 +77,6 @@ class ImageController extends BaseController
      * @throws ElementNotFoundException
      * @throws WrongInputException
      * @throws WrongInputExceptionArray
-     * @OAS\Post(path="/hosts/{hostId}/images",
-     *     tags={"images"},
-     *     @OAS\Parameter(
-     *      description="ID of the Host",
-     *      in="path",
-     *      name="hostId",
-     *      required=true,
-     *        @OAS\Schema(
-     *          type="integer"
-     *        ),
-     *     ),
-     *     @OAS\Parameter(
-     *      description="Same body as the LXD Request body to create an Image from stopped Container or LXD Request body for source image case",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      ),
-     *      @OAS\Response(
-     *          response=202,
-     *          description="The placeholder image - some elements will be added after the image was async created - finished will then change to true - if the creation fails, finished stays false and an error attribute displays the error",
-     *          @OAS\JsonContent(ref="#/components/schemas/image"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *     @OAS\Response(
-     *          response=404,
-     *          description="No Host for the provided id found",
-     *      ),
-     *      @OAS\Response(
-     *          response=400,
-     *          description="Validation failed or there is a LXD Error",
-     *      ),
-     * )
      */
     public function createImage(int $hostId, Request $request, ImageWorker $imageWorker, EntityManagerInterface $em)
     {
@@ -270,31 +194,6 @@ class ImageController extends BaseController
      *
      * @Route("/images/{imageId}", name="delete_image", methods={"DELETE"})
      *
-     * @OAS\Delete(path="/images/{imageId}",
-     *     tags={"images"},
-     *     @OAS\Parameter(
-     *      description="ID of the Image",
-     *      in="path",
-     *      name="imageId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=204,
-     *          description="Image with the specified ImageId successfully deleted",
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Image with the ImageId found",
-     *      ),
-     *     @OAS\Response(
-     *          response=400,
-     *          description="There was an error deleting the Image, the error contains the message 'Couldn't delete alias - {LXD-Error}' or 'Couldn't delete image - {LXD-Error}'",
-     *      ),
-     * )
-     *
      * @param $imageId
      * @param ImageApi $api
      * @param ImageAliasApi $aliasApi
@@ -365,28 +264,6 @@ class ImageController extends BaseController
      *
      * @Route("/images/{imageId}", name="get_single_image", methods={"GET"})
      *
-     * @OAS\Get(path="/images/{imageId}",
-     *     tags={"images"},
-     *     @OAS\Parameter(
-     *      description="ID of the Image",
-     *      in="path",
-     *      name="imageId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Image with the specified ImageId",
-     *          @OAS\JsonContent(ref="#/components/schemas/image"),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Images with the ImageId found",
-     *      ),
-     * )
-     *
      * @throws ElementNotFoundException
      */
     public function getSingleImage($imageId)
@@ -408,41 +285,6 @@ class ImageController extends BaseController
      * Update an Image by its id
      *
      * @Route("/images/{imageId}", name="update_single_image", methods={"PUT"})
-     *
-     * @OAS\Put(path="/images/{imageId}",
-     *     tags={"images"},
-     *     @OAS\Parameter(
-     *      description="ID of the Image",
-     *      in="path",
-     *      name="imageId",
-     *      required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Parameter(
-     *      description="Same body as the LXD Request body to update an Image via Put",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      ),
-     *      @OAS\Response(
-     *          response=202,
-     *          description="The updated Image",
-     *          @OAS\JsonContent(ref="#/components/schemas/image"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *     @OAS\Response(
-     *          response=404,
-     *          description="No Image for the provided id found",
-     *      ),
-     *      @OAS\Response(
-     *          response=400,
-     *          description="Image update on LXD Api failed, the error message is 'Couldn't update Image - {LXD-Error}'",
-     *      ),
-     * )
      *
      * @param $imageId
      * @param Request $request

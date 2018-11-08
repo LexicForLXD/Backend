@@ -5,7 +5,6 @@ namespace AppBundle\Controller;
 
 
 use Symfony\Component\Routing\Annotation\Route;
-use Swagger\Annotations as OAS;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,54 +28,6 @@ class BackupScheduleController extends BaseController
      * Create a new backup schedule.
      *
      * @Route("/schedules", methods={"POST"})
-     *
-     * @OAS\Post(path="/schedules", tags={"backups"},
-     *
-     *  @OAS\Parameter(
-     *      description="body for backupschedule",
-     *      in="body",
-     *      name="bodyCreateSchedule",
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="name",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="description",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="executionTime",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="type",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="destination",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="containers",
-     *              type="array",
-     *          ),
-     *      ),
-     *  ),
-     *
-     *  @OAS\Response(
-     *      description="Created BackupSchedule",
-     *      response=201
-     *  ),
-     *  @OAS\Response(
-     *      description="Nonvalid input data",
-     *      response=400
-     *  ),
-     *  @OAS\Response(
-     *      description="Container not found",
-     *      response=404
-     *  ),
-     * )
      *
      * @param Request $request
      * @param EntityManagerInterface $em
@@ -121,25 +72,6 @@ class BackupScheduleController extends BaseController
      *
      * @Route("/schedules/{scheduleId}", methods={"DELETE"})
      *
-     * @OAS\Delete(path="/schedules/{scheduleId}", tags={"backups"},
-     *  @OAS\Parameter(
-     *      description="Which schedule should be deleted",
-     *      in="path",
-     *      name="scheduleId",
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *  @OAS\Response(
-     *      description="Success message",
-     *      response=204
-     *  ),
-     *  @OAS\Response(
-     *      description="Schedule not found",
-     *      response=404
-     *  ),
-     * )
-     *
      * @param integer $scheduleId
      * @param EntityManagerInterface $em
      * @param ScheduleSSH $sshApi
@@ -168,62 +100,6 @@ class BackupScheduleController extends BaseController
      * Update a BackupSchedule on the Host.
      *
      * @Route("/schedules/{scheduleId}", methods={"PUT"})
-     *
-     * @OAS\Put(path="/schedules/{scheduleId}", tags={"backups"},
-     *  @OAS\Parameter(
-     *      description="Which schedule should be updated",
-     *      in="path",
-     *      name="scheduleId",
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *  @OAS\Parameter(
-     *      description="body for backupschedule",
-     *      in="body",
-     *      name="bodyCreateSchedule",
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="name",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="description",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="executionTime",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="type",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="destination",
-     *              type="string",
-     *          ),
-     *          @OAS\Property(
-     *              property="containers",
-     *              type="array",
-     *          ),
-     *      ),
-     *  ),
-     *
-     *  @OAS\Response(
-     *      description="Updated BackupSchedule",
-     *      response=200
-     *  ),
-     *  @OAS\Response(
-     *      description="Nonvalid input data",
-     *      response=400
-     *  ),
-     *  @OAS\Response(
-     *      description="Container or Schedule not found",
-     *      response=404
-     *  ),
-     * )
-     *
      *
      * @param Request $request
      * @param integer $scheduleId
@@ -282,25 +158,6 @@ class BackupScheduleController extends BaseController
      *
      * @Route("/schedules/{scheduleId}", methods={"GET"})
      *
-     * @OAS\Get(path="/schedules/{scheduleId}", tags={"backups"},
-     *  @OAS\Parameter(
-     *      description="Which schedule should be shown",
-     *      in="path",
-     *      name="scheduleId",
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *  @OAS\Response(
-     *      description="one schedule",
-     *      response=200
-     *  ),
-     *  @OAS\Response(
-     *      description="Schedule not found",
-     *      response=404
-     *  ),
-     * )
-     *
      * @param integer $scheduleId
      * @return Response
      * @throws ElementNotFoundException
@@ -324,17 +181,6 @@ class BackupScheduleController extends BaseController
      * List all BackupSchedules
      *
      * @Route("/schedules", methods={"GET"})
-     *
-     * @OAS\Get(path="/schedules", tags={"backups"},
-     *  @OAS\Response(
-     *      description="All schedules",
-     *      response=200
-     *  ),
-     *  @OAS\Response(
-     *      description="Schedules not found",
-     *      response=404
-     *  ),
-     * )
      *
      * @return Response
      * @throws ElementNotFoundException

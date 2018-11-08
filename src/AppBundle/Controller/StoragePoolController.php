@@ -18,7 +18,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Swagger\Annotations as OAS;
 use AppBundle\Entity\StoragePool;
 
 class StoragePoolController extends BaseController
@@ -27,31 +26,6 @@ class StoragePoolController extends BaseController
      * Get all storage pools from one host
      *
      * @Route("/hosts/{hostId}/storage-pools", name="storage_pool_all_from_host", methods={"GET"})
-     *
-     * @OAS\Get(path="/hosts/{hostId}/storage-pools",
-     *     tags={"storage-pools"},
-     *      @OAS\Response(
-     *          response=200,
-     *          description="List of all storage pools",
-     *          @OAS\JsonContent(ref="#/components/schemas/storage_pool"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *      @OAS\Parameter(
-     *          description="ID of the Host",
-     *          in="path",
-     *          name="hostId",
-     *          required=true,
-     *          @OAS\Schema(
-     *              type="integer"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No storage pools found",
-     *      ),
-     * )
      *
      * @param $hostId
      * @return Response
@@ -78,22 +52,6 @@ class StoragePoolController extends BaseController
      *
      * @Route("/storage-pools", name="storage_pool_all", methods={"GET"})
      *
-     * @OAS\Get(path="//storage-pools",
-     *     tags={"storage-pools"},
-     *      @OAS\Response(
-     *          response=200,
-     *          description="List of all storage pools",
-     *          @OAS\JsonContent(ref="#/components/schemas/storage_pool"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No storage pools found",
-     *      ),
-     * )
-     *
      * @return Response
      * @throws ElementNotFoundException
      */
@@ -117,29 +75,6 @@ class StoragePoolController extends BaseController
      * Get a single storage pool by its id
      *
      * @Route("/storage-pools/{storagePoolId}", name="storage_pool_single", methods={"GET"})
-     *
-     * @OAS\Get(path="/storage-pools/{storagePoolId}",
-     *  tags={"storage-pools"},
-     *  @OAS\Response(
-     *      response=200,
-     *      description="Detailed information about a specific storage pool",
-     *      @OAS\JsonContent(ref="#/components/schemas/storage_pool"),
-     *  ),
-     *  @OAS\Response(
-     *      description="No storage pool for the provided id found",
-     *      response=404
-     * ),
-     *
-     *  @OAS\Parameter(
-     *      description="ID of the storage pool",
-     *      in="path",
-     *      name="storagePoolId",
-     *      required=true,
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *)
      *
      * @param $storagePoolId
      * @return Response
@@ -165,48 +100,6 @@ class StoragePoolController extends BaseController
      * Create a storage pool
      *
      * @Route("/hosts/{hostId}/storage-pools", name="create_storage_pool", methods={"POST"})
-     *
-     * @OAS\Post(path="/hosts/{hostId}/storage-pools",
-     * tags={"storage-pools"},
-     * @OAS\Parameter(
-     *      description="Parameters for the new storage pool",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *      @OAS\Property(
-     *          property="name",
-     *          type="string",
-     *      ),
-     *      @OAS\Property(
-     *          property="driver",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="config",
-     *          type="string"
-     *      ),
-     *  ),
-     * ),
-     * @OAS\Parameter(
-     *  description="ID of the Host the storage pool should be created on",
-     *  in="path",
-     *  name="hostId",
-     *  required=true,
-     *  @OAS\Schema(
-     *     type="integer"
-     *  ),
-     * ),
-     * @OAS\Response(
-     *  description="The provided values for the storage pool are not valid",
-     *  response=400
-     * ),
-     * @OAS\Response(
-     *  description="The storage pool was successfully created",
-     *  response=201,
-     *  @OAS\JsonContent(ref="#/components/schemas/storage_pool"),
-     * ),
-     * )
      *
      * @param Request $request
      * @param int $hostId
@@ -256,56 +149,6 @@ class StoragePoolController extends BaseController
      *
      * @Route("/storage-pools/{storagePoolId}", name="edit_storage_pool", methods={"PUT"})
      *
-     * @OAS\Put(path="/storage-pools/{storagePoolId}",
-     * tags={"storage-pools"},
-     * @OAS\Parameter(
-     *      description="Parameters which should be used to update the storage pool",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *      @OAS\Property(
-     *          property="name",
-     *          type="string",
-     *      ),
-     *      @OAS\Property(
-     *          property="description",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="config",
-     *          type="string"
-     *      ),
-     *      @OAS\Property(
-     *          property="devices",
-     *          type="string"
-     *      ),
-     *  ),
-     * ),
-     * @OAS\Parameter(
-     *  description="ID of the storage pool",
-     *  in="path",
-     *  name="storagePoolId",
-     *  required=true,
-     *  @OAS\Schema(
-     *     type="integer"
-     *  ),
-     * ),
-     * @OAS\Response(
-     *  description="No storage pool for the provided id found",
-     *  response=404
-     * ),
-     * @OAS\Response(
-     *  description="The provided values for the storage pool are not valid or the LXD Api call failed",
-     *  response=400
-     * ),
-     * @OAS\Response(
-     *  description="The storage pool was successfully updated",
-     *  @OAS\JsonContent(ref="#/components/schemas/storage_pool"),
-     *  response=201
-     * ),
-     * )
-     *
      * @param $storagePoolId
      * @param Request $request
      * @param EntityManagerInterface $em
@@ -350,31 +193,7 @@ class StoragePoolController extends BaseController
      * Delete a existing storage pool
      *
      * @Route("/storage-pools/{storagePoolId}", name="delete_storage_pool", methods={"DELETE"})
-     *
-     * @OAS\Delete(path="/storage-pools/{storagePoolId}",
-     *  tags={"storage-pools"},
-     *  @OAS\Parameter(
-     *      description="ID of the storage pool",
-     *      in="path",
-     *      name="storagePoolId",
-     *      required=true,
-     *      @OAS\Schema(
-     *          type="integer"
-     *      ),
-     *  ),
-     *  @OAS\Response(
-     *      response=204,
-     *      description="The storage pool was successfully deleted",
-     *  ),
-     *  @OAS\Response(
-     *      response=400,
-     *      description="The storage pool couldn't be deleted, because it is used by at least one Container or the LXD Api call failed",
-     *  ),
-     *  @OAS\Response(
-     *      description="No storage pool for the provided id found",
-     *      response=404
-     * ),
-     *)
+     * 
      * @param $storagePoolId
      * @param EntityManagerInterface $em
      * @param StorageApi $storageApi

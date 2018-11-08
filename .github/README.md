@@ -5,7 +5,8 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/43ce32100dde4fcfabe9e67fbc3f06f8)](https://www.codacy.com/app/LexicForLXD/Backend?utm_source=github.com&utm_medium=referral&utm_content=LexicForLXD/Backend&utm_campaign=Badge_Grade)
 
-<!-- [![coverage report](https://git.janrtr.de/syp-lxc/Backend/badges/master/coverage.svg)](https://git.janrtr.de/syp-lxc/Backend/commits/master) -->
+Lexic is a container management system for lxc. It can connect to multiple lxc host and manage these.
+The backend interacts directly with lxc and the frontend connects to the backend.
 
 ## Requirements
 
@@ -13,46 +14,22 @@
 
 ## Installation from Source
 
-### Resolve dependencies and set parameters
+Have a look [here](../docs/INSTALLATION.md) for detailed info.
 
-```
-composer install
-```
-
-### Create Database schema
-
-```php
-php bin/console doctrine:schema:update --force
-```
-
-### Password grant client erzeugen
-
-```php
-php bin/console fos:oauth-server:create-client --grant-type password --grant-type refresh_token
-```
-
-### User erzeugen
-
-```php
-php bin/console app:create-user
-```
-
-# Installation via Docker
+## Installation via Docker
 
 - see prod environment documentation [here](../docs/DOCKER.md)
 - see backend development environment documentation [here](../docs/DOCKER_DEV.md)
 
+## Getting started
+
+[here](../docs/GETTING_STARTED.md)
+
 ## Documentation
-
-### Create up to date Swagger documentation
-
-```php
-./vendor/bin/swagger -e vendor
-```
 
 ### Hosted swagger docs
 
-[here](https://lexicforlxd.github.io/Backend/?url=https://raw.githubusercontent.com/LexicForLXD/Backend/gh-pages/openapi.json)
+[here](https://lexicforlxd.github.io/Backend/?url=https://raw.githubusercontent.com/LexicForLXD/Backend/master/docs/openapi.yaml)
 
 ## License
 

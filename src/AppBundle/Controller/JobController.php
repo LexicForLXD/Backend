@@ -7,7 +7,6 @@ use AppBundle\Exception\ElementNotFoundException;
 use Dtc\QueueBundle\Entity\Job;
 use Dtc\QueueBundle\Entity\JobArchive;
 use Symfony\Component\Routing\Annotation\Route;
-use Swagger\Annotations as OAS;
 use Doctrine\ORM\EntityManagerInterface;
 
 
@@ -20,21 +19,6 @@ class JobController extends BaseController
      *
      * @Route("/jobs/containers", name="container_job_fetch", methods={"GET"})
      *
-     * @OAS\Get(path="/jobs/containers",
-     *     tags={"job"},
-     *     @OAS\Parameter(
-     *          description="Whether to show running or archived jobs. Default is running.",
-     *          in="query",
-     *          name="type",
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *     ),
-     *     @OAS\Response(
-     *          response=202,
-     *          description="all container jobs"
-     *     ),
-     * )
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
@@ -71,21 +55,6 @@ class JobController extends BaseController
      *
      * @Route("/jobs/containers/state", name="container_state_job_fetch", methods={"GET"})
      *
-     * @OAS\Get(path="/jobs/containers/state",
-     *     tags={"job"},
-     *     @OAS\Parameter(
-     *          description="Whether to show running or archived jobs. Default is running.",
-     *          in="query",
-     *          name="type",
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *     ),
-     *     @OAS\Response(
-     *          response=202,
-     *          description="all container state jobs"
-     *     ),
-     * )
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
@@ -120,22 +89,7 @@ class JobController extends BaseController
      * Returns all import jobs depending on the type.
      *
      * @Route("/jobs/import", name="import_fetch", methods={"GET"})
-     *
-     * @OAS\Get(path="/jobs/import",
-     *     tags={"job"},
-     *     @OAS\Parameter(
-     *          description="Whether to show running or archived jobs. Default is running.",
-     *          in="query",
-     *          name="type",
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *     ),
-     *     @OAS\Response(
-     *          response=202,
-     *          description="all import jobs"
-     *     ),
-     * )
+     * 
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
@@ -172,21 +126,6 @@ class JobController extends BaseController
      *
      * @Route("/jobs/backup", name="backup_job_fetch", methods={"GET"})
      *
-     * @OAS\Get(path="/jobs/backup",
-     *     tags={"job"},
-     *     @OAS\Parameter(
-     *          description="Whether to show running or archived jobs. Default is running.",
-     *          in="query",
-     *          name="type",
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *     ),
-     *     @OAS\Response(
-     *          response=202,
-     *          description="all backup jobs"
-     *     ),
-     * )
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
@@ -223,21 +162,6 @@ class JobController extends BaseController
      *
      * @Route("/jobs/images", name="image_job_fetch", methods={"GET"})
      *
-     * @OAS\Get(path="/jobs/images",
-     *     tags={"job"},
-     *     @OAS\Parameter(
-     *          description="Whether to show running or archived jobs. Default is running.",
-     *          in="query",
-     *          name="type",
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *     ),
-     *     @OAS\Response(
-     *          response=202,
-     *          description="all image jobs"
-     *     ),
-     * )
      * @param Request $request
      * @return Response
      * @throws ElementNotFoundException
@@ -278,33 +202,6 @@ class JobController extends BaseController
      * @param int $jobId
      * @param EntityManagerInterface $em
      * @return json
-     *
-     * 
-     * @OAS\Delete(path="/jobs/{jobId}",
-     *  tags={"jobs"},
-     * @OAS\Parameter(
-     *     description="ID von zu löschendem job",
-     *     in="path",
-     *     name="jobId",
-     *     required=true,
-     *     @OAS\Schema(
-     *         type="integer"
-     *     ),
-     *  ),
-     * @OAS\Parameter(
-     *          description="Whether to delete a running or archived job. Default is running.",
-     *          in="query",
-     *          name="type",
-     *          @OAS\Schema(
-     *              type="string"
-     *          ),
-     *     ),
-     *
-     * @OAS\Response(
-     *     response=204,
-     *     description="delete completed"
-     *  ),
-     * )
      */
     public function deleteJob(Request $request, int $jobId, EntityManagerInterface $em)
     {

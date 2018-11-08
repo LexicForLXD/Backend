@@ -12,7 +12,6 @@ use AppBundle\Exception\WrongInputExceptionArray;
 use AppBundle\Worker\BackupWorker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Swagger\Annotations as OAS;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,22 +24,6 @@ class BackupController extends BaseController
      *
      * @return Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Get(path="/backups",
-     *     tags={"backups"},
-     *      @OAS\Response(
-     *          response=200,
-     *          description="List of all successful Backups",
-     *          @OAS\JsonContent(ref="#/components/schemas/backup"),
-     *          @OAS\Schema(
-     *              type="array"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Backups found",
-     *      ),
-     * )
      */
     public function getAllBackups()
     {
@@ -64,34 +47,6 @@ class BackupController extends BaseController
      *
      * @return Response
      * @throws ElementNotFoundException
-     *
-     * @OAS\Get(path="/backups/{id}",
-     *     tags={"backups"},
-     *     @OAS\Parameter(
-     *      description="Id of the Backup",
-     *      name="id",
-     *      in="path",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="id",
-     *              type="int",
-     *          ),
-     *      ),
-     *      ),
-     *      @OAS\Response(
-     *          response=200,
-     *          description="Single Backup with the provided id",
-     *          @OAS\JsonContent(ref="#/components/schemas/backup"),
-     *          @OAS\Schema(
-     *              type="object"
-     *          ),
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Backup for the id found",
-     *      ),
-     * )
      */
     public function getBackupById($id)
     {
@@ -118,34 +73,6 @@ class BackupController extends BaseController
      * @return Response
      * @throws ForbiddenException
      * @throws WrongInputExceptionArray
-     * @OAS\Post(path="webhooks/backups?token={token}",
-     * tags={"backups"},
-     * @OAS\Parameter(
-     *      description="The authorization token set in the Backup Schedule",
-     *      name="token",
-     *      in="query",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="token",
-     *              type="string",
-     *          ),
-     *      ),
-     * ),
-     * @OAS\Response(
-     *  description="The provided parameters are invalid",
-     *  response=400
-     * ),
-     * @OAS\Response(
-     *  description="The backup token is invalid",
-     *  response=403
-     * ),
-     * @OAS\Response(
-     *  description="The new Backup object was created",
-     *  response=201,
-     *  @OAS\JsonContent(ref="#/components/schemas/backup"),
-     * ),
-     * )
      */
     public function backupCreationWebhook(Request $request, EntityManagerInterface $em)
     {
@@ -188,30 +115,6 @@ class BackupController extends BaseController
      * @param EntityManagerInterface $em
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @throws ElementNotFoundException
-     *
-     * @OAS\Delete(path="/backups/{id}",
-     *     tags={"backups"},
-     *     @OAS\Parameter(
-     *      description="Id of the Backup",
-     *      name="id",
-     *      in="path",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="id",
-     *              type="int",
-     *          ),
-     *      ),
-     *      ),
-     *      @OAS\Response(
-     *          response=204,
-     *          description="Backup for the provided id deleted",
-     *      ),
-     *      @OAS\Response(
-     *          response=404,
-     *          description="No Backup for the id found",
-     *      ),
-     * )
      */
     public function deleteBackupEntry($id, EntityManagerInterface $em)
     {
@@ -232,43 +135,6 @@ class BackupController extends BaseController
 
     /**
      * @Route("/backups", name="create_backup", methods={"POST"})
-     *
-     * @OAS\Post(path="/backups",
-     *  tags={"backups"},
-     *  @OAS\Parameter(
-     *      description="Create a manual backup of containers from the same host",
-     *      name="body",
-     *      in="body",
-     *      required=true,
-     *      @OAS\Schema(
-     *          @OAS\Property(
-     *              property="destination",
-     *              type="int",
-     *          ),
-     *          @OAS\Property(
-     *              property="containerIds",
-     *              type="array",
-     *          ),
-     *          @OAS\Property(
-     *              property="backupName",
-     *              type="string",
-     *          ),
-     *      ),
-     *  ),
-     *  @OAS\Response(
-     *      description="The provided parameters are invalid",
-     *      response=400
-     *  ),
-     *  @OAS\Response(
-     *      description="The backup token is invalid",
-     *      response=403
-     *  ),
-     *  @OAS\Response(
-     *      description="The new Backup object was created",
-     *      response=201,
-     *      @OAS\JsonContent(ref="#/components/schemas/backup"),
-     *  ),
-     * )
      *
      * @param Request $request
      * @param EntityManagerInterface $em

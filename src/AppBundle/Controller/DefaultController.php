@@ -4,16 +4,11 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Swagger\Annotations as SWG;
 
 class DefaultController extends BaseController
 {
     /**
      * @Route("/", name="homepage")
-     * SWG\Info(
-     *     title="Lexic API",
-     *     version="1.0"
-     * )
      */
     public function indexAction()
     {

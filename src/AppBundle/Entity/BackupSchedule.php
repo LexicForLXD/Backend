@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as OAS;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Entity\BackupDestination;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -17,7 +16,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @package AppBundle\Entity
  *
  * @ORM\Entity
- * @OAS\Schema(schema="backupSchedule", type="object")
  * @UniqueEntity("name")
  * @UniqueEntity("token")
  */
@@ -29,7 +27,6 @@ class BackupSchedule
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @OAS\Property(example="14")
      */
     protected $id;
 
@@ -39,7 +36,6 @@ class BackupSchedule
      * @ORM\Column(type="string", unique=true, nullable=false)
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     * @OAS\Property(example="Schedule1")
      */
     protected $name;
 
@@ -48,7 +44,6 @@ class BackupSchedule
      *
      * @ORM\Column(type="string", nullable=true)
      * @Assert\Type("string")
-     * @OAS\Property(example="Schedule1 des")
      */
     protected $description;
 
@@ -59,7 +54,6 @@ class BackupSchedule
      * @Assert\NotBlank()
      * @Assert\Choice({"daily", "weekly", "monthly"}, strict="true")
      * @Assert\Type("string")
-     * @OAS\Property(example="daily")
      */
     protected $executionTime;
 
@@ -82,7 +76,6 @@ class BackupSchedule
      * @Assert\NotBlank()
      * @Assert\Type("string")
      * @Assert\Choice({"full", "incremental"}, strict="true")
-     * @OAS\Property(example="full")
      */
     protected $type;
 
@@ -363,7 +356,7 @@ class BackupSchedule
         $commandTexts = '#!/bin/sh
 
         ';
-        
+
         $backupName = str_replace(" ", "", $this->name);
 
 
@@ -412,9 +405,9 @@ class BackupSchedule
                 '# Backup via duplicity
                 duplicity ' . $this->type . ' --no-encryption /tmp/' . $backupName . ' ' . $this->destination->getDestinationText($this->name);
         }
-        
+
         $commandTexts = $commandTexts .
-                '
+            '
 
             # Make api call to webhook
             curl -X POST -k ' . $this->webhookUrl . '

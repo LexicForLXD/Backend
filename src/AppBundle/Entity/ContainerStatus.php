@@ -6,7 +6,6 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as JMS;
-use Swagger\Annotations as OAS;
 
 
 /**
@@ -15,7 +14,6 @@ use Swagger\Annotations as OAS;
  * @ORM\Table(name="container_status")
  *
  * @ORM\Entity
- * @OAS\Schema(schema="containerStatus", type="object")
  */
 class ContainerStatus
 {
@@ -23,7 +21,6 @@ class ContainerStatus
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @OAS\Property(example="4")
      */
     protected $id;
 
@@ -33,7 +30,6 @@ class ContainerStatus
      * @Assert\NotNull()
      * @Assert\Type("bool")
      *
-     * @OAS\Property(example="true")
      */
     protected $nagiosEnabled;
 
@@ -44,7 +40,6 @@ class ContainerStatus
      * @Assert\NotBlank()
      * @Assert\Type("string")
      *
-     * @OAS\Property(example="ContainerWebServer1")
      */
     protected $nagiosName;
 
@@ -54,8 +49,6 @@ class ContainerStatus
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("string")
-     *
-     * @OAS\Property(example="check_http")
      */
     protected $checkName;
 
@@ -65,8 +58,6 @@ class ContainerStatus
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Type("int")
-     *
-     * @OAS\Property(example="1")
      */
     protected $sourceNumber;
 
@@ -76,8 +67,6 @@ class ContainerStatus
      * @Assert\NotNull
      * @Assert\NotBlank()
      * @Assert\Url()
-     *
-     * @OAS\Property(example="https://nagios.example.com/pnp4nagios/")
      */
     protected $nagiosUrl;
 
@@ -100,7 +89,7 @@ class ContainerStatus
     /**
      * @return bool
      */
-    public function isNagiosEnabled(): bool
+    public function isNagiosEnabled() : bool
     {
         return $this->nagiosEnabled;
     }
@@ -116,7 +105,7 @@ class ContainerStatus
     /**
      * @return null|String
      */
-    public function getNagiosName(): String
+    public function getNagiosName() : String
     {
         return $this->nagiosName;
     }
@@ -132,7 +121,7 @@ class ContainerStatus
     /**
      * @return null|String
      */
-    public function getNagiosUrl(): String
+    public function getNagiosUrl() : String
     {
         return $this->nagiosUrl;
     }
@@ -148,7 +137,7 @@ class ContainerStatus
     /**
      * @return String
      */
-    public function getCheckName(): string
+    public function getCheckName() : string
     {
         return $this->checkName;
     }
@@ -164,7 +153,7 @@ class ContainerStatus
     /**
      * @return int
      */
-    public function getSourceNumber(): int
+    public function getSourceNumber() : int
     {
         return $this->sourceNumber;
     }

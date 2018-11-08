@@ -1,0 +1,2820 @@
+openapi: 3.0.0
+info:
+  title: Lexic API
+  version: 0.9.9
+  description: Central set of REST Api endpoints to manage multi LXD Host environments
+paths:
+  #Backups
+  /backups:
+    get:
+      tags:
+        - backups
+      summary: Get all successful Backups
+      operationId: 'AppBundle\Controller\BackupController::getAllBackups'
+      responses:
+        "200":
+          description: List of all successful Backups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/backup"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Stores a new manual backup.
+      tags:
+        - backups
+      operationId: 'AppBundle\Controller\BackupController::storeBackupAction'
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                destination:
+                  type: integer
+                containerIds:
+                  type: array
+                  items:
+                    type: integer
+                name:
+                  type: string
+              required:
+                - destination
+                - containerIds
+                - name
+              example:
+                destination: 1
+                containerIds:
+                  - 1
+                  - 2
+                name: justabackup
+      responses:
+        "201":
+          description: The new Backup object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backup"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          description: The backup token is invalid
+  /backups/{id}:
+    get:
+      tags:
+        - backups
+      summary: Get single Backup by it's id
+      operationId: 'AppBundle\Controller\BackupController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the Backup
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Single Backup with the provided id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backup"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - backups
+      summary: Delete an existing Backup
+      operationId: 'AppBundle\Controller\BackupController::deleteBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the Backup
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Backup for the provided id deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /webhooks/backups:
+    post:
+      tags:
+        - backups
+      summary: Webhook to create a new Backup object based on a Backup Schedule
+      operationId: 'AppBundle\Controller\BackupController::backupCreationWebhook'
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token set in the Backup Schedule
+          required: true
+          schema:
+            type: string
+
+      responses:
+        "201":
+          description: The new Backup object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backup"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          description: The backup token is invalid
+  #BackupSchedules
+  /schedules:
+    get:
+      tags:
+        - backupSchedules
+      summary: Get all successful Backups
+      operationId: 'AppBundle\Controller\BackupScheduleController::getAllBackups'
+      responses:
+        "200":
+          description: List of all BackupSchedules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/backupSchedule"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Stores a new backupSchedule.
+      tags:
+        - backupSchedules
+      operationId: 'AppBundle\Controller\BackupScheduleController::storeBackupAction'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                executionTime:
+                  type: string
+                  enum:
+                    - "daily"
+                    - "weekly"
+                    - "monthly"
+                destination:
+                  type: integer
+                containerIds:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - destination
+                - containerIds
+                - name
+                - executionTime
+            example:
+              name: justabackup
+              description: Jus a description.
+              destination: 1
+              containerIds:
+                - 1
+                - 2
+              executionTime: daily
+      responses:
+        "201":
+          description: The new BackupSchedule object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupSchedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /schedules/{id}:
+    get:
+      tags:
+        - backupSchedules
+      summary: Get single BackupSchedule by it's id
+      operationId: 'AppBundle\Controller\BackupScheduleController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the BackupSchedule
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Single BackupSchedule with the provided id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupSchedule"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - backupSchedules
+      summary: Delete an existing BackupSchedule
+      operationId: 'AppBundle\Controller\BackupScheduleController::deleteBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the BackupSchedule
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: BackupSchedule for the provided id deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - backupSchedules
+      summary: Update an existing BackupSchedule
+      operationId: 'AppBundle\Controller\BackupScheduleController::updateBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the BackupSchedule
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                executionTime:
+                  type: string
+                  enum:
+                    - "daily"
+                    - "weekly"
+                    - "monthly"
+                destination:
+                  type: integer
+                containerIds:
+                  type: array
+                  items:
+                    type: integer
+              required:
+                - destination
+                - containerIds
+                - name
+                - executionTime
+            example:
+              name: justabackup
+              description: Jus a description.
+              destination: 1
+              containerIds:
+                - 1
+                - 2
+              executionTime: daily
+      responses:
+        "200":
+          description: The BackupSchedule object was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupSchedule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #backupDestinations
+  /backupdestinations:
+    get:
+      tags:
+        - backupDestinations
+      summary: Get all successful backupDestination
+      operationId: 'AppBundle\Controller\BackupDestinationController::getAllBackups'
+      responses:
+        "200":
+          description: List of all backupDestinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/backupDestination"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Stores a new backupDestination.
+      tags:
+        - backupDestinations
+      operationId: 'AppBundle\Controller\BackupDestinationController::storeBackupAction'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                hostname:
+                  type: string
+                protocol:
+                  type: string
+                path:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - protocol
+                - path
+            examples:
+              sftp:
+                summary: example for remote sftp
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: sftp
+                  path: /path/to/backupfolder
+                  hostname: remote.server.de
+                  username: user
+                  password: password
+              local:
+                summary: example for local filesystem
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: local
+      responses:
+        "201":
+          description: The new backupDestination object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupDestination"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /backupdestinations/{id}:
+    get:
+      tags:
+        - backupDestinations
+      summary: Get single backupDestination by it's id
+      operationId: 'AppBundle\Controller\BackupDestinationController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the backupDestination
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Single backupDestination with the provided id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupDestination"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - backupDestinations
+      summary: Delete an existing backupDestination
+      operationId: 'AppBundle\Controller\BackupDestinationController::deleteBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the backupDestination
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: backupDestination for the provided id deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - backupDestinations
+      summary: Update an existing backupDestination
+      operationId: 'AppBundle\Controller\BackupDestinationController::updateBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the backupDestination
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                hostname:
+                  type: string
+                protocol:
+                  type: string
+                path:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - protocol
+                - path
+            examples:
+              sftp:
+                summary: example for remote sftp
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: sftp
+                  path: /path/to/backupfolder
+                  hostname: remote.server.de
+                  username: user
+                  password: password
+              local:
+                summary: example for local filesystem
+                value:
+                  name: backupDest1
+                  description: Jus a description.
+                  protocol: local
+      responses:
+        "200":
+          description: The backupDestination object was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/backupDestination"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #containers
+  /containers:
+    get:
+      tags:
+        - containers
+      summary: Get all containers
+      responses:
+        "200":
+          description: List of all containers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/container"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /hosts/{hostId}/containers:
+    get:
+      tags:
+        - containers
+      summary: Get all containers from one host
+      operationId: 'AppBundle\Controller\ContainerController::getAllBackups'
+      parameters:
+        - name: fresh
+          in: query
+          description: If the config of the containers should be fetched fresh from the lxc host. defaults to false
+          schema:
+            type: string
+            example: "true"
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of all containers from selected host
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/container"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: Stores a new container.
+      tags:
+        - containers
+      operationId: 'AppBundle\Controller\ContainerController::storeBackupAction'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    architecture:
+                      type: string
+                      default: x86_64
+                    ephemeral:
+                      type: boolean
+                      default: false
+                    config:
+                      type: object
+                    devices:
+                      type: object
+                    storagePoolId:
+                      type: integer
+                    profiles:
+                      type: array
+                      items:
+                        type: integer
+                    fingerprint:
+                      type: string
+                  required:
+                    - name
+                    - storagePoolId
+                    - fingerprint
+                  example:
+                    name: c1
+                    description: Jus a description.
+                    architecture: x86_64
+                    storagePoolId: 1
+                    ephemeral: false
+                    profiles: [1, 2]
+                    fingerprint: 459b996bc8db8701fcbe87c09dbb7412c4e52858f40bd60b3a99ce329d09850fs
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    architecture:
+                      type: string
+                      default: x86_64
+                    ephemeral:
+                      type: boolean
+                      default: false
+                    config:
+                      type: object
+                    devices:
+                      type: object
+                    storagePoolId:
+                      type: integer
+                    profiles:
+                      type: array
+                      items:
+                        type: integer
+                    alias:
+                      type: string
+                  required:
+                    - name
+                    - storagePoolId
+                    - alias
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    architecture:
+                      type: string
+                      default: x86_64
+                    ephemeral:
+                      type: boolean
+                      default: false
+                    config:
+                      type: object
+                    devices:
+                      type: object
+                    storagePoolId:
+                      type: integer
+                    profiles:
+                      type: array
+                      items:
+                        type: integer
+                    oldContainerId:
+                      type: integer
+                    containerOnly:
+                      type: boolean
+                      default: true
+                  required:
+                    - name
+                    - storagePoolId
+                    - oldContainerId
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    architecture:
+                      type: string
+                      default: x86_64
+                    ephemeral:
+                      type: boolean
+                      default: false
+                    config:
+                      type: object
+                    devices:
+                      type: object
+                    storagePoolId:
+                      type: integer
+                    profiles:
+                      type: array
+                      items:
+                        type: integer
+                    oldContainerId:
+                      type: integer
+                    containerOnly:
+                      type: boolean
+                      default: true
+                    live:
+                      type: boolean
+                      default: false
+                  required:
+                    - name
+                    - storagePoolId
+                    - oldContainerId
+                  example:
+                    name: c4
+                    description: Jus a description.
+                    architecture: x86_64
+                    storagePoolId: 1
+                    ephemeral: false
+                    profiles: [1, 2]
+                    oldContainerId: 2
+            examples:
+              fingerprint:
+                summary: example for fingerprint
+                value:
+                  name: c1
+                  description: Jus a description.
+                  architecture: x86_64
+                  storagePoolId: 1
+                  ephemeral: false
+                  profiles: [1, 2]
+                  fingerprint: 459b996bc8db8701fcbe87c09dbb7412c4e52858f40bd60b3a99ce329d09850fs
+              alias:
+                summary: example for alias
+                value:
+                  name: c2
+                  description: Jus a description.
+                  architecture: x86_64
+                  storagePoolId: 1
+                  ephemeral: false
+                  profiles: [1, 2]
+                  alias: 1
+              copy:
+                summary: example for copy
+                value:
+                  name: c3
+                  description: Jus a description.
+                  architecture: x86_64
+                  storagePoolId: 1
+                  ephemeral: false
+                  profiles: [1, 2]
+                  oldContainerId: 2
+              migration:
+                summary: example for migratioon
+                value:
+                  name: c4
+                  description: Jus a description.
+                  architecture: x86_64
+                  storagePoolId: 1
+                  ephemeral: false
+                  profiles: [1, 2]
+                  oldContainerId: 2
+      responses:
+        "201":
+          description: The new container object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /containers/{id}:
+    get:
+      tags:
+        - containers
+      summary: Get single container by it's id
+      operationId: 'AppBundle\Controller\ContainerController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+        - name: fresh
+          in: query
+          description: If the config of the container should be fetched fresh from the lxc host. defaults to false
+          schema:
+            type: string
+            example: "true"
+
+      responses:
+        "200":
+          description: Single container with the provided id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - containers
+      summary: Delete an existing container
+      operationId: 'AppBundle\Controller\ContainerController::deleteBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: container for the provided id deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - containers
+      summary: Update an existing container
+      operationId: 'AppBundle\Controller\ContainerController::updateBackupEntry'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                ephemeral:
+                  type: boolean
+                  default: false
+                config:
+                  type: object
+                devices:
+                  type: object
+                profiles:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        "200":
+          description: The container object was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #containerStates
+  /containers/{containerId}/state:
+    get:
+      tags:
+        - containerStates
+      summary: Get state of container
+      operationId: 'AppBundle\Controller\ContainerStateController::getBackupById'
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: State of container
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/containerState"
+              example:
+                state: running
+                stateCode: 103
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - containerStates
+      summary: Update containers state
+      operationId: 'AppBundle\Controller\ContainerStateController::getBackupById'
+      parameters:
+        - name: id
+          in: path
+          description: Id of the container
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                timeout:
+                  type: integer
+                  default: 30
+                  description: in seconds
+                force:
+                  type: boolean
+                  default: false
+                stateful:
+                  type: boolean
+                  default: false
+              required:
+                - action
+      responses:
+        "200":
+          description: Single container updated with current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #hosts
+  /hosts:
+    get:
+      tags:
+        - hosts
+      summary: Gets all hosts
+      responses:
+        "200":
+          description: Array of hosts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/host"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - hosts
+      summary: Adds new host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                ipv4:
+                  type: string
+                ipv6:
+                  type: string
+                domainName:
+                  type: string
+                mac:
+                  type: string
+                port:
+                  type: integer
+                  default: 8443
+                password:
+                  type: string
+              required:
+                - name
+      responses:
+        "201":
+          description: The host object was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/host"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /hosts/{hostId}:
+    get:
+      tags:
+        - hosts
+      summary: Get one hosts
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: One host
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/host"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - hosts
+      summary: Update a host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                ipv4:
+                  type: string
+                ipv6:
+                  type: string
+                domainName:
+                  type: string
+                mac:
+                  type: string
+                port:
+                  type: integer
+                  default: 8443
+              required:
+                - name
+      responses:
+        "200":
+          description: One host
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/host"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    delete:
+      tags:
+        - hosts
+      summary: Delete a host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "204":
+          description: Host was successful deleted.
+  /hosts/{hostId}/authentication:
+    post:
+      tags:
+        - hosts
+      summary: Authentcate a host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required:
+                - password
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "200":
+          description: Successful authenticated
+
+  #images
+  /images:
+    get:
+      tags:
+        - images
+      summary: Get all images
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "200":
+          description: Array of images.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/image"
+  /hosts/{hostId}/images:
+    get:
+      tags:
+        - images
+      summary: Get all images from on host.
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "200":
+          description: Array of images.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/image"
+    post:
+      tags:
+        - images
+      summary: Create new image on host.
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of the host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - "container"
+                        - "image"
+                        - "url"
+                    name:
+                      type: string
+                      description: Container name if type == container
+                    server:
+                      type: string
+                      description: server if type == image
+                    protocol:
+                      type: string
+                      enum:
+                        - "lxd"
+                        - "simplestreams"
+                      default: "lxd"
+                    secret:
+                      type: string
+                    certificate:
+                      type: string
+                    fingerprint:
+                      type: string
+                    alias:
+                      type: string
+
+                filename:
+                  type: string
+                public:
+                  type: boolean
+                properties:
+                  type: object
+                auto_update:
+                  type: boolean
+                aliases:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      description:
+                        type: string
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "201":
+          description: Created image.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/image"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+  /images/{imageId}:
+    get:
+      tags:
+        - images
+      summary: Info about a single image
+      parameters:
+        - name: imageId
+          in: path
+          description: Id of image
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: requested image
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/image"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - images
+      summary: Delete a single image
+      parameters:
+        - name: imageId
+          in: path
+          description: Id of image
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Image with the specified ImageId successfully deleted
+        "400":
+          description: There was an error deleting the Image, the error contains the message 'Couldn't delete alias - {LXD-Error}' or 'Couldn't delete image - {LXD-Error}'
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - images
+      summary: update image by id
+      parameters:
+        - name: imageId
+          in: path
+          description: Id of image
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                public:
+                  type: boolean
+                properties:
+                  type: object
+                auto_update:
+                  type: boolean
+      responses:
+        "200":
+          description: requested image
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/image"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /images/{imageId}/aliases:
+    post:
+      tags:
+        - image-alias
+      summary: create alias for existing image
+      parameters:
+        - name: imageId
+          in: path
+          description: Id of image
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "201":
+          description: Created image-alias
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/image"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+  /images/aliases/{aliasId}:
+    delete:
+      tags:
+        - image-alias
+      summary: delete image-alias by id
+      parameters:
+        - name: aliasId
+          in: path
+          description: Id of alias
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: The ImageAlias was successfully deleted
+        "400":
+          description: Deleting of the ImageAlias for an Image which is in the creation process is not possible or a LXD Error
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags:
+        - image-alias
+      summary: change name or description of image-alias
+      parameters:
+        - name: aliasId
+          in: path
+          description: Id of alias
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "200":
+          description: image-alias successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/imageAlias"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #Import
+  /sync/hosts/{hostId}/images:
+    post:
+      tags:
+        - import
+      summary: Import all images from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+  /sync/hosts/{hostId}/containers:
+    post:
+      tags:
+        - import
+      summary: Import all containers from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+  /sync/hosts/{hostId}/storage-pools:
+    post:
+      tags:
+        - import
+      summary: Import all storage pools from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+  /sync/hosts/{hostId}/profiles:
+    post:
+      tags:
+        - import
+      summary: Import all profiles from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+  /sync/hosts/{hostId}:
+    post:
+      tags:
+        - import
+      summary: Import all from one host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: info if task was started
+
+  #jobs
+  /jobs/containers:
+    get:
+      tags:
+        - job
+      summary: get all container jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all container jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/containers/state:
+    get:
+      tags:
+        - job
+      summary: get all container state jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all container state jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/import:
+    get:
+      tags:
+        - job
+      summary: get all import jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all import jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/backup:
+    get:
+      tags:
+        - job
+      summary: get all backup jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all backup jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/images:
+    get:
+      tags:
+        - job
+      summary: get all image jobs
+      parameters:
+        - name: type
+          in: query
+          description: Whether to show running or archived jobs. Default is running.
+          schema:
+            type: string
+            example: "running"
+            enum:
+              - running
+              - archived
+      responses:
+        "200":
+          description: all image jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/job"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /jobs/{jobId}:
+    delete:
+      tags:
+        - job
+      summary: Delete job by id
+      parameters:
+        - name: jobId
+          in: path
+          description: Id of job
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: The job was successfully deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  #Containter-Monitoring
+  /monitoring/logs/containers/{containerId}:
+    get:
+      tags:
+        - container-monitoring
+      summary: List all available logfiles form one container
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of container
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of all available logfiles for the Container as an array under the attribute logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: string
+                      example: lxc.conf
+        "400":
+          description: Returns an LXD Error 'LXD-Error - {LXD-Response}'
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/logs/containers/{containerId}/{logfile}:
+    get:
+      tags:
+        - container-monitoring
+      summary: Get the content of a logfile
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of container
+          required: true
+          schema:
+            type: integer
+        - name: logfile
+          in: path
+          description: name of logfile with fileending
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns the filecontent as text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Returns an LXD Error 'LXD-Error - {LXD-Response}'
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/containers/{containerId}:
+    get:
+      tags:
+        - container-monitoring
+      summary: Get all containerstatus nagios configs for a container
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of container
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: list of all container status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/containerStatus"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - container-monitoring
+      summary: create container status config
+      parameters:
+        - name: containerId
+          in: path
+          description: Id of container
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                nagiosEnabled:
+                  type: boolean
+                nagiosName:
+                  type: string
+                nagiosUrl:
+                  type: string
+                checkName:
+                  type: string
+                sourceNumber:
+                  type: integer
+              required:
+                - nagiosEnabled
+                - nagiosName
+                - nagiosUrl
+                - checkName
+                - sourceNumber
+              example:
+                nagiosEnabled: true
+                nagiosName: ContainerWebServer
+                nagiosUrl: https://nagios.example.com/pnp4nagios/
+                checkName: check_http
+                sourceNumber: 0
+      responses:
+        "201":
+          description: created container status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/containerStatus"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/{checkId}/containers:
+    put:
+      tags:
+        - container-monitoring
+      summary: update container status config
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of container status
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                nagiosEnabled:
+                  type: boolean
+                nagiosName:
+                  type: string
+                nagiosUrl:
+                  type: string
+                checkName:
+                  type: string
+                sourceNumber:
+                  type: integer
+              required:
+                - nagiosEnabled
+                - nagiosName
+                - nagiosUrl
+                - checkName
+                - sourceNumber
+              example:
+                nagiosEnabled: true
+                nagiosName: ContainerWebServer
+                nagiosUrl: https://nagios.example.com/pnp4nagios/
+                checkName: check_http
+                sourceNumber: 0
+      responses:
+        "200":
+          description: updated container status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/containerStatus"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - container-monitoring
+      summary: delete container status config
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of container status
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: container status deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/{checkId}/containers/graph:
+    get:
+      tags:
+        - container-monitoring
+      summary: get nagios graph
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of container status
+          required: true
+          schema:
+            type: integer
+        - name: timerange
+          in: query
+          description: Define a custom timerange for the output graph, examples -1day or -3weeks or -1year or yesterday
+          schema:
+            type: string
+            example: -1year
+
+      responses:
+        "200":
+          description: Returns the Nagios stats graph as png with mime-type image/png
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Error getting the Nagios graph image - returns json error with mime-type application/json
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # Monitoring host
+  /monitoring/logs/hosts/{hostId}:
+    get:
+      tags:
+        - host-monitoring
+      summary: get content of single logfile
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+        - name: logpath
+          in: query
+          description: path of logfile on host
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns the filecontent as text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Error getting the logfile
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/hosts/{hostId}:
+    get:
+      tags:
+        - host-monitoring
+      summary: Get all hoststatus nagios configs for a host
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: list of all host status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/hostStatus"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - host-monitoring
+      summary: create host status config
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                nagiosEnabled:
+                  type: boolean
+                nagiosName:
+                  type: string
+                nagiosUrl:
+                  type: string
+                checkName:
+                  type: string
+                sourceNumber:
+                  type: integer
+              required:
+                - nagiosEnabled
+                - nagiosName
+                - nagiosUrl
+                - checkName
+                - sourceNumber
+              example:
+                nagiosEnabled: true
+                nagiosName: hostWebServer
+                nagiosUrl: https://nagios.example.com/pnp4nagios/
+                checkName: check_http
+                sourceNumber: 0
+      responses:
+        "201":
+          description: created host status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hostStatus"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/{checkId}/hosts:
+    put:
+      tags:
+        - host-monitoring
+      summary: update host status config
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of host status
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                nagiosEnabled:
+                  type: boolean
+                nagiosName:
+                  type: string
+                nagiosUrl:
+                  type: string
+                checkName:
+                  type: string
+                sourceNumber:
+                  type: integer
+              required:
+                - nagiosEnabled
+                - nagiosName
+                - nagiosUrl
+                - checkName
+                - sourceNumber
+              example:
+                nagiosEnabled: true
+                nagiosName: hostWebServer
+                nagiosUrl: https://nagios.example.com/pnp4nagios/
+                checkName: check_http
+                sourceNumber: 0
+      responses:
+        "200":
+          description: updated host status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hostStatus"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags:
+        - host-monitoring
+      summary: delete host status config
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of host status
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: host status deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /monitoring/checks/{checkId}/hosts/graph:
+    get:
+      tags:
+        - host-monitoring
+      summary: get nagios graph
+      parameters:
+        - name: checkId
+          in: path
+          description: Id of host status
+          required: true
+          schema:
+            type: integer
+        - name: timerange
+          in: query
+          description: Define a custom timerange for the output graph, examples -1day or -3weeks or -1year or yesterday
+          schema:
+            type: string
+            example: -1year
+
+      responses:
+        "200":
+          description: Returns the Nagios stats graph as png with mime-type image/png
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Error getting the Nagios graph image - returns json error with mime-type application/json
+        "404":
+          $ref: "#/components/responses/NotFound"
+  # Profiles
+  /profiles:
+    get:
+      summary: get all profiles
+      tags:
+        - profile
+      responses:
+        "200":
+          description: array with all profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/profile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags:
+        - profile
+      summary: create profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                config:
+                  type: object
+                devices:
+                  type: object
+      responses:
+        "201":
+          description: created profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/profile"
+  /profiles/{profileId}:
+    get:
+      summary: get single profile
+      tags:
+        - profile
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of profile
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: single profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/profile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: update single profile
+      tags:
+        - profile
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of profile
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                config:
+                  type: object
+                devicces:
+                  type: object
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "200":
+          description: single profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/profile"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+    delete:
+      summary: delete single profile
+      tags:
+        - profile
+      parameters:
+        - name: profileId
+          in: path
+          description: Id of profile
+          required: true
+          schema:
+            type: integer
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "204":
+          description: profile deleted
+
+  # Backup Restore
+  /restores/backups/{backupId}:
+    get:
+      summary: get all files in a duplicity backup
+      tags:
+        - backup-restore
+      parameters:
+        - name: backupId
+          in: path
+          description: Id of backup
+          required: true
+          schema:
+            type: integer
+        - name: host
+          in: query
+          description: ID of the Host, where the Duplicity command should be executed on. Could be any host which is allowed to access the Backups backupDestination
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Array of all Container backup tarballs included in the specified duplicity Backup
+        "400":
+          description: Error getting the list of files from the duplicity backup
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: restore backup
+      tags:
+        - backup-restore
+      parameters:
+        - name: backupId
+          in: path
+          description: Id of backup
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                tarball:
+                  type: string
+                containerName:
+                  type: string
+                hostId:
+                  type: integer
+      responses:
+        "201":
+          description: new container
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/container"
+        "400":
+          description: One of the body parameters is missing or an error occurred in the image restore process or in the Container creation
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # Storage pool
+  /hosts/{hostId}/storage-pools:
+    get:
+      summary: Get all storage pools from one host
+      tags:
+        - storage-pool
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: list of storage pools from single host
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/storagePool"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      summary: create storage pool
+      tags:
+        - storage-pool
+      parameters:
+        - name: hostId
+          in: path
+          description: Id of host
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                driver:
+                  type: string
+                config:
+                  type: string
+      responses:
+        "201":
+          description: new storage pool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/storagePool"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+  /storage-pools:
+    get:
+      summary: get all storage pools
+      tags:
+        - storage-pool
+      responses:
+        "200":
+          description: all storage pools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/storagePool"
+  /storage-pools/{storagePoolId}:
+    get:
+      summary: get single storage pool
+      tags:
+        - storage-pool
+      parameters:
+        - name: storagePoolId
+          in: path
+          description: Id of storage pool
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: single storage pool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/storagePool"
+        "404":
+          $ref: "#/components/response/NotFound"
+    put:
+      summary: update single storage pool
+      tags:
+        - storage-pool
+      parameters:
+        - name: storagePoolId
+          in: path
+          description: Id of storage pool
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                driver:
+                  type: string
+                config:
+                  type: string
+      responses:
+        "200":
+          description: new storage pool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/storagePool"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+    delete:
+      summary: delete storage pool
+      tags:
+        - storage-pool
+      parameters:
+        - name: storagePoolId
+          in: path
+          description: Id of storage pool
+          required: true
+          schema:
+            type: integer
+      responses: 
+        "204":
+          description: storage pool successfully deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # User
+  /users:
+    get:
+      summary: get all users
+      tags:
+        - user
+      responses:
+        "200":
+          description: list with all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/user"
+    post:
+      summary: create new user
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+  /users/{userId}:
+    get:
+      summary: get single user
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          description: Id of user
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: update single user
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          description: Id of user
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/WrongInput"
+    delete:
+      summary: delete single user
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          description: Id of user
+          required: true
+          schema:
+            type: integer
+      responses:
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "204":
+          description: successfully deleted user
+  /user:
+    get:
+      summary: get current user
+      tags:
+        - user
+      responses:
+        "200":
+          description: single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        
+        
+      
+
+components:
+  #Models
+  schemas:
+    backup:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        timestamp:
+          type: string
+          format: date-time
+          example: "2018-03-10T22:40:28+00:00"
+        destinationId:
+          type: integer
+          example: 1
+        containerIds:
+          type: array
+          items:
+            type: integer
+          example: [1]
+        backupScheduleId:
+          type: integer
+          example: 2
+      example:
+        id: 1
+        timestamp: 2018-03-10T22:40:28+00:00
+        destinationId: 1
+        containerIds: [1, 2]
+        backupScheduleId: 1
+    backupDestination:
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "DestName"
+        description:
+          type: string
+          example: "DestDesc"
+        path:
+          type: string
+          example: "/path/to/folder"
+        hostname:
+          type: string
+          example: "192.168.10.10"
+        protocol:
+          type: string
+          example: "sftp"
+        username:
+          type: string
+          example: "username"
+        password:
+          type: string
+          example: "password"
+      type: object
+    backupSchedule:
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "DestName"
+        description:
+          type: string
+          example: "DestDesc"
+        executionTime:
+          type: string
+          example: "daily"
+        destination:
+          $ref: "#/components/schemas/backupDestination"
+    container:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        hostId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: C1
+        ephemeral:
+          type: boolean
+          example: false
+        architecture:
+          type: string
+          example: x86_64
+        config:
+          type: object
+        expandedConfig:
+          type: object
+        devices:
+          type: object
+        expandedDevices:
+          type: object
+        profileIds:
+          type: array
+          items:
+            type: integer
+        state:
+          type: string
+          example: running
+        storagePool:
+          $ref: "#/components/schemas/storagePool"
+    containerState:
+      type: object
+      properties:
+        state:
+          type: string
+        stateCode:
+          type: integer
+    containerStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nagiosEnabled:
+          type: boolean
+          example: true
+        nagiosName:
+          type: string
+          example: ContainerWeb1
+        nagiosUrl:
+          type: string
+          example: https://nagios.example.com/pnp4nagios/
+        checkName:
+          type: string
+          example: check_http
+        sourceNumber:
+          type: integer
+          example: 1
+    host:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        ipv4:
+          type: string
+          example: "192.168.10.10"
+        ipv6:
+          type: string
+          example: fe80::50
+        domainName:
+          type: string
+          example: host.domain.de
+        mac:
+          type: string
+        port:
+          type: integer
+          example: 8443
+        authenticated:
+          type: boolean
+          example: false
+        containerIds:
+          type: array
+          items:
+            type: integer
+          example: [1, 2]
+        storagePoolIds:
+          type: array
+          items:
+            type: integer
+          example: [3, 4]
+    hostStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nagiosEnabled:
+          type: boolean
+          example: true
+        nagiosName:
+          type: string
+          example: Host1
+        nagiosUrl:
+          type: string
+          example: https://nagios.example.com/pnp4nagios/
+        checkName:
+          type: string
+          example: check_http
+        sourceNumber:
+          type: integer
+          example: 1
+    image:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        hostId:
+          type: integer
+          example: 1
+        fingerprint:
+          type: string
+          example: 459b996bc8db8701fcbe87c09dbb7412c4e52858f40bd60b3a99ce329d09850f
+        architecture:
+          type: string
+          example: x86_64
+        size:
+          type: integer
+        public:
+          type: boolean
+          example: false
+        filename:
+          type: string
+          example: imageName
+        finished:
+          type: boolean
+          example: false
+        aliases:
+          type: array
+          items:
+            $ref: "#/components/schemas/imageAlias"
+        properties:
+          type: object
+        containerId:
+          type: array
+          items:
+            type: integer
+    imageAlias:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Alias1
+        description:
+          type: string
+          example: Just a description
+    profile:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        hostId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Profile1
+        description:
+          type: string
+          example: Just a description+
+        config:
+          type: object
+        devices:
+          type: object
+        containerIds:
+          type: array
+          items:
+            type: integer
+    storagePool:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        hostId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: pool1
+        driver:
+          type: string
+          example: zfs
+        config:
+          type: object
+    job:
+      type: object
+      properties:
+        id:
+          type: integer
+        args:
+          type: string
+        className:
+          type: string
+        crcHash:
+          type: string
+        createdAt:
+          type: string
+        startedAt:
+          type: string
+        finishedAt:
+          type: string
+        updatedAt:
+          type: string
+        elapsed:
+          type: number
+        exceptions:
+          type: integer
+        failures:
+          type: integer
+        retries:
+          type: integer
+        stalls:
+          type: integer
+
+        maxExceptions:
+          type: integer
+        maxFailures:
+          type: integer
+        maxRetries:
+          type: integer
+        maxStalls:
+          type: integer
+        method:
+          type: string
+        runId:
+          type: string
+        status:
+          type: string
+        whenUs:
+          type: integer
+        workerName:
+          type: string
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+
+  #Responses
+  responses:
+    NotFound:
+      description: Entity was not found.
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: No <entity> for ID <ID> found
+    BadRequest:
+      description: There were some errors in the submitted data.
+      content:
+        application/json:
+          schema:
+            properties:
+              error:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: object
+                    properties:
+                      nameOfParameter:
+                        type: string
+                        example: The key is the parameter which has an error. The value is error.

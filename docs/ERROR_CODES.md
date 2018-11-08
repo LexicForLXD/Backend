@@ -4,7 +4,7 @@ NOT YET IMPLEMENTED
 
 | Code | Meaning                                                            |
 | ---- | ------------------------------------------------------------------ |
-| 200  | Operation was successful                                            |
+| 200  | Operation was successful                                           |
 | 201  | Entity was created                                                 |
 | 202  | Operation will be done in the background. No guaranty for success. |
 | 204  | Entity was deleted                                                 |
@@ -16,3 +16,4 @@ NOT YET IMPLEMENTED
 | 409  | Conflict. Maybe some associations which hinder a delete            |
 |      |                                                                    |
 | 500  | Internal server error                                              |
+| 503  | Method not allowed on this endpoint                                |
