@@ -1,8 +1,5 @@
 {
-  "verifyConditions": [
-    "@semantic-release/github",
-    "semantic-release-docker"
-  ],
+  "verifyConditions": ["@semantic-release/github", "semantic-release-docker"],
   "prepare": [
     {
       "path": "@semantic-release/changelog",
