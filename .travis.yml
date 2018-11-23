@@ -25,6 +25,7 @@ jobs:
         - cp app/config/parameters.yml.travis app/config/parameters.yml
         - php bin/console doctrine:schema:update --force --env=test
         - php bin/console doctrine:fixtures:load -n --env=test
+        - composer require phpunit/phpunit
       script: SYMFONY_DEPRECATIONS_HELPER=weak_vendors phpdbg -rrv ./vendor/bin/simple-phpunit -v
     - stage: release
       if: branch = master AND type != pull_request
