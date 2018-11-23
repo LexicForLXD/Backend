@@ -26,7 +26,7 @@ jobs:
         - php bin/console doctrine:schema:update --force --env=test
         - php bin/console doctrine:fixtures:load -n --env=test
         - composer require phpunit/phpunit
-      script: SYMFONY_PHPUNIT_VERSION=7.4 SYMFONY_DEPRECATIONS_HELPER=weak_vendors phpdbg -rr phpunit
+      script: phpdbg -rr ./vendor/phpunit
     - stage: release
       if: branch = master AND type != pull_request
       language: node_js
