@@ -1,34 +1,33 @@
 #script: phpdbg -r ./vendor/bin/simple-phpunit -v
+language: "php"
+php:
+  - "7.0"
+  - "7.1"
+  - "7.2"
+addons:
+  apt:
+    update: true
+services:
+  - postgresql
+before_install:
+  - sudo apt install libssh2-php
+  - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo $CERT_CRT >> client.crt
+  - echo echo $CERT_KEY >> client.key
+  - phpenv config-rm xdebug.ini
+install:
+  - composer install --no-interaction
+before_script:
+  - psql -c 'create database travis_lexic_test;' -U postgres
+  - cp app/config/parameters.yml.travis app/config/parameters.yml
+  - php bin/console doctrine:schema:update --force --env=test
+  - php bin/console doctrine:fixtures:load -n --env=test
+  - composer require phpunit/phpunit
+  # script: phpdbg -rr ./vendor/bin/phpunit
+script: SYMFONY_PHPUNIT_VERSION=7.4 SYMFONY_DEPRECATIONS_HELPER=weak_vendors ./vendor/bin/simple-phpunit
 
 jobs:
   include:
-    - stage: tests
-      language: php
-      php:
-        - "7.0"
-        - "7.1"
-        - "7.2"
-      addons:
-        apt:
-          update: true
-      services:
-        - postgresql
-      before_install:
-        - sudo apt install libssh2-php
-        - echo "extension = ssh2.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-        - echo $CERT_CRT >> client.crt
-        - echo echo $CERT_KEY >> client.key
-        - phpenv config-rm xdebug.ini
-      install:
-        - composer install --no-interaction
-      before_script:
-        - psql -c 'create database travis_lexic_test;' -U postgres
-        - cp app/config/parameters.yml.travis app/config/parameters.yml
-        - php bin/console doctrine:schema:update --force --env=test
-        - php bin/console doctrine:fixtures:load -n --env=test
-        - composer require phpunit/phpunit
-      # script: phpdbg -rr ./vendor/bin/phpunit
-      script: SYMFONY_PHPUNIT_VERSION=7.4 SYMFONY_DEPRECATIONS_HELPER=weak_vendors ./vendor/bin/simple-phpunit
     - stage: release
       if: branch = master AND type != pull_request
       language: node_js
