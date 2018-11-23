@@ -23,7 +23,7 @@ before_script:
   - php bin/console doctrine:fixtures:load -n --env=test
   - composer require phpunit/phpunit
   # script: phpdbg -rr ./vendor/bin/phpunit
-script: SYMFONY_PHPUNIT_VERSION=7.4 SYMFONY_DEPRECATIONS_HELPER=weak_vendors phpdbg -rr ./vendor/bin/simple-phpunit tests/AppBundle/Entity/ProfileEntityTest.php
+script: SYMFONY_PHPUNIT_VERSION=7.4 SYMFONY_DEPRECATIONS_HELPER=weak_vendors ./vendor/bin/simple-phpunit
 
 jobs:
   include:
