@@ -26,6 +26,10 @@ before_script:
   # script: phpdbg -rr ./vendor/bin/phpunit
 script: SYMFONY_PHPUNIT_VERSION=7.4 SYMFONY_DEPRECATIONS_HELPER=weak_vendors ./vendor/bin/simple-phpunit
 
+matrix:
+  allow_failures:
+    - php: "7.0"
+
 jobs:
   include:
     - stage: release
