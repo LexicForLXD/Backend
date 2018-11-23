@@ -23,7 +23,7 @@ jobs:
         - cp app/config/parameters.yml.travis app/config/parameters.yml
         - php bin/console doctrine:schema:update --force --env=test
         - php bin/console doctrine:fixtures:load -n --env=test
-      script: SYMFONY_PHPUNIT_VERSION=6.4 SYMFONY_DEPRECATIONS_HELPER=weak_vendors ./vendor/bin/simple-phpunit
+      script: SYMFONY_PHPUNIT_VERSION=6.4 SYMFONY_DEPRECATIONS_HELPER=weak_vendors phpdbg -r ./vendor/bin/simple-phpunit -v
     - stage: tests
       language: php
       php: "7.2"
